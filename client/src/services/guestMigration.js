@@ -231,12 +231,26 @@ export const migrateGuestDataToAccount =
 
     // =====================================================
     // NOTES
+    //
+    // Notes V2 can be linked to Subjects and pinned.
+    // Subjects were migrated first, so remap the guest
+    // subject ID to the newly-created account Subject ID.
     // =====================================================
 
     for (
       const note
       of guestData.notes
     ) {
+      const mappedSubjectId =
+        note.subjectId
+          ? subjectIdMap.get(
+              String(
+                note.subjectId
+              )
+            ) ||
+            null
+          : null;
+
       await apiRequest(
         "/api/notes",
         {
@@ -252,6 +266,14 @@ export const migrateGuestDataToAccount =
               content:
                 note.content ||
                 "",
+
+              subjectId:
+                mappedSubjectId,
+
+              pinned:
+                Boolean(
+                  note.pinned
+                ),
             }),
         }
       );
@@ -290,12 +312,49 @@ export const migrateGuestDataToAccount =
 
     // =====================================================
     // TASKS
+    //
+    // Tasks V2 stores more than a title. Preserve the guest
+    // subject link, priority and deadline fields while
+    // remapping the old local Subject ID to the new account
+    // Subject ID created above.
     // =====================================================
 
     for (
       const task
       of guestData.tasks
     ) {
+      const mappedSubjectId =
+        task.subjectId
+          ? subjectIdMap.get(
+              String(
+                task.subjectId
+              )
+            ) ||
+            null
+          : null;
+
+      const safePriority =
+        [
+          "low",
+          "medium",
+          "high",
+        ].includes(
+          task.priority
+        )
+          ? task.priority
+          : "medium";
+
+      const safeDueDate =
+        task.dueDate ||
+        null;
+
+      const safeDueTime =
+        safeDueDate &&
+        typeof task.dueTime ===
+          "string"
+          ? task.dueTime
+          : "";
+
       const createdTask =
         await apiRequest(
           "/api/tasks",
@@ -308,6 +367,18 @@ export const migrateGuestDataToAccount =
                 title:
                   task.title ||
                   "Untitled Task",
+
+                subjectId:
+                  mappedSubjectId,
+
+                priority:
+                  safePriority,
+
+                dueDate:
+                  safeDueDate,
+
+                dueTime:
+                  safeDueTime,
               }),
           }
         );

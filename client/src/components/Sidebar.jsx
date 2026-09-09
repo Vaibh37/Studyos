@@ -6,134 +6,172 @@ import {
   CalendarDays,
   Timer,
   BarChart3,
+  Trophy,
   Settings,
+  X,
 } from "lucide-react";
 
 const menuItems = [
   {
     label: "Dashboard",
+    page: "dashboard",
     icon: LayoutDashboard,
   },
-
   {
     label: "Tasks",
+    page: "tasks",
     icon: CheckSquare,
   },
-
   {
     label: "Subjects",
+    page: "subjects",
     icon: BookOpen,
   },
-
   {
     label: "Notes",
+    page: "notes",
     icon: FileText,
   },
-
   {
     label: "Calendar",
+    page: "calendar",
     icon: CalendarDays,
   },
-
   {
     label: "Focus",
+    page: "focus",
     icon: Timer,
   },
-
   {
     label: "Progress",
+    page: "progress",
     icon: BarChart3,
+  },
+  {
+    label: "Leaderboard",
+    page: "leaderboard",
+    icon: Trophy,
   },
 ];
 
 function Sidebar({
   activePage,
   onNavigate,
+  isOpen = false,
+  onClose,
 }) {
+  const navigate = (page) => {
+    onNavigate(page);
+  };
+
   return (
-    <aside className="sidebar">
+    <aside
+      className={`sidebar app-shell-v2-sidebar ${
+        isOpen ? "is-open" : ""
+      }`}
+      aria-label="StudyOS navigation"
+    >
+      {/* ================================================
+          LOGO
+      ================================================= */}
 
-      <div className="sidebar-logo">
+      <div className="sidebar-logo app-shell-v2-sidebar-header">
 
-        <div className="logo-mark">
-          S
+        <div className="app-shell-v2-brand">
+
+          <div className="logo-mark">
+            S
+          </div>
+
+          <span>
+            StudyOS
+          </span>
+
         </div>
 
-        <span>
-          StudyOS
-        </span>
+        <button
+          type="button"
+          className="app-shell-v2-sidebar-close"
+          onClick={onClose}
+          aria-label="Close navigation"
+        >
+          <X size={19} />
+        </button>
 
       </div>
 
-      <nav className="sidebar-nav">
+      {/* ================================================
+          NAVIGATION
+      ================================================= */}
 
-        {menuItems.map(
-          (item) => {
-            const Icon =
-              item.icon;
+      <nav className="sidebar-nav app-shell-v2-nav">
 
-            const page =
-              item.label.toLowerCase();
+        {menuItems.map((item) => {
+          const Icon = item.icon;
 
-            return (
-              <button
-                type="button"
-                key={
-                  item.label
-                }
-                className={`nav-item ${
-                  activePage ===
-                  page
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  onNavigate(
-                    page
-                  )
-                }
-              >
+          const active =
+            activePage === item.page;
 
-                <Icon
-                  size={20}
-                />
+          return (
+            <button
+              type="button"
+              key={item.page}
+              className={`nav-item ${
+                active ? "active" : ""
+              }`}
+              onClick={() =>
+                navigate(item.page)
+              }
+              aria-current={
+                active
+                  ? "page"
+                  : undefined
+              }
+            >
+              <Icon
+                size={19}
+                strokeWidth={1.8}
+              />
 
-                <span>
-                  {item.label}
-                </span>
-
-              </button>
-            );
-          }
-        )}
+              <span>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
 
       </nav>
+
+      {/* ================================================
+          SETTINGS
+      ================================================= */}
 
       <div className="sidebar-bottom">
 
         <button
           type="button"
           className={`nav-item ${
-            activePage ===
-            "settings"
+            activePage === "settings"
               ? "active"
               : ""
           }`}
           onClick={() =>
-            onNavigate(
-              "settings"
-            )
+            navigate("settings")
+          }
+          aria-current={
+            activePage === "settings"
+              ? "page"
+              : undefined
           }
         >
-
           <Settings
-            size={20}
+            size={19}
+            strokeWidth={1.8}
           />
 
           <span>
             Settings
           </span>
-
         </button>
 
       </div>

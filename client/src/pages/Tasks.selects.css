@@ -1,0 +1,152 @@
+/* =========================================================
+   STUDYOS TASKS — CUSTOM SELECT INTEGRATION
+========================================================= */
+
+.task-study-select {
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* =========================================================
+   BASE TASK SELECT
+========================================================= */
+
+.task-study-select
+.study-select-trigger {
+  width: 100%;
+
+  min-height: 39px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    var(--tasks-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--tasks-surface);
+
+  color:
+    var(--tasks-text);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.task-study-select
+.study-select-trigger:hover:not(:disabled) {
+  border-color:
+    var(--tasks-border-strong);
+
+  background:
+    var(--tasks-surface-2);
+}
+
+
+/* =========================================================
+   OPEN
+========================================================= */
+
+.task-study-select
+.study-select-trigger.open {
+  border-color:
+    var(--tasks-accent);
+
+  background:
+    var(--tasks-surface-2);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      99,
+      102,
+      241,
+      0.08
+    );
+}
+
+
+/* =========================================================
+   ADD TASK
+========================================================= */
+
+.add-task-study-select
+.study-select-trigger {
+  min-height: 39px;
+}
+
+
+/* =========================================================
+   TASK FILTER
+========================================================= */
+
+.task-filter-study-select
+.study-select-trigger {
+  min-height: 39px;
+
+  border-radius: 9px;
+
+  background:
+    var(--tasks-surface-2);
+}
+
+
+/* =========================================================
+   TASK EDIT
+========================================================= */
+
+.task-edit-study-select
+.study-select-trigger {
+  min-height: 38px;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   LIGHT THEME
+========================================================= */
+
+.light-theme
+.task-study-select
+.study-select-trigger {
+  border-color:
+    var(--tasks-border);
+
+  background:
+    var(--tasks-surface);
+
+  color:
+    var(--tasks-text);
+}
+
+.light-theme
+.task-filter-study-select
+.study-select-trigger {
+  background:
+    var(--tasks-surface-2);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+  max-width: 760px
+) {
+
+  .task-filter-study-select {
+    width: 100%;
+  }
+
+}

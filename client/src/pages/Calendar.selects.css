@@ -1,0 +1,400 @@
+/* =========================================================
+   STUDYOS CALENDAR
+   CUSTOM DATE + DROPDOWN CONTROLS
+========================================================= */
+
+.calendar-v3-page {
+  --calendar-control-surface:
+    #1b1f2a;
+
+  --calendar-control-surface-hover:
+    #202532;
+
+  --calendar-control-border:
+    #2a3040;
+
+  --calendar-control-border-strong:
+    #3a4357;
+
+  --calendar-control-text:
+    #f4f6fb;
+
+  --calendar-control-muted:
+    #8b93a7;
+}
+
+
+/* =========================================================
+   STUDY DATE PICKER VARIABLES
+
+   StudyDatePicker was originally created for Tasks and
+   expects these variables to exist.
+========================================================= */
+
+.calendar-v3-page
+.study-date-picker {
+  --tasks-surface:
+    var(
+      --calendar-control-surface
+    );
+
+  --tasks-surface-2:
+    var(
+      --calendar-control-surface-hover
+    );
+
+  --tasks-surface-3:
+    #242a36;
+
+  --tasks-border:
+    var(
+      --calendar-control-border
+    );
+
+  --tasks-border-strong:
+    var(
+      --calendar-control-border-strong
+    );
+
+  --tasks-text:
+    var(
+      --calendar-control-text
+    );
+
+  --tasks-muted:
+    var(
+      --calendar-control-muted
+    );
+
+  --tasks-faint:
+    #697286;
+
+  --tasks-accent:
+    #6366f1;
+}
+
+
+/* =========================================================
+   CUSTOM FORM FIELD
+========================================================= */
+
+.calendar-v3-form-field {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  gap: 8px;
+
+  color:
+    var(
+      --calendar-control-muted
+    );
+
+  font-size: 13px;
+}
+
+.calendar-v3-form-field
+> span {
+  display: block;
+}
+
+
+/* =========================================================
+   DATE PICKER
+========================================================= */
+
+.calendar-v3-form-field
+.study-date-picker {
+  width: 100%;
+
+  min-width: 0;
+}
+
+.calendar-v3-form-field
+.study-date-trigger {
+  width: 100%;
+
+  height: 43px;
+  min-height: 43px;
+
+  padding:
+    0
+    13px;
+
+  border:
+    1px solid
+    var(
+      --calendar-control-border
+    );
+
+  border-radius: 10px;
+
+  background:
+    var(
+      --calendar-control-surface
+    );
+
+  color:
+    var(
+      --calendar-control-text
+    );
+
+  font-size: 13px;
+}
+
+.calendar-v3-form-field
+.study-date-trigger:hover:not(
+  :disabled
+) {
+  border-color:
+    var(
+      --calendar-control-border-strong
+    );
+
+  background:
+    var(
+      --calendar-control-surface-hover
+    );
+}
+
+.calendar-v3-form-field
+.study-date-trigger.active {
+  border-color:
+    #6366f1;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      99,
+      102,
+      241,
+      0.08
+    );
+}
+
+
+/* =========================================================
+   EVENT TYPE DROPDOWN
+========================================================= */
+
+.calendar-v3-type-select {
+  width: 100%;
+
+  min-width: 0;
+}
+
+.calendar-v3-type-select
+.study-select-trigger {
+  width: 100%;
+
+  min-height: 43px;
+
+  padding:
+    0
+    13px;
+
+  border:
+    1px solid
+    var(
+      --calendar-control-border
+    );
+
+  border-radius: 10px;
+
+  background:
+    var(
+      --calendar-control-surface
+    );
+
+  color:
+    var(
+      --calendar-control-text
+    );
+
+  font-size: 13px;
+}
+
+.calendar-v3-type-select
+.study-select-trigger:hover:not(
+  :disabled
+) {
+  border-color:
+    var(
+      --calendar-control-border-strong
+    );
+
+  background:
+    var(
+      --calendar-control-surface-hover
+    );
+}
+
+.calendar-v3-type-select
+.study-select-trigger.open {
+  border-color:
+    #6366f1;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      99,
+      102,
+      241,
+      0.08
+    );
+}
+
+
+/* =========================================================
+   DO NOT CLIP FLOATING CONTROLS
+========================================================= */
+
+.calendar-form-card,
+.calendar-event-form,
+.calendar-v2-form,
+.calendar-v3-form-field {
+  overflow: visible;
+}
+
+
+/* =========================================================
+   LIGHT THEME
+========================================================= */
+
+.light-theme
+.calendar-v3-page {
+  --calendar-control-surface:
+    #ffffff;
+
+  --calendar-control-surface-hover:
+    #f7f8fb;
+
+  --calendar-control-border:
+    #dfe3ea;
+
+  --calendar-control-border-strong:
+    #cbd2dc;
+
+  --calendar-control-text:
+    #20242e;
+
+  --calendar-control-muted:
+    #697386;
+}
+
+.light-theme
+.calendar-v3-page
+.study-date-picker {
+  --tasks-surface:
+    #ffffff;
+
+  --tasks-surface-2:
+    #f7f8fb;
+
+  --tasks-surface-3:
+    #eef1f6;
+
+  --tasks-border:
+    #dfe3ea;
+
+  --tasks-border-strong:
+    #cbd2dc;
+
+  --tasks-text:
+    #20242e;
+
+  --tasks-muted:
+    #697386;
+
+  --tasks-faint:
+    #8a93a3;
+
+  --tasks-accent:
+    #6366f1;
+}
+
+
+/* =========================================================
+   FIX LIGHT THEME DATE PICKER PORTAL
+========================================================= */
+
+.light-theme
+.study-date-popover-portal {
+  --tasks-surface:
+    #ffffff;
+
+  --tasks-surface-2:
+    #f8f9fc;
+
+  --tasks-surface-3:
+    #eff1f7;
+
+  --tasks-border:
+    #e3e6ee;
+
+  --tasks-border-strong:
+    #d0d5df;
+
+  --tasks-text:
+    #1d2433;
+
+  --tasks-muted:
+    #697386;
+
+  --tasks-faint:
+    #8c95a5;
+
+  --tasks-accent:
+    #6366f1;
+
+  background:
+    #ffffff;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (
+  max-width: 1000px
+) {
+
+  .calendar-v3-type-select,
+  .calendar-v3-form-field
+  .study-date-picker {
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+  max-width: 650px
+) {
+
+  .calendar-v3-type-select,
+  .calendar-v3-form-field
+  .study-date-picker {
+    width: 100%;
+  }
+
+  .calendar-v3-form-field
+  .study-date-trigger,
+  .calendar-v3-type-select
+  .study-select-trigger {
+    min-height: 44px;
+  }
+
+}

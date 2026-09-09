@@ -19,14 +19,15 @@ import {
   googleProvider,
 } from "../firebase";
 
+import {
+  API_URL,
+} from "../services/api";
+
 const AuthContext =
   createContext(null);
 
 const GUEST_KEY =
   "studyos_guest_mode";
-
-const API_URL =
-  "http://localhost:5000";
 
 export function AuthProvider({
   children,
@@ -62,7 +63,7 @@ export function AuthProvider({
   ] = useState("idle");
 
   // =========================================
-  // VERIFY USER WITH OUR EXPRESS BACKEND
+  // VERIFY USER WITH EXPRESS BACKEND
   // =========================================
 
   const verifyBackendUser =
@@ -124,15 +125,10 @@ export function AuthProvider({
           "verified"
         );
 
-        console.log(
-          "✅ BACKEND AUTH VERIFIED:",
-          data.user
-        );
-
         return data.user;
       } catch (error) {
         console.error(
-          "❌ BACKEND AUTH FAILED:",
+          "Backend authentication failed:",
           error
         );
 
@@ -281,7 +277,7 @@ export function AuthProvider({
     };
 
   // =========================================
-  // GUEST
+  // GUEST MODE
   // =========================================
 
   const continueAsGuest =
@@ -368,15 +364,15 @@ export function AuthProvider({
     };
 
   // =========================================
-  // MODE
+  // CURRENT MODE
   // =========================================
 
   const mode =
     firebaseUser
       ? "authenticated"
       : guestMode
-      ? "guest"
-      : "none";
+        ? "guest"
+        : "none";
 
   return (
     <AuthContext.Provider

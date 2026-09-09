@@ -30,57 +30,393 @@ import {
   updateCalendarEvent,
 } from "../services/calendarData";
 
+import StudyDatePicker from "../components/StudyDatePicker";
+import StudySelect from "../components/StudySelect";
+
+import "./Calendar.selects.css";
+
+// =========================================================
+// EVENT TYPES
+// =========================================================
+
 const EVENT_TYPES = [
   {
-    label: "Assignment",
     value: "assignment",
+    label: "Assignment",
+    description: "Homework, submission or coursework",
   },
   {
-    label: "Exam",
     value: "exam",
+    label: "Exam",
+    description: "Test, quiz or examination",
   },
   {
-    label: "Project",
     value: "project",
+    label: "Project",
+    description: "Project milestone or deadline",
   },
   {
-    label: "Study",
     value: "study",
+    label: "Study",
+    description: "Planned study block",
   },
   {
-    label: "Other",
     value: "other",
+    label: "Other",
+    description: "Anything else on your schedule",
   },
 ];
+
+// =========================================================
+// DATE HELPERS
+// =========================================================
+
+const getDateKey = (
+  date
+) => {
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  return `${year}-${month}-${day}`;
+};
+
+const parseEventDate = (
+  value
+) => {
+  if (!value) {
+    return null;
+  }
+
+  if (
+    typeof value ===
+    "string"
+  ) {
+    const match =
+      value.match(
+        /^(\d{4})-(\d{2})-(\d{2})/
+      );
+
+    if (match) {
+      return new Date(
+        Number(match[1]),
+        Number(match[2]) -
+          1,
+        Number(match[3])
+      );
+    }
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+};
+
+const parseDateInput = (
+  value
+) => {
+  const match =
+    String(
+      value || ""
+    ).match(
+      /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  return new Date(
+    Number(match[1]),
+    Number(match[2]) -
+      1,
+    Number(match[3])
+  );
+};
+
+const isSameDay = (
+  first,
+  second
+) => {
+  return (
+    getDateKey(first) ===
+    getDateKey(second)
+  );
+};
+
+const formatSelectedDate = (
+  date
+) => {
+  return date.toLocaleDateString(
+    "en-IN",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  );
+};
+
+// =========================================================
+// STUDY HELPERS
+// =========================================================
+
+const getSessionDate = (
+  session
+) => {
+  const value =
+    session.startedAt ||
+    session.endedAt;
+
+  if (!value) {
+    return null;
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return date;
+};
+
+const formatStudyTime = (
+  seconds
+) => {
+  const safe =
+    Math.max(
+      0,
+      Number(seconds) ||
+        0
+    );
+
+  const totalMinutes =
+    Math.floor(
+      safe / 60
+    );
+
+  const hours =
+    Math.floor(
+      totalMinutes / 60
+    );
+
+  const minutes =
+    totalMinutes % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  if (
+    totalMinutes > 0
+  ) {
+    return `${totalMinutes}m`;
+  }
+
+  if (safe > 0) {
+    return `${Math.floor(
+      safe
+    )}s`;
+  }
+
+  return "0m";
+};
+
+const formatSessionTime = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  return date.toLocaleTimeString(
+    "en-IN",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+};
+
+const formatTaskTime = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  const [
+    hour,
+    minute,
+  ] =
+    String(value)
+      .split(":")
+      .map(Number);
+
+  if (
+    Number.isNaN(hour) ||
+    Number.isNaN(minute)
+  ) {
+    return value;
+  }
+
+  const date =
+    new Date();
+
+  date.setHours(
+    hour,
+    minute,
+    0,
+    0
+  );
+
+  return date.toLocaleTimeString(
+    "en-IN",
+    {
+      hour: "numeric",
+      minute: "2-digit",
+    }
+  );
+};
+
+// =========================================================
+// EVENT HELPERS
+// =========================================================
+
+const getTypeClass = (
+  eventType
+) => {
+  return String(
+    eventType || "other"
+  )
+    .toLowerCase()
+    .replace(
+      /\s+/g,
+      "-"
+    );
+};
+
+const getTypeLabel = (
+  eventType
+) => {
+  const normalized =
+    String(
+      eventType ||
+        "other"
+    ).toLowerCase();
+
+  if (
+    normalized ===
+    "task"
+  ) {
+    return "Task";
+  }
+
+  return (
+    EVENT_TYPES.find(
+      (
+        item
+      ) =>
+        item.value ===
+        normalized
+    )?.label ||
+    "Other"
+  );
+};
+
+const isTaskEvent = (
+  calendarEvent
+) => {
+  return (
+    calendarEvent?.source ===
+      "task" ||
+    calendarEvent?.type ===
+      "task"
+  );
+};
+
+// =========================================================
+// CALENDAR
+// =========================================================
 
 function Calendar() {
   const {
     isGuest,
   } = useAuth();
 
-  // =========================================================
+  // =======================================================
   // DATA
-  // =========================================================
+  // =======================================================
 
-  const [events, setEvents] =
-    useState([]);
+  const [
+    events,
+    setEvents,
+  ] = useState([]);
 
   const [
     sessions,
     setSessions,
   ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   const [
     refreshing,
     setRefreshing,
   ] = useState(false);
 
-  // =========================================================
+  // =======================================================
   // CALENDAR
-  // =========================================================
+  // =======================================================
 
   const [
     currentDate,
@@ -96,9 +432,9 @@ function Calendar() {
     new Date()
   );
 
-  // =========================================================
-  // FORM
-  // =========================================================
+  // =======================================================
+  // EVENT FORM
+  // =======================================================
 
   const [
     showForm,
@@ -110,13 +446,17 @@ function Calendar() {
     setEditingEventId,
   ] = useState(null);
 
-  const [title, setTitle] =
-    useState("");
+  const [
+    title,
+    setTitle,
+  ] = useState("");
 
-  const [type, setType] =
-    useState(
-      "assignment"
-    );
+  const [
+    type,
+    setType,
+  ] = useState(
+    "assignment"
+  );
 
   const [
     formDate,
@@ -128,9 +468,9 @@ function Calendar() {
     setSaving,
   ] = useState(false);
 
-  // =========================================================
-  // DELETE EVENT
-  // =========================================================
+  // =======================================================
+  // DELETE
+  // =======================================================
 
   const [
     deleteEventId,
@@ -142,282 +482,48 @@ function Calendar() {
     setDeleting,
   ] = useState(false);
 
-  // =========================================================
-  // MESSAGE
-  // =========================================================
+  // =======================================================
+  // MESSAGES
+  // =======================================================
 
   const [
     message,
     setMessage,
   ] = useState("");
 
-  const [error, setError] =
-    useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  // =========================================================
+  // =======================================================
   // MESSAGE HELPERS
-  // =========================================================
+  // =======================================================
 
-  const showSuccess =
-    (text) => {
-      setError("");
-      setMessage(text);
+  const showSuccess = (
+    text
+  ) => {
+    setError("");
+    setMessage(text);
 
-      window.setTimeout(
-        () => {
-          setMessage("");
-        },
-        3000
-      );
-    };
+    window.setTimeout(
+      () => {
+        setMessage("");
+      },
+      3000
+    );
+  };
 
-  const showError =
-    (text) => {
-      setMessage("");
-      setError(text);
-    };
+  const showError = (
+    text
+  ) => {
+    setMessage("");
+    setError(text);
+  };
 
-  // =========================================================
-  // DATE HELPERS
-  // =========================================================
-
-  const getDateKey =
-    (date) => {
-      const year =
-        date.getFullYear();
-
-      const month =
-        String(
-          date.getMonth() +
-            1
-        ).padStart(
-          2,
-          "0"
-        );
-
-      const day =
-        String(
-          date.getDate()
-        ).padStart(
-          2,
-          "0"
-        );
-
-      return `${year}-${month}-${day}`;
-    };
-
-  const parseEventDate =
-    (value) => {
-      if (!value) {
-        return null;
-      }
-
-      if (
-        typeof value ===
-        "string"
-      ) {
-        const match =
-          value.match(
-            /^(\d{4})-(\d{2})-(\d{2})/
-          );
-
-        if (match) {
-          return new Date(
-            Number(
-              match[1]
-            ),
-            Number(
-              match[2]
-            ) - 1,
-            Number(
-              match[3]
-            )
-          );
-        }
-      }
-
-      const date =
-        new Date(value);
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return null;
-      }
-
-      return new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      );
-    };
-
-  const parseDateInput =
-    (value) => {
-      const match =
-        String(
-          value || ""
-        ).match(
-          /^(\d{4})-(\d{2})-(\d{2})$/
-        );
-
-      if (!match) {
-        return null;
-      }
-
-      return new Date(
-        Number(
-          match[1]
-        ),
-        Number(
-          match[2]
-        ) - 1,
-        Number(
-          match[3]
-        )
-      );
-    };
-
-  const isSameDay =
-    (
-      date1,
-      date2
-    ) => {
-      return (
-        getDateKey(
-          date1
-        ) ===
-        getDateKey(
-          date2
-        )
-      );
-    };
-
-  const formatSelectedDate =
-    (date) => {
-      return date.toLocaleDateString(
-        "en-IN",
-        {
-          weekday:
-            "long",
-
-          day:
-            "numeric",
-
-          month:
-            "long",
-
-          year:
-            "numeric",
-        }
-      );
-    };
-
-  // =========================================================
-  // SESSION DATE
-  // =========================================================
-
-  const getSessionDate =
-    (session) => {
-      const value =
-        session.startedAt ||
-        session.endedAt;
-
-      if (!value) {
-        return null;
-      }
-
-      const date =
-        new Date(value);
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return null;
-      }
-
-      return date;
-    };
-
-  // =========================================================
-  // FORMAT TIME
-  // =========================================================
-
-  const formatStudyTime =
-    (seconds) => {
-      const safe =
-        Math.max(
-          0,
-          Number(seconds) ||
-            0
-        );
-
-      const totalMinutes =
-        Math.floor(
-          safe / 60
-        );
-
-      const hours =
-        Math.floor(
-          totalMinutes /
-            60
-        );
-
-      const minutes =
-        totalMinutes %
-        60;
-
-      if (hours > 0) {
-        return `${hours}h ${minutes}m`;
-      }
-
-      if (
-        totalMinutes > 0
-      ) {
-        return `${totalMinutes}m`;
-      }
-
-      if (safe > 0) {
-        return `${Math.floor(
-          safe
-        )}s`;
-      }
-
-      return "0m";
-    };
-
-  const formatSessionTime =
-    (value) => {
-      const date =
-        new Date(value);
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return "";
-      }
-
-      return date.toLocaleTimeString(
-        "en-IN",
-        {
-          hour:
-            "2-digit",
-
-          minute:
-            "2-digit",
-        }
-      );
-    };
-
-  // =========================================================
-  // LOAD DATA
-  // =========================================================
+  // =======================================================
+  // LOAD
+  // =======================================================
 
   const loadCalendarData =
     async (
@@ -480,7 +586,7 @@ function Calendar() {
         );
 
         showError(
-          loadError.message ||
+          loadError?.message ||
             "Couldn't load Calendar."
         );
       } finally {
@@ -494,87 +600,114 @@ function Calendar() {
       }
     };
 
-  // =========================================================
+  // =======================================================
   // INITIAL LOAD
-  // =========================================================
+  // =======================================================
 
   useEffect(() => {
     loadCalendarData(
       false
     );
-  }, [isGuest]);
+  }, [
+    isGuest,
+  ]);
 
-  // =========================================================
-  // LIVE FOCUS UPDATE
-  // =========================================================
+  // =======================================================
+  // LIVE UPDATES
+  // =======================================================
 
   useEffect(() => {
-    const handleSessionUpdate =
+    const refresh =
       () => {
         loadCalendarData(
           false
         );
       };
 
-    window.addEventListener(
+    const eventNames = [
       "studyos-sessions-updated",
-      handleSessionUpdate
+      "studyos-tasks-updated",
+      "studyos-events-updated",
+    ];
+
+    eventNames.forEach(
+      (
+        eventName
+      ) => {
+        window.addEventListener(
+          eventName,
+          refresh
+        );
+      }
     );
 
     return () => {
-      window.removeEventListener(
-        "studyos-sessions-updated",
-        handleSessionUpdate
+      eventNames.forEach(
+        (
+          eventName
+        ) => {
+          window.removeEventListener(
+            eventName,
+            refresh
+          );
+        }
       );
     };
-  }, [isGuest]);
+  }, [
+    isGuest,
+  ]);
 
-  // =========================================================
+  // =======================================================
   // SORT EVENTS
-  // =========================================================
+  // =======================================================
 
   const sortedEvents =
     useMemo(() => {
       return [
         ...events,
       ].sort(
-        (a, b) => {
-          const dateA =
+        (
+          first,
+          second
+        ) => {
+          const firstDate =
             parseEventDate(
-              a.date
+              first.date
             );
 
-          const dateB =
+          const secondDate =
             parseEventDate(
-              b.date
+              second.date
             );
 
           if (
-            !dateA &&
-            !dateB
+            !firstDate &&
+            !secondDate
           ) {
             return 0;
           }
 
-          if (!dateA) {
+          if (!firstDate) {
             return 1;
           }
 
-          if (!dateB) {
+          if (!secondDate) {
             return -1;
           }
 
           return (
-            dateA -
-            dateB
+            firstDate -
+            secondDate
           );
         }
       );
-    }, [events]);
+    }, [
+      events,
+    ]);
 
-  // =========================================================
+  // =======================================================
   // CALENDAR DAYS
-  // =========================================================
+  // =======================================================
 
   const calendarDays =
     useMemo(() => {
@@ -610,13 +743,11 @@ function Calendar() {
 
       const days = [];
 
-      // PREVIOUS MONTH
-
       for (
-        let i =
+        let index =
           firstWeekday - 1;
-        i >= 0;
-        i--
+        index >= 0;
+        index--
       ) {
         days.push({
           date:
@@ -624,15 +755,13 @@ function Calendar() {
               year,
               month - 1,
               previousMonthDays -
-                i
+                index
             ),
 
           currentMonth:
             false,
         });
       }
-
-      // CURRENT MONTH
 
       for (
         let day = 1;
@@ -653,13 +782,10 @@ function Calendar() {
         });
       }
 
-      // NEXT MONTH
-
       let nextDay = 1;
 
       while (
-        days.length <
-        42
+        days.length < 42
       ) {
         days.push({
           date:
@@ -677,67 +803,82 @@ function Calendar() {
       }
 
       return days;
-    }, [currentDate]);
+    }, [
+      currentDate,
+    ]);
 
-  // =========================================================
+  // =======================================================
   // EVENTS FOR DATE
-  // =========================================================
+  // =======================================================
 
-  const getEventsForDate =
-    (date) => {
-      return sortedEvents.filter(
-        (event) => {
-          const eventDate =
-            parseEventDate(
-              event.date
+  const getEventsForDate = (
+    date
+  ) => {
+    return sortedEvents.filter(
+      (
+        calendarEvent
+      ) => {
+        const eventDate =
+          parseEventDate(
+            calendarEvent.date
+          );
+
+        return (
+          eventDate &&
+          isSameDay(
+            eventDate,
+            date
+          )
+        );
+      }
+    );
+  };
+
+  // =======================================================
+  // SESSIONS FOR DATE
+  // =======================================================
+
+  const getSessionsForDate = (
+    date
+  ) => {
+    return sessions
+      .filter(
+        (
+          session
+        ) => {
+          const sessionDate =
+            getSessionDate(
+              session
             );
 
           return (
-            eventDate &&
+            sessionDate &&
             isSameDay(
-              eventDate,
+              sessionDate,
               date
             )
           );
         }
+      )
+      .sort(
+        (
+          first,
+          second
+        ) =>
+          new Date(
+            second.startedAt ||
+              second.endedAt
+          ) -
+          new Date(
+            first.startedAt ||
+              first.endedAt
+          )
       );
-    };
+  };
 
-  // =========================================================
-  // SESSIONS FOR DATE
-  // =========================================================
-
-  const getSessionsForDate =
-    (date) => {
-      return sessions
-        .filter(
-          (session) => {
-            const sessionDate =
-              getSessionDate(
-                session
-              );
-
-            return (
-              sessionDate &&
-              isSameDay(
-                sessionDate,
-                date
-              )
-            );
-          }
-        )
-        .sort(
-          (a, b) =>
-            new Date(
-              b.startedAt ||
-                b.endedAt
-            ) -
-            new Date(
-              a.startedAt ||
-                a.endedAt
-            )
-        );
-    };
+  // =======================================================
+  // SELECTED DATE DATA
+  // =======================================================
 
   const selectedDateEvents =
     getEventsForDate(
@@ -763,9 +904,9 @@ function Calendar() {
       0
     );
 
-  // =========================================================
-  // MONTH STATS
-  // =========================================================
+  // =======================================================
+  // MONTH FOCUS
+  // =======================================================
 
   const monthStudySeconds =
     useMemo(() => {
@@ -807,25 +948,43 @@ function Calendar() {
       currentDate,
     ]);
 
-  // =========================================================
-  // MONTH NAME
-  // =========================================================
+  const monthEventCount =
+    useMemo(() => {
+      return events.filter(
+        (
+          calendarEvent
+        ) => {
+          const date =
+            parseEventDate(
+              calendarEvent.date
+            );
+
+          return (
+            date &&
+            date.getMonth() ===
+              currentDate.getMonth() &&
+            date.getFullYear() ===
+              currentDate.getFullYear()
+          );
+        }
+      ).length;
+    }, [
+      events,
+      currentDate,
+    ]);
 
   const monthName =
     currentDate.toLocaleDateString(
       "en-IN",
       {
-        month:
-          "long",
-
-        year:
-          "numeric",
+        month: "long",
+        year: "numeric",
       }
     );
 
-  // =========================================================
+  // =======================================================
   // NAVIGATION
-  // =========================================================
+  // =======================================================
 
   const previousMonth =
     () => {
@@ -873,46 +1032,47 @@ function Calendar() {
       );
     };
 
-  // =========================================================
+  // =======================================================
   // SELECT DATE
-  // =========================================================
+  // =======================================================
 
-  const selectDate =
-    (date) => {
-      setSelectedDate(
-        date
+  const selectDate = (
+    date
+  ) => {
+    setSelectedDate(
+      date
+    );
+
+    if (
+      date.getMonth() !==
+        currentDate.getMonth() ||
+      date.getFullYear() !==
+        currentDate.getFullYear()
+    ) {
+      setCurrentDate(
+        new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          1
+        )
       );
+    }
 
-      if (
-        date.getMonth() !==
-          currentDate.getMonth() ||
-        date.getFullYear() !==
-          currentDate.getFullYear()
-      ) {
-        setCurrentDate(
-          new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            1
-          )
-        );
-      }
+    if (
+      showForm &&
+      !editingEventId
+    ) {
+      setFormDate(
+        getDateKey(
+          date
+        )
+      );
+    }
+  };
 
-      if (
-        showForm &&
-        !editingEventId
-      ) {
-        setFormDate(
-          getDateKey(
-            date
-          )
-        );
-      }
-    };
-
-  // =========================================================
+  // =======================================================
   // RESET FORM
-  // =========================================================
+  // =======================================================
 
   const resetForm =
     () => {
@@ -925,19 +1085,15 @@ function Calendar() {
       );
 
       setTitle("");
-
       setType(
         "assignment"
       );
-
-      setFormDate(
-        ""
-      );
+      setFormDate("");
     };
 
-  // =========================================================
-  // ADD FORM
-  // =========================================================
+  // =======================================================
+  // ADD EVENT
+  // =======================================================
 
   const openAddForm =
     () => {
@@ -968,68 +1124,74 @@ function Calendar() {
       setError("");
     };
 
-  // =========================================================
-  // EDIT FORM
-  // =========================================================
+  // =======================================================
+  // EDIT EVENT
+  // =======================================================
 
-  const openEditForm =
-    (
-      calendarEvent
-    ) => {
-      if (saving) {
-        return;
-      }
+  const openEditForm = (
+    calendarEvent
+  ) => {
+    if (
+      saving ||
+      isTaskEvent(
+        calendarEvent
+      )
+    ) {
+      return;
+    }
 
-      const eventDate =
-        parseEventDate(
-          calendarEvent.date
-        );
-
-      const normalizedType =
-        String(
-          calendarEvent.type ||
-            "other"
-        ).toLowerCase();
-
-      setEditingEventId(
-        calendarEvent._id
+    const eventDate =
+      parseEventDate(
+        calendarEvent.date
       );
 
-      setTitle(
-        calendarEvent.title ||
-          ""
-      );
+    const normalizedType =
+      String(
+        calendarEvent.type ||
+          "other"
+      ).toLowerCase();
 
-      setType(
-        EVENT_TYPES.some(
-          (item) =>
-            item.value ===
-            normalizedType
-        )
-          ? normalizedType
-          : "other"
-      );
+    setEditingEventId(
+      calendarEvent._id
+    );
 
-      setFormDate(
-        eventDate
-          ? getDateKey(
-              eventDate
-            )
-          : getDateKey(
-              selectedDate
-            )
-      );
+    setTitle(
+      calendarEvent.title ||
+        ""
+    );
 
-      setShowForm(
-        true
-      );
+    setType(
+      EVENT_TYPES.some(
+        (
+          item
+        ) =>
+          item.value ===
+          normalizedType
+      )
+        ? normalizedType
+        : "other"
+    );
 
-      setError("");
-    };
+    setFormDate(
+      eventDate
+        ? getDateKey(
+            eventDate
+          )
+        : getDateKey(
+            selectedDate
+          )
+    );
 
-  // =========================================================
+    setShowForm(
+      true
+    );
+
+    setError("");
+  };
+
+  // =======================================================
   // SAVE EVENT
-  // =========================================================
+  // =======================================================
 
   const saveEvent =
     async (
@@ -1072,7 +1234,7 @@ function Calendar() {
 
         setError("");
 
-        const isEditing =
+        const editing =
           Boolean(
             editingEventId
           );
@@ -1088,33 +1250,38 @@ function Calendar() {
         };
 
         const savedEvent =
-          isEditing
+          editing
             ? await updateCalendarEvent(
                 isGuest,
                 editingEventId,
                 eventData,
                 events.find(
-                  (event) =>
-                    event._id ===
+                  (
+                    calendarEvent
+                  ) =>
+                    calendarEvent._id ===
                     editingEventId
-                ) || null
+                ) ||
+                  null
               )
             : await createCalendarEvent(
                 isGuest,
                 eventData
               );
 
-        if (isEditing) {
+        if (editing) {
           setEvents(
             (
               currentEvents
             ) =>
               currentEvents.map(
-                (event) =>
-                  event._id ===
+                (
+                  calendarEvent
+                ) =>
+                  calendarEvent._id ===
                   savedEvent._id
                     ? savedEvent
-                    : event
+                    : calendarEvent
               )
           );
 
@@ -1136,12 +1303,6 @@ function Calendar() {
           );
         }
 
-        window.dispatchEvent(
-          new Event(
-            "studyos-events-updated"
-          )
-        );
-
         setSelectedDate(
           chosenDate
         );
@@ -1151,6 +1312,12 @@ function Calendar() {
             chosenDate.getFullYear(),
             chosenDate.getMonth(),
             1
+          )
+        );
+
+        window.dispatchEvent(
+          new Event(
+            "studyos-events-updated"
           )
         );
 
@@ -1164,7 +1331,7 @@ function Calendar() {
         );
 
         showError(
-          saveError.message ||
+          saveError?.message ||
             "Couldn't save the event."
         );
       } finally {
@@ -1174,20 +1341,26 @@ function Calendar() {
       }
     };
 
-  // =========================================================
+  // =======================================================
   // DELETE EVENT
-  // =========================================================
+  // =======================================================
 
-  const openDeleteModal =
-    (id) => {
-      if (deleting) {
-        return;
-      }
+  const openDeleteModal = (
+    calendarEvent
+  ) => {
+    if (
+      deleting ||
+      isTaskEvent(
+        calendarEvent
+      )
+    ) {
+      return;
+    }
 
-      setDeleteEventId(
-        id
-      );
-    };
+    setDeleteEventId(
+      calendarEvent._id
+    );
+  };
 
   const closeDeleteModal =
     () => {
@@ -1202,8 +1375,10 @@ function Calendar() {
 
   const eventBeingDeleted =
     events.find(
-      (event) =>
-        event._id ===
+      (
+        calendarEvent
+      ) =>
+        calendarEvent._id ===
         deleteEventId
     );
 
@@ -1231,8 +1406,10 @@ function Calendar() {
             currentEvents
           ) =>
             currentEvents.filter(
-              (event) =>
-                event._id !==
+              (
+                calendarEvent
+              ) =>
+                calendarEvent._id !==
                 deleteEventId
             )
         );
@@ -1266,7 +1443,7 @@ function Calendar() {
         );
 
         showError(
-          deleteError.message ||
+          deleteError?.message ||
             "Couldn't delete the event."
         );
       } finally {
@@ -1276,66 +1453,28 @@ function Calendar() {
       }
     };
 
-  // =========================================================
-  // TYPE CLASS
-  // =========================================================
-
-  const getTypeClass =
-    (eventType) => {
-      return String(
-        eventType ||
-          "other"
-      )
-        .toLowerCase()
-        .replace(
-          /\s+/g,
-          "-"
-        );
-    };
-
-  // =========================================================
-  // EVENT TYPE LABEL
-  // =========================================================
-
-  const getTypeLabel =
-    (eventType) => {
-      const normalized =
-        String(
-          eventType ||
-            "other"
-        ).toLowerCase();
-
-      return (
-        EVENT_TYPES.find(
-          (item) =>
-            item.value ===
-            normalized
-        )?.label ||
-        "Other"
-      );
-    };
-
-  // =========================================================
+  // =======================================================
   // UI
-  // =========================================================
+  // =======================================================
 
   return (
     <div className="calendar-page calendar-v3-page">
 
-      {/* HEADER */}
+      {/* ===================================================
+          HEADER
+      =================================================== */}
 
       <header className="dashboard-header calendar-v3-header">
 
         <div>
 
           <h1>
-            Calendar 📅
+            Calendar
           </h1>
 
           <p>
-            Plan upcoming work and
-            see what you actually
-            studied.
+            Plan upcoming work and see
+            what you actually studied.
           </p>
 
         </div>
@@ -1364,7 +1503,9 @@ function Calendar() {
               }
             />
 
-            Refresh
+            {refreshing
+              ? "Refreshing..."
+              : "Refresh"}
 
           </button>
 
@@ -1388,15 +1529,15 @@ function Calendar() {
 
       </header>
 
-      {/* MESSAGE */}
+      {/* ===================================================
+          MESSAGES
+      =================================================== */}
 
       {message && (
         <div className="calendar-v2-message success">
           {message}
         </div>
       )}
-
-      {/* ERROR */}
 
       {error && (
         <div className="calendar-v2-message error">
@@ -1417,9 +1558,9 @@ function Calendar() {
         </div>
       )}
 
-      {/* =====================================================
-          ADD / EDIT EVENT
-      ===================================================== */}
+      {/* ===================================================
+          EVENT FORM
+      =================================================== */}
 
       {showForm && (
         <div className="calendar-form-card dashboard-card">
@@ -1455,10 +1596,13 @@ function Calendar() {
               disabled={
                 saving
               }
+              aria-label="Close event form"
             >
+
               <X
                 size={17}
               />
+
             </button>
 
           </div>
@@ -1470,6 +1614,8 @@ function Calendar() {
             }
           >
 
+            {/* TITLE */}
+
             <label>
 
               Event title
@@ -1480,9 +1626,7 @@ function Calendar() {
                 value={
                   title
                 }
-                maxLength={
-                  100
-                }
+                maxLength={100}
                 disabled={
                   saving
                 }
@@ -1499,73 +1643,58 @@ function Calendar() {
 
             </label>
 
-            <label>
+            {/* DATE */}
 
-              Date
+            <div className="calendar-v3-form-field">
 
-              <input
-                type="date"
+              <span>
+                Date
+              </span>
+
+              <StudyDatePicker
                 value={
                   formDate
                 }
+                onChange={
+                  setFormDate
+                }
+                placeholder="Choose date"
                 disabled={
                   saving
-                }
-                onChange={(
-                  event
-                ) =>
-                  setFormDate(
-                    event.target
-                      .value
-                  )
                 }
               />
 
-            </label>
+            </div>
 
-            <label>
+            {/* EVENT TYPE */}
 
-              Event type
+            <div className="calendar-v3-form-field">
 
-              <select
+              <span>
+                Event type
+              </span>
+
+              <StudySelect
                 value={
                   type
                 }
+                onChange={
+                  setType
+                }
+                options={
+                  EVENT_TYPES
+                }
+                placeholder="Assignment"
+                className="calendar-v3-type-select"
                 disabled={
                   saving
                 }
-                onChange={(
-                  event
-                ) =>
-                  setType(
-                    event.target
-                      .value
-                  )
-                }
-              >
+                ariaLabel="Choose event type"
+              />
 
-                {EVENT_TYPES.map(
-                  (
-                    item
-                  ) => (
-                    <option
-                      key={
-                        item.value
-                      }
-                      value={
-                        item.value
-                      }
-                    >
-                      {
-                        item.label
-                      }
-                    </option>
-                  )
-                )}
+            </div>
 
-              </select>
-
-            </label>
+            {/* ACTIONS */}
 
             <div className="calendar-v2-form-actions">
 
@@ -1589,11 +1718,13 @@ function Calendar() {
                   saving
                 }
               >
+
                 {saving
                   ? "Saving..."
                   : editingEventId
-                  ? "Save Changes"
-                  : "Add Event"}
+                    ? "Save Changes"
+                    : "Add Event"}
+
               </button>
 
             </div>
@@ -1603,9 +1734,9 @@ function Calendar() {
         </div>
       )}
 
-      {/* =====================================================
+      {/* ===================================================
           MONTH SUMMARY
-      ===================================================== */}
+      =================================================== */}
 
       <section className="calendar-v3-summary">
 
@@ -1620,22 +1751,7 @@ function Calendar() {
           </span>
 
           <strong>
-            {events.filter(
-              (event) => {
-                const date =
-                  parseEventDate(
-                    event.date
-                  );
-
-                return (
-                  date &&
-                  date.getMonth() ===
-                    currentDate.getMonth() &&
-                  date.getFullYear() ===
-                    currentDate.getFullYear()
-                );
-              }
-            ).length}
+            {monthEventCount}
           </strong>
 
         </div>
@@ -1660,11 +1776,15 @@ function Calendar() {
 
       </section>
 
-      {/* =====================================================
-          CALENDAR LAYOUT
-      ===================================================== */}
+      {/* ===================================================
+          MAIN LAYOUT
+      =================================================== */}
 
       <section className="calendar-layout">
+
+        {/* =================================================
+            MONTH
+        ================================================= */}
 
         <div className="calendar-card dashboard-card">
 
@@ -1677,9 +1797,7 @@ function Calendar() {
               </span>
 
               <h2>
-                {
-                  monthName
-                }
+                {monthName}
               </h2>
 
             </div>
@@ -1691,6 +1809,7 @@ function Calendar() {
                 onClick={
                   previousMonth
                 }
+                aria-label="Previous month"
               >
                 <ChevronLeft
                   size={17}
@@ -1712,6 +1831,7 @@ function Calendar() {
                 onClick={
                   nextMonth
                 }
+                aria-label="Next month"
               >
                 <ChevronRight
                   size={17}
@@ -1790,19 +1910,25 @@ function Calendar() {
                     key={`${getDateKey(
                       date
                     )}-${index}`}
-                    className={`calendar-day ${
+                    className={[
+                      "calendar-day",
+
                       !currentMonth
                         ? "other-month"
-                        : ""
-                    } ${
+                        : "",
+
                       today
                         ? "today"
-                        : ""
-                    } ${
+                        : "",
+
                       selected
                         ? "selected"
-                        : ""
-                    }`}
+                        : "",
+                    ]
+                      .filter(
+                        Boolean
+                      )
+                      .join(" ")}
                     onClick={() =>
                       selectDate(
                         date
@@ -1811,12 +1937,8 @@ function Calendar() {
                   >
 
                     <span className="calendar-day-number">
-                      {
-                        date.getDate()
-                      }
+                      {date.getDate()}
                     </span>
-
-                    {/* SCHEDULED EVENTS */}
 
                     {dayEvents.length >
                       0 && (
@@ -1845,8 +1967,6 @@ function Calendar() {
                       </div>
                     )}
 
-                    {/* ACTUAL FOCUS */}
-
                     {daySessions.length >
                       0 && (
                       <div className="calendar-v3-focus-indicator">
@@ -1867,9 +1987,7 @@ function Calendar() {
                     {dayEvents.length >
                       0 && (
                       <span className="calendar-event-count">
-                        {
-                          dayEvents.length
-                        }
+                        {dayEvents.length}
                       </span>
                     )}
 
@@ -1882,9 +2000,9 @@ function Calendar() {
 
         </div>
 
-        {/* ===================================================
-            SELECTED DAY
-        =================================================== */}
+        {/* =================================================
+            SELECTED DATE
+        ================================================= */}
 
         <aside className="selected-date-card dashboard-card calendar-v3-selected">
 
@@ -1900,11 +2018,8 @@ function Calendar() {
                 {selectedDate.toLocaleDateString(
                   "en-IN",
                   {
-                    day:
-                      "numeric",
-
-                    month:
-                      "short",
+                    day: "numeric",
+                    month: "short",
                   }
                 )}
               </h2>
@@ -1917,10 +2032,13 @@ function Calendar() {
               onClick={
                 openAddForm
               }
+              aria-label="Add event"
             >
+
               <Plus
                 size={17}
               />
+
             </button>
 
           </div>
@@ -1942,10 +2060,8 @@ function Calendar() {
               />
 
               <span>
-                {
-                  selectedDateEvents.length
-                }{" "}
-                scheduled
+                {selectedDateEvents.length}
+                {" scheduled"}
               </span>
 
             </div>
@@ -1959,8 +2075,8 @@ function Calendar() {
               <span>
                 {formatStudyTime(
                   selectedStudySeconds
-                )}{" "}
-                focused
+                )}
+                {" focused"}
               </span>
 
             </div>
@@ -1980,9 +2096,7 @@ function Calendar() {
               </span>
 
               <strong>
-                {
-                  selectedDateEvents.length
-                }
+                {selectedDateEvents.length}
               </strong>
 
             </div>
@@ -2013,76 +2127,145 @@ function Calendar() {
               selectedDateEvents.map(
                 (
                   calendarEvent
-                ) => (
+                ) => {
+                  const task =
+                    isTaskEvent(
+                      calendarEvent
+                    );
 
-                  <div
-                    className="calendar-event-item calendar-v2-event-item"
-                    key={
-                      calendarEvent._id
-                    }
-                  >
-
+                  return (
                     <div
-                      className={`calendar-v2-type-marker ${getTypeClass(
-                        calendarEvent.type
-                      )}`}
-                    />
+                      className={[
+                        "calendar-event-item",
+                        "calendar-v2-event-item",
 
-                    <div className="calendar-event-info">
+                        task
+                          ? "calendar-task-event"
+                          : "",
+                      ]
+                        .filter(
+                          Boolean
+                        )
+                        .join(" ")}
+                      key={
+                        calendarEvent._id
+                      }
+                    >
 
-                      <strong>
-                        {
-                          calendarEvent.title
-                        }
-                      </strong>
+                      {/* TYPE MARKER */}
 
-                      <span
-                        className={`calendar-v2-type ${getTypeClass(
+                      <div
+                        className={`calendar-v2-type-marker ${getTypeClass(
                           calendarEvent.type
                         )}`}
-                      >
-                        {getTypeLabel(
-                          calendarEvent.type
-                        )}
-                      </span>
+                      />
+
+                      {/* CONTENT */}
+
+                      <div className="calendar-event-info">
+
+                        <strong className="calendar-event-title">
+                          {calendarEvent.title}
+                        </strong>
+
+                        <div className="calendar-task-meta">
+
+                          <span
+                            className={`calendar-v2-type ${getTypeClass(
+                              calendarEvent.type
+                            )}`}
+                          >
+                            {getTypeLabel(
+                              calendarEvent.type
+                            )}
+                          </span>
+
+                          {task &&
+                            calendarEvent.subjectName && (
+                              <span className="calendar-task-subject">
+
+                                <BookOpen
+                                  size={11}
+                                />
+
+                                {calendarEvent.subjectName}
+
+                              </span>
+                            )}
+
+                          {task &&
+                            calendarEvent.priority && (
+                              <span
+                                className={`calendar-task-priority ${calendarEvent.priority}`}
+                              >
+                                {calendarEvent.priority}
+                              </span>
+                            )}
+
+                          {task &&
+                            calendarEvent.dueTime && (
+                              <span className="calendar-task-time">
+
+                                <Clock3
+                                  size={11}
+                                />
+
+                                {formatTaskTime(
+                                  calendarEvent.dueTime
+                                )}
+
+                              </span>
+                            )}
+
+                        </div>
+
+                      </div>
+
+                      {/* NORMAL EVENT ACTIONS */}
+
+                      {!task && (
+                        <div className="calendar-v2-event-actions">
+
+                          <button
+                            type="button"
+                            className="calendar-v2-edit"
+                            onClick={() =>
+                              openEditForm(
+                                calendarEvent
+                              )
+                            }
+                            aria-label={`Edit ${calendarEvent.title}`}
+                          >
+
+                            <Pencil
+                              size={15}
+                            />
+
+                          </button>
+
+                          <button
+                            type="button"
+                            className="calendar-v2-delete"
+                            onClick={() =>
+                              openDeleteModal(
+                                calendarEvent
+                              )
+                            }
+                            aria-label={`Delete ${calendarEvent.title}`}
+                          >
+
+                            <Trash2
+                              size={15}
+                            />
+
+                          </button>
+
+                        </div>
+                      )}
 
                     </div>
-
-                    <div className="calendar-v2-event-actions">
-
-                      <button
-                        type="button"
-                        className="calendar-v2-edit"
-                        onClick={() =>
-                          openEditForm(
-                            calendarEvent
-                          )
-                        }
-                      >
-                        <Pencil
-                          size={15}
-                        />
-                      </button>
-
-                      <button
-                        type="button"
-                        className="calendar-v2-delete"
-                        onClick={() =>
-                          openDeleteModal(
-                            calendarEvent._id
-                          )
-                        }
-                      >
-                        <Trash2
-                          size={15}
-                        />
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                )
+                  );
+                }
               )
 
             )}
@@ -2090,7 +2273,7 @@ function Calendar() {
           </div>
 
           {/* =================================================
-              ACTUAL STUDY HISTORY
+              FOCUS HISTORY
           ================================================= */}
 
           <div className="calendar-v3-section calendar-v3-focus-section">
@@ -2102,9 +2285,7 @@ function Calendar() {
               </span>
 
               <strong>
-                {
-                  selectedDateSessions.length
-                }
+                {selectedDateSessions.length}
               </strong>
 
             </div>
@@ -2130,7 +2311,6 @@ function Calendar() {
                 (
                   session
                 ) => (
-
                   <div
                     className="calendar-v3-session"
                     key={
@@ -2171,7 +2351,6 @@ function Calendar() {
                     </strong>
 
                   </div>
-
                 )
               )
 
@@ -2183,9 +2362,9 @@ function Calendar() {
 
       </section>
 
-      {/* =====================================================
+      {/* ===================================================
           DELETE MODAL
-      ===================================================== */}
+      =================================================== */}
 
       {deleteEventId && (
 
@@ -2198,6 +2377,9 @@ function Calendar() {
 
           <div
             className="delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="calendar-delete-title"
             onClick={(
               event
             ) =>
@@ -2206,10 +2388,14 @@ function Calendar() {
           >
 
             <div className="delete-modal-icon">
-              🗑️
+
+              <Trash2
+                size={21}
+              />
+
             </div>
 
-            <h2>
+            <h2 id="calendar-delete-title">
               Delete this event?
             </h2>
 
@@ -2263,7 +2449,6 @@ function Calendar() {
           </div>
 
         </div>
-
       )}
 
     </div>

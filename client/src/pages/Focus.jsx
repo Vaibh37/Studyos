@@ -23,6 +23,8 @@ import {
   useAuth,
 } from "../context/AuthContext";
 
+import StudySelect from "../components/StudySelect";
+
 import apiRequest from "../services/api";
 
 import {
@@ -34,6 +36,8 @@ import {
   deleteStudySession,
   getStudySessions,
 } from "../services/studySessionData";
+
+import "./Focus.selects.css";
 
 const TIMER_STORAGE_KEY_BASE =
   "studyos_active_focus_timer";
@@ -2058,56 +2062,42 @@ function Focus() {
                     Subject
                   </label>
 
-                  <div className="focus-v1-select-wrap">
+                  <div className="focus-v1-select-wrap focus-v2-select-wrap">
 
                     <BookOpen
                       size={16}
                     />
 
-                    <select
+                    <StudySelect
                       value={
                         selectedSubjectId
                       }
+                      onChange={
+                        setSelectedSubjectId
+                      }
+                      options={[
+                        {
+                          value: "",
+                          label: "General Study",
+                          description: "Focus without linking a subject",
+                        },
+                        ...subjects.map(
+                          (subject) => ({
+                            value: subject._id,
+                            label: subject.name,
+                            description: subject.code || "Subject",
+                            color: subject.color || "#6366f1",
+                          })
+                        ),
+                      ]}
+                      placeholder="General Study"
+                      className="focus-v2-subject-select"
                       disabled={
                         status !==
                         "idle"
                       }
-                      onChange={(
-                        event
-                      ) =>
-                        setSelectedSubjectId(
-                          event.target
-                            .value
-                        )
-                      }
-                    >
-
-                      <option value="">
-                        General Study
-                      </option>
-
-                      {subjects.map(
-                        (
-                          subject
-                        ) => (
-
-                          <option
-                            key={
-                              subject._id
-                            }
-                            value={
-                              subject._id
-                            }
-                          >
-                            {
-                              subject.name
-                            }
-                          </option>
-
-                        )
-                      )}
-
-                    </select>
+                      ariaLabel="Choose Focus subject"
+                    />
 
                   </div>
 

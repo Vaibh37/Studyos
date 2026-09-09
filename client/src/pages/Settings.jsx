@@ -22,6 +22,7 @@ import {
   Sun,
   Target,
   Timer,
+  Trophy,
   Trash2,
   Upload,
   UserRound,
@@ -29,11 +30,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
-
-import apiRequest, {
-  API_URL,
-} from "../services/api";
-
+import apiRequest, { API_URL } from "../services/api";
 import {
   createLocalId,
   localDb,
@@ -49,6 +46,15 @@ import {
   getStudySessions,
 } from "../services/studySessionData";
 
+import LeaderboardSettings from "../components/LeaderboardSettings";
+import StudySelect from "../components/StudySelect";
+
+import "./Settings.mobile.css";
+
+// =========================================================
+// LOCAL PREFERENCES
+// =========================================================
+
 const PREFERENCE_KEYS = [
   "studyos_name",
   "studyos_theme",
@@ -60,11 +66,66 @@ const PREFERENCE_KEYS = [
   "studyos_startup_page",
 ];
 
-function Settings() {
-  // =========================
-  // ACCOUNT / AUTH
-  // =========================
+// =========================================================
+// STARTUP PAGES
+// =========================================================
 
+const VALID_STARTUP_PAGES = [
+  "dashboard",
+  "tasks",
+  "subjects",
+  "notes",
+  "calendar",
+  "focus",
+  "progress",
+  "leaderboard",
+  "settings",
+];
+
+const STARTUP_PAGE_OPTIONS = [
+  {
+    value: "dashboard",
+    label: "Dashboard",
+  },
+  {
+    value: "tasks",
+    label: "Tasks",
+  },
+  {
+    value: "subjects",
+    label: "Subjects",
+  },
+  {
+    value: "notes",
+    label: "Notes",
+  },
+  {
+    value: "calendar",
+    label: "Calendar",
+  },
+  {
+    value: "focus",
+    label: "Focus",
+  },
+  {
+    value: "progress",
+    label: "Progress",
+  },
+  {
+    value: "leaderboard",
+    label: "Leaderboard",
+  },
+  {
+    value: "settings",
+    label: "Settings",
+  },
+];
+
+// =========================================================
+// SETTINGS
+// =========================================================
+
+function Settings() {
   const {
     firebaseUser,
     isAuthenticated,
@@ -72,71 +133,141 @@ function Settings() {
     logout,
   } = useAuth();
 
-  const [loggingOut, setLoggingOut] = useState(false);
+  // =======================================================
+  // ACCOUNT
+  // =======================================================
 
-  // =========================
+  const [
+    loggingOut,
+    setLoggingOut,
+  ] = useState(false);
+
+  // =======================================================
   // PROFILE
-  // =========================
+  // =======================================================
 
-  const [name, setName] = useState(
-    localStorage.getItem("studyos_name") || ""
+  const [
+    name,
+    setName,
+  ] = useState(
+    localStorage.getItem(
+      "studyos_name"
+    ) || ""
   );
 
-  // =========================
+  // =======================================================
   // APPEARANCE
-  // =========================
+  // =======================================================
 
-  const [theme, setTheme] = useState(
-    localStorage.getItem("studyos_theme") || "dark"
+  const [
+    theme,
+    setTheme,
+  ] = useState(
+    localStorage.getItem(
+      "studyos_theme"
+    ) || "dark"
   );
 
-  // =========================
-  // REAL APP PREFERENCES
-  // =========================
+  // =======================================================
+  // STUDY PREFERENCES
+  // =======================================================
 
-  const [dailyGoalHours, setDailyGoalHours] = useState(() => {
-    const stored = Number(localStorage.getItem("studyos_study_goal"));
-    return Number.isFinite(stored) && stored > 0 ? stored : 2;
+  const [
+    dailyGoalHours,
+    setDailyGoalHours,
+  ] = useState(() => {
+    const stored =
+      Number(
+        localStorage.getItem(
+          "studyos_study_goal"
+        )
+      );
+
+    return (
+      Number.isFinite(
+        stored
+      ) &&
+      stored > 0
+        ? stored
+        : 2
+    );
   });
 
-  const [focusDuration, setFocusDuration] = useState(() => {
-    const stored = Number(localStorage.getItem("studyos_focus_duration"));
-    return Number.isFinite(stored) && stored >= 1 && stored <= 720
-      ? Math.round(stored)
-      : 50;
+  const [
+    focusDuration,
+    setFocusDuration,
+  ] = useState(() => {
+    const stored =
+      Number(
+        localStorage.getItem(
+          "studyos_focus_duration"
+        )
+      );
+
+    return (
+      Number.isFinite(
+        stored
+      ) &&
+      stored >= 1 &&
+      stored <= 720
+        ? Math.round(
+            stored
+          )
+        : 50
+    );
   });
 
-  const validStartupPages = [
-    "dashboard",
-    "tasks",
-    "subjects",
-    "notes",
-    "calendar",
-    "focus",
-    "progress",
-    "settings",
-  ];
+  const [
+    startupPage,
+    setStartupPage,
+  ] = useState(() => {
+    const stored =
+      localStorage.getItem(
+        "studyos_startup_page"
+      );
 
-  const [startupPage, setStartupPage] = useState(() => {
-    const stored = localStorage.getItem("studyos_startup_page");
-    return validStartupPages.includes(stored) ? stored : "dashboard";
+    return VALID_STARTUP_PAGES.includes(
+      stored
+    )
+      ? stored
+      : "dashboard";
   });
 
-  // =========================
+  // =======================================================
   // STATUS
-  // =========================
+  // =======================================================
 
-  const [saved, setSaved] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [
+    saved,
+    setSaved,
+  ] = useState(false);
 
-  const [backendStatus, setBackendStatus] =
-    useState("checking");
+  const [
+    message,
+    setMessage,
+  ] = useState("");
 
-  const [checkingStatus, setCheckingStatus] =
-    useState(false);
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  const [dataCounts, setDataCounts] = useState({
+  const [
+    backendStatus,
+    setBackendStatus,
+  ] = useState(
+    "checking"
+  );
+
+  const [
+    checkingStatus,
+    setCheckingStatus,
+  ] = useState(false);
+
+  const [
+    dataCounts,
+    setDataCounts,
+  ] = useState({
     tasks: 0,
     subjects: 0,
     notes: 0,
@@ -144,144 +275,248 @@ function Settings() {
     sessions: 0,
   });
 
-  // =========================
+  // =======================================================
   // NOTIFICATIONS
-  // =========================
+  // =======================================================
 
-  const getNotificationStatus = () => {
-    if (!("Notification" in window)) {
-      return "unsupported";
-    }
+  const getNotificationStatus =
+    () => {
+      if (
+        !(
+          "Notification"
+          in window
+        )
+      ) {
+        return "unsupported";
+      }
 
-    return Notification.permission;
-  };
+      return Notification.permission;
+    };
 
-  const [notificationStatus, setNotificationStatus] =
-    useState(getNotificationStatus());
+  const [
+    notificationStatus,
+    setNotificationStatus,
+  ] = useState(
+    getNotificationStatus
+  );
 
-  // =========================
-  // BACKUP / IMPORT
-  // =========================
+  // =======================================================
+  // BACKUP
+  // =======================================================
 
-  const fileInputRef = useRef(null);
+  const fileInputRef =
+    useRef(null);
 
-  const [exporting, setExporting] =
-    useState(false);
+  const [
+    exporting,
+    setExporting,
+  ] = useState(false);
 
-  const [importing, setImporting] =
-    useState(false);
+  const [
+    importing,
+    setImporting,
+  ] = useState(false);
 
-  const [pendingBackup, setPendingBackup] =
-    useState(null);
+  const [
+    pendingBackup,
+    setPendingBackup,
+  ] = useState(null);
 
-  const [showImportModal, setShowImportModal] =
-    useState(false);
+  const [
+    showImportModal,
+    setShowImportModal,
+  ] = useState(false);
 
-  // =========================
-  // RESET PREFERENCES
-  // =========================
+  // =======================================================
+  // RESET
+  // =======================================================
 
-  const [showResetModal, setShowResetModal] =
-    useState(false);
+  const [
+    showResetModal,
+    setShowResetModal,
+  ] = useState(false);
 
-  // =========================
-  // DELETE ALL DATA
-  // =========================
+  // =======================================================
+  // DELETE ALL
+  // =======================================================
 
-  const [showDeleteAllModal, setShowDeleteAllModal] =
-    useState(false);
+  const [
+    showDeleteAllModal,
+    setShowDeleteAllModal,
+  ] = useState(false);
 
-  const [deleteText, setDeleteText] =
-    useState("");
+  const [
+    deleteText,
+    setDeleteText,
+  ] = useState("");
 
-  const [deletingAll, setDeletingAll] =
-    useState(false);
+  const [
+    deletingAll,
+    setDeletingAll,
+  ] = useState(false);
 
-  // =========================
-  // SETTINGS UI
-  // =========================
+  // =======================================================
+  // SETTINGS SECTION
+  // =======================================================
 
-  const [activeSection, setActiveSection] = useState("account");
+  const [
+    activeSection,
+    setActiveSection,
+  ] = useState(
+    "account"
+  );
 
-  // =========================
-  // HELPERS
-  // =========================
+  // =======================================================
+  // MESSAGE HELPERS
+  // =======================================================
 
-  const showSuccessMessage = (text) => {
-    setError("");
-    setMessage(text);
-
-    window.setTimeout(() => {
-      setMessage("");
-    }, 3000);
-  };
-
-  const showErrorMessage = (text) => {
-    setMessage("");
-    setError(text);
-  };
-
-  // =========================
-  // ACCOUNT HELPERS
-  // =========================
-
-  const getAuthProviderLabel = () => {
-    const providerId = firebaseUser?.providerData?.[0]?.providerId;
-
-    if (providerId === "google.com") {
-      return "Google";
-    }
-
-    if (providerId === "twitter.com") {
-      return "X";
-    }
-
-    if (providerId === "password") {
-      return "Email & Password";
-    }
-
-    return isAuthenticated ? "Firebase" : "Guest";
-  };
-
-  const handleLogout = async () => {
-    if (loggingOut) {
-      return;
-    }
-
-    try {
-      setLoggingOut(true);
+  const showSuccessMessage =
+    (
+      text
+    ) => {
       setError("");
-      setMessage("");
+      setMessage(text);
 
-      await logout();
-    } catch (logoutError) {
-      console.error("Logout failed:", logoutError);
-      showErrorMessage("Couldn't sign out. Please try again.");
-    } finally {
-      setLoggingOut(false);
-    }
-  };
+      window.setTimeout(
+        () => {
+          setMessage("");
+        },
+        3000
+      );
+    };
+
+  const showErrorMessage =
+    (
+      text
+    ) => {
+      setMessage("");
+      setError(text);
+    };
+
+  // =======================================================
+  // AUTH PROVIDER
+  // =======================================================
+
+  const getAuthProviderLabel =
+    () => {
+      const providerId =
+        firebaseUser
+          ?.providerData
+          ?.[0]
+          ?.providerId;
+
+      if (
+        providerId ===
+        "google.com"
+      ) {
+        return "Google";
+      }
+
+      if (
+        providerId ===
+        "twitter.com"
+      ) {
+        return "X";
+      }
+
+      if (
+        providerId ===
+        "password"
+      ) {
+        return "Email & Password";
+      }
+
+      return isAuthenticated
+        ? "Firebase"
+        : "Guest";
+    };
+
+  // =======================================================
+  // LOGOUT
+  // =======================================================
+
+  const handleLogout =
+    async () => {
+      if (
+        loggingOut
+      ) {
+        return;
+      }
+
+      try {
+        setLoggingOut(
+          true
+        );
+
+        setError("");
+        setMessage("");
+
+        await logout();
+      } catch (
+        logoutError
+      ) {
+        console.error(
+          "Logout failed:",
+          logoutError
+        );
+
+        showErrorMessage(
+          "Couldn't sign out. Please try again."
+        );
+      } finally {
+        setLoggingOut(
+          false
+        );
+      }
+    };
+
+  // =======================================================
+  // FIREBASE DISPLAY NAME
+  // =======================================================
 
   useEffect(() => {
-    const accountName = firebaseUser?.displayName?.trim();
-    const existingName = localStorage.getItem("studyos_name");
+    const accountName =
+      firebaseUser
+        ?.displayName
+        ?.trim();
 
-    if (accountName && !existingName) {
-      localStorage.setItem("studyos_name", accountName);
-      setName(accountName);
+    const existingName =
+      localStorage.getItem(
+        "studyos_name"
+      );
+
+    if (
+      accountName &&
+      !existingName
+    ) {
+      localStorage.setItem(
+        "studyos_name",
+        accountName
+      );
+
+      setName(
+        accountName
+      );
 
       window.dispatchEvent(
-        new Event("studyos-name-updated")
+        new Event(
+          "studyos-name-updated"
+        )
       );
     }
-  }, [firebaseUser]);
+  }, [
+    firebaseUser,
+  ]);
 
-  // =========================
+  // =======================================================
   // THEME
-  // =========================
+  // =======================================================
 
   useEffect(() => {
-    if (theme === "light") {
+    if (
+      theme ===
+      "light"
+    ) {
       document.body.classList.add(
         "light-theme"
       );
@@ -290,167 +525,249 @@ function Settings() {
         "light-theme"
       );
     }
-  }, [theme]);
+  }, [
+    theme,
+  ]);
 
-  const changeTheme = (newTheme) => {
-    setTheme(newTheme);
-
-    localStorage.setItem(
-      "studyos_theme",
+  const changeTheme =
+    (
       newTheme
-    );
+    ) => {
+      setTheme(
+        newTheme
+      );
 
-    window.dispatchEvent(
-      new Event("studyos-theme-updated")
-    );
+      localStorage.setItem(
+        "studyos_theme",
+        newTheme
+      );
 
-    showSuccessMessage(
-      `Switched to ${newTheme} theme`
-    );
-  };
+      window.dispatchEvent(
+        new Event(
+          "studyos-theme-updated"
+        )
+      );
 
-  // =========================
+      showSuccessMessage(
+        `Switched to ${newTheme} theme`
+      );
+    };
+
+  // =======================================================
   // SAVE PROFILE
-  // =========================
+  // =======================================================
 
-  const saveProfile = (event) => {
-    event.preventDefault();
+  const saveProfile =
+    (
+      event
+    ) => {
+      event.preventDefault();
 
-    const cleanName = name.trim();
+      const cleanName =
+        name.trim();
 
-    localStorage.setItem(
-      "studyos_name",
-      cleanName
-    );
+      localStorage.setItem(
+        "studyos_name",
+        cleanName
+      );
 
-    setName(cleanName);
+      setName(
+        cleanName
+      );
 
-    window.dispatchEvent(
-      new Event("studyos-name-updated")
-    );
+      window.dispatchEvent(
+        new Event(
+          "studyos-name-updated"
+        )
+      );
 
-    setSaved(true);
+      setSaved(
+        true
+      );
 
-    showSuccessMessage(
-      "Profile saved successfully"
-    );
+      showSuccessMessage(
+        "Profile saved successfully"
+      );
 
-    window.setTimeout(() => {
-      setSaved(false);
-    }, 2000);
-  };
+      window.setTimeout(
+        () => {
+          setSaved(
+            false
+          );
+        },
+        2000
+      );
+    };
 
-  // =========================
+  // =======================================================
   // STARTUP PAGE
-  // =========================
+  // =======================================================
 
-  const changeStartupPage = (page) => {
-    if (!validStartupPages.includes(page)) {
-      return;
-    }
+  const changeStartupPage =
+    (
+      page
+    ) => {
+      if (
+        !VALID_STARTUP_PAGES.includes(
+          page
+        )
+      ) {
+        return;
+      }
 
-    setStartupPage(page);
-    localStorage.setItem("studyos_startup_page", page);
-
-    window.dispatchEvent(
-      new Event("studyos-preferences-updated")
-    );
-
-    showSuccessMessage("Startup page saved");
-  };
-
-  // =========================
-  // FOCUS / STUDY PREFERENCES
-  // =========================
-
-  const saveStudyPreferences = (event) => {
-    event.preventDefault();
-
-    const goal = Number(dailyGoalHours);
-    const duration = Number(focusDuration);
-
-    if (!Number.isFinite(goal) || goal < 0.25 || goal > 24) {
-      showErrorMessage(
-        "Daily study goal must be between 0.25 and 24 hours."
+      setStartupPage(
+        page
       );
-      return;
-    }
 
-    if (
-      !Number.isFinite(duration) ||
-      duration < 1 ||
-      duration > 720
-    ) {
-      showErrorMessage(
-        "Default Focus duration must be between 1 and 720 minutes."
+      localStorage.setItem(
+        "studyos_startup_page",
+        page
       );
-      return;
-    }
 
-    const cleanGoal = Math.round(goal * 100) / 100;
-    const cleanDuration = Math.round(duration);
+      window.dispatchEvent(
+        new Event(
+          "studyos-preferences-updated"
+        )
+      );
 
-    setDailyGoalHours(cleanGoal);
-    setFocusDuration(cleanDuration);
+      showSuccessMessage(
+        "Startup page saved"
+      );
+    };
 
-    localStorage.setItem("studyos_study_goal", String(cleanGoal));
-    localStorage.setItem(
-      "studyos_focus_duration",
-      String(cleanDuration)
-    );
+  // =======================================================
+  // STUDY SETTINGS
+  // =======================================================
 
-    window.dispatchEvent(
-      new Event("studyos-focus-settings-updated")
-    );
+  const saveStudyPreferences =
+    (
+      event
+    ) => {
+      event.preventDefault();
 
-    window.dispatchEvent(
-      new Event("studyos-preferences-updated")
-    );
+      const goal =
+        Number(
+          dailyGoalHours
+        );
 
-    showSuccessMessage("Study preferences saved");
-  };
+      const duration =
+        Number(
+          focusDuration
+        );
 
-  // =========================
-  // STORAGE HELPERS
-  // =========================
+      if (
+        !Number.isFinite(
+          goal
+        ) ||
+        goal < 0.25 ||
+        goal > 24
+      ) {
+        showErrorMessage(
+          "Daily study goal must be between 0.25 and 24 hours."
+        );
+
+        return;
+      }
+
+      if (
+        !Number.isFinite(
+          duration
+        ) ||
+        duration < 1 ||
+        duration > 720
+      ) {
+        showErrorMessage(
+          "Default Focus duration must be between 1 and 720 minutes."
+        );
+
+        return;
+      }
+
+      const cleanGoal =
+        Math.round(
+          goal * 100
+        ) /
+        100;
+
+      const cleanDuration =
+        Math.round(
+          duration
+        );
+
+      setDailyGoalHours(
+        cleanGoal
+      );
+
+      setFocusDuration(
+        cleanDuration
+      );
+
+      localStorage.setItem(
+        "studyos_study_goal",
+        String(
+          cleanGoal
+        )
+      );
+
+      localStorage.setItem(
+        "studyos_focus_duration",
+        String(
+          cleanDuration
+        )
+      );
+
+      window.dispatchEvent(
+        new Event(
+          "studyos-focus-settings-updated"
+        )
+      );
+
+      window.dispatchEvent(
+        new Event(
+          "studyos-preferences-updated"
+        )
+      );
+
+      showSuccessMessage(
+        "Study preferences saved"
+      );
+    };
+
+  // =======================================================
+  // DATA READERS
+  // =======================================================
 
   const getTasksData =
     async () => {
-      if (isGuest) {
-        return localDb.getAll(
-          "tasks"
-        );
-      }
-
-      return apiRequest(
-        "/api/tasks"
-      );
+      return isGuest
+        ? localDb.getAll(
+            "tasks"
+          )
+        : apiRequest(
+            "/api/tasks"
+          );
     };
 
   const getSubjectsData =
     async () => {
-      if (isGuest) {
-        return localDb.getAll(
-          "subjects"
-        );
-      }
-
-      return apiRequest(
-        "/api/subjects"
-      );
+      return isGuest
+        ? localDb.getAll(
+            "subjects"
+          )
+        : apiRequest(
+            "/api/subjects"
+          );
     };
 
   const getNotesData =
     async () => {
-      if (isGuest) {
-        return localDb.getAll(
-          "notes"
-        );
-      }
-
-      return apiRequest(
-        "/api/notes"
-      );
+      return isGuest
+        ? localDb.getAll(
+            "notes"
+          )
+        : apiRequest(
+            "/api/notes"
+          );
     };
 
   const getEventsData =
@@ -475,32 +792,41 @@ function Settings() {
         notes,
         events,
         studySessions,
-      ] = await Promise.all([
-        getTasksData(),
-        getSubjectsData(),
-        getNotesData(),
-        getEventsData(),
-        getSessionsData(),
-      ]);
+      ] =
+        await Promise.all([
+          getTasksData(),
+          getSubjectsData(),
+          getNotesData(),
+          getEventsData(),
+          getSessionsData(),
+        ]);
 
       return {
         tasks:
-          Array.isArray(tasks)
+          Array.isArray(
+            tasks
+          )
             ? tasks
             : [],
 
         subjects:
-          Array.isArray(subjects)
+          Array.isArray(
+            subjects
+          )
             ? subjects
             : [],
 
         notes:
-          Array.isArray(notes)
+          Array.isArray(
+            notes
+          )
             ? notes
             : [],
 
         events:
-          Array.isArray(events)
+          Array.isArray(
+            events
+          )
             ? events
             : [],
 
@@ -513,6 +839,10 @@ function Settings() {
       };
     };
 
+  // =======================================================
+  // GLOBAL DATA EVENTS
+  // =======================================================
+
   const dispatchStudyDataUpdated =
     () => {
       [
@@ -522,7 +852,9 @@ function Settings() {
         "studyos-events-updated",
         "studyos-sessions-updated",
       ].forEach(
-        (eventName) => {
+        (
+          eventName
+        ) => {
           window.dispatchEvent(
             new Event(
               eventName
@@ -532,88 +864,115 @@ function Settings() {
       );
     };
 
-  // =========================
+  // =======================================================
   // SYSTEM STATUS
-  // =========================
+  // =======================================================
 
-  const refreshSystemStatus = async (
-    showMessage = false
-  ) => {
-    try {
-      setCheckingStatus(true);
-
-      const healthResponse = await fetch(
-        `${API_URL}/api/health`
-      );
-
-      if (!healthResponse.ok) {
-        throw new Error(
-          "Backend health check failed"
+  const refreshSystemStatus =
+    async (
+      showMessage = false
+    ) => {
+      try {
+        setCheckingStatus(
+          true
         );
-      }
 
-      setBackendStatus("online");
+        const healthResponse =
+          await fetch(
+            `${API_URL}/api/health`
+          );
 
-      const {
-        tasks,
-        subjects,
-        notes,
-        events,
-        studySessions,
-      } =
-        await getAllStudyData();
+        if (
+          !healthResponse.ok
+        ) {
+          throw new Error(
+            "Backend health check failed"
+          );
+        }
 
-      setDataCounts({
-        tasks:
-          tasks.length,
-
-        subjects:
-          subjects.length,
-
-        notes:
-          notes.length,
-
-        events:
-          events.length,
-
-        sessions:
-          studySessions.length,
-      });
-
-      if (showMessage) {
-        showSuccessMessage(
-          "System status refreshed"
+        setBackendStatus(
+          "online"
         );
-      }
-    } catch (statusError) {
-      console.error(
-        "System status error:",
+
+        const {
+          tasks,
+          subjects,
+          notes,
+          events,
+          studySessions,
+        } =
+          await getAllStudyData();
+
+        setDataCounts({
+          tasks:
+            tasks.length,
+
+          subjects:
+            subjects.length,
+
+          notes:
+            notes.length,
+
+          events:
+            events.length,
+
+          sessions:
+            studySessions.length,
+        });
+
+        if (
+          showMessage
+        ) {
+          showSuccessMessage(
+            "System status refreshed"
+          );
+        }
+      } catch (
         statusError
-      );
+      ) {
+        console.error(
+          "System status error:",
+          statusError
+        );
 
-      setBackendStatus("offline");
+        setBackendStatus(
+          "offline"
+        );
 
-      if (showMessage) {
-        showErrorMessage(
-          "StudyOS backend appears to be offline."
+        if (
+          showMessage
+        ) {
+          showErrorMessage(
+            "StudyOS backend appears to be offline."
+          );
+        }
+      } finally {
+        setCheckingStatus(
+          false
         );
       }
-    } finally {
-      setCheckingStatus(false);
-    }
-  };
+    };
 
   useEffect(() => {
-    refreshSystemStatus(false);
-  }, [isGuest]);
+    refreshSystemStatus(
+      false
+    );
+  }, [
+    isGuest,
+  ]);
 
-  // =========================
-  // BROWSER NOTIFICATION PERMISSION
-  // =========================
+  // =======================================================
+  // NOTIFICATION PERMISSION
+  // =======================================================
 
   const requestNotificationPermission =
     async () => {
-      if (!("Notification" in window)) {
+      if (
+        !(
+          "Notification"
+          in window
+        )
+      ) {
         setNotificationStatus(
           "unsupported"
         );
@@ -627,22 +986,31 @@ function Settings() {
 
       try {
         const permission =
-          await Notification.requestPermission();
+          await Notification
+            .requestPermission();
 
-        setNotificationStatus(permission);
+        setNotificationStatus(
+          permission
+        );
 
-        if (permission === "granted") {
+        if (
+          permission ===
+          "granted"
+        ) {
           showSuccessMessage(
             "Browser notifications enabled"
           );
         } else if (
-          permission === "denied"
+          permission ===
+          "denied"
         ) {
           showErrorMessage(
             "Notification permission was denied. You can change it from your browser site settings."
           );
         }
-      } catch (notificationError) {
+      } catch (
+        notificationError
+      ) {
         console.error(
           notificationError
         );
@@ -653,786 +1021,973 @@ function Settings() {
       }
     };
 
-  // =========================
+  // =======================================================
   // TEST NOTIFICATION
-  // =========================
+  // =======================================================
 
-  const testNotification = () => {
-    if (
-      !("Notification" in window) ||
-      Notification.permission !== "granted"
-    ) {
-      showErrorMessage(
-        "Enable browser notifications first."
-      );
+  const testNotification =
+    () => {
+      if (
+        !(
+          "Notification"
+          in window
+        ) ||
+        Notification.permission !==
+          "granted"
+      ) {
+        showErrorMessage(
+          "Enable browser notifications first."
+        );
 
-      return;
-    }
+        return;
+      }
 
-    try {
-      new Notification("StudyOS 🎓", {
-        body:
-          "Notifications are working correctly.",
-      });
-
-      showSuccessMessage(
-        "Test notification sent"
-      );
-    } catch (notificationError) {
-      console.error(
-        notificationError
-      );
-
-      showErrorMessage(
-        "Couldn't send the test notification."
-      );
-    }
-  };
-
-  // =========================
-  // EXPORT BACKUP
-  // =========================
-
-  const exportBackup = async () => {
-    try {
-      setExporting(true);
-      setError("");
-      setMessage("");
-
-      const {
-        tasks,
-        subjects,
-        notes,
-        events,
-        studySessions,
-      } =
-        await getAllStudyData();
-
-      const preferences = {};
-
-      PREFERENCE_KEYS.forEach(
-        (key) => {
-          const value =
-            localStorage.getItem(key);
-
-          if (value !== null) {
-            preferences[key] = value;
+      try {
+        new Notification(
+          "StudyOS",
+          {
+            body:
+              "Notifications are working correctly.",
           }
-        }
-      );
+        );
 
-      const backup = {
-        app: "StudyOS",
+        showSuccessMessage(
+          "Test notification sent"
+        );
+      } catch (
+        notificationError
+      ) {
+        console.error(
+          notificationError
+        );
 
-        version: 1,
+        showErrorMessage(
+          "Couldn't send the test notification."
+        );
+      }
+    };
 
-        exportedAt:
-          new Date().toISOString(),
+  // =======================================================
+  // EXPORT BACKUP
+  // =======================================================
 
-        preferences,
+  const exportBackup =
+    async () => {
+      try {
+        setExporting(
+          true
+        );
 
-        data: {
+        setError("");
+        setMessage("");
+
+        const {
           tasks,
           subjects,
           notes,
           events,
           studySessions,
-        },
-      };
+        } =
+          await getAllStudyData();
 
-      const blob = new Blob(
-        [
-          JSON.stringify(
-            backup,
-            null,
-            2
-          ),
-        ],
-        {
-          type: "application/json",
-        }
-      );
+        const preferences = {};
 
-      const url =
-        URL.createObjectURL(blob);
+        PREFERENCE_KEYS.forEach(
+          (
+            key
+          ) => {
+            const value =
+              localStorage.getItem(
+                key
+              );
 
-      const link =
-        document.createElement("a");
+            if (
+              value !==
+              null
+            ) {
+              preferences[
+                key
+              ] =
+                value;
+            }
+          }
+        );
 
-      const date =
-        new Date()
-          .toISOString()
-          .slice(0, 10);
+        const backup = {
+          app:
+            "StudyOS",
 
-      link.href = url;
+          version:
+            2,
 
-      link.download =
-        `studyos-backup-${date}.json`;
+          exportedAt:
+            new Date()
+              .toISOString(),
 
-      document.body.appendChild(link);
+          preferences,
 
-      link.click();
+          data: {
+            tasks,
+            subjects,
+            notes,
+            events,
+            studySessions,
+          },
+        };
 
-      link.remove();
+        const blob =
+          new Blob(
+            [
+              JSON.stringify(
+                backup,
+                null,
+                2
+              ),
+            ],
+            {
+              type:
+                "application/json",
+            }
+          );
 
-      URL.revokeObjectURL(url);
+        const url =
+          URL.createObjectURL(
+            blob
+          );
 
-      showSuccessMessage(
-        "StudyOS backup exported"
-      );
-    } catch (backupError) {
-      console.error(
-        "Backup export failed:",
+        const link =
+          document.createElement(
+            "a"
+          );
+
+        const date =
+          new Date()
+            .toISOString()
+            .slice(
+              0,
+              10
+            );
+
+        link.href =
+          url;
+
+        link.download =
+          `studyos-backup-${date}.json`;
+
+        document.body.appendChild(
+          link
+        );
+
+        link.click();
+
+        link.remove();
+
+        URL.revokeObjectURL(
+          url
+        );
+
+        showSuccessMessage(
+          "StudyOS backup exported"
+        );
+      } catch (
         backupError
-      );
+      ) {
+        console.error(
+          "Backup export failed:",
+          backupError
+        );
 
-      showErrorMessage(
-        "Couldn't export your StudyOS backup."
-      );
-    } finally {
-      setExporting(false);
-    }
-  };
+        showErrorMessage(
+          "Couldn't export your StudyOS backup."
+        );
+      } finally {
+        setExporting(
+          false
+        );
+      }
+    };
 
-  // =========================
-  // CHOOSE IMPORT FILE
-  // =========================
+  // =======================================================
+  // READ BACKUP
+  // =======================================================
 
-  const chooseBackupFile = () => {
-    fileInputRef.current?.click();
-  };
+  const handleBackupFile =
+    async (
+      event
+    ) => {
+      const file =
+        event.target
+          .files?.[0];
 
-  // =========================
-  // READ IMPORT FILE
-  // =========================
-
-  const handleBackupFile = async (
-    event
-  ) => {
-    const file =
-      event.target.files?.[0];
-
-    event.target.value = "";
-
-    if (!file) {
-      return;
-    }
-
-    try {
-      const text = await file.text();
-
-      const backup =
-        JSON.parse(text);
+      event.target.value =
+        "";
 
       if (
-        backup?.app !== "StudyOS" ||
-        !backup?.data
+        !file
       ) {
-        throw new Error(
-          "This is not a valid StudyOS backup."
-        );
+        return;
       }
 
-      setPendingBackup(backup);
-
-      setShowImportModal(true);
-
-      setError("");
-      setMessage("");
-    } catch (fileError) {
-      console.error(
-        "Backup read error:",
-        fileError
-      );
-
-      showErrorMessage(
-        fileError.message ||
-          "Invalid backup file."
-      );
-    }
-  };
-
-  // =========================
-  // IMPORT BACKUP
-  // =========================
-
-  const importBackup = async () => {
-    if (!pendingBackup) {
-      return;
-    }
-
-    try {
-      setImporting(true);
-      setError("");
-      setMessage("");
-
-      const {
-        tasks = [],
-        subjects = [],
-        notes = [],
-        events = [],
-        studySessions = [],
-      } =
-        pendingBackup.data;
-
-      const subjectIdMap =
-        new Map();
-
-      // -------------------------
-      // SUBJECTS
-      // -------------------------
-
-      for (
-        const subject
-        of subjects
-      ) {
-        const subjectData = {
-          name:
-            subject.name ||
-            "Untitled Subject",
-
-          code:
-            subject.code ||
-            "",
-
-          description:
-            subject.description ||
-            "",
-
-          color:
-            subject.color ||
-            "#6366f1",
-        };
-
-        let createdSubject;
-
-        if (isGuest) {
-          const now =
-            new Date()
-              .toISOString();
-
-          createdSubject = {
-            _id:
-              createLocalId(),
-
-            ...subjectData,
-
-            createdAt:
-              now,
-
-            updatedAt:
-              now,
-          };
-
-          await localDb.put(
-            "subjects",
-            createdSubject
+      try {
+        const backup =
+          JSON.parse(
+            await file.text()
           );
-        } else {
-          createdSubject =
-            await apiRequest(
-              "/api/subjects",
-              {
-                method:
-                  "POST",
-
-                body:
-                  JSON.stringify(
-                    subjectData
-                  ),
-              }
-            );
-        }
 
         if (
-          subject?._id &&
-          createdSubject?._id
+          backup?.app !==
+            "StudyOS" ||
+          !backup?.data
         ) {
-          subjectIdMap.set(
-            String(
-              subject._id
-            ),
-            createdSubject._id
+          throw new Error(
+            "This is not a valid StudyOS backup."
           );
         }
-      }
 
-      // -------------------------
-      // NOTES
-      // -------------------------
+        setPendingBackup(
+          backup
+        );
 
-      for (
-        const note
-        of notes
+        setShowImportModal(
+          true
+        );
+
+        setError("");
+        setMessage("");
+      } catch (
+        fileError
       ) {
-        const noteData = {
-          title:
-            note.title ||
-            "Untitled Note",
+        console.error(
+          "Backup read error:",
+          fileError
+        );
 
-          content:
-            note.content ||
-            "",
-        };
-
-        if (isGuest) {
-          const now =
-            new Date()
-              .toISOString();
-
-          await localDb.put(
-            "notes",
-            {
-              _id:
-                createLocalId(),
-
-              ...noteData,
-
-              createdAt:
-                now,
-
-              updatedAt:
-                now,
-            }
-          );
-        } else {
-          await apiRequest(
-            "/api/notes",
-            {
-              method:
-                "POST",
-
-              body:
-                JSON.stringify(
-                  noteData
-                ),
-            }
-          );
-        }
-      }
-
-      // -------------------------
-      // EVENTS
-      // -------------------------
-
-      for (
-        const calendarEvent
-        of events
-      ) {
-        await createCalendarEvent(
-          isGuest,
-          {
-            title:
-              calendarEvent.title ||
-              "Untitled Event",
-
-            date:
-              calendarEvent.date,
-
-            type:
-              calendarEvent.type ||
-              "other",
-          }
+        showErrorMessage(
+          fileError.message ||
+            "Invalid backup file."
         );
       }
+    };
 
-      // -------------------------
-      // TASKS
-      // -------------------------
+  // =======================================================
+  // IMPORT BACKUP
+  // =======================================================
 
-      for (
-        const task
-        of tasks
+  const importBackup =
+    async () => {
+      if (
+        !pendingBackup
       ) {
-        const title =
-          task.title ||
-          "Untitled Task";
+        return;
+      }
 
-        if (isGuest) {
-          const now =
-            new Date()
-              .toISOString();
+      try {
+        setImporting(
+          true
+        );
 
-          await localDb.put(
-            "tasks",
-            {
+        setError("");
+        setMessage("");
+
+        const {
+          tasks = [],
+          subjects = [],
+          notes = [],
+          events = [],
+          studySessions = [],
+        } =
+          pendingBackup.data;
+
+        const subjectIdMap =
+          new Map();
+
+        // =================================================
+        // SUBJECTS
+        // =================================================
+
+        for (
+          const subject
+          of subjects
+        ) {
+          const subjectData = {
+            name:
+              subject.name ||
+              "Untitled Subject",
+
+            code:
+              subject.code ||
+              "",
+
+            description:
+              subject.description ||
+              "",
+
+            color:
+              subject.color ||
+              "#6366f1",
+          };
+
+          let createdSubject;
+
+          if (
+            isGuest
+          ) {
+            const now =
+              new Date()
+                .toISOString();
+
+            createdSubject = {
               _id:
                 createLocalId(),
 
-              title,
-
-              completed:
-                Boolean(
-                  task.completed
-                ),
-
-              completedAt:
-                task.completed
-                  ? task.completedAt ||
-                    now
-                  : null,
+              ...subjectData,
 
               createdAt:
                 now,
 
               updatedAt:
                 now,
-            }
-          );
-        } else {
-          const createdTask =
-            await apiRequest(
-              "/api/tasks",
-              {
-                method:
-                  "POST",
+            };
 
-                body:
-                  JSON.stringify({
-                    title,
-                  }),
-              }
+            await localDb.put(
+              "subjects",
+              createdSubject
             );
+          } else {
+            createdSubject =
+              await apiRequest(
+                "/api/subjects",
+                {
+                  method:
+                    "POST",
 
-          if (task.completed) {
-            await apiRequest(
-              `/api/tasks/${createdTask._id}`,
-              {
-                method:
-                  "PATCH",
+                  body:
+                    JSON.stringify(
+                      subjectData
+                    ),
+                }
+              );
+          }
 
-                body:
-                  JSON.stringify({
-                    completed:
-                      true,
-                  }),
-              }
+          if (
+            subject?._id &&
+            createdSubject?._id
+          ) {
+            subjectIdMap.set(
+              String(
+                subject._id
+              ),
+              createdSubject._id
             );
           }
         }
-      }
 
-      // -------------------------
-      // STUDY SESSIONS
-      // -------------------------
+        // =================================================
+        // NOTES
+        // =================================================
 
-      for (
-        const session
-        of studySessions
-      ) {
-        const mappedSubjectId =
-          session.subjectId
-            ? subjectIdMap.get(
-                String(
-                  session.subjectId
-                )
-              ) ||
-              null
-            : null;
+        for (
+          const note
+          of notes
+        ) {
+          const mappedSubjectId =
+            note.subjectId
+              ? subjectIdMap.get(
+                  String(
+                    note.subjectId
+                  )
+                ) ||
+                null
+              : null;
 
-        await createStudySession(
-          isGuest,
-          {
+          const noteData = {
+            title:
+              note.title ||
+              "Untitled Note",
+
+            content:
+              note.content ||
+              "",
+
             subjectId:
               mappedSubjectId,
 
             subjectName:
-              session.subjectName ||
-              "General Study",
+              mappedSubjectId
+                ? note.subjectName ||
+                  ""
+                : "",
 
-            plannedMinutes:
-              Number(
-                session.plannedMinutes
-              ) ||
-              1,
+            pinned:
+              Boolean(
+                note.pinned
+              ),
+          };
 
-            durationSeconds:
-              Number(
-                session.durationSeconds
-              ) ||
-              1,
+          if (
+            isGuest
+          ) {
+            const now =
+              new Date()
+                .toISOString();
 
-            startedAt:
-              session.startedAt,
+            await localDb.put(
+              "notes",
+              {
+                _id:
+                  createLocalId(),
 
-            endedAt:
-              session.endedAt,
+                ...noteData,
+
+                createdAt:
+                  now,
+
+                updatedAt:
+                  now,
+              }
+            );
+          } else {
+            await apiRequest(
+              "/api/notes",
+              {
+                method:
+                  "POST",
+
+                body:
+                  JSON.stringify({
+                    title:
+                      noteData.title,
+
+                    content:
+                      noteData.content,
+
+                    subjectId:
+                      noteData.subjectId,
+
+                    pinned:
+                      noteData.pinned,
+                  }),
+              }
+            );
           }
-        );
-      }
+        }
 
-      // -------------------------
-      // PREFERENCES
-      // -------------------------
+        // =================================================
+        // EVENTS
+        // =================================================
 
-      if (
-        pendingBackup.preferences &&
-        typeof pendingBackup
-          .preferences ===
-          "object"
-      ) {
-        Object.entries(
-          pendingBackup.preferences
-        ).forEach(
-          ([key, value]) => {
-            if (
-              PREFERENCE_KEYS.includes(
-                key
+        for (
+          const calendarEvent
+          of events
+        ) {
+          await createCalendarEvent(
+            isGuest,
+            {
+              title:
+                calendarEvent.title ||
+                "Untitled Event",
+
+              date:
+                calendarEvent.date,
+
+              type:
+                calendarEvent.type ||
+                "other",
+            }
+          );
+        }
+
+        // =================================================
+        // TASKS
+        // =================================================
+
+        for (
+          const task
+          of tasks
+        ) {
+          const mappedSubjectId =
+            task.subjectId
+              ? subjectIdMap.get(
+                  String(
+                    task.subjectId
+                  )
+                ) ||
+                null
+              : null;
+
+          const taskData = {
+            title:
+              task.title ||
+              "Untitled Task",
+
+            subjectId:
+              mappedSubjectId,
+
+            subjectName:
+              mappedSubjectId
+                ? task.subjectName ||
+                  ""
+                : "",
+
+            priority:
+              [
+                "low",
+                "medium",
+                "high",
+              ].includes(
+                task.priority
               )
+                ? task.priority
+                : "medium",
+
+            dueDate:
+              task.dueDate ||
+              null,
+
+            dueTime:
+              task.dueTime ||
+              "",
+
+            completed:
+              Boolean(
+                task.completed
+              ),
+
+            completedAt:
+              task.completed
+                ? task.completedAt ||
+                  null
+                : null,
+          };
+
+          if (
+            isGuest
+          ) {
+            const now =
+              new Date()
+                .toISOString();
+
+            await localDb.put(
+              "tasks",
+              {
+                _id:
+                  createLocalId(),
+
+                ...taskData,
+
+                createdAt:
+                  now,
+
+                updatedAt:
+                  now,
+              }
+            );
+          } else {
+            const createdTask =
+              await apiRequest(
+                "/api/tasks",
+                {
+                  method:
+                    "POST",
+
+                  body:
+                    JSON.stringify({
+                      title:
+                        taskData.title,
+
+                      subjectId:
+                        taskData.subjectId,
+
+                      priority:
+                        taskData.priority,
+
+                      dueDate:
+                        taskData.dueDate,
+
+                      dueTime:
+                        taskData.dueTime,
+                    }),
+                }
+              );
+
+            if (
+              taskData.completed
             ) {
-              localStorage.setItem(
-                key,
-                String(value)
+              await apiRequest(
+                `/api/tasks/${createdTask._id}`,
+                {
+                  method:
+                    "PATCH",
+
+                  body:
+                    JSON.stringify({
+                      completed:
+                        true,
+                    }),
+                }
               );
             }
           }
-        );
+        }
 
-        const importedName =
-          localStorage.getItem(
-            "studyos_name"
-          ) || "";
+        // =================================================
+        // STUDY SESSIONS
+        // =================================================
 
-        const importedTheme =
-          localStorage.getItem(
-            "studyos_theme"
-          ) || "dark";
+        for (
+          const session
+          of studySessions
+        ) {
+          const mappedSubjectId =
+            session.subjectId
+              ? subjectIdMap.get(
+                  String(
+                    session.subjectId
+                  )
+                ) ||
+                null
+              : null;
 
-        setName(
-          importedName
-        );
+          await createStudySession(
+            isGuest,
+            {
+              subjectId:
+                mappedSubjectId,
 
-        setTheme(
-          importedTheme
-        );
+              subjectName:
+                session.subjectName ||
+                "General Study",
 
-        const importedGoal =
-          Number(
-            localStorage.getItem(
-              "studyos_study_goal"
-            )
+              plannedMinutes:
+                Number(
+                  session.plannedMinutes
+                ) ||
+                1,
+
+              durationSeconds:
+                Number(
+                  session.durationSeconds
+                ) ||
+                1,
+
+              startedAt:
+                session.startedAt,
+
+              endedAt:
+                session.endedAt,
+            }
+          );
+        }
+
+        // =================================================
+        // PREFERENCES
+        // =================================================
+
+        if (
+          pendingBackup
+            .preferences &&
+          typeof pendingBackup
+            .preferences ===
+            "object"
+        ) {
+          Object.entries(
+            pendingBackup
+              .preferences
+          ).forEach(
+            ([
+              key,
+              value,
+            ]) => {
+              if (
+                PREFERENCE_KEYS.includes(
+                  key
+                )
+              ) {
+                localStorage.setItem(
+                  key,
+                  String(
+                    value
+                  )
+                );
+              }
+            }
           );
 
-        setDailyGoalHours(
-          Number.isFinite(
-            importedGoal
-          ) &&
-          importedGoal > 0
-            ? importedGoal
-            : 2
-        );
-
-        const importedFocusDuration =
-          Number(
+          setName(
             localStorage.getItem(
-              "studyos_focus_duration"
-            )
+              "studyos_name"
+            ) ||
+              ""
           );
 
-        setFocusDuration(
-          Number.isFinite(
-            importedFocusDuration
-          ) &&
-          importedFocusDuration >=
-            1 &&
-          importedFocusDuration <=
-            720
-            ? Math.round(
-                importedFocusDuration
+          setTheme(
+            localStorage.getItem(
+              "studyos_theme"
+            ) ||
+              "dark"
+          );
+
+          const importedGoal =
+            Number(
+              localStorage.getItem(
+                "studyos_study_goal"
               )
-            : 50
-        );
+            );
 
-        const importedStartup =
-          localStorage.getItem(
-            "studyos_startup_page"
+          setDailyGoalHours(
+            Number.isFinite(
+              importedGoal
+            ) &&
+            importedGoal > 0
+              ? importedGoal
+              : 2
           );
 
-        setStartupPage(
-          validStartupPages.includes(
-            importedStartup
-          )
-            ? importedStartup
-            : "dashboard"
+          const importedFocusDuration =
+            Number(
+              localStorage.getItem(
+                "studyos_focus_duration"
+              )
+            );
+
+          setFocusDuration(
+            Number.isFinite(
+              importedFocusDuration
+            ) &&
+            importedFocusDuration >=
+              1 &&
+            importedFocusDuration <=
+              720
+              ? Math.round(
+                  importedFocusDuration
+                )
+              : 50
+          );
+
+          const importedStartup =
+            localStorage.getItem(
+              "studyos_startup_page"
+            );
+
+          setStartupPage(
+            VALID_STARTUP_PAGES.includes(
+              importedStartup
+            )
+              ? importedStartup
+              : "dashboard"
+          );
+
+          window.dispatchEvent(
+            new Event(
+              "studyos-name-updated"
+            )
+          );
+
+          window.dispatchEvent(
+            new Event(
+              "studyos-theme-updated"
+            )
+          );
+
+          window.dispatchEvent(
+            new Event(
+              "studyos-focus-settings-updated"
+            )
+          );
+
+          window.dispatchEvent(
+            new Event(
+              "studyos-preferences-updated"
+            )
+          );
+        }
+
+        dispatchStudyDataUpdated();
+
+        setShowImportModal(
+          false
         );
 
-        window.dispatchEvent(
-          new Event(
-            "studyos-name-updated"
-          )
+        setPendingBackup(
+          null
         );
 
-        window.dispatchEvent(
-          new Event(
-            "studyos-theme-updated"
-          )
+        await refreshSystemStatus(
+          false
         );
 
-        window.dispatchEvent(
-          new Event(
-            "studyos-focus-settings-updated"
-          )
+        showSuccessMessage(
+          "Backup imported successfully"
+        );
+      } catch (
+        importError
+      ) {
+        console.error(
+          "Import failed:",
+          importError
         );
 
-        window.dispatchEvent(
-          new Event(
-            "studyos-preferences-updated"
-          )
+        showErrorMessage(
+          importError.message ||
+            "Backup import failed."
+        );
+      } finally {
+        setImporting(
+          false
         );
       }
-
-      dispatchStudyDataUpdated();
-
-      setShowImportModal(
-        false
-      );
-
-      setPendingBackup(
-        null
-      );
-
-      await refreshSystemStatus(
-        false
-      );
-
-      showSuccessMessage(
-        "Backup imported successfully"
-      );
-    } catch (importError) {
-      console.error(
-        "Import failed:",
-        importError
-      );
-
-      showErrorMessage(
-        importError.message ||
-          "Backup import failed."
-      );
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  // =========================
-  // COPY DIAGNOSTICS
-  // =========================
-
-  const copyDiagnostics = async () => {
-    const diagnostics = {
-      app: "StudyOS",
-
-      mode:
-        isGuest
-          ? "guest"
-          : "account",
-
-      timestamp:
-        new Date().toISOString(),
-
-      backend:
-        backendStatus,
-
-      api:
-        API_URL,
-
-      notificationPermission:
-        notificationStatus,
-
-      theme,
-
-      preferences: {
-        dailyGoalHours,
-        focusDuration,
-        startupPage,
-      },
-
-      data: dataCounts,
-
-      browser:
-        navigator.userAgent,
     };
 
-    try {
-      await navigator.clipboard.writeText(
-        JSON.stringify(
-          diagnostics,
-          null,
-          2
+  // =======================================================
+  // DIAGNOSTICS
+  // =======================================================
+
+  const copyDiagnostics =
+    async () => {
+      const diagnostics = {
+        app:
+          "StudyOS",
+
+        mode:
+          isGuest
+            ? "guest"
+            : "account",
+
+        timestamp:
+          new Date()
+            .toISOString(),
+
+        backend:
+          backendStatus,
+
+        api:
+          API_URL,
+
+        notificationPermission:
+          notificationStatus,
+
+        theme,
+
+        preferences: {
+          dailyGoalHours,
+          focusDuration,
+          startupPage,
+        },
+
+        data:
+          dataCounts,
+
+        browser:
+          navigator.userAgent,
+      };
+
+      try {
+        await navigator
+          .clipboard
+          .writeText(
+            JSON.stringify(
+              diagnostics,
+              null,
+              2
+            )
+          );
+
+        showSuccessMessage(
+          "Diagnostics copied"
+        );
+      } catch (
+        clipboardError
+      ) {
+        console.error(
+          clipboardError
+        );
+
+        showErrorMessage(
+          "Couldn't copy diagnostics."
+        );
+      }
+    };
+
+  // =======================================================
+  // RESET PREFERENCES
+  // =======================================================
+
+  const resetPreferences =
+    () => {
+      PREFERENCE_KEYS.forEach(
+        (
+          key
+        ) => {
+          localStorage.removeItem(
+            key
+          );
+        }
+      );
+
+      setName("");
+      setTheme("dark");
+
+      setDailyGoalHours(
+        2
+      );
+
+      setFocusDuration(
+        50
+      );
+
+      setStartupPage(
+        "dashboard"
+      );
+
+      document.body.classList.remove(
+        "light-theme"
+      );
+
+      window.dispatchEvent(
+        new Event(
+          "studyos-name-updated"
         )
       );
 
+      window.dispatchEvent(
+        new Event(
+          "studyos-theme-updated"
+        )
+      );
+
+      window.dispatchEvent(
+        new Event(
+          "studyos-focus-settings-updated"
+        )
+      );
+
+      window.dispatchEvent(
+        new Event(
+          "studyos-preferences-updated"
+        )
+      );
+
+      setShowResetModal(
+        false
+      );
+
       showSuccessMessage(
-        "Diagnostics copied"
+        "Preferences reset"
       );
-    } catch (clipboardError) {
-      console.error(
-        clipboardError
-      );
+    };
 
-      showErrorMessage(
-        "Couldn't copy diagnostics."
-      );
-    }
-  };
-
-  // =========================
-  // RESET PREFERENCES
-  // =========================
-
-  const resetPreferences = () => {
-    PREFERENCE_KEYS.forEach(
-      (key) => {
-        localStorage.removeItem(key);
-      }
-    );
-
-    setName("");
-    setTheme("dark");
-    setDailyGoalHours(2);
-    setFocusDuration(50);
-    setStartupPage("dashboard");
-
-    document.body.classList.remove(
-      "light-theme"
-    );
-
-    window.dispatchEvent(
-      new Event(
-        "studyos-name-updated"
-      )
-    );
-
-    window.dispatchEvent(
-      new Event(
-        "studyos-theme-updated"
-      )
-    );
-
-    window.dispatchEvent(
-      new Event("studyos-focus-settings-updated")
-    );
-
-    window.dispatchEvent(
-      new Event("studyos-preferences-updated")
-    );
-
-    setShowResetModal(false);
-
-    showSuccessMessage(
-      "Preferences reset"
-    );
-  };
-
-  // =========================
+  // =======================================================
   // DELETE COLLECTION
-  // =========================
+  // =======================================================
 
   const deleteCollection =
     async (
       endpoint,
       storeName
     ) => {
-      if (isGuest) {
+      if (
+        isGuest
+      ) {
         await localDb.clear(
           storeName
         );
@@ -1482,9 +2037,9 @@ function Settings() {
       }
     };
 
-  // =========================
-  // DELETE ALL STUDY DATA
-  // =========================
+  // =======================================================
+  // DELETE ALL
+  // =======================================================
 
   const deleteAllStudyData =
     async () => {
@@ -1533,9 +2088,7 @@ function Settings() {
           false
         );
 
-        setDeleteText(
-          ""
-        );
+        setDeleteText("");
 
         await refreshSystemStatus(
           false
@@ -1564,38 +2117,39 @@ function Settings() {
       }
     };
 
-  // =========================
-  // STATUS LABEL
-  // =========================
+  // =======================================================
+  // NOTIFICATION LABEL
+  // =======================================================
 
-  const getNotificationLabel = () => {
-    if (
-      notificationStatus ===
-      "granted"
-    ) {
-      return "Enabled";
-    }
+  const getNotificationLabel =
+    () => {
+      if (
+        notificationStatus ===
+        "granted"
+      ) {
+        return "Enabled";
+      }
 
-    if (
-      notificationStatus ===
-      "denied"
-    ) {
-      return "Blocked";
-    }
+      if (
+        notificationStatus ===
+        "denied"
+      ) {
+        return "Blocked";
+      }
 
-    if (
-      notificationStatus ===
-      "unsupported"
-    ) {
-      return "Unsupported";
-    }
+      if (
+        notificationStatus ===
+        "unsupported"
+      ) {
+        return "Unsupported";
+      }
 
-    return "Not enabled";
-  };
+      return "Not enabled";
+    };
 
-  // =========================
-  // UI
-  // =========================
+  // =======================================================
+  // COUNTS
+  // =======================================================
 
   const totalStoredItems =
     dataCounts.tasks +
@@ -1604,467 +2158,1069 @@ function Settings() {
     dataCounts.events +
     dataCounts.sessions;
 
+  // =======================================================
+  // SETTINGS SECTIONS
+  // =======================================================
+
   const settingsSections = [
     {
-      id: "account",
-      label: "Account",
-      description: "Identity and sign out",
-      icon: BadgeCheck,
+      id:
+        "account",
+
+      label:
+        "Account",
+
+      description:
+        "Identity and sign out",
+
+      icon:
+        BadgeCheck,
     },
+
     {
-      id: "general",
-      label: "General",
-      description: "Profile and overview",
-      icon: UserRound,
+      id:
+        "general",
+
+      label:
+        "General",
+
+      description:
+        "Profile and overview",
+
+      icon:
+        UserRound,
     },
+
     {
-      id: "appearance",
-      label: "Appearance",
-      description: "Theme and interface",
-      icon: Palette,
+      id:
+        "appearance",
+
+      label:
+        "Appearance",
+
+      description:
+        "Theme and interface",
+
+      icon:
+        Palette,
     },
+
     {
-      id: "focus",
-      label: "Focus & Goals",
-      description: "Study targets and timer",
-      icon: Target,
+      id:
+        "focus",
+
+      label:
+        "Focus & Goals",
+
+      description:
+        "Study targets and timer",
+
+      icon:
+        Target,
     },
+
     {
-      id: "notifications",
-      label: "Notifications",
-      description: "Browser alerts",
-      icon: Bell,
+      id:
+        "leaderboard",
+
+      label:
+        "Leaderboard",
+
+      description:
+        "Competition and privacy",
+
+      icon:
+        Trophy,
     },
+
     {
-      id: "data",
-      label: "Data & Backup",
-      description: "Storage and restore",
-      icon: Database,
+      id:
+        "notifications",
+
+      label:
+        "Notifications",
+
+      description:
+        "Browser alerts",
+
+      icon:
+        Bell,
     },
+
     {
-      id: "system",
-      label: "System",
-      description: "API and diagnostics",
-      icon: Server,
+      id:
+        "data",
+
+      label:
+        "Data & Backup",
+
+      description:
+        "Storage and restore",
+
+      icon:
+        Database,
     },
+
     {
-      id: "danger",
-      label: "Danger Zone",
-      description: "Reset and deletion",
-      icon: ShieldAlert,
+      id:
+        "system",
+
+      label:
+        "System",
+
+      description:
+        "API and diagnostics",
+
+      icon:
+        Server,
+    },
+
+    {
+      id:
+        "danger",
+
+      label:
+        "Danger Zone",
+
+      description:
+        "Reset and deletion",
+
+      icon:
+        ShieldAlert,
     },
   ];
 
+  const settingsSectionOptions =
+    settingsSections.map(
+      (
+        section
+      ) => ({
+        value:
+          section.id,
+
+        label:
+          section.label,
+
+        description:
+          section.description,
+      })
+    );
+
   const activeSectionMeta =
     settingsSections.find(
-      (section) => section.id === activeSection
-    ) || settingsSections[0];
+      (
+        section
+      ) =>
+        section.id ===
+        activeSection
+    ) ||
+    settingsSections[0];
 
-  const ActiveSectionIcon = activeSectionMeta.icon;
+  const ActiveSectionIcon =
+    activeSectionMeta.icon;
+
+  // =======================================================
+  // UI
+  // =======================================================
 
   return (
     <div className="dashboard settings-page settings-v2-page">
+
+      {/* ===================================================
+          HEADER
+      =================================================== */}
+
       <header className="dashboard-header settings-v2-header">
+
         <div>
-          <p className="settings-v2-eyebrow">STUDYOS CONTROL CENTER</p>
-          <h1>Settings</h1>
-          <p>
-            Manage your account, profile, study goals, Focus defaults, browser
-            permissions, backups and StudyOS data.
+
+          <p className="settings-v2-eyebrow">
+            STUDYOS CONTROL CENTER
           </p>
+
+          <h1>
+            Settings
+          </h1>
+
+          <p>
+            Manage your account,
+            profile, study goals,
+            Focus defaults, browser
+            permissions, backups and
+            StudyOS data.
+          </p>
+
         </div>
 
         <div
           className={`settings-v2-api-pill settings-v2-api-${backendStatus}`}
           title={`API: ${API_URL}`}
         >
+
           <span className="settings-v2-status-dot" />
-          {backendStatus === "checking" && "Checking API"}
-          {backendStatus === "online" && "API Online"}
-          {backendStatus === "offline" && "API Offline"}
+
+          {backendStatus ===
+            "checking" &&
+            "Checking API"}
+
+          {backendStatus ===
+            "online" &&
+            "API Online"}
+
+          {backendStatus ===
+            "offline" &&
+            "API Offline"}
+
         </div>
+
       </header>
+
+      {/* ===================================================
+          SUCCESS
+      =================================================== */}
 
       {message && (
         <div className="settings-v2-notice settings-v2-notice-success">
-          <CheckCircle2 size={19} />
-          <span>{message}</span>
+
+          <CheckCircle2
+            size={19}
+          />
+
+          <span>
+            {message}
+          </span>
+
         </div>
       )}
+
+      {/* ===================================================
+          ERROR
+      =================================================== */}
 
       {error && (
         <div className="settings-v2-notice settings-v2-notice-error">
-          <XCircle size={19} />
+
+          <XCircle
+            size={19}
+          />
+
           <div>
-            <strong>Something went wrong</strong>
-            <span>{error}</span>
+
+            <strong>
+              Something went wrong
+            </strong>
+
+            <span>
+              {error}
+            </span>
+
           </div>
-          <button type="button" onClick={() => setError("")}>
+
+          <button
+            type="button"
+            onClick={() =>
+              setError("")
+            }
+          >
             Dismiss
           </button>
+
         </div>
       )}
 
+      {/* ===================================================
+          SETTINGS SHELL
+      =================================================== */}
+
       <div className="settings-v2-shell">
-        <aside className="settings-v2-nav" aria-label="Settings sections">
+
+        {/* =================================================
+            SETTINGS NAV
+        ================================================= */}
+
+        <aside
+          className="settings-v2-nav"
+          aria-label="Settings sections"
+        >
+
           <div className="settings-v2-nav-heading">
-            <span>Settings</span>
-            <small>{totalStoredItems} stored items</small>
+
+            <span>
+              Settings
+            </span>
+
+            <small>
+              {totalStoredItems}
+              {" stored items"}
+            </small>
+
           </div>
 
+          {/* ===============================================
+              MOBILE SETTINGS DROPDOWN
+          ================================================ */}
+
+          <div className="settings-v2-mobile-picker">
+
+            <StudySelect
+              value={
+                activeSection
+              }
+              onChange={
+                setActiveSection
+              }
+              options={
+                settingsSectionOptions
+              }
+              placeholder="Choose settings section"
+              className="settings-v2-section-select"
+              ariaLabel="Choose settings section"
+            />
+
+          </div>
+
+          {/* ===============================================
+              DESKTOP NAV
+          ================================================ */}
+
           <div className="settings-v2-nav-list">
-            {settingsSections.map((section) => {
-              const Icon = section.icon;
-              const isActive = activeSection === section.id;
 
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  className={`settings-v2-nav-item ${
-                    isActive ? "active" : ""
-                  }`}
-                  onClick={() => setActiveSection(section.id)}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <span className="settings-v2-nav-icon">
-                    <Icon size={18} strokeWidth={1.9} />
-                  </span>
+            {settingsSections.map(
+              (
+                section
+              ) => {
+                const Icon =
+                  section.icon;
 
-                  <span className="settings-v2-nav-copy">
-                    <strong>{section.label}</strong>
-                    <small>{section.description}</small>
-                  </span>
-                </button>
-              );
-            })}
+                const isActive =
+                  activeSection ===
+                  section.id;
+
+                return (
+                  <button
+                    key={
+                      section.id
+                    }
+                    type="button"
+                    className={`settings-v2-nav-item ${
+                      isActive
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setActiveSection(
+                        section.id
+                      )
+                    }
+                    aria-current={
+                      isActive
+                        ? "page"
+                        : undefined
+                    }
+                  >
+
+                    <span className="settings-v2-nav-icon">
+
+                      <Icon
+                        size={18}
+                        strokeWidth={1.9}
+                      />
+
+                    </span>
+
+                    <span className="settings-v2-nav-copy">
+
+                      <strong>
+                        {section.label}
+                      </strong>
+
+                      <small>
+                        {section.description}
+                      </small>
+
+                    </span>
+
+                  </button>
+                );
+              }
+            )}
+
           </div>
 
           <div className="settings-v2-nav-footer">
-            <div className="settings-v2-nav-footer-mark">S</div>
-            <div>
-              <strong>StudyOS</strong>
-              <span>Local development build</span>
+
+            <div className="settings-v2-nav-footer-mark">
+              S
             </div>
+
+            <div>
+
+              <strong>
+                StudyOS
+              </strong>
+
+              <span>
+                Local development build
+              </span>
+
+            </div>
+
           </div>
+
         </aside>
 
+        {/* =================================================
+            CONTENT
+        ================================================= */}
+
         <main className="settings-v2-content">
+
           <div className="settings-v2-section-heading">
+
             <div className="settings-v2-section-icon">
-              <ActiveSectionIcon size={21} strokeWidth={1.9} />
+
+              <ActiveSectionIcon
+                size={21}
+                strokeWidth={1.9}
+              />
+
             </div>
+
             <div>
-              <h2>{activeSectionMeta.label}</h2>
-              <p>{activeSectionMeta.description}</p>
+
+              <h2>
+                {activeSectionMeta.label}
+              </h2>
+
+              <p>
+                {activeSectionMeta.description}
+              </p>
+
             </div>
+
           </div>
 
-          {activeSection === "account" && (
+          {/* ===============================================
+              ACCOUNT
+          ================================================ */}
+
+          {activeSection ===
+            "account" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>{isAuthenticated ? "Signed-in account" : "Guest session"}</h3>
+
+                    <h3>
+                      {isAuthenticated
+                        ? "Signed-in account"
+                        : "Guest session"}
+                    </h3>
+
                     <p>
                       {isAuthenticated
                         ? "Firebase handles your sign-in and your cloud study data is private to this account."
                         : "Guest mode stores study data only in this browser using IndexedDB."}
                     </p>
+
                   </div>
-                  {isAuthenticated ? <Cloud size={21} /> : <UserRound size={21} />}
+
+                  {isAuthenticated ? (
+                    <Cloud
+                      size={21}
+                    />
+                  ) : (
+                    <UserRound
+                      size={21}
+                    />
+                  )}
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>{isAuthenticated ? (firebaseUser?.displayName || "StudyOS user") : "Guest"}</strong>
+
+                    <strong>
+                      {isAuthenticated
+                        ? firebaseUser
+                            ?.displayName ||
+                          "StudyOS user"
+                        : "Guest"}
+                    </strong>
+
                     <span>
                       {isAuthenticated
-                        ? (firebaseUser?.email || "No email available")
+                        ? firebaseUser
+                            ?.email ||
+                          "No email available"
                         : "No account or email is connected to this session."}
                     </span>
+
                   </div>
 
                   <div className="settings-v2-row-actions">
+
                     <span className="settings-v2-status-badge settings-v2-notification-granted">
-                      {isAuthenticated ? getAuthProviderLabel() : "Guest"}
+
+                      {isAuthenticated
+                        ? getAuthProviderLabel()
+                        : "Guest"}
+
                     </span>
+
                   </div>
+
                 </div>
 
                 {isAuthenticated && (
                   <div className="settings-v2-info-panel">
-                    <BadgeCheck size={18} />
+
+                    <BadgeCheck
+                      size={18}
+                    />
+
                     <div>
-                      <strong>Account protection is active</strong>
+
+                      <strong>
+                        Account protection is active
+                      </strong>
+
                       <p>
-                        Firebase verifies your sign-in and your MongoDB study data is
-                        scoped to this account.
+                        Firebase verifies
+                        your sign-in and
+                        your MongoDB study
+                        data is scoped to
+                        this account.
                       </p>
+
                     </div>
+
                   </div>
                 )}
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>{isAuthenticated ? "Sign out" : "Exit guest mode"}</strong>
+
+                    <strong>
+                      {isAuthenticated
+                        ? "Sign out"
+                        : "Exit guest mode"}
+                    </strong>
+
                     <span>
                       {isAuthenticated
                         ? "Ends this Firebase session and returns to the StudyOS welcome screen."
-                        : "Returns to the welcome screen so you can choose Google, Email, X later, or Guest again."}
+                        : "Returns to the welcome screen so you can choose an account or use Guest again."}
                     </span>
+
                   </div>
 
                   <button
                     type="button"
                     className="settings-v2-danger-outline"
-                    onClick={handleLogout}
-                    disabled={loggingOut}
+                    onClick={
+                      handleLogout
+                    }
+                    disabled={
+                      loggingOut
+                    }
                   >
-                    <LogOut size={16} />
+
+                    <LogOut
+                      size={16}
+                    />
+
                     {loggingOut
                       ? "Signing out..."
                       : isAuthenticated
-                      ? "Sign out"
-                      : "Exit guest"}
+                        ? "Sign out"
+                        : "Exit guest"}
+
                   </button>
+
                 </div>
+
               </div>
+
             </section>
           )}
 
-          {activeSection === "general" && (
+          {/* ===============================================
+              GENERAL
+          ================================================ */}
+
+          {activeSection ===
+            "general" && (
             <section className="settings-v2-section-stack">
+
+              {/* PROFILE */}
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Profile</h3>
+
+                    <h3>
+                      Profile
+                    </h3>
+
                     <p>
-                      This is the name StudyOS uses on your dashboard greeting.
+                      This is the name
+                      StudyOS uses on
+                      your dashboard
+                      greeting.
                     </p>
+
                   </div>
-                  <UserRound size={21} />
+
+                  <UserRound
+                    size={21}
+                  />
+
                 </div>
 
-                <form className="settings-v2-form" onSubmit={saveProfile}>
+                <form
+                  className="settings-v2-form"
+                  onSubmit={
+                    saveProfile
+                  }
+                >
+
                   <label className="settings-v2-field">
-                    <span>Display name</span>
-                    <small>Maximum 50 characters.</small>
+
+                    <span>
+                      Display name
+                    </span>
+
+                    <small>
+                      Maximum 50 characters.
+                    </small>
+
                     <input
                       type="text"
                       placeholder="Enter your name"
-                      value={name}
+                      value={
+                        name
+                      }
                       maxLength={50}
-                      onChange={(event) => setName(event.target.value)}
+                      onChange={(
+                        event
+                      ) =>
+                        setName(
+                          event.target.value
+                        )
+                      }
                     />
+
                   </label>
 
                   <div className="settings-v2-form-footer">
+
                     <span className="settings-v2-form-hint">
+
                       {name.trim()
                         ? `Dashboard greeting: ${name.trim()}`
                         : "No name will be shown in the dashboard greeting."}
+
                     </span>
 
                     <button
                       type="submit"
                       className="settings-v2-primary-button"
                     >
-                      {saved ? "Saved" : "Save profile"}
+                      {saved
+                        ? "Saved"
+                        : "Save profile"}
                     </button>
+
                   </div>
+
                 </form>
+
               </div>
 
+              {/* STARTUP */}
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Startup</h3>
-                    <p>Choose which page StudyOS opens to after a fresh reload.</p>
+
+                    <h3>
+                      Startup
+                    </h3>
+
+                    <p>
+                      Choose which page
+                      StudyOS opens to
+                      after a fresh
+                      reload.
+                    </p>
+
                   </div>
-                  <Timer size={21} />
+
+                  <Timer
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>Startup page</strong>
-                    <span>This takes effect the next time StudyOS is opened or reloaded.</span>
+
+                    <strong>
+                      Startup page
+                    </strong>
+
+                    <span>
+                      This takes effect
+                      the next time
+                      StudyOS is opened
+                      or reloaded.
+                    </span>
+
                   </div>
 
                   <div className="settings-v2-row-actions">
-                    <select
-                      className="settings-v3-select"
-                      value={startupPage}
-                      onChange={(event) => changeStartupPage(event.target.value)}
-                    >
-                      <option value="dashboard">Dashboard</option>
-                      <option value="tasks">Tasks</option>
-                      <option value="subjects">Subjects</option>
-                      <option value="notes">Notes</option>
-                      <option value="calendar">Calendar</option>
-                      <option value="focus">Focus</option>
-                      <option value="progress">Progress</option>
-                      <option value="settings">Settings</option>
-                    </select>
+
+                    <StudySelect
+                      value={
+                        startupPage
+                      }
+                      onChange={
+                        changeStartupPage
+                      }
+                      options={
+                        STARTUP_PAGE_OPTIONS
+                      }
+                      placeholder="Startup page"
+                      className="settings-v2-startup-select"
+                      ariaLabel="Choose startup page"
+                    />
+
                   </div>
+
                 </div>
+
               </div>
 
+              {/* OVERVIEW */}
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>StudyOS overview</h3>
-                    <p>A live snapshot of data currently stored by your app.</p>
+
+                    <h3>
+                      StudyOS overview
+                    </h3>
+
+                    <p>
+                      A live snapshot of
+                      data currently
+                      stored by your app.
+                    </p>
+
                   </div>
-                  <HardDrive size={21} />
+
+                  <HardDrive
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-stat-grid">
-                  <div className="settings-v2-stat-card">
-                    <span><ListChecks size={18} /> Tasks</span>
-                    <strong>{dataCounts.tasks}</strong>
-                  </div>
-                  <div className="settings-v2-stat-card">
-                    <span><BookOpen size={18} /> Subjects</span>
-                    <strong>{dataCounts.subjects}</strong>
-                  </div>
-                  <div className="settings-v2-stat-card">
-                    <span><FileText size={18} /> Notes</span>
-                    <strong>{dataCounts.notes}</strong>
-                  </div>
-                  <div className="settings-v2-stat-card">
-                    <span><CalendarDays size={18} /> Events</span>
-                    <strong>{dataCounts.events}</strong>
-                  </div>
-                  <div className="settings-v2-stat-card">
-                    <span><Timer size={18} /> Focus sessions</span>
-                    <strong>{dataCounts.sessions}</strong>
-                  </div>
+
+                  <StatItem
+                    icon={
+                      ListChecks
+                    }
+                    label="Tasks"
+                    value={
+                      dataCounts.tasks
+                    }
+                  />
+
+                  <StatItem
+                    icon={
+                      BookOpen
+                    }
+                    label="Subjects"
+                    value={
+                      dataCounts.subjects
+                    }
+                  />
+
+                  <StatItem
+                    icon={
+                      FileText
+                    }
+                    label="Notes"
+                    value={
+                      dataCounts.notes
+                    }
+                  />
+
+                  <StatItem
+                    icon={
+                      CalendarDays
+                    }
+                    label="Events"
+                    value={
+                      dataCounts.events
+                    }
+                  />
+
+                  <StatItem
+                    icon={
+                      Timer
+                    }
+                    label="Focus sessions"
+                    value={
+                      dataCounts.sessions
+                    }
+                  />
+
                 </div>
+
               </div>
+
             </section>
           )}
 
-          {activeSection === "appearance" && (
+          {/* ===============================================
+              APPEARANCE
+          ================================================ */}
+
+          {activeSection ===
+            "appearance" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Theme</h3>
-                    <p>Choose the visual theme used across StudyOS.</p>
+
+                    <h3>
+                      Theme
+                    </h3>
+
+                    <p>
+                      Choose the visual
+                      theme used across
+                      StudyOS.
+                    </p>
+
                   </div>
-                  <Palette size={21} />
+
+                  <Palette
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-theme-grid">
-                  <button
-                    type="button"
-                    className={`settings-v2-theme-card ${
-                      theme === "dark" ? "active" : ""
-                    }`}
-                    onClick={() => changeTheme("dark")}
-                    aria-pressed={theme === "dark"}
-                  >
-                    <div className="settings-v2-theme-preview settings-v2-theme-preview-dark">
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <div className="settings-v2-theme-copy">
-                      <span className="settings-v2-theme-icon"><Moon size={18} /></span>
-                      <div>
-                        <strong>Dark</strong>
-                        <small>Low-light StudyOS interface</small>
-                      </div>
-                    </div>
-                    {theme === "dark" && <CheckCircle2 size={19} />}
-                  </button>
 
-                  <button
-                    type="button"
-                    className={`settings-v2-theme-card ${
-                      theme === "light" ? "active" : ""
-                    }`}
-                    onClick={() => changeTheme("light")}
-                    aria-pressed={theme === "light"}
-                  >
-                    <div className="settings-v2-theme-preview settings-v2-theme-preview-light">
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <div className="settings-v2-theme-copy">
-                      <span className="settings-v2-theme-icon"><Sun size={18} /></span>
-                      <div>
-                        <strong>Light</strong>
-                        <small>Bright StudyOS interface</small>
-                      </div>
-                    </div>
-                    {theme === "light" && <CheckCircle2 size={19} />}
-                  </button>
+                  <ThemeButton
+                    theme="dark"
+                    activeTheme={
+                      theme
+                    }
+                    label="Dark"
+                    description="Low-light StudyOS interface"
+                    icon={
+                      Moon
+                    }
+                    onClick={
+                      changeTheme
+                    }
+                  />
+
+                  <ThemeButton
+                    theme="light"
+                    activeTheme={
+                      theme
+                    }
+                    label="Light"
+                    description="Bright StudyOS interface"
+                    icon={
+                      Sun
+                    }
+                    onClick={
+                      changeTheme
+                    }
+                  />
+
                 </div>
+
               </div>
 
               <div className="settings-v2-info-panel">
-                <Palette size={18} />
+
+                <Palette
+                  size={18}
+                />
+
                 <div>
-                  <strong>Theme changes save instantly</strong>
+
+                  <strong>
+                    Theme changes save instantly
+                  </strong>
+
                   <p>
-                    You do not need to press a separate save button after changing
-                    the theme.
+                    You do not need a
+                    separate save button
+                    after changing theme.
                   </p>
+
                 </div>
+
               </div>
+
             </section>
           )}
 
-          {activeSection === "focus" && (
+          {/* ===============================================
+              FOCUS
+          ================================================ */}
+
+          {activeSection ===
+            "focus" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Study targets</h3>
-                    <p>These values feed directly into Progress and new Focus sessions.</p>
+
+                    <h3>
+                      Study targets
+                    </h3>
+
+                    <p>
+                      These values feed
+                      directly into
+                      Progress and new
+                      Focus sessions.
+                    </p>
+
                   </div>
-                  <Target size={21} />
+
+                  <Target
+                    size={21}
+                  />
+
                 </div>
 
-                <form className="settings-v2-form" onSubmit={saveStudyPreferences}>
+                <form
+                  className="settings-v2-form"
+                  onSubmit={
+                    saveStudyPreferences
+                  }
+                >
+
                   <label className="settings-v2-field">
-                    <span>Daily study goal</span>
-                    <small>Used by the Progress daily-goal meter. Example: 2 = two hours.</small>
+
+                    <span>
+                      Daily study goal
+                    </span>
+
+                    <small>
+                      Used by the Progress
+                      daily-goal meter.
+                    </small>
+
                     <div className="settings-v3-unit-field">
+
                       <input
                         type="number"
                         min="0.25"
                         max="24"
                         step="0.25"
-                        value={dailyGoalHours}
-                        onChange={(event) => setDailyGoalHours(event.target.value)}
+                        value={
+                          dailyGoalHours
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          setDailyGoalHours(
+                            event.target.value
+                          )
+                        }
                       />
-                      <span>hours / day</span>
+
+                      <span>
+                        hours / day
+                      </span>
+
                     </div>
+
                   </label>
 
                   <label className="settings-v2-field">
-                    <span>Default Focus duration</span>
-                    <small>Used whenever a fresh Focus timer opens with no active session.</small>
+
+                    <span>
+                      Default Focus duration
+                    </span>
+
+                    <small>
+                      Used whenever a
+                      fresh Focus timer
+                      opens.
+                    </small>
+
                     <div className="settings-v3-unit-field">
+
                       <input
                         type="number"
                         min="1"
                         max="720"
                         step="1"
-                        value={focusDuration}
-                        onChange={(event) => setFocusDuration(event.target.value)}
+                        value={
+                          focusDuration
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          setFocusDuration(
+                            event.target.value
+                          )
+                        }
                       />
-                      <span>minutes</span>
+
+                      <span>
+                        minutes
+                      </span>
+
                     </div>
+
                   </label>
 
                   <div className="settings-v2-form-footer">
+
                     <span className="settings-v2-form-hint">
-                      Progress goal: {dailyGoalHours || 0}h · Focus default: {focusDuration || 0}m
+
+                      Progress goal:{" "}
+                      {dailyGoalHours ||
+                        0}
+                      h
+                      {" · "}
+                      Focus default:{" "}
+                      {focusDuration ||
+                        0}
+                      m
+
                     </span>
 
                     <button
@@ -2073,323 +3229,620 @@ function Settings() {
                     >
                       Save study preferences
                     </button>
+
                   </div>
+
                 </form>
+
               </div>
 
-              <div className="settings-v2-info-panel">
-                <Timer size={18} />
-                <div>
-                  <strong>These are real app settings</strong>
-                  <p>
-                    The daily goal is read by Progress and the Focus duration is read by the Focus timer.
-                  </p>
-                </div>
-              </div>
             </section>
           )}
 
-          {activeSection === "notifications" && (
+          {/* ===============================================
+              LEADERBOARD
+          ================================================ */}
+
+          {activeSection ===
+            "leaderboard" && (
+            <LeaderboardSettings />
+          )}
+
+          {/* ===============================================
+              NOTIFICATIONS
+          ================================================ */}
+
+          {activeSection ===
+            "notifications" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Browser notifications</h3>
+
+                    <h3>
+                      Browser notifications
+                    </h3>
+
                     <p>
-                      StudyOS needs browser permission before it can show desktop
-                      notifications.
+                      StudyOS needs
+                      browser permission
+                      before it can show
+                      desktop notifications.
                     </p>
+
                   </div>
-                  <Bell size={21} />
+
+                  <Bell
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>Permission</strong>
-                    <span>Current browser notification permission.</span>
+
+                    <strong>
+                      Permission
+                    </strong>
+
+                    <span>
+                      Current browser
+                      notification
+                      permission.
+                    </span>
+
                   </div>
 
                   <div className="settings-v2-row-actions">
+
                     <span
                       className={`settings-v2-status-badge settings-v2-notification-${notificationStatus}`}
                     >
                       {getNotificationLabel()}
                     </span>
 
-                    {notificationStatus !== "granted" &&
-                      notificationStatus !== "unsupported" && (
+                    {notificationStatus !==
+                      "granted" &&
+                      notificationStatus !==
+                        "unsupported" && (
                         <button
                           type="button"
                           className="settings-v2-secondary-button"
-                          onClick={requestNotificationPermission}
+                          onClick={
+                            requestNotificationPermission
+                          }
                         >
                           Enable notifications
                         </button>
                       )}
+
                   </div>
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>Test notification</strong>
+
+                    <strong>
+                      Test notification
+                    </strong>
+
                     <span>
-                      Send a real desktop notification to verify everything works.
+                      Send a desktop
+                      notification to
+                      verify everything
+                      works.
                     </span>
+
                   </div>
 
                   <button
                     type="button"
                     className="settings-v2-secondary-button"
-                    onClick={testNotification}
-                    disabled={notificationStatus !== "granted"}
+                    onClick={
+                      testNotification
+                    }
+                    disabled={
+                      notificationStatus !==
+                      "granted"
+                    }
                   >
-                    <Bell size={16} />
+
+                    <Bell
+                      size={16}
+                    />
+
                     Send test
+
                   </button>
+
                 </div>
+
               </div>
 
-              {notificationStatus === "denied" && (
+              {notificationStatus ===
+                "denied" && (
                 <div className="settings-v2-warning-panel">
-                  <ShieldAlert size={18} />
+
+                  <ShieldAlert
+                    size={18}
+                  />
+
                   <div>
-                    <strong>Notifications are blocked by the browser</strong>
+
+                    <strong>
+                      Notifications are blocked by the browser
+                    </strong>
+
                     <p>
-                      Re-enable permission from your browser's site settings, then
-                      come back here and test again.
+                      Re-enable permission
+                      from your browser
+                      site settings, then
+                      test again.
                     </p>
+
                   </div>
+
                 </div>
               )}
+
             </section>
           )}
 
-          {activeSection === "data" && (
+          {/* ===============================================
+              DATA
+          ================================================ */}
+
+          {activeSection ===
+            "data" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Stored study data</h3>
+
+                    <h3>
+                      Stored study data
+                    </h3>
+
                     <p>
                       {isGuest
                         ? "Live counts from this browser's guest IndexedDB storage."
                         : "Live counts from your private StudyOS cloud data."}
                     </p>
+
                   </div>
-                  <Database size={21} />
+
+                  <Database
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-data-list">
-                  <div className="settings-v2-data-item">
-                    <ListChecks size={18} />
-                    <span>Tasks</span>
-                    <strong>{dataCounts.tasks}</strong>
-                  </div>
-                  <div className="settings-v2-data-item">
-                    <BookOpen size={18} />
-                    <span>Subjects</span>
-                    <strong>{dataCounts.subjects}</strong>
-                  </div>
-                  <div className="settings-v2-data-item">
-                    <FileText size={18} />
-                    <span>Notes</span>
-                    <strong>{dataCounts.notes}</strong>
-                  </div>
-                  <div className="settings-v2-data-item">
-                    <CalendarDays size={18} />
-                    <span>Calendar events</span>
-                    <strong>{dataCounts.events}</strong>
-                  </div>
-                  <div className="settings-v2-data-item">
-                    <Timer size={18} />
-                    <span>Focus sessions</span>
-                    <strong>{dataCounts.sessions}</strong>
-                  </div>
+
+                  <DataItem
+                    icon={
+                      ListChecks
+                    }
+                    label="Tasks"
+                    value={
+                      dataCounts.tasks
+                    }
+                  />
+
+                  <DataItem
+                    icon={
+                      BookOpen
+                    }
+                    label="Subjects"
+                    value={
+                      dataCounts.subjects
+                    }
+                  />
+
+                  <DataItem
+                    icon={
+                      FileText
+                    }
+                    label="Notes"
+                    value={
+                      dataCounts.notes
+                    }
+                  />
+
+                  <DataItem
+                    icon={
+                      CalendarDays
+                    }
+                    label="Calendar events"
+                    value={
+                      dataCounts.events
+                    }
+                  />
+
+                  <DataItem
+                    icon={
+                      Timer
+                    }
+                    label="Focus sessions"
+                    value={
+                      dataCounts.sessions
+                    }
+                  />
+
                 </div>
+
               </div>
 
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>Backup & restore</h3>
+
+                    <h3>
+                      Backup & restore
+                    </h3>
+
                     <p>
-                      Keep a portable JSON backup of your StudyOS data and local
-                      preferences.
+                      Keep a portable
+                      JSON backup of your
+                      StudyOS data and
+                      local preferences.
                     </p>
+
                   </div>
-                  <HardDrive size={21} />
+
+                  <HardDrive
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>Export StudyOS backup</strong>
+
+                    <strong>
+                      Export StudyOS backup
+                    </strong>
+
                     <span>
-                      Downloads tasks, subjects, notes, events, Focus sessions and preferences.
+                      Downloads tasks,
+                      subjects, notes,
+                      events, Focus
+                      sessions and
+                      preferences.
                     </span>
+
                   </div>
 
                   <button
                     type="button"
                     className="settings-v2-primary-button"
-                    disabled={exporting}
-                    onClick={exportBackup}
+                    disabled={
+                      exporting
+                    }
+                    onClick={
+                      exportBackup
+                    }
                   >
-                    <Download size={16} />
-                    {exporting ? "Exporting..." : "Export backup"}
+
+                    <Download
+                      size={16}
+                    />
+
+                    {exporting
+                      ? "Exporting..."
+                      : "Export backup"}
+
                   </button>
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>Import StudyOS backup</strong>
+
+                    <strong>
+                      Import StudyOS backup
+                    </strong>
+
                     <span>
-                      Adds records from a StudyOS JSON backup to your current data.
+                      Adds records from a
+                      StudyOS JSON backup
+                      to current data.
                     </span>
+
                   </div>
 
                   <button
                     type="button"
                     className="settings-v2-secondary-button"
-                    disabled={importing}
-                    onClick={chooseBackupFile}
+                    disabled={
+                      importing
+                    }
+                    onClick={() =>
+                      fileInputRef
+                        .current
+                        ?.click()
+                    }
                   >
-                    <Upload size={16} />
+
+                    <Upload
+                      size={16}
+                    />
+
                     Import backup
+
                   </button>
 
                   <input
-                    ref={fileInputRef}
+                    ref={
+                      fileInputRef
+                    }
                     type="file"
                     accept=".json,application/json"
-                    onChange={handleBackupFile}
+                    onChange={
+                      handleBackupFile
+                    }
                     className="settings-v2-hidden-input"
                   />
+
                 </div>
+
               </div>
+
             </section>
           )}
 
-          {activeSection === "system" && (
+          {/* ===============================================
+              SYSTEM
+          ================================================ */}
+
+          {activeSection ===
+            "system" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-panel">
+
                 <div className="settings-v2-panel-header">
+
                   <div>
-                    <h3>StudyOS API</h3>
-                    <p>Connection information for your local backend.</p>
+
+                    <h3>
+                      StudyOS API
+                    </h3>
+
+                    <p>
+                      Connection
+                      information for
+                      your backend.
+                    </p>
+
                   </div>
-                  <Server size={21} />
+
+                  <Server
+                    size={21}
+                  />
+
                 </div>
 
                 <div className="settings-v2-row">
+
                   <div className="settings-v2-row-copy">
-                    <strong>Backend status</strong>
+
+                    <strong>
+                      Backend status
+                    </strong>
+
                     <span>
-                      Health check plus Tasks, Subjects, Notes, Events and Focus endpoints.
+                      Health check plus
+                      all core StudyOS
+                      endpoints.
                     </span>
+
                   </div>
 
                   <div className="settings-v2-row-actions">
+
                     <span
                       className={`settings-v2-status-badge settings-v2-backend-${backendStatus}`}
                     >
+
                       <span className="settings-v2-status-dot" />
-                      {backendStatus === "checking" && "Checking"}
-                      {backendStatus === "online" && "Online"}
-                      {backendStatus === "offline" && "Offline"}
+
+                      {backendStatus ===
+                        "checking" &&
+                        "Checking"}
+
+                      {backendStatus ===
+                        "online" &&
+                        "Online"}
+
+                      {backendStatus ===
+                        "offline" &&
+                        "Offline"}
+
                     </span>
 
                     <button
                       type="button"
                       className="settings-v2-secondary-button"
-                      disabled={checkingStatus}
-                      onClick={() => refreshSystemStatus(true)}
+                      disabled={
+                        checkingStatus
+                      }
+                      onClick={() =>
+                        refreshSystemStatus(
+                          true
+                        )
+                      }
                     >
+
                       <RefreshCw
                         size={16}
-                        className={checkingStatus ? "settings-v2-spin" : ""}
+                        className={
+                          checkingStatus
+                            ? "settings-v2-spin"
+                            : ""
+                        }
                       />
-                      {checkingStatus ? "Checking..." : "Refresh"}
+
+                      {checkingStatus
+                        ? "Checking..."
+                        : "Refresh"}
+
                     </button>
+
                   </div>
+
                 </div>
 
                 <div className="settings-v2-row">
-                  <div className="settings-v2-row-copy">
-                    <strong>API address</strong>
-                    <span className="settings-v2-mono">{API_URL}</span>
-                  </div>
-                </div>
 
-                <div className="settings-v2-row">
                   <div className="settings-v2-row-copy">
-                    <strong>Diagnostics</strong>
-                    <span>
-                      Copy current API, browser, theme and data-count information.
+
+                    <strong>
+                      API address
+                    </strong>
+
+                    <span className="settings-v2-mono">
+                      {API_URL}
                     </span>
+
+                  </div>
+
+                </div>
+
+                <div className="settings-v2-row">
+
+                  <div className="settings-v2-row-copy">
+
+                    <strong>
+                      Diagnostics
+                    </strong>
+
+                    <span>
+                      Copy current API,
+                      browser, theme and
+                      data information.
+                    </span>
+
                   </div>
 
                   <button
                     type="button"
                     className="settings-v2-secondary-button"
-                    onClick={copyDiagnostics}
+                    onClick={
+                      copyDiagnostics
+                    }
                   >
-                    <Copy size={16} />
+
+                    <Copy
+                      size={16}
+                    />
+
                     Copy diagnostics
+
                   </button>
+
                 </div>
+
               </div>
 
-              <div className="settings-v2-info-panel">
-                <Server size={18} />
-                <div>
-                  <strong>Development environment</strong>
-                  <p>
-                    This build currently talks directly to your local Express API at
-                    {` ${API_URL}`}.
-                  </p>
-                </div>
-              </div>
             </section>
           )}
 
-          {activeSection === "danger" && (
+          {/* ===============================================
+              DANGER
+          ================================================ */}
+
+          {activeSection ===
+            "danger" && (
             <section className="settings-v2-section-stack">
+
               <div className="settings-v2-danger-panel">
+
                 <div className="settings-v2-danger-copy">
+
                   <div className="settings-v2-danger-icon">
-                    <RotateCcw size={20} />
+
+                    <RotateCcw
+                      size={20}
+                    />
+
                   </div>
+
                   <div>
-                    <h3>Reset local preferences</h3>
+
+                    <h3>
+                      Reset local preferences
+                    </h3>
+
                     <p>
-                      Clears your display name, theme and StudyOS preferences from
-                      this browser. MongoDB study data remains untouched.
+                      Clears display name,
+                      theme and StudyOS
+                      preferences from
+                      this browser. Study
+                      data remains
+                      untouched.
                     </p>
+
                   </div>
+
                 </div>
 
                 <button
                   type="button"
                   className="settings-v2-danger-outline"
-                  onClick={() => setShowResetModal(true)}
+                  onClick={() =>
+                    setShowResetModal(
+                      true
+                    )
+                  }
                 >
                   Reset preferences
                 </button>
+
               </div>
 
               <div className="settings-v2-danger-panel settings-v2-danger-panel-critical">
+
                 <div className="settings-v2-danger-copy">
+
                   <div className="settings-v2-danger-icon">
-                    <Trash2 size={20} />
+
+                    <Trash2
+                      size={20}
+                    />
+
                   </div>
+
                   <div>
-                    <h3>Delete all StudyOS data</h3>
+
+                    <h3>
+                      Delete all StudyOS data
+                    </h3>
+
                     <p>
-                      {isGuest
-                        ? "Permanently deletes all guest tasks, subjects, notes, calendar events and Focus sessions from this browser. This cannot be undone."
-                        : "Permanently deletes all tasks, subjects, notes, calendar events and Focus sessions belonging to this account. This cannot be undone."}
+                      Permanently deletes
+                      every task, subject,
+                      note, calendar event
+                      and Focus session.
+                      This cannot be
+                      undone.
                     </p>
+
                   </div>
+
                 </div>
 
                 <button
@@ -2397,48 +3850,88 @@ function Settings() {
                   className="settings-v2-danger-solid"
                   onClick={() => {
                     setDeleteText("");
-                    setShowDeleteAllModal(true);
+
+                    setShowDeleteAllModal(
+                      true
+                    );
                   }}
                 >
-                  <Trash2 size={16} />
+
+                  <Trash2
+                    size={16}
+                  />
+
                   Delete everything
+
                 </button>
+
               </div>
+
             </section>
           )}
+
         </main>
+
       </div>
+
+      {/* ===================================================
+          IMPORT MODAL
+      =================================================== */}
 
       {showImportModal && (
         <div
           className="delete-modal-overlay"
-          onClick={() => {
-            if (!importing) {
-              setShowImportModal(false);
-            }
-          }}
+          onClick={() =>
+            !importing &&
+            setShowImportModal(
+              false
+            )
+          }
         >
+
           <div
             className="settings-v2-modal"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(
+              event
+            ) =>
+              event.stopPropagation()
+            }
           >
+
             <div className="settings-v2-modal-icon settings-v2-modal-icon-neutral">
-              <Upload size={22} />
+
+              <Upload
+                size={22}
+              />
+
             </div>
 
-            <h2>Import StudyOS backup?</h2>
+            <h2>
+              Import StudyOS backup?
+            </h2>
+
             <p>
-              Imported items will be added to your current StudyOS data. Existing
-              items are not automatically removed, so importing the same backup more
-              than once can create duplicates.
+              Imported items are added
+              to current data. Existing
+              items are not automatically
+              removed, so importing
+              twice can create
+              duplicates.
             </p>
 
             <div className="settings-v2-modal-actions">
+
               <button
                 type="button"
                 className="settings-v2-secondary-button"
-                disabled={importing}
-                onClick={() => setShowImportModal(false)}
+                disabled={
+                  importing
+                }
+                onClick={() =>
+                  setShowImportModal(
+                    false
+                  )
+                }
               >
                 Cancel
               </button>
@@ -2446,41 +3939,84 @@ function Settings() {
               <button
                 type="button"
                 className="settings-v2-primary-button"
-                disabled={importing}
-                onClick={importBackup}
+                disabled={
+                  importing
+                }
+                onClick={
+                  importBackup
+                }
               >
-                <Upload size={16} />
-                {importing ? "Importing..." : "Import backup"}
+
+                <Upload
+                  size={16}
+                />
+
+                {importing
+                  ? "Importing..."
+                  : "Import backup"}
+
               </button>
+
             </div>
+
           </div>
+
         </div>
       )}
+
+      {/* ===================================================
+          RESET MODAL
+      =================================================== */}
 
       {showResetModal && (
         <div
           className="delete-modal-overlay"
-          onClick={() => setShowResetModal(false)}
+          onClick={() =>
+            setShowResetModal(
+              false
+            )
+          }
         >
+
           <div
             className="settings-v2-modal"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(
+              event
+            ) =>
+              event.stopPropagation()
+            }
           >
+
             <div className="settings-v2-modal-icon settings-v2-modal-icon-warning">
-              <RotateCcw size={22} />
+
+              <RotateCcw
+                size={22}
+              />
+
             </div>
 
-            <h2>Reset preferences?</h2>
+            <h2>
+              Reset preferences?
+            </h2>
+
             <p>
-              Your display name, theme and local StudyOS preferences will return to
-              their defaults. Tasks, subjects, notes and events stay safe.
+              Your display name, theme
+              and local StudyOS
+              preferences return to
+              defaults. Study data stays
+              safe.
             </p>
 
             <div className="settings-v2-modal-actions">
+
               <button
                 type="button"
                 className="settings-v2-secondary-button"
-                onClick={() => setShowResetModal(false)}
+                onClick={() =>
+                  setShowResetModal(
+                    false
+                  )
+                }
               >
                 Cancel
               </button>
@@ -2488,58 +4024,108 @@ function Settings() {
               <button
                 type="button"
                 className="settings-v2-danger-outline"
-                onClick={resetPreferences}
+                onClick={
+                  resetPreferences
+                }
               >
                 Reset preferences
               </button>
+
             </div>
+
           </div>
+
         </div>
       )}
+
+      {/* ===================================================
+          DELETE ALL MODAL
+      =================================================== */}
 
       {showDeleteAllModal && (
         <div
           className="delete-modal-overlay"
-          onClick={() => {
-            if (!deletingAll) {
-              setShowDeleteAllModal(false);
-            }
-          }}
+          onClick={() =>
+            !deletingAll &&
+            setShowDeleteAllModal(
+              false
+            )
+          }
         >
+
           <div
             className="settings-v2-modal settings-v2-modal-danger"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(
+              event
+            ) =>
+              event.stopPropagation()
+            }
           >
+
             <div className="settings-v2-modal-icon settings-v2-modal-icon-danger">
-              <ShieldAlert size={22} />
+
+              <ShieldAlert
+                size={22}
+              />
+
             </div>
 
-            <h2>Delete all StudyOS data?</h2>
+            <h2>
+              Delete all StudyOS data?
+            </h2>
+
             <p>
-              This permanently deletes every task, subject, note, calendar event and Focus session
-              currently stored by StudyOS.
+              This permanently deletes
+              every task, subject, note,
+              calendar event and Focus
+              session currently stored
+              by StudyOS.
             </p>
 
             <label className="settings-v2-delete-field">
+
               <span>
-                Type <strong>DELETE</strong> to confirm
+                Type{" "}
+                <strong>
+                  DELETE
+                </strong>{" "}
+                to confirm
               </span>
+
               <input
                 type="text"
-                value={deleteText}
-                disabled={deletingAll}
+                value={
+                  deleteText
+                }
+                disabled={
+                  deletingAll
+                }
                 placeholder="DELETE"
                 autoComplete="off"
-                onChange={(event) => setDeleteText(event.target.value)}
+                onChange={(
+                  event
+                ) =>
+                  setDeleteText(
+                    event.target.value
+                  )
+                }
               />
+
             </label>
 
             <div className="settings-v2-modal-actions">
+
               <button
                 type="button"
                 className="settings-v2-secondary-button"
-                disabled={deletingAll}
-                onClick={() => setShowDeleteAllModal(false)}
+                disabled={
+                  deletingAll
+                }
+                onClick={() =>
+                  setShowDeleteAllModal(
+                    false
+                  )
+                }
               >
                 Cancel
               </button>
@@ -2547,17 +4133,173 @@ function Settings() {
               <button
                 type="button"
                 className="settings-v2-danger-solid"
-                disabled={deleteText !== "DELETE" || deletingAll}
-                onClick={deleteAllStudyData}
+                disabled={
+                  deleteText !==
+                    "DELETE" ||
+                  deletingAll
+                }
+                onClick={
+                  deleteAllStudyData
+                }
               >
-                <Trash2 size={16} />
-                {deletingAll ? "Deleting..." : "Delete all data"}
+
+                <Trash2
+                  size={16}
+                />
+
+                {deletingAll
+                  ? "Deleting..."
+                  : "Delete all data"}
+
               </button>
+
             </div>
+
           </div>
+
         </div>
       )}
+
     </div>
+  );
+}
+
+// =========================================================
+// STAT ITEM
+// =========================================================
+
+function StatItem({
+  icon:
+    Icon,
+  label,
+  value,
+}) {
+  return (
+    <div className="settings-v2-stat-card">
+
+      <span>
+
+        <Icon
+          size={18}
+        />
+
+        {label}
+
+      </span>
+
+      <strong>
+        {value}
+      </strong>
+
+    </div>
+  );
+}
+
+// =========================================================
+// DATA ITEM
+// =========================================================
+
+function DataItem({
+  icon:
+    Icon,
+  label,
+  value,
+}) {
+  return (
+    <div className="settings-v2-data-item">
+
+      <Icon
+        size={18}
+      />
+
+      <span>
+        {label}
+      </span>
+
+      <strong>
+        {value}
+      </strong>
+
+    </div>
+  );
+}
+
+// =========================================================
+// THEME BUTTON
+// =========================================================
+
+function ThemeButton({
+  theme,
+  activeTheme,
+  label,
+  description,
+  icon:
+    Icon,
+  onClick,
+}) {
+  const active =
+    activeTheme ===
+    theme;
+
+  return (
+    <button
+      type="button"
+      className={`settings-v2-theme-card ${
+        active
+          ? "active"
+          : ""
+      }`}
+      onClick={() =>
+        onClick(
+          theme
+        )
+      }
+      aria-pressed={
+        active
+      }
+    >
+
+      <div
+        className={`settings-v2-theme-preview settings-v2-theme-preview-${theme}`}
+      >
+
+        <span />
+        <span />
+        <span />
+
+      </div>
+
+      <div className="settings-v2-theme-copy">
+
+        <span className="settings-v2-theme-icon">
+
+          <Icon
+            size={18}
+          />
+
+        </span>
+
+        <div>
+
+          <strong>
+            {label}
+          </strong>
+
+          <small>
+            {description}
+          </small>
+
+        </div>
+
+      </div>
+
+      {active && (
+        <CheckCircle2
+          size={19}
+        />
+      )}
+
+    </button>
   );
 }
 

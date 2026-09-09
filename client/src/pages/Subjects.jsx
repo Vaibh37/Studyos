@@ -1,7 +1,24 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
+
+import {
+  AlertTriangle,
+  BookOpen,
+  CheckCircle2,
+  Clock3,
+  Hash,
+  ListChecks,
+  Pencil,
+  Plus,
+  Search,
+  Timer,
+  Trash2,
+  TrendingUp,
+  X,
+} from "lucide-react";
 
 import apiRequest from "../services/api";
 
@@ -11,13 +28,300 @@ import {
 } from "../services/localDb";
 
 import {
+  getStudySessions,
+} from "../services/studySessionData";
+
+import {
   useAuth,
 } from "../context/AuthContext";
+
+import StudySelect from "../components/StudySelect";
+
+// =========================================================
+// COLORS
+// =========================================================
+
+const SUBJECT_COLORS = [
+  "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#ec4899",
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#14b8a6",
+  "#06b6d4",
+  "#3b82f6",
+  "#64748b",
+];
+
+const SUBJECT_SORT_OPTIONS = [
+  {
+    value: "activity",
+    label: "Recent activity",
+  },
+
+  {
+    value: "name",
+    label: "Name",
+  },
+
+  {
+    value: "focus",
+    label: "Most studied",
+  },
+
+  {
+    value: "tasks",
+    label: "Most pending tasks",
+  },
+];
+
+// =========================================================
+// HELPERS
+// =========================================================
+
+const safeDate = (
+  value
+) => {
+  if (!value) {
+    return null;
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return date;
+};
+
+const formatStudyTime = (
+  seconds
+) => {
+  const safe =
+    Math.max(
+      0,
+      Number(seconds) || 0
+    );
+
+  const minutes =
+    Math.floor(
+      safe / 60
+    );
+
+  const hours =
+    Math.floor(
+      minutes / 60
+    );
+
+  const remainingMinutes =
+    minutes % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${remainingMinutes}m`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+
+  if (safe > 0) {
+    return `${Math.floor(
+      safe
+    )}s`;
+  }
+
+  return "0m";
+};
+
+const formatRelativeDate = (
+  value
+) => {
+  const date =
+    safeDate(value);
+
+  if (!date) {
+    return "Never";
+  }
+
+  const now =
+    new Date();
+
+  const today =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+  const target =
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+  const difference =
+    Math.round(
+      (
+        today -
+        target
+      ) /
+        (
+          1000 *
+          60 *
+          60 *
+          24
+        )
+    );
+
+  if (difference === 0) {
+    return "Today";
+  }
+
+  if (difference === 1) {
+    return "Yesterday";
+  }
+
+  if (
+    difference > 1 &&
+    difference < 7
+  ) {
+    return `${difference} days ago`;
+  }
+
+  return date.toLocaleDateString(
+    "en-IN",
+    {
+      day: "numeric",
+      month: "short",
+    }
+  );
+};
+
+const getSubjectId = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  if (
+    typeof value ===
+    "object"
+  ) {
+    return String(
+      value._id ||
+        value.id ||
+        ""
+    );
+  }
+
+  return String(value);
+};
+
+const sessionBelongsToSubject = (
+  session,
+  subject
+) => {
+  const sessionSubjectId =
+    getSubjectId(
+      session.subjectId
+    );
+
+  if (
+    sessionSubjectId &&
+    sessionSubjectId ===
+      String(subject._id)
+  ) {
+    return true;
+  }
+
+  if (
+    !sessionSubjectId &&
+    session.subjectName &&
+    subject.name
+  ) {
+    return (
+      session.subjectName
+        .trim()
+        .toLowerCase() ===
+      subject.name
+        .trim()
+        .toLowerCase()
+    );
+  }
+
+  return false;
+};
+
+const taskBelongsToSubject = (
+  task,
+  subject
+) => {
+  return (
+    getSubjectId(
+      task.subjectId
+    ) ===
+    String(subject._id)
+  );
+};
+
+const noteBelongsToSubject = (
+  note,
+  subject
+) => {
+  const noteSubjectId =
+    getSubjectId(
+      note.subjectId
+    );
+
+  if (
+    noteSubjectId &&
+    noteSubjectId ===
+      String(subject._id)
+  ) {
+    return true;
+  }
+
+  if (
+    !noteSubjectId &&
+    note.subjectName &&
+    subject.name
+  ) {
+    return (
+      note.subjectName
+        .trim()
+        .toLowerCase() ===
+      subject.name
+        .trim()
+        .toLowerCase()
+    );
+  }
+
+  return false;
+};
+
+// =========================================================
+// SUBJECTS
+// =========================================================
 
 function Subjects() {
   const {
     isGuest,
   } = useAuth();
+
+  // =======================================================
+  // DATA
+  // =======================================================
 
   const [
     subjects,
@@ -25,9 +329,54 @@ function Subjects() {
   ] = useState([]);
 
   const [
+    tasks,
+    setTasks,
+  ] = useState([]);
+
+  const [
+    sessions,
+    setSessions,
+  ] = useState([]);
+
+  const [
+    notes,
+    setNotes,
+  ] = useState([]);
+
+  const [
     loading,
     setLoading,
   ] = useState(true);
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  // =======================================================
+  // SEARCH / SORT
+  // =======================================================
+
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
+  const [
+    sortBy,
+    setSortBy,
+  ] = useState(
+    "activity"
+  );
+
+  // =======================================================
+  // FORM
+  // =======================================================
 
   const [
     showForm,
@@ -61,9 +410,19 @@ function Subjects() {
     "#6366f1"
   );
 
-  // =========================================
-  // DELETE MODAL
-  // =========================================
+  const [
+    saving,
+    setSaving,
+  ] = useState(false);
+
+  const [
+    formError,
+    setFormError,
+  ] = useState("");
+
+  // =======================================================
+  // DELETE
+  // =======================================================
 
   const [
     deleteTarget,
@@ -75,80 +434,202 @@ function Subjects() {
     setDeleting,
   ] = useState(false);
 
-  // =========================================================
-  // FETCH SUBJECTS
-  // =========================================================
+  // =======================================================
+  // LOAD
+  // =======================================================
 
-  const fetchSubjects =
-    async () => {
+  const loadSubjectsHub =
+    async (
+      manual = false
+    ) => {
       try {
-        setLoading(true);
-
-        let data;
-
-        // =====================================
-        // GUEST
-        // =====================================
-
-        if (isGuest) {
-          data =
-            await localDb.getAll(
-              "subjects"
-            );
-
-          data =
-            data.sort(
-              (
-                a,
-                b
-              ) =>
-                new Date(
-                  b.createdAt ||
-                    0
-                ) -
-                new Date(
-                  a.createdAt ||
-                    0
-                )
-            );
+        if (manual) {
+          setRefreshing(
+            true
+          );
+        } else {
+          setLoading(
+            true
+          );
         }
 
-        // =====================================
-        // ACCOUNT
-        // =====================================
+        setError("");
 
-        else {
-          data =
-            await apiRequest(
-              "/api/subjects"
-            );
-        }
+        const subjectsPromise =
+          isGuest
+            ? localDb.getAll(
+                "subjects"
+              )
+            : apiRequest(
+                "/api/subjects"
+              );
+
+        const tasksPromise =
+          isGuest
+            ? localDb.getAll(
+                "tasks"
+              )
+            : apiRequest(
+                "/api/tasks"
+              );
+
+        const notesPromise =
+          isGuest
+            ? localDb.getAll(
+                "notes"
+              )
+            : apiRequest(
+                "/api/notes"
+              );
+
+        const [
+          subjectData,
+          taskData,
+          sessionData,
+          noteData,
+        ] =
+          await Promise.all([
+            subjectsPromise,
+            tasksPromise,
+            getStudySessions(
+              isGuest
+            ),
+            notesPromise,
+          ]);
+
+        const safeSubjects =
+          Array.isArray(
+            subjectData
+          )
+            ? subjectData
+            : [];
+
+        const safeTasks =
+          Array.isArray(
+            taskData
+          )
+            ? taskData
+            : [];
+
+        const safeSessions =
+          Array.isArray(
+            sessionData
+          )
+            ? sessionData
+            : [];
+
+        const safeNotes =
+          Array.isArray(
+            noteData
+          )
+            ? noteData
+            : [];
 
         setSubjects(
-          Array.isArray(data)
-            ? data
-            : []
+          safeSubjects
         );
-      } catch (error) {
+
+        setTasks(
+          safeTasks
+        );
+
+        setSessions(
+          safeSessions
+        );
+
+        setNotes(
+          safeNotes
+        );
+      } catch (
+        loadError
+      ) {
         console.error(
-          "Failed to fetch subjects:",
-          error
+          "Failed to load Subjects V2:",
+          loadError
+        );
+
+        setError(
+          loadError?.message ||
+            "Could not load subject data."
         );
       } finally {
-        setLoading(false);
+        setLoading(
+          false
+        );
+
+        setRefreshing(
+          false
+        );
       }
     };
 
-  useEffect(() => {
-    fetchSubjects();
-  }, [isGuest]);
+  // =======================================================
+  // INITIAL LOAD
+  // =======================================================
 
-  // =========================================================
+  useEffect(() => {
+    loadSubjectsHub(
+      false
+    );
+  }, [
+    isGuest,
+  ]);
+
+  // =======================================================
+  // LIVE UPDATES
+  // =======================================================
+
+  useEffect(() => {
+    const refresh =
+      () => {
+        loadSubjectsHub(
+          false
+        );
+      };
+
+    const events = [
+      "studyos-tasks-updated",
+      "studyos-sessions-updated",
+      "studyos-notes-updated",
+    ];
+
+    events.forEach(
+      (
+        eventName
+      ) => {
+        window.addEventListener(
+          eventName,
+          refresh
+        );
+      }
+    );
+
+    return () => {
+      events.forEach(
+        (
+          eventName
+        ) => {
+          window.removeEventListener(
+            eventName,
+            refresh
+          );
+        }
+      );
+    };
+  }, [
+    isGuest,
+  ]);
+
+  // =======================================================
   // RESET FORM
-  // =========================================================
+  // =======================================================
 
   const resetForm =
     () => {
+      if (saving) {
+        return;
+      }
+
       setName("");
       setCode("");
       setDescription("");
@@ -160,14 +641,16 @@ function Subjects() {
         null
       );
 
+      setFormError("");
+
       setShowForm(
         false
       );
     };
 
-  // =========================================================
-  // OPEN ADD FORM
-  // =========================================================
+  // =======================================================
+  // ADD
+  // =======================================================
 
   const openAddForm =
     () => {
@@ -182,23 +665,28 @@ function Subjects() {
         "#6366f1"
       );
 
+      setFormError("");
+
       setShowForm(
         true
       );
     };
 
-  // =========================================================
-  // OPEN EDIT FORM
-  // =========================================================
+  // =======================================================
+  // EDIT
+  // =======================================================
 
   const openEditForm =
-    (subject) => {
+    (
+      subject
+    ) => {
       setEditingSubject(
         subject
       );
 
       setName(
-        subject.name
+        subject.name ||
+          ""
       );
 
       setCode(
@@ -216,27 +704,65 @@ function Subjects() {
           "#6366f1"
       );
 
+      setFormError("");
+
       setShowForm(
         true
       );
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     };
 
-  // =========================================================
-  // SAVE SUBJECT
-  // =========================================================
+  // =======================================================
+  // SAVE
+  // =======================================================
 
   const saveSubject =
-    async (event) => {
+    async (
+      event
+    ) => {
       event.preventDefault();
 
       const trimmedName =
         name.trim();
 
-      if (!trimmedName) {
+      const trimmedCode =
+        code.trim();
+
+      const trimmedDescription =
+        description.trim();
+
+      if (
+        !trimmedName
+      ) {
+        setFormError(
+          "Subject name is required."
+        );
+
+        return;
+      }
+
+      if (
+        trimmedName.length >
+        80
+      ) {
+        setFormError(
+          "Subject name is too long."
+        );
+
         return;
       }
 
       try {
+        setSaving(
+          true
+        );
+
+        setFormError("");
+
         let savedSubject;
 
         const subjectData = {
@@ -244,17 +770,13 @@ function Subjects() {
             trimmedName,
 
           code:
-            code.trim(),
+            trimmedCode,
 
           description:
-            description.trim(),
+            trimmedDescription,
 
           color,
         };
-
-        // =====================================
-        // GUEST
-        // =====================================
 
         if (isGuest) {
           const now =
@@ -266,7 +788,6 @@ function Subjects() {
           ) {
             savedSubject = {
               ...editingSubject,
-
               ...subjectData,
 
               _id:
@@ -298,13 +819,7 @@ function Subjects() {
             "subjects",
             savedSubject
           );
-        }
-
-        // =====================================
-        // ACCOUNT
-        // =====================================
-
-        else {
+        } else {
           savedSubject =
             await apiRequest(
               editingSubject
@@ -324,23 +839,23 @@ function Subjects() {
             );
         }
 
-        // =====================================
-        // UPDATE UI
-        // =====================================
-
         if (
           editingSubject
         ) {
           setSubjects(
             (
-              currentSubjects
+              current
             ) =>
-              currentSubjects.map(
+              current.map(
                 (
                   subject
                 ) =>
-                  subject._id ===
-                  savedSubject._id
+                  String(
+                    subject._id
+                  ) ===
+                  String(
+                    savedSubject._id
+                  )
                     ? savedSubject
                     : subject
               )
@@ -348,10 +863,10 @@ function Subjects() {
         } else {
           setSubjects(
             (
-              currentSubjects
+              current
             ) => [
               savedSubject,
-              ...currentSubjects,
+              ...current,
             ]
           );
         }
@@ -363,20 +878,33 @@ function Subjects() {
         );
 
         resetForm();
-      } catch (error) {
+      } catch (
+        saveError
+      ) {
         console.error(
           "Failed to save subject:",
-          error
+          saveError
+        );
+
+        setFormError(
+          saveError?.message ||
+            "Could not save subject."
+        );
+      } finally {
+        setSaving(
+          false
         );
       }
     };
 
-  // =========================================================
-  // DELETE MODAL
-  // =========================================================
+  // =======================================================
+  // DELETE
+  // =======================================================
 
   const openDeleteConfirmation =
-    (subject) => {
+    (
+      subject
+    ) => {
       setDeleteTarget(
         subject
       );
@@ -384,7 +912,9 @@ function Subjects() {
 
   const closeDeleteConfirmation =
     () => {
-      if (deleting) {
+      if (
+        deleting
+      ) {
         return;
       }
 
@@ -393,35 +923,27 @@ function Subjects() {
       );
     };
 
-  // =========================================================
-  // DELETE SUBJECT
-  // =========================================================
-
   const confirmDeleteSubject =
     async () => {
-      if (!deleteTarget) {
+      if (
+        !deleteTarget
+      ) {
         return;
       }
 
       try {
-        setDeleting(true);
+        setDeleting(
+          true
+        );
 
-        // =====================================
-        // GUEST
-        // =====================================
+        setError("");
 
         if (isGuest) {
           await localDb.remove(
             "subjects",
             deleteTarget._id
           );
-        }
-
-        // =====================================
-        // ACCOUNT
-        // =====================================
-
-        else {
+        } else {
           await apiRequest(
             `/api/subjects/${deleteTarget._id}`,
             {
@@ -433,14 +955,18 @@ function Subjects() {
 
         setSubjects(
           (
-            currentSubjects
+            current
           ) =>
-            currentSubjects.filter(
+            current.filter(
               (
                 subject
               ) =>
-                subject._id !==
-                deleteTarget._id
+                String(
+                  subject._id
+                ) !==
+                String(
+                  deleteTarget._id
+                )
             )
         );
 
@@ -453,311 +979,1302 @@ function Subjects() {
         setDeleteTarget(
           null
         );
-      } catch (error) {
+      } catch (
+        deleteError
+      ) {
         console.error(
           "Failed to delete subject:",
-          error
+          deleteError
+        );
+
+        setError(
+          deleteError?.message ||
+            "Could not delete subject."
         );
       } finally {
-        setDeleting(false);
+        setDeleting(
+          false
+        );
       }
     };
 
+  // =======================================================
+  // SUBJECT METRICS
+  // =======================================================
+
+  const subjectMetrics =
+    useMemo(() => {
+      const map =
+        new Map();
+
+      const now =
+        new Date();
+
+      const weekStart =
+        new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() -
+            6
+        );
+
+      weekStart.setHours(
+        0,
+        0,
+        0,
+        0
+      );
+
+      subjects.forEach(
+        (
+          subject
+        ) => {
+          const subjectTasks =
+            tasks.filter(
+              (
+                task
+              ) =>
+                taskBelongsToSubject(
+                  task,
+                  subject
+                )
+            );
+
+          const subjectSessions =
+            sessions.filter(
+              (
+                session
+              ) =>
+                sessionBelongsToSubject(
+                  session,
+                  subject
+                )
+            );
+
+          const subjectNotes =
+            notes.filter(
+              (
+                note
+              ) =>
+                noteBelongsToSubject(
+                  note,
+                  subject
+                )
+            );
+
+          const completedTasks =
+            subjectTasks.filter(
+              (
+                task
+              ) =>
+                Boolean(
+                  task.completed
+                )
+            ).length;
+
+          const pendingTasks =
+            subjectTasks.length -
+            completedTasks;
+
+          const completionRate =
+            subjectTasks.length >
+            0
+              ? Math.round(
+                  (
+                    completedTasks /
+                    subjectTasks.length
+                  ) *
+                    100
+                )
+              : 0;
+
+          const totalFocusSeconds =
+            subjectSessions.reduce(
+              (
+                total,
+                session
+              ) =>
+                total +
+                Math.max(
+                  0,
+                  Number(
+                    session.durationSeconds
+                  ) ||
+                    0
+                ),
+              0
+            );
+
+          const weekFocusSeconds =
+            subjectSessions.reduce(
+              (
+                total,
+                session
+              ) => {
+                const date =
+                  safeDate(
+                    session.startedAt ||
+                      session.endedAt ||
+                      session.createdAt
+                  );
+
+                if (
+                  !date ||
+                  date <
+                    weekStart
+                ) {
+                  return total;
+                }
+
+                return (
+                  total +
+                  Math.max(
+                    0,
+                    Number(
+                      session.durationSeconds
+                    ) ||
+                      0
+                  )
+                );
+              },
+              0
+            );
+
+          const lastSession =
+            [
+              ...subjectSessions,
+            ]
+              .map(
+                (
+                  session
+                ) => ({
+                  ...session,
+
+                  _studyDate:
+                    safeDate(
+                      session.startedAt ||
+                        session.endedAt ||
+                        session.createdAt
+                    ),
+                })
+              )
+              .filter(
+                (
+                  session
+                ) =>
+                  session._studyDate
+              )
+              .sort(
+                (
+                  first,
+                  second
+                ) =>
+                  second._studyDate -
+                  first._studyDate
+              )[0] ||
+            null;
+
+          const lastStudiedAt =
+            lastSession
+              ? lastSession._studyDate
+              : null;
+
+          map.set(
+            String(
+              subject._id
+            ),
+            {
+              taskCount:
+                subjectTasks.length,
+
+              completedTasks,
+
+              pendingTasks,
+
+              completionRate,
+
+              sessionCount:
+                subjectSessions.length,
+
+              noteCount:
+                subjectNotes.length,
+
+              totalFocusSeconds,
+
+              weekFocusSeconds,
+
+              lastStudiedAt,
+            }
+          );
+        }
+      );
+
+      return map;
+    }, [
+      subjects,
+      tasks,
+      sessions,
+      notes,
+    ]);
+
+  // =======================================================
+  // OVERALL STATS
+  // =======================================================
+
+  const overallStats =
+    useMemo(() => {
+      let pendingTasks =
+        0;
+
+      let completedTasks =
+        0;
+
+      let totalFocusSeconds =
+        0;
+
+      let weekFocusSeconds =
+        0;
+
+      subjectMetrics.forEach(
+        (
+          metrics
+        ) => {
+          pendingTasks +=
+            metrics.pendingTasks;
+
+          completedTasks +=
+            metrics.completedTasks;
+
+          totalFocusSeconds +=
+            metrics.totalFocusSeconds;
+
+          weekFocusSeconds +=
+            metrics.weekFocusSeconds;
+        }
+      );
+
+      return {
+        pendingTasks,
+        completedTasks,
+        totalFocusSeconds,
+        weekFocusSeconds,
+      };
+    }, [
+      subjectMetrics,
+    ]);
+
+  // =======================================================
+  // FILTER / SORT
+  // =======================================================
+
+  const visibleSubjects =
+    useMemo(() => {
+      const query =
+        search
+          .trim()
+          .toLowerCase();
+
+      const filtered =
+        subjects.filter(
+          (
+            subject
+          ) => {
+            if (
+              !query
+            ) {
+              return true;
+            }
+
+            return [
+              subject.name,
+              subject.code,
+              subject.description,
+            ]
+              .filter(
+                Boolean
+              )
+              .some(
+                (
+                  value
+                ) =>
+                  String(
+                    value
+                  )
+                    .toLowerCase()
+                    .includes(
+                      query
+                    )
+              );
+          }
+        );
+
+      return [
+        ...filtered,
+      ].sort(
+        (
+          first,
+          second
+        ) => {
+          const firstMetrics =
+            subjectMetrics.get(
+              String(
+                first._id
+              )
+            );
+
+          const secondMetrics =
+            subjectMetrics.get(
+              String(
+                second._id
+              )
+            );
+
+          if (
+            sortBy ===
+            "name"
+          ) {
+            return first.name.localeCompare(
+              second.name
+            );
+          }
+
+          if (
+            sortBy ===
+            "focus"
+          ) {
+            return (
+              (
+                secondMetrics
+                  ?.totalFocusSeconds ||
+                0
+              ) -
+              (
+                firstMetrics
+                  ?.totalFocusSeconds ||
+                0
+              )
+            );
+          }
+
+          if (
+            sortBy ===
+            "tasks"
+          ) {
+            return (
+              (
+                secondMetrics
+                  ?.pendingTasks ||
+                0
+              ) -
+              (
+                firstMetrics
+                  ?.pendingTasks ||
+                0
+              )
+            );
+          }
+
+          const firstActivity =
+            firstMetrics
+              ?.lastStudiedAt
+              ?.getTime?.() ||
+            safeDate(
+              first.createdAt
+            )?.getTime() ||
+            0;
+
+          const secondActivity =
+            secondMetrics
+              ?.lastStudiedAt
+              ?.getTime?.() ||
+            safeDate(
+              second.createdAt
+            )?.getTime() ||
+            0;
+
+          return (
+            secondActivity -
+            firstActivity
+          );
+        }
+      );
+    }, [
+      subjects,
+      subjectMetrics,
+      search,
+      sortBy,
+    ]);
+
+  // =======================================================
+  // UI
+  // =======================================================
+
   return (
-    <div className="dashboard">
+    <div className="dashboard subjects-v2-page">
 
-      {/* HEADER */}
-
-      <header className="dashboard-header">
+      <header className="dashboard-header subjects-v2-header">
 
         <div>
 
+          <span className="subjects-v2-eyebrow">
+            STUDY LIBRARY
+          </span>
+
           <h1>
-            Subjects 📚
+            Subjects
           </h1>
 
           <p>
-            Organize your studies by subject.
+            Organize your coursework
+            and see real Focus and
+            task activity for every
+            subject.
           </p>
 
         </div>
 
         <button
-          className="add-subject-button"
-          onClick={openAddForm}
+          type="button"
+          className="subjects-v2-add-button"
+          onClick={
+            openAddForm
+          }
         >
-          + Add Subject
+
+          <Plus
+            size={16}
+          />
+
+          Add subject
+
         </button>
 
       </header>
 
-      {/* ADD / EDIT FORM */}
+      {error && (
+        <div className="subjects-v2-error">
+
+          <AlertTriangle
+            size={16}
+          />
+
+          <span>
+            {error}
+          </span>
+
+          <button
+            type="button"
+            onClick={() =>
+              setError("")
+            }
+            aria-label="Dismiss error"
+          >
+            <X
+              size={15}
+            />
+          </button>
+
+        </div>
+      )}
+
+      <section className="subjects-v2-stats">
+
+        <SubjectStat
+          icon={
+            <BookOpen
+              size={18}
+            />
+          }
+          label="Subjects"
+          value={
+            subjects.length
+          }
+          description="Active study areas"
+        />
+
+        <SubjectStat
+          icon={
+            <Timer
+              size={18}
+            />
+          }
+          label="Focus this week"
+          value={
+            formatStudyTime(
+              overallStats.weekFocusSeconds
+            )
+          }
+          description="Across your subjects"
+        />
+
+        <SubjectStat
+          icon={
+            <ListChecks
+              size={18}
+            />
+          }
+          label="Pending tasks"
+          value={
+            overallStats.pendingTasks
+          }
+          description="Linked to subjects"
+        />
+
+        <SubjectStat
+          icon={
+            <CheckCircle2
+              size={18}
+            />
+          }
+          label="Completed"
+          value={
+            overallStats.completedTasks
+          }
+          description="Linked subject tasks"
+        />
+
+      </section>
 
       {showForm && (
+        <section className="dashboard-card subjects-v2-form-card">
 
-        <section className="dashboard-card subject-form-card">
+          <div className="subjects-v2-form-header">
 
-          <div className="card-header">
+            <div>
 
-            <h2>
-              {editingSubject
-                ? "Edit Subject"
-                : "Add New Subject"}
-            </h2>
+              <span className="subjects-v2-eyebrow">
+                {editingSubject
+                  ? "EDIT SUBJECT"
+                  : "NEW SUBJECT"}
+              </span>
+
+              <h2>
+                {editingSubject
+                  ? "Update subject"
+                  : "Create subject"}
+              </h2>
+
+              <p>
+                Add a clear name,
+                optional code and a
+                visual color.
+              </p>
+
+            </div>
 
             <button
               type="button"
-              onClick={resetForm}
+              className="subjects-v2-icon-button"
+              onClick={
+                resetForm
+              }
+              disabled={
+                saving
+              }
+              aria-label="Close subject form"
             >
-              Cancel
+
+              <X
+                size={17}
+              />
+
             </button>
 
           </div>
 
           <form
-            className="subject-form"
-            onSubmit={saveSubject}
+            className="subjects-v2-form"
+            onSubmit={
+              saveSubject
+            }
           >
 
-            <div className="subject-form-row">
+            <div className="subjects-v2-form-grid">
 
-              <label>
-                Subject name
+              <label className="subjects-v2-field">
 
-                <input
-                  type="text"
-                  placeholder="e.g. Mathematics"
-                  value={name}
-                  onChange={(event) =>
-                    setName(
-                      event.target.value
-                    )
-                  }
-                />
+                <span>
+                  Subject name
+                </span>
+
+                <div className="subjects-v2-input-wrap">
+
+                  <BookOpen
+                    size={15}
+                  />
+
+                  <input
+                    type="text"
+                    maxLength={80}
+                    placeholder="e.g. Mathematics"
+                    value={
+                      name
+                    }
+                    onChange={(
+                      event
+                    ) => {
+                      setName(
+                        event.target
+                          .value
+                      );
+
+                      setFormError(
+                        ""
+                      );
+                    }}
+                    disabled={
+                      saving
+                    }
+                    autoFocus
+                  />
+
+                </div>
+
               </label>
 
-              <label>
-                Subject code
+              <label className="subjects-v2-field">
 
-                <input
-                  type="text"
-                  placeholder="e.g. MATH101"
-                  value={code}
-                  onChange={(event) =>
-                    setCode(
-                      event.target.value
-                    )
-                  }
-                />
+                <span>
+                  Subject code
+                </span>
+
+                <div className="subjects-v2-input-wrap">
+
+                  <Hash
+                    size={15}
+                  />
+
+                  <input
+                    type="text"
+                    maxLength={30}
+                    placeholder="e.g. MATH101"
+                    value={
+                      code
+                    }
+                    onChange={(
+                      event
+                    ) =>
+                      setCode(
+                        event.target
+                          .value
+                      )
+                    }
+                    disabled={
+                      saving
+                    }
+                  />
+
+                </div>
+
               </label>
 
             </div>
 
-            <label>
-              Description
+            <label className="subjects-v2-field">
+
+              <span>
+                Description
+              </span>
 
               <textarea
-                placeholder="A short description..."
-                value={description}
-                onChange={(event) =>
+                maxLength={300}
+                placeholder="What are you studying in this subject?"
+                value={
+                  description
+                }
+                onChange={(
+                  event
+                ) =>
                   setDescription(
-                    event.target.value
+                    event.target
+                      .value
                   )
                 }
-              />
-            </label>
-
-            <label>
-              Subject color
-
-              <input
-                type="color"
-                value={color}
-                onChange={(event) =>
-                  setColor(
-                    event.target.value
-                  )
+                disabled={
+                  saving
                 }
               />
+
+              <small>
+                {description.length}/300
+              </small>
+
             </label>
 
-            <button
-              type="submit"
-              className="save-subject-button"
-            >
-              {editingSubject
-                ? "Save Changes"
-                : "Create Subject"}
-            </button>
+            <div className="subjects-v2-color-field">
+
+              <span>
+                Subject color
+              </span>
+
+              <div className="subjects-v2-color-options">
+
+                {SUBJECT_COLORS.map(
+                  (
+                    option
+                  ) => (
+                    <button
+                      key={
+                        option
+                      }
+                      type="button"
+                      className={`subjects-v2-color-option ${
+                        color ===
+                        option
+                          ? "active"
+                          : ""
+                      }`}
+                      style={{
+                        "--subject-picker-color":
+                          option,
+                      }}
+                      onClick={() =>
+                        setColor(
+                          option
+                        )
+                      }
+                      disabled={
+                        saving
+                      }
+                      aria-label={`Use color ${option}`}
+                      aria-pressed={
+                        color ===
+                        option
+                      }
+                    >
+                      {color ===
+                        option && (
+                        <CheckCircle2
+                          size={13}
+                        />
+                      )}
+                    </button>
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+            {formError && (
+              <div className="subjects-v2-form-error">
+
+                <AlertTriangle
+                  size={14}
+                />
+
+                {formError}
+
+              </div>
+            )}
+
+            <div className="subjects-v2-form-actions">
+
+              <button
+                type="button"
+                className="subjects-v2-secondary-button"
+                onClick={
+                  resetForm
+                }
+                disabled={
+                  saving
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="subjects-v2-primary-button"
+                disabled={
+                  saving ||
+                  !name.trim()
+                }
+              >
+
+                {editingSubject ? (
+                  <Pencil
+                    size={15}
+                  />
+                ) : (
+                  <Plus
+                    size={15}
+                  />
+                )}
+
+                {saving
+                  ? "Saving..."
+                  : editingSubject
+                    ? "Save changes"
+                    : "Create subject"}
+
+              </button>
+
+            </div>
 
           </form>
 
         </section>
-
       )}
 
-      {/* LOADING */}
+      <section className="subjects-v2-toolbar">
+
+        <div className="subjects-v2-search">
+
+          <Search
+            size={15}
+          />
+
+          <input
+            type="text"
+            value={
+              search
+            }
+            placeholder="Search subjects..."
+            onChange={(
+              event
+            ) =>
+              setSearch(
+                event.target.value
+              )
+            }
+          />
+
+          {search && (
+            <button
+              type="button"
+              onClick={() =>
+                setSearch("")
+              }
+              aria-label="Clear search"
+            >
+              <X
+                size={14}
+              />
+            </button>
+          )}
+
+        </div>
+
+        <StudySelect
+          value={
+            sortBy
+          }
+          onChange={
+            setSortBy
+          }
+          options={
+            SUBJECT_SORT_OPTIONS
+          }
+          placeholder="Recent activity"
+          className="subjects-v2-sort-select"
+          ariaLabel="Sort subjects"
+        />
+
+        <button
+          type="button"
+          className="subjects-v2-refresh"
+          onClick={() =>
+            loadSubjectsHub(
+              true
+            )
+          }
+          disabled={
+            refreshing
+          }
+        >
+          <TrendingUp
+            size={15}
+          />
+
+          {refreshing
+            ? "Refreshing..."
+            : "Refresh"}
+        </button>
+
+      </section>
 
       {loading ? (
 
-        <div className="dashboard-card">
-          <p>
-            Loading subjects...
-          </p>
-        </div>
+        <section className="dashboard-card subjects-v2-empty">
+
+          <BookOpen
+            size={25}
+          />
+
+          <strong>
+            Loading subjects
+          </strong>
+
+          <span>
+            Building your subject
+            overview.
+          </span>
+
+        </section>
 
       ) : subjects.length ===
         0 ? (
 
-        <div className="dashboard-card empty-subjects">
+        <section className="dashboard-card subjects-v2-empty">
 
-          <h2>
-            No subjects yet 📚
-          </h2>
+          <BookOpen
+            size={27}
+          />
 
-          <p>
-            Add your first subject to start organizing
-            your studies.
-          </p>
+          <strong>
+            No subjects yet
+          </strong>
+
+          <span>
+            Create a subject to start
+            linking tasks and Focus
+            sessions.
+          </span>
 
           <button
-            className="add-subject-button"
-            onClick={openAddForm}
+            type="button"
+            className="subjects-v2-primary-button"
+            onClick={
+              openAddForm
+            }
           >
-            + Add Subject
+            <Plus
+              size={15}
+            />
+
+            Create first subject
           </button>
 
-        </div>
+        </section>
+
+      ) : visibleSubjects.length ===
+        0 ? (
+
+        <section className="dashboard-card subjects-v2-empty">
+
+          <Search
+            size={25}
+          />
+
+          <strong>
+            No matching subjects
+          </strong>
+
+          <span>
+            Try a different search.
+          </span>
+
+        </section>
 
       ) : (
 
-        <section className="subjects-grid">
+        <section className="subjects-v2-grid">
 
-          {subjects.map(
-            (subject) => (
+          {visibleSubjects.map(
+            (
+              subject
+            ) => {
+              const metrics =
+                subjectMetrics.get(
+                  String(
+                    subject._id
+                  )
+                ) || {
+                  taskCount: 0,
+                  completedTasks: 0,
+                  pendingTasks: 0,
+                  completionRate: 0,
+                  sessionCount: 0,
+                  noteCount: 0,
+                  totalFocusSeconds: 0,
+                  weekFocusSeconds: 0,
+                  lastStudiedAt: null,
+                };
 
-              <div
-                className="subject-card"
-                key={
-                  subject._id
-                }
-              >
-
-                <div
-                  className="subject-color"
+              return (
+                <article
+                  key={
+                    subject._id
+                  }
+                  className="subjects-v2-card"
                   style={{
-                    backgroundColor:
+                    "--subject-color":
                       subject.color ||
                       "#6366f1",
                   }}
-                />
+                >
 
-                <div className="subject-card-content">
+                  <div className="subjects-v2-card-accent" />
 
-                  <div className="subject-card-header">
+                  <div className="subjects-v2-card-header">
 
-                    <div>
+                    <div className="subjects-v2-card-icon">
 
-                      <h2>
-                        {subject.name}
-                      </h2>
+                      <BookOpen
+                        size={19}
+                      />
 
-                      {subject.code && (
+                    </div>
 
-                        <span className="subject-code">
-                          {subject.code}
-                        </span>
+                    <div className="subjects-v2-card-heading">
 
-                      )}
+                      <div>
+
+                        <h2>
+                          {subject.name}
+                        </h2>
+
+                        {subject.code && (
+                          <span className="subjects-v2-code">
+                            {subject.code}
+                          </span>
+                        )}
+
+                      </div>
+
+                    </div>
+
+                    <div className="subjects-v2-card-actions">
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openEditForm(
+                            subject
+                          )
+                        }
+                        aria-label={`Edit ${subject.name}`}
+                        title="Edit subject"
+                      >
+
+                        <Pencil
+                          size={15}
+                        />
+
+                      </button>
+
+                      <button
+                        type="button"
+                        className="danger"
+                        onClick={() =>
+                          openDeleteConfirmation(
+                            subject
+                          )
+                        }
+                        aria-label={`Delete ${subject.name}`}
+                        title="Delete subject"
+                      >
+
+                        <Trash2
+                          size={15}
+                        />
+
+                      </button>
 
                     </div>
 
                   </div>
 
-                  <p className="subject-description">
+                  <p className="subjects-v2-description">
 
                     {subject.description ||
                       "No description added yet."}
 
                   </p>
 
-                  <div className="subject-card-actions">
+                  <div className="subjects-v2-focus-block">
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openEditForm(
-                          subject
-                        )
-                      }
-                    >
-                      Edit
-                    </button>
+                    <div>
 
-                    <button
-                      type="button"
-                      className="danger-button"
-                      onClick={() =>
-                        openDeleteConfirmation(
-                          subject
-                        )
-                      }
-                    >
-                      Delete
-                    </button>
+                      <span>
+                        <Timer
+                          size={13}
+                        />
+
+                        Total focus
+                      </span>
+
+                      <strong>
+                        {formatStudyTime(
+                          metrics.totalFocusSeconds
+                        )}
+                      </strong>
+
+                    </div>
+
+                    <div>
+
+                      <span>
+                        <Clock3
+                          size={13}
+                        />
+
+                        This week
+                      </span>
+
+                      <strong>
+                        {formatStudyTime(
+                          metrics.weekFocusSeconds
+                        )}
+                      </strong>
+
+                    </div>
 
                   </div>
 
-                </div>
+                  <div className="subjects-v2-progress">
 
-              </div>
+                    <div className="subjects-v2-progress-heading">
 
-            )
+                      <span>
+                        Task completion
+                      </span>
+
+                      <strong>
+                        {metrics.completionRate}%
+                      </strong>
+
+                    </div>
+
+                    <div className="subjects-v2-progress-track">
+
+                      <div
+                        className="subjects-v2-progress-bar"
+                        style={{
+                          width:
+                            `${metrics.completionRate}%`,
+                        }}
+                      />
+
+                    </div>
+
+                  </div>
+
+                  <div className="subjects-v2-mini-stats">
+
+                    <div>
+
+                      <ListChecks
+                        size={14}
+                      />
+
+                      <span>
+                        Pending
+                      </span>
+
+                      <strong>
+                        {metrics.pendingTasks}
+                      </strong>
+
+                    </div>
+
+                    <div>
+
+                      <CheckCircle2
+                        size={14}
+                      />
+
+                      <span>
+                        Done
+                      </span>
+
+                      <strong>
+                        {metrics.completedTasks}
+                      </strong>
+
+                    </div>
+
+                    <div>
+
+                      <Timer
+                        size={14}
+                      />
+
+                      <span>
+                        Sessions
+                      </span>
+
+                      <strong>
+                        {metrics.sessionCount}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+                  <div className="subjects-v2-card-footer">
+
+                    <span>
+                      {metrics.noteCount}
+                      {" "}
+                      {metrics.noteCount ===
+                      1
+                        ? "note"
+                        : "notes"}
+                    </span>
+
+                    <strong>
+                      Last studied{" "}
+                      {formatRelativeDate(
+                        metrics.lastStudiedAt
+                      )}
+                    </strong>
+
+                  </div>
+
+                </article>
+              );
+            }
           )}
 
         </section>
 
       )}
 
-      {/* DELETE CONFIRMATION */}
-
       {deleteTarget && (
-
         <div
           className="delete-modal-overlay"
-          onClick={
-            closeDeleteConfirmation
-          }
-          role="presentation"
+          onMouseDown={(
+            event
+          ) => {
+            if (
+              event.target ===
+                event.currentTarget &&
+              !deleting
+            ) {
+              closeDeleteConfirmation();
+            }
+          }}
         >
 
-          <div
-            className="delete-modal"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
+          <div className="delete-modal subjects-v2-delete-modal">
 
             <div className="delete-modal-icon">
-              🗑️
+
+              <Trash2
+                size={21}
+              />
+
             </div>
 
             <div className="delete-modal-content">
 
               <h2>
-                Delete Subject?
+                Delete subject?
               </h2>
 
               <p>
-                Are you sure you want to delete{" "}
+                Remove{" "}
                 <strong>
                   {deleteTarget.name}
-                </strong>
-                ?
+                </strong>{" "}
+                from StudyOS?
               </p>
 
               <span>
-                This action cannot be undone.
+                This action cannot be
+                undone.
               </span>
 
             </div>
@@ -787,9 +2304,15 @@ function Subjects() {
                   deleting
                 }
               >
+
+                <Trash2
+                  size={15}
+                />
+
                 {deleting
                   ? "Deleting..."
-                  : "Yes, Delete"}
+                  : "Delete subject"}
+
               </button>
 
             </div>
@@ -797,8 +2320,44 @@ function Subjects() {
           </div>
 
         </div>
-
       )}
+
+    </div>
+  );
+}
+
+// =========================================================
+// STAT CARD
+// =========================================================
+
+function SubjectStat({
+  icon,
+  label,
+  value,
+  description,
+}) {
+  return (
+    <div className="subjects-v2-stat">
+
+      <div className="subjects-v2-stat-top">
+
+        <span className="subjects-v2-stat-icon">
+          {icon}
+        </span>
+
+        <span>
+          {label}
+        </span>
+
+      </div>
+
+      <strong>
+        {value}
+      </strong>
+
+      <small>
+        {description}
+      </small>
 
     </div>
   );

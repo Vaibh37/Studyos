@@ -9,47 +9,188 @@ import {
 // HELPERS
 // =========================================================
 
-const sortEvents = (events) => {
-  return [...events].sort(
-    (a, b) =>
-      new Date(a.date) -
-      new Date(b.date)
+const sortEvents = (
+  events
+) => {
+  return [
+    ...events,
+  ].sort(
+    (a, b) => {
+      const dateA =
+        new Date(
+          a.date
+        );
+
+      const dateB =
+        new Date(
+          b.date
+        );
+
+      return (
+        dateA - dateB
+      );
+    }
   );
 };
 
-const sortSessions = (sessions) => {
-  return [...sessions].sort(
+const sortSessions = (
+  sessions
+) => {
+  return [
+    ...sessions,
+  ].sort(
     (a, b) =>
-      new Date(b.startedAt) -
-      new Date(a.startedAt)
+      new Date(
+        b.startedAt
+      ) -
+      new Date(
+        a.startedAt
+      )
   );
 };
 
 // =========================================================
-// GET EVENTS
+// TASK → CALENDAR ITEM
+// =========================================================
+
+const taskToCalendarEvent =
+  (task) => {
+    return {
+      _id:
+        `task:${task._id}`,
+
+      title:
+        task.title,
+
+      date:
+        task.dueDate,
+
+      type:
+        "task",
+
+      source:
+        "task",
+
+      taskId:
+        task._id,
+
+      subjectId:
+        task.subjectId ||
+        null,
+
+      subjectName:
+        task.subjectName ||
+        "",
+
+      priority:
+        task.priority ||
+        "medium",
+
+      dueTime:
+        task.dueTime ||
+        "",
+
+      completed:
+        Boolean(
+          task.completed
+        ),
+
+      createdAt:
+        task.createdAt,
+
+      updatedAt:
+        task.updatedAt,
+    };
+  };
+
+// =========================================================
+// GET EVENTS + TASK DEADLINES
 // =========================================================
 
 export const getCalendarEvents =
   async (isGuest) => {
-    if (isGuest) {
-      const events =
-        await localDb.getAll(
-          "events"
-        );
+    let events = [];
+    let tasks = [];
 
-      return sortEvents(
-        events
-      );
+    // =====================================================
+    // GUEST MODE
+    // =====================================================
+
+    if (isGuest) {
+      [
+        events,
+        tasks,
+      ] =
+        await Promise.all([
+          localDb.getAll(
+            "events"
+          ),
+
+          localDb.getAll(
+            "tasks"
+          ),
+        ]);
     }
 
-    const events =
-      await apiRequest(
-        "/api/events"
-      );
+    // =====================================================
+    // ACCOUNT MODE
+    // =====================================================
 
-    return Array.isArray(events)
-      ? events
-      : [];
+    else {
+      [
+        events,
+        tasks,
+      ] =
+        await Promise.all([
+          apiRequest(
+            "/api/events"
+          ),
+
+          apiRequest(
+            "/api/tasks"
+          ),
+        ]);
+    }
+
+    const safeEvents =
+      Array.isArray(
+        events
+      )
+        ? events
+        : [];
+
+    const safeTasks =
+      Array.isArray(
+        tasks
+      )
+        ? tasks
+        : [];
+
+    // =====================================================
+    // ONLY PENDING TASKS WITH DEADLINES
+    // =====================================================
+
+    const taskEvents =
+      safeTasks
+        .filter(
+          (task) =>
+            Boolean(
+              task.dueDate
+            ) &&
+            !task.completed
+        )
+        .map(
+          taskToCalendarEvent
+        );
+
+    // =====================================================
+    // MERGE WITHOUT DUPLICATING DATABASE RECORDS
+    // =====================================================
+
+    return sortEvents([
+      ...safeEvents,
+      ...taskEvents,
+    ]);
   };
 
 // =========================================================
@@ -98,7 +239,8 @@ export const createCalendarEvent =
     return apiRequest(
       "/api/events",
       {
-        method: "POST",
+        method:
+          "POST",
 
         body:
           JSON.stringify(
@@ -119,6 +261,26 @@ export const updateCalendarEvent =
     eventData,
     existingEvent = null
   ) => {
+    // =====================================================
+    // TASK DEADLINES ARE NOT CALENDAR EVENTS
+    // =====================================================
+
+    if (
+      String(
+        id
+      ).startsWith(
+        "task:"
+      )
+    ) {
+      throw new Error(
+        "Task deadlines must be edited from Tasks."
+      );
+    }
+
+    // =====================================================
+    // GUEST EVENT
+    // =====================================================
+
     if (isGuest) {
       let currentEvent =
         existingEvent;
@@ -158,10 +320,15 @@ export const updateCalendarEvent =
       return updatedEvent;
     }
 
+    // =====================================================
+    // ACCOUNT EVENT
+    // =====================================================
+
     return apiRequest(
       `/api/events/${id}`,
       {
-        method: "PUT",
+        method:
+          "PUT",
 
         body:
           JSON.stringify(
@@ -180,6 +347,26 @@ export const deleteCalendarEvent =
     isGuest,
     id
   ) => {
+    // =====================================================
+    // TASK DEADLINES ARE CONTROLLED FROM TASKS
+    // =====================================================
+
+    if (
+      String(
+        id
+      ).startsWith(
+        "task:"
+      )
+    ) {
+      throw new Error(
+        "Task deadlines must be deleted from Tasks."
+      );
+    }
+
+    // =====================================================
+    // GUEST EVENT
+    // =====================================================
+
     if (isGuest) {
       await localDb.remove(
         "events",
@@ -191,6 +378,10 @@ export const deleteCalendarEvent =
           "Event deleted successfully",
       };
     }
+
+    // =====================================================
+    // ACCOUNT EVENT
+    // =====================================================
 
     return apiRequest(
       `/api/events/${id}`,

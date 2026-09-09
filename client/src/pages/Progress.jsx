@@ -6,15 +6,22 @@ import {
 
 import {
   Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  Award,
   BarChart3,
   BookOpen,
+  CalendarCheck2,
   CheckCircle2,
   Clock3,
+  FileText,
   Flame,
+  Link2,
+  Minus,
+  Pin,
   RefreshCw,
   Target,
   Timer,
-  Trophy,
   TrendingUp,
 } from "lucide-react";
 
@@ -32,174 +39,329 @@ import {
   getStudySessions,
 } from "../services/studySessionData";
 
-function Progress() {
-  const {
-    isGuest,
-  } = useAuth();
-  // =========================================================
-  // DATA
-  // =========================================================
+// =========================================================
+// DATE HELPERS
+// =========================================================
 
-  const [tasks, setTasks] =
-    useState([]);
+const safeDate = (
+  value
+) => {
+  if (!value) {
+    return null;
+  }
 
-  const [sessions, setSessions] =
-    useState([]);
+  const date =
+    new Date(value);
 
-  const [loading, setLoading] =
-    useState(true);
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
 
-  const [refreshing, setRefreshing] =
-    useState(false);
+  return date;
+};
 
-  const [error, setError] =
-    useState("");
+const startOfDay = (
+  value = new Date()
+) => {
+  const date =
+    new Date(value);
 
-  // =========================================================
-  // DAILY GOAL
-  // =========================================================
-
-  const getDailyGoalMinutes =
-    () => {
-      const stored =
-        Number(
-          localStorage.getItem(
-            "studyos_study_goal"
-          )
-        );
-
-      if (
-        Number.isFinite(stored) &&
-        stored > 0
-      ) {
-        return stored * 60;
-      }
-
-      return 120;
-    };
-
-  const [
-    dailyGoalMinutes,
-    setDailyGoalMinutes,
-  ] = useState(
-    getDailyGoalMinutes
+  date.setHours(
+    0,
+    0,
+    0,
+    0
   );
 
-  // =========================================================
-  // DATE HELPERS
-  // =========================================================
+  return date;
+};
 
-  const startOfDay = (
+const addDays = (
+  value,
+  amount
+) => {
+  const date =
+    new Date(value);
+
+  date.setDate(
+    date.getDate() +
+      amount
+  );
+
+  return startOfDay(
     date
-  ) => {
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
+  );
+};
+
+const dateKey = (
+  value
+) => {
+  const date =
+    startOfDay(
+      value
+    );
+
+  return [
+    date.getFullYear(),
+
+    String(
+      date.getMonth() +
+        1
+    ).padStart(
+      2,
+      "0"
+    ),
+
+    String(
       date.getDate()
+    ).padStart(
+      2,
+      "0"
+    ),
+  ].join("-");
+};
+
+// =========================================================
+// GENERAL HELPERS
+// =========================================================
+
+const getSubjectId = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  if (
+    typeof value ===
+    "object"
+  ) {
+    return String(
+      value._id ||
+        value.id ||
+        ""
     );
-  };
+  }
 
-  const subtractDays = (
-    date,
-    amount
-  ) => {
-    const copy =
-      new Date(date);
+  return String(
+    value
+  );
+};
 
-    copy.setDate(
-      copy.getDate() -
-        amount
+const formatStudyTime = (
+  seconds
+) => {
+  const safe =
+    Math.max(
+      0,
+      Number(seconds) ||
+        0
     );
 
-    return startOfDay(
-      copy
+  const minutes =
+    Math.floor(
+      safe / 60
     );
-  };
 
-  const getDateKey = (
-    date
-  ) => {
-    return [
-      date.getFullYear(),
-
-      String(
-        date.getMonth() +
-          1
-      ).padStart(
-        2,
-        "0"
-      ),
-
-      String(
-        date.getDate()
-      ).padStart(
-        2,
-        "0"
-      ),
-    ].join("-");
-  };
-
-  const isSameDay = (
-    a,
-    b
-  ) => {
-    return (
-      getDateKey(a) ===
-      getDateKey(b)
+  const hours =
+    Math.floor(
+      minutes / 60
     );
-  };
 
-  // =========================================================
-  // FORMAT STUDY TIME
-  // =========================================================
+  const remaining =
+    minutes % 60;
 
-  const formatStudyTime = (
-    seconds
-  ) => {
-    const safe =
+  if (hours > 0) {
+    return `${hours}h ${remaining}m`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+
+  if (safe > 0) {
+    return `${Math.floor(
+      safe
+    )}s`;
+  }
+
+  return "0m";
+};
+
+const formatChartValue = (
+  seconds
+) => {
+  const minutes =
+    Math.round(
       Math.max(
         0,
         Number(seconds) ||
           0
-      );
+      ) / 60
+    );
 
-    const totalMinutes =
-      Math.floor(
-        safe / 60
-      );
-
+  if (
+    minutes >= 60
+  ) {
     const hours =
-      Math.floor(
-        totalMinutes /
-          60
+      minutes / 60;
+
+    return `${hours.toFixed(
+      hours >= 10
+        ? 0
+        : 1
+    )}h`;
+  }
+
+  return `${minutes}m`;
+};
+
+const formatRelativeActivity = (
+  value
+) => {
+  const date =
+    safeDate(
+      value
+    );
+
+  if (!date) {
+    return "";
+  }
+
+  const now =
+    new Date();
+
+  const today =
+    startOfDay(
+      now
+    );
+
+  const target =
+    startOfDay(
+      date
+    );
+
+  const diffDays =
+    Math.round(
+      (
+        today.getTime() -
+        target.getTime()
+      ) /
+        86400000
+    );
+
+  const time =
+    date.toLocaleTimeString(
+      "en-IN",
+      {
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+      }
+    );
+
+  if (
+    diffDays === 0
+  ) {
+    return `Today · ${time}`;
+  }
+
+  if (
+    diffDays === 1
+  ) {
+    return `Yesterday · ${time}`;
+  }
+
+  return date.toLocaleDateString(
+    "en-IN",
+    {
+      day:
+        "numeric",
+
+      month:
+        "short",
+    }
+  );
+};
+
+// =========================================================
+// PROGRESS
+// =========================================================
+
+function Progress() {
+  const {
+    isGuest,
+  } = useAuth();
+
+  // =======================================================
+  // DATA
+  // =======================================================
+
+  const [
+    tasks,
+    setTasks,
+  ] = useState([]);
+
+  const [
+    sessions,
+    setSessions,
+  ] = useState([]);
+
+  const [
+    subjects,
+    setSubjects,
+  ] = useState([]);
+
+  const [
+    notes,
+    setNotes,
+  ] = useState([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    dailyGoalMinutes,
+    setDailyGoalMinutes,
+  ] = useState(() => {
+    const stored =
+      Number(
+        localStorage.getItem(
+          "studyos_study_goal"
+        )
       );
 
-    const minutes =
-      totalMinutes %
-      60;
+    return (
+      Number.isFinite(
+        stored
+      ) &&
+      stored > 0
+        ? stored * 60
+        : 120
+    );
+  });
 
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-
-    if (
-      totalMinutes > 0
-    ) {
-      return `${totalMinutes}m`;
-    }
-
-    if (safe > 0) {
-      return `${Math.floor(
-        safe
-      )}s`;
-    }
-
-    return "0m";
-  };
-
-  // =========================================================
-  // LOAD DATA
-  // =========================================================
+  // =======================================================
+  // LOAD
+  // =======================================================
 
   const loadProgress =
     async (
@@ -218,7 +380,7 @@ function Progress() {
 
         setError("");
 
-        const taskPromise =
+        const tasksPromise =
           isGuest
             ? localDb.getAll(
                 "tasks"
@@ -227,18 +389,40 @@ function Progress() {
                 "/api/tasks"
               );
 
-        const sessionPromise =
-          getStudySessions(
-            isGuest
-          );
+        const subjectsPromise =
+          isGuest
+            ? localDb.getAll(
+                "subjects"
+              )
+            : apiRequest(
+                "/api/subjects"
+              );
+
+        const notesPromise =
+          isGuest
+            ? localDb.getAll(
+                "notes"
+              )
+            : apiRequest(
+                "/api/notes"
+              );
 
         const [
           taskData,
           sessionData,
+          subjectData,
+          noteData,
         ] =
           await Promise.all([
-            taskPromise,
-            sessionPromise,
+            tasksPromise,
+
+            getStudySessions(
+              isGuest
+            ),
+
+            subjectsPromise,
+
+            notesPromise,
           ]);
 
         setTasks(
@@ -257,8 +441,36 @@ function Progress() {
             : []
         );
 
+        setSubjects(
+          Array.isArray(
+            subjectData
+          )
+            ? subjectData
+            : []
+        );
+
+        setNotes(
+          Array.isArray(
+            noteData
+          )
+            ? noteData
+            : []
+        );
+
+        const goal =
+          Number(
+            localStorage.getItem(
+              "studyos_study_goal"
+            )
+          );
+
         setDailyGoalMinutes(
-          getDailyGoalMinutes()
+          Number.isFinite(
+            goal
+          ) &&
+          goal > 0
+            ? goal * 60
+            : 120
         );
       } catch (
         loadError
@@ -269,66 +481,178 @@ function Progress() {
         );
 
         setError(
-          loadError.message ||
-            "Couldn't load progress."
+          loadError?.message ||
+            "Could not load your progress."
         );
       } finally {
-        setLoading(false);
-        setRefreshing(false);
+        setLoading(
+          false
+        );
+
+        setRefreshing(
+          false
+        );
       }
     };
 
-  // =========================================================
+  // =======================================================
   // INITIAL LOAD
-  // =========================================================
+  // =======================================================
 
   useEffect(() => {
-    loadProgress(false);
-  }, [isGuest]);
+    loadProgress(
+      false
+    );
+  }, [
+    isGuest,
+  ]);
 
-  // =========================================================
-  // LIVE TASK / SESSION UPDATE
-  // =========================================================
+  // =======================================================
+  // LIVE UPDATES
+  // =======================================================
 
   useEffect(() => {
-    const refreshProgress =
+    const refresh =
       () => {
-        loadProgress(false);
+        loadProgress(
+          false
+        );
       };
 
-    window.addEventListener(
+    const events = [
       "studyos-sessions-updated",
-      refreshProgress
-    );
-
-    window.addEventListener(
       "studyos-tasks-updated",
-      refreshProgress
+      "studyos-subjects-updated",
+      "studyos-notes-updated",
+      "studyos-focus-settings-updated",
+      "studyos-preferences-updated",
+    ];
+
+    events.forEach(
+      (
+        eventName
+      ) => {
+        window.addEventListener(
+          eventName,
+          refresh
+        );
+      }
     );
 
     return () => {
-      window.removeEventListener(
-        "studyos-sessions-updated",
-        refreshProgress
-      );
-
-      window.removeEventListener(
-        "studyos-tasks-updated",
-        refreshProgress
+      events.forEach(
+        (
+          eventName
+        ) => {
+          window.removeEventListener(
+            eventName,
+            refresh
+          );
+        }
       );
     };
-  }, [isGuest]);
+  }, [
+    isGuest,
+  ]);
 
-  // =========================================================
-  // TASK STATS
-  // =========================================================
+  // =======================================================
+  // NORMALIZED SESSIONS
+  // =======================================================
+
+  const validSessions =
+    useMemo(() => {
+      return sessions
+        .map(
+          (
+            session
+          ) => {
+            const duration =
+              Number(
+                session.durationSeconds
+              ) ||
+              0;
+
+            const activityDate =
+              safeDate(
+                session.endedAt ||
+                  session.startedAt ||
+                  session.createdAt
+              );
+
+            return {
+              ...session,
+
+              _duration:
+                Math.max(
+                  0,
+                  duration
+                ),
+
+              _date:
+                activityDate,
+            };
+          }
+        )
+        .filter(
+          (
+            session
+          ) =>
+            session._duration >
+              0 &&
+            session._date
+        );
+    }, [
+      sessions,
+    ]);
+
+  // =======================================================
+  // TASKS
+  // =======================================================
 
   const completedTasks =
-    tasks.filter(
-      (task) =>
-        task.completed ===
-        true
+    useMemo(
+      () =>
+        tasks.filter(
+          (
+            task
+          ) =>
+            Boolean(
+              task.completed
+            )
+        ),
+      [
+        tasks,
+      ]
     );
+
+  const completedTimestamped =
+    useMemo(() => {
+      return completedTasks
+        .map(
+          (
+            task
+          ) => ({
+            ...task,
+
+            _date:
+              safeDate(
+                task.completedAt
+              ),
+          })
+        )
+        .filter(
+          (
+            task
+          ) =>
+            task._date
+        );
+    }, [
+      completedTasks,
+    ]);
+
+  // =======================================================
+  // BASIC TASK STATS
+  // =======================================================
 
   const totalTasks =
     tasks.length;
@@ -337,624 +661,1291 @@ function Progress() {
     completedTasks.length;
 
   const pendingCount =
-    totalTasks -
-    completedCount;
+    Math.max(
+      0,
+      totalTasks -
+        completedCount
+    );
 
   const completionRate =
     totalTasks > 0
       ? Math.round(
-          (completedCount /
-            totalTasks) *
+          (
+            completedCount /
+            totalTasks
+          ) *
             100
         )
       : 0;
 
-  // =========================================================
-  // TASK HISTORY
-  // =========================================================
+  // =======================================================
+  // TIME PERIODS
+  // =======================================================
 
-  const timestampedTasks =
-    useMemo(() => {
-      return completedTasks.filter(
-        (task) => {
-          if (
-            !task.completedAt
-          ) {
-            return false;
-          }
-
-          const date =
-            new Date(
-              task.completedAt
-            );
-
-          return !Number.isNaN(
-            date.getTime()
-          );
-        }
-      );
-    }, [tasks]);
-
-  const completedToday =
-    timestampedTasks.filter(
-      (task) =>
-        isSameDay(
-          new Date(
-            task.completedAt
-          ),
-          new Date()
-        )
-    ).length;
-
-  // =========================================================
-  // VALID SESSIONS
-  // =========================================================
-
-  const validSessions =
-    useMemo(() => {
-      return sessions.filter(
-        (session) => {
-          const duration =
-            Number(
-              session.durationSeconds
-            );
-
-          const date =
-            new Date(
-              session.endedAt
-            );
-
-          return (
-            Number.isFinite(
-              duration
-            ) &&
-            duration > 0 &&
-            !Number.isNaN(
-              date.getTime()
-            )
-          );
-        }
-      );
-    }, [sessions]);
-
-  // =========================================================
-  // SESSION TOTALS
-  // =========================================================
-
-  const totalStudySeconds =
-    validSessions.reduce(
-      (
-        total,
-        session
-      ) =>
-        total +
-        Number(
-          session.durationSeconds
-        ),
-      0
+  const today =
+    startOfDay(
+      new Date()
     );
 
-  const todayStudySeconds =
-    validSessions
-      .filter(
-        (session) =>
-          isSameDay(
-            new Date(
-              session.endedAt
-            ),
-            new Date()
-          )
-      )
-      .reduce(
+  const currentWeekStart =
+    addDays(
+      today,
+      -6
+    );
+
+  const previousWeekStart =
+    addDays(
+      today,
+      -13
+    );
+
+  const previousWeekEnd =
+    addDays(
+      today,
+      -7
+    );
+
+  const thirtyDayStart =
+    addDays(
+      today,
+      -29
+    );
+
+  // =======================================================
+  // DAILY ACTIVITY MAP
+  // =======================================================
+
+  const focusByDay =
+    useMemo(() => {
+      const map =
+        new Map();
+
+      validSessions.forEach(
         (
-          total,
           session
-        ) =>
-          total +
-          Number(
-            session.durationSeconds
-          ),
-        0
+        ) => {
+          const key =
+            dateKey(
+              session._date
+            );
+
+          map.set(
+            key,
+            (
+              map.get(
+                key
+              ) ||
+              0
+            ) +
+              session._duration
+          );
+        }
       );
 
-  // =========================================================
-  // DAILY GOAL
-  // =========================================================
+      return map;
+    }, [
+      validSessions,
+    ]);
 
-  const todayStudyMinutes =
-    todayStudySeconds /
-    60;
+  const tasksByDay =
+    useMemo(() => {
+      const map =
+        new Map();
 
-  const dailyGoalPercent =
-    Math.min(
-      100,
-      Math.round(
-        (todayStudyMinutes /
-          dailyGoalMinutes) *
-          100
-      )
-    );
+      completedTimestamped.forEach(
+        (
+          task
+        ) => {
+          const key =
+            dateKey(
+              task._date
+            );
 
-  // =========================================================
-  // LAST 7 DAYS
-  // =========================================================
+          map.set(
+            key,
+            (
+              map.get(
+                key
+              ) ||
+              0
+            ) +
+              1
+          );
+        }
+      );
+
+      return map;
+    }, [
+      completedTimestamped,
+    ]);
+
+  // =======================================================
+  // CURRENT WEEK
+  // =======================================================
 
   const weekActivity =
     useMemo(() => {
-      const result = [];
-
-      for (
-        let i = 6;
-        i >= 0;
-        i--
-      ) {
-        const date =
-          subtractDays(
-            new Date(),
-            i
-          );
-
-        const studySeconds =
-          validSessions
-            .filter(
-              (session) =>
-                isSameDay(
-                  new Date(
-                    session.endedAt
-                  ),
-                  date
-                )
-            )
-            .reduce(
-              (
-                total,
-                session
-              ) =>
-                total +
-                Number(
-                  session.durationSeconds
-                ),
-              0
+      return Array.from(
+        {
+          length:
+            7,
+        },
+        (
+          _,
+          index
+        ) => {
+          const date =
+            addDays(
+              currentWeekStart,
+              index
             );
 
-        const tasksCompleted =
-          timestampedTasks.filter(
-            (task) =>
-              isSameDay(
-                new Date(
-                  task.completedAt
-                ),
-                date
-              )
-          ).length;
-
-        result.push({
-          key:
-            getDateKey(
+          const key =
+            dateKey(
               date
-            ),
+            );
 
-          date,
+          return {
+            key,
 
-          label:
-            date.toLocaleDateString(
-              "en-IN",
-              {
-                weekday:
-                  "short",
-              }
-            ),
+            date,
 
-          studySeconds,
+            label:
+              date.toLocaleDateString(
+                "en-IN",
+                {
+                  weekday:
+                    "short",
+                }
+              ),
 
-          studyMinutes:
-            studySeconds /
-            60,
+            shortDate:
+              date.toLocaleDateString(
+                "en-IN",
+                {
+                  day:
+                    "numeric",
+                }
+              ),
 
-          tasksCompleted,
-        });
-      }
+            focusSeconds:
+              focusByDay.get(
+                key
+              ) ||
+              0,
 
-      return result;
-    }, [
-      validSessions,
-      timestampedTasks,
-    ]);
+            tasks:
+              tasksByDay.get(
+                key
+              ) ||
+              0,
 
-  const weekStudySeconds =
-    weekActivity.reduce(
-      (
-        total,
-        day
-      ) =>
-        total +
-        day.studySeconds,
-      0
-    );
-
-  const weekTasksCompleted =
-    weekActivity.reduce(
-      (
-        total,
-        day
-      ) =>
-        total +
-        day.tasksCompleted,
-      0
-    );
-
-  const maxStudyMinutes =
-    Math.max(
-      ...weekActivity.map(
-        (day) =>
-          day.studyMinutes
-      ),
-      1
-    );
-
-  // =========================================================
-  // STUDY STREAK
-  // =========================================================
-
-  const studyStreak =
-    useMemo(() => {
-      const activeDates =
-        new Set();
-
-      validSessions.forEach(
-        (session) => {
-          activeDates.add(
-            getDateKey(
-              new Date(
-                session.endedAt
-              )
-            )
-          );
+            isToday:
+              key ===
+              dateKey(
+                today
+              ),
+          };
         }
       );
+    }, [
+      focusByDay,
+      tasksByDay,
+    ]);
+
+  // =======================================================
+  // WEEK TOTAL
+  // =======================================================
+
+  const weekStudySeconds =
+    useMemo(
+      () =>
+        weekActivity.reduce(
+          (
+            total,
+            day
+          ) =>
+            total +
+            day.focusSeconds,
+          0
+        ),
+      [
+        weekActivity,
+      ]
+    );
+
+  // =======================================================
+  // PREVIOUS WEEK
+  // =======================================================
+
+  const previousWeekSeconds =
+    useMemo(() => {
+      return validSessions.reduce(
+        (
+          total,
+          session
+        ) => {
+          const day =
+            startOfDay(
+              session._date
+            );
+
+          if (
+            day <
+              previousWeekStart ||
+            day >
+              previousWeekEnd
+          ) {
+            return total;
+          }
+
+          return (
+            total +
+            session._duration
+          );
+        },
+        0
+      );
+    }, [
+      validSessions,
+    ]);
+
+  // =======================================================
+  // TREND
+  // =======================================================
+
+  const weekTrend =
+    useMemo(() => {
+      if (
+        previousWeekSeconds ===
+          0 &&
+        weekStudySeconds ===
+          0
+      ) {
+        return {
+          direction:
+            "flat",
+
+          value:
+            0,
+
+          label:
+            "No change",
+        };
+      }
 
       if (
-        activeDates.size ===
+        previousWeekSeconds ===
+        0
+      ) {
+        return {
+          direction:
+            "up",
+
+          value:
+            null,
+
+          label:
+            "New activity",
+        };
+      }
+
+      const change =
+        Math.round(
+          (
+            (
+              weekStudySeconds -
+              previousWeekSeconds
+            ) /
+            previousWeekSeconds
+          ) *
+            100
+        );
+
+      if (
+        change > 0
+      ) {
+        return {
+          direction:
+            "up",
+
+          value:
+            Math.abs(
+              change
+            ),
+
+          label:
+            "vs previous 7 days",
+        };
+      }
+
+      if (
+        change < 0
+      ) {
+        return {
+          direction:
+            "down",
+
+          value:
+            Math.abs(
+              change
+            ),
+
+          label:
+            "vs previous 7 days",
+        };
+      }
+
+      return {
+        direction:
+          "flat",
+
+        value:
+          0,
+
+        label:
+          "vs previous 7 days",
+      };
+    }, [
+      weekStudySeconds,
+      previousWeekSeconds,
+    ]);
+
+  // =======================================================
+  // TODAY
+  // =======================================================
+
+  const todayFocusSeconds =
+    focusByDay.get(
+      dateKey(
+        today
+      )
+    ) ||
+    0;
+
+  const todayFocusMinutes =
+    todayFocusSeconds /
+    60;
+
+  const goalPercent =
+    dailyGoalMinutes > 0
+      ? Math.round(
+          (
+            todayFocusMinutes /
+            dailyGoalMinutes
+          ) *
+            100
+        )
+      : 0;
+
+  const goalBarPercent =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        goalPercent
+      )
+    );
+
+  const remainingGoalMinutes =
+    Math.max(
+      0,
+      Math.ceil(
+        dailyGoalMinutes -
+          todayFocusMinutes
+      )
+    );
+
+  // =======================================================
+  // TOTAL STUDY
+  // =======================================================
+
+  const totalStudySeconds =
+    useMemo(
+      () =>
+        validSessions.reduce(
+          (
+            total,
+            session
+          ) =>
+            total +
+            session._duration,
+          0
+        ),
+      [
+        validSessions,
+      ]
+    );
+
+  // =======================================================
+  // CURRENT STREAK
+  // =======================================================
+
+  const currentStreak =
+    useMemo(() => {
+      const activeDays =
+        new Set(
+          validSessions.map(
+            (
+              session
+            ) =>
+              dateKey(
+                session._date
+              )
+          )
+        );
+
+      if (
+        activeDays.size ===
         0
       ) {
         return 0;
       }
 
       let cursor =
-        startOfDay(
-          new Date()
-        );
-
-      /*
-        If no study session
-        today yet, yesterday
-        can still maintain the
-        current streak.
-      */
+        today;
 
       if (
-        !activeDates.has(
-          getDateKey(
+        !activeDays.has(
+          dateKey(
             cursor
           )
         )
       ) {
         cursor =
-          subtractDays(
+          addDays(
             cursor,
-            1
+            -1
           );
       }
 
-      let streak = 0;
+      let streak =
+        0;
 
       while (
-        activeDates.has(
-          getDateKey(
+        activeDays.has(
+          dateKey(
             cursor
           )
         )
       ) {
-        streak += 1;
+        streak +=
+          1;
 
         cursor =
-          subtractDays(
+          addDays(
             cursor,
-            1
+            -1
           );
       }
 
       return streak;
-    }, [validSessions]);
+    }, [
+      validSessions,
+    ]);
 
-  // =========================================================
-  // ACTIVE STUDY DAYS
-  // =========================================================
+  // =======================================================
+  // 30 DAY CONSISTENCY
+  // =======================================================
 
-  const activeStudyDays =
+  const consistencyDays =
     useMemo(() => {
-      const unique =
-        new Set();
+      return Array.from(
+        {
+          length:
+            30,
+        },
+        (
+          _,
+          index
+        ) => {
+          const date =
+            addDays(
+              thirtyDayStart,
+              index
+            );
 
-      validSessions.forEach(
-        (session) => {
-          unique.add(
-            getDateKey(
-              new Date(
-                session.endedAt
-              )
-            )
+          const key =
+            dateKey(
+              date
+            );
+
+          const focusSeconds =
+            focusByDay.get(
+              key
+            ) ||
+            0;
+
+          const taskCount =
+            tasksByDay.get(
+              key
+            ) ||
+            0;
+
+          const minutes =
+            focusSeconds /
+            60;
+
+          let level =
+            0;
+
+          if (
+            focusSeconds >
+              0 ||
+            taskCount >
+              0
+          ) {
+            level =
+              1;
+          }
+
+          if (
+            minutes >=
+            30
+          ) {
+            level =
+              2;
+          }
+
+          if (
+            minutes >=
+            60
+          ) {
+            level =
+              3;
+          }
+
+          if (
+            minutes >=
+            dailyGoalMinutes
+          ) {
+            level =
+              4;
+          }
+
+          return {
+            key,
+            date,
+            focusSeconds,
+            taskCount,
+            level,
+          };
+        }
+      );
+    }, [
+      focusByDay,
+      tasksByDay,
+      dailyGoalMinutes,
+    ]);
+
+  const active30Days =
+    consistencyDays.filter(
+      (
+        day
+      ) =>
+        day.focusSeconds >
+          0 ||
+        day.taskCount >
+          0
+    ).length;
+
+  const goalDays =
+    consistencyDays.filter(
+      (
+        day
+      ) =>
+        day.focusSeconds /
+          60 >=
+        dailyGoalMinutes
+    ).length;
+
+  // =======================================================
+  // SESSION INSIGHTS
+  // =======================================================
+
+  const longestSession =
+    useMemo(() => {
+      return validSessions.reduce(
+        (
+          longest,
+          session
+        ) =>
+          Math.max(
+            longest,
+            session._duration
+          ),
+        0
+      );
+    }, [
+      validSessions,
+    ]);
+
+  const averageSession =
+    validSessions.length >
+    0
+      ? Math.round(
+          totalStudySeconds /
+            validSessions.length
+        )
+      : 0;
+
+  // =======================================================
+  // BEST DAY
+  // =======================================================
+
+  const bestDay =
+    useMemo(() => {
+      let best = {
+        seconds:
+          0,
+
+        date:
+          null,
+      };
+
+      focusByDay.forEach(
+        (
+          seconds,
+          key
+        ) => {
+          if (
+            seconds >
+            best.seconds
+          ) {
+            best = {
+              seconds,
+
+              date:
+                safeDate(
+                  `${key}T12:00:00`
+                ),
+            };
+          }
+        }
+      );
+
+      return best;
+    }, [
+      focusByDay,
+    ]);
+
+  // =======================================================
+  // COMPLETED TODAY
+  // =======================================================
+
+  const completedToday =
+    completedTimestamped.filter(
+      (
+        task
+      ) =>
+        dateKey(
+          task._date
+        ) ===
+        dateKey(
+          today
+        )
+    ).length;
+
+  // =======================================================
+  // SUBJECT LOOKUP
+  // =======================================================
+
+  const subjectById =
+    useMemo(() => {
+      const map =
+        new Map();
+
+      subjects.forEach(
+        (
+          subject
+        ) => {
+          map.set(
+            String(
+              subject._id
+            ),
+            subject
           );
         }
       );
 
-      return unique.size;
-    }, [validSessions]);
+      return map;
+    }, [
+      subjects,
+    ]);
 
-  // =========================================================
-  // LONGEST SESSION
-  // =========================================================
-
-  const longestSession =
-    useMemo(() => {
-      if (
-        validSessions.length ===
-        0
-      ) {
-        return null;
-      }
-
-      return [
-        ...validSessions,
-      ].sort(
-        (a, b) =>
-          Number(
-            b.durationSeconds
-          ) -
-          Number(
-            a.durationSeconds
-          )
-      )[0];
-    }, [validSessions]);
-
-  // =========================================================
-  // AVERAGE SESSION
-  // =========================================================
-
-  const averageSessionSeconds =
-    validSessions.length > 0
-      ? totalStudySeconds /
-        validSessions.length
-      : 0;
-
-  // =========================================================
-  // SUBJECT BREAKDOWN
-  // =========================================================
+  // =======================================================
+  // SUBJECT ANALYTICS
+  // =======================================================
 
   const subjectBreakdown =
     useMemo(() => {
-      const map = {};
+      const map =
+        new Map();
+
+      subjects.forEach(
+        (
+          subject
+        ) => {
+          map.set(
+            String(
+              subject._id
+            ),
+            {
+              id:
+                String(
+                  subject._id
+                ),
+
+              name:
+                subject.name,
+
+              color:
+                subject.color ||
+                "#6366f1",
+
+              focusSeconds:
+                0,
+
+              sessions:
+                0,
+
+              tasks:
+                0,
+
+              completedTasks:
+                0,
+
+              notes:
+                0,
+            }
+          );
+        }
+      );
+
+      const general = {
+        id:
+          "general",
+
+        name:
+          "General Study",
+
+        color:
+          "#64748b",
+
+        focusSeconds:
+          0,
+
+        sessions:
+          0,
+
+        tasks:
+          0,
+
+        completedTasks:
+          0,
+
+        notes:
+          0,
+      };
 
       validSessions.forEach(
-        (session) => {
-          const name =
-            session.subjectName?.trim() ||
-            "General Study";
-
-          if (!map[name]) {
-            map[name] = {
-              name,
-              seconds: 0,
-              sessions: 0,
-            };
-          }
-
-          map[name].seconds +=
-            Number(
-              session.durationSeconds
+        (
+          session
+        ) => {
+          const id =
+            getSubjectId(
+              session.subjectId
             );
 
-          map[name].sessions +=
+          let entry =
+            id
+              ? map.get(
+                  id
+                )
+              : null;
+
+          if (
+            !entry &&
+            session.subjectName
+          ) {
+            const matchingSubject =
+              subjects.find(
+                (
+                  subject
+                ) =>
+                  subject.name
+                    ?.trim()
+                    .toLowerCase() ===
+                  session.subjectName
+                    ?.trim()
+                    .toLowerCase()
+              );
+
+            if (
+              matchingSubject
+            ) {
+              entry =
+                map.get(
+                  String(
+                    matchingSubject._id
+                  )
+                );
+            }
+          }
+
+          if (!entry) {
+            general.focusSeconds +=
+              session._duration;
+
+            general.sessions +=
+              1;
+
+            return;
+          }
+
+          entry.focusSeconds +=
+            session._duration;
+
+          entry.sessions +=
             1;
         }
       );
 
-      return Object.values(
-        map
-      ).sort(
-        (a, b) =>
-          b.seconds -
-          a.seconds
-      );
-    }, [validSessions]);
+      tasks.forEach(
+        (
+          task
+        ) => {
+          const id =
+            getSubjectId(
+              task.subjectId
+            );
 
-  const topSubject =
-    subjectBreakdown[0] ||
-    null;
+          const entry =
+            id
+              ? map.get(
+                  id
+                )
+              : null;
 
-  // =========================================================
-  // RECENT SESSIONS
-  // =========================================================
-
-  const recentSessions =
-    [...validSessions]
-      .sort(
-        (a, b) =>
-          new Date(
-            b.endedAt
-          ) -
-          new Date(
-            a.endedAt
-          )
-      )
-      .slice(0, 5);
-
-  // =========================================================
-  // SESSION DATE FORMAT
-  // =========================================================
-
-  const formatSessionDate =
-    (value) => {
-      const date =
-        new Date(value);
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return "";
-      }
-
-      if (
-        isSameDay(
-          date,
-          new Date()
-        )
-      ) {
-        return `Today · ${date.toLocaleTimeString(
-          "en-IN",
-          {
-            hour:
-              "2-digit",
-            minute:
-              "2-digit",
+          if (!entry) {
+            return;
           }
-        )}`;
-      }
 
-      return date.toLocaleDateString(
-        "en-IN",
-        {
-          day:
-            "numeric",
+          entry.tasks +=
+            1;
 
-          month:
-            "short",
-
-          hour:
-            "2-digit",
-
-          minute:
-            "2-digit",
+          if (
+            task.completed
+          ) {
+            entry.completedTasks +=
+              1;
+          }
         }
       );
-    };
 
-  // =========================================================
+      notes.forEach(
+        (
+          note
+        ) => {
+          const id =
+            getSubjectId(
+              note.subjectId
+            );
+
+          let entry =
+            id
+              ? map.get(
+                  id
+                )
+              : null;
+
+          if (
+            !entry &&
+            note.subjectName
+          ) {
+            const matchingSubject =
+              subjects.find(
+                (
+                  subject
+                ) =>
+                  subject.name
+                    ?.trim()
+                    .toLowerCase() ===
+                  note.subjectName
+                    ?.trim()
+                    .toLowerCase()
+              );
+
+            if (
+              matchingSubject
+            ) {
+              entry =
+                map.get(
+                  String(
+                    matchingSubject._id
+                  )
+                );
+            }
+          }
+
+          if (
+            entry
+          ) {
+            entry.notes +=
+              1;
+          }
+        }
+      );
+
+      const result =
+        Array.from(
+          map.values()
+        );
+
+      if (
+        general.focusSeconds >
+          0
+      ) {
+        result.push(
+          general
+        );
+      }
+
+      return result.sort(
+        (
+          first,
+          second
+        ) =>
+          second.focusSeconds -
+          first.focusSeconds
+      );
+    }, [
+      subjects,
+      subjectById,
+      validSessions,
+      tasks,
+      notes,
+    ]);
+
+  const totalSubjectFocus =
+    subjectBreakdown.reduce(
+      (
+        total,
+        subject
+      ) =>
+        total +
+        subject.focusSeconds,
+      0
+    );
+
+  const topSubject =
+    subjectBreakdown.find(
+      (
+        subject
+      ) =>
+        subject.focusSeconds >
+        0
+    ) ||
+    null;
+
+  // =======================================================
+  // NOTE STATS
+  // =======================================================
+
+  const linkedNotes =
+    notes.filter(
+      (
+        note
+      ) =>
+        Boolean(
+          getSubjectId(
+            note.subjectId
+          )
+        )
+    ).length;
+
+  const pinnedNotes =
+    notes.filter(
+      (
+        note
+      ) =>
+        Boolean(
+          note.pinned
+        )
+    ).length;
+
+  const notesUpdatedThisWeek =
+    notes.filter(
+      (
+        note
+      ) => {
+        const date =
+          safeDate(
+            note.updatedAt ||
+              note.createdAt
+          );
+
+        if (!date) {
+          return false;
+        }
+
+        return (
+          startOfDay(
+            date
+          ) >=
+          currentWeekStart
+        );
+      }
+    ).length;
+
+  // =======================================================
+  // RECENT ACTIVITY
+  // =======================================================
+
+  const recentActivity =
+    useMemo(() => {
+      const sessionItems =
+        validSessions.map(
+          (
+            session
+          ) => ({
+            id:
+              `session-${session._id || session.id || session._date.getTime()}`,
+
+            type:
+              "session",
+
+            date:
+              session._date,
+
+            title:
+              session.subjectName ||
+              "Focus session",
+
+            meta:
+              formatStudyTime(
+                session._duration
+              ),
+          })
+        );
+
+      const taskItems =
+        completedTimestamped.map(
+          (
+            task
+          ) => ({
+            id:
+              `task-${task._id || task.id}`,
+
+            type:
+              "task",
+
+            date:
+              task._date,
+
+            title:
+              task.title ||
+              "Completed task",
+
+            meta:
+              "Completed",
+          })
+        );
+
+      return [
+        ...sessionItems,
+        ...taskItems,
+      ]
+        .sort(
+          (
+            first,
+            second
+          ) =>
+            second.date -
+            first.date
+        )
+        .slice(
+          0,
+          8
+        );
+    }, [
+      validSessions,
+      completedTimestamped,
+    ]);
+
+  // =======================================================
+  // CHART MAX
+  // =======================================================
+
+  const chartMax =
+    Math.max(
+      ...weekActivity.map(
+        (
+          day
+        ) =>
+          day.focusSeconds
+      ),
+      1
+    );
+
+  // =======================================================
   // INSIGHT
-  // =========================================================
+  // =======================================================
 
-  const getInsight =
-    () => {
+  const insight =
+    useMemo(() => {
       if (
-        validSessions.length ===
-          0 &&
-        totalTasks === 0
-      ) {
-        return {
-          icon: "🚀",
-
-          title:
-            "Your StudyOS history starts here",
-
-          text:
-            "Complete tasks and run Focus sessions to start building meaningful progress data.",
-        };
-      }
-
-      if (
-        dailyGoalPercent >=
-        100
-      ) {
-        return {
-          icon: "🗿",
-
-          title:
-            "Daily goal destroyed",
-
-          text:
-            `You've studied ${formatStudyTime(
-              todayStudySeconds
-            )} today and cleared your ${dailyGoalMinutes / 60}h target.`,
-        };
-      }
-
-      if (
-        studyStreak >= 7
-      ) {
-        return {
-          icon: "🔥",
-
-          title:
-            `${studyStreak}-day study streak`,
-
-          text:
-            "You're past the motivation stage now. This is becoming a habit.",
-        };
-      }
-
-      if (
-        todayStudySeconds >
+        totalStudySeconds ===
         0
       ) {
         return {
-          icon: "⚡",
+          icon:
+            Target,
 
           title:
-            "Momentum secured",
+            "Start building your baseline",
 
           text:
-            `You've focused for ${formatStudyTime(
-              todayStudySeconds
-            )} today. Keep stacking sessions.`,
+            "Complete a Focus session and StudyOS will begin turning your activity into useful trends.",
+        };
+      }
+
+      if (
+        goalPercent >=
+        100
+      ) {
+        return {
+          icon:
+            Award,
+
+          title:
+            "Daily goal complete",
+
+          text:
+            `You've reached ${goalPercent}% of today's Focus goal. Anything more today is extra momentum.`,
+        };
+      }
+
+      if (
+        currentStreak >=
+        7
+      ) {
+        return {
+          icon:
+            Flame,
+
+          title:
+            "Strong consistency",
+
+          text:
+            `Your current Focus streak is ${currentStreak} days. Protect the habit before chasing bigger sessions.`,
+        };
+      }
+
+      if (
+        weekTrend.direction ===
+        "up"
+      ) {
+        return {
+          icon:
+            TrendingUp,
+
+          title:
+            "Your week is moving up",
+
+          text:
+            weekTrend.value ===
+            null
+              ? "This week has study activity where the previous week had none."
+              : `Your Focus time is ${weekTrend.value}% higher than the previous seven days.`,
+        };
+      }
+
+      if (
+        topSubject
+      ) {
+        return {
+          icon:
+            BookOpen,
+
+          title:
+            `${topSubject.name} leads your Focus time`,
+
+          text:
+            `You've logged ${formatStudyTime(
+              topSubject.focusSeconds
+            )} in this subject. Check the subject distribution below for balance.`,
         };
       }
 
       return {
-        icon: "🎯",
+        icon:
+          Activity,
 
         title:
-          "One session changes the chart",
+          "Keep the data honest",
 
         text:
-          "Start a Focus session today and keep your study streak moving.",
+          "Progress becomes more useful as Focus sessions and completed tasks accumulate naturally.",
       };
-    };
+    }, [
+      totalStudySeconds,
+      goalPercent,
+      currentStreak,
+      weekTrend,
+      topSubject,
+    ]);
 
-  const insight =
-    getInsight();
+  const InsightIcon =
+    insight.icon;
 
-  // =========================================================
+  // =======================================================
+  // TREND ICON
+  // =======================================================
+
+  const TrendIcon =
+    weekTrend.direction ===
+    "up"
+      ? ArrowUpRight
+      : weekTrend.direction ===
+          "down"
+        ? ArrowDownRight
+        : Minus;
+
+  // =======================================================
   // UI
-  // =========================================================
+  // =======================================================
 
   return (
-    <div className="dashboard progress-v3-page">
+    <div className="dashboard progress-v4-page">
 
-      {/* =====================================================
+      {/* ===================================================
           HEADER
-      ===================================================== */}
+      =================================================== */}
 
-      <header className="dashboard-header progress-v3-header">
+      <header className="dashboard-header progress-v4-header">
 
         <div>
 
+          <span className="progress-v4-page-eyebrow">
+            STUDY ANALYTICS
+          </span>
+
           <h1>
-            Progress 📊
+            Progress
           </h1>
 
           <p>
-            Your real study activity,
-            task completion and focus
-            history.
+            A real view of your Focus,
+            task completion, consistency,
+            subjects and study habits.
           </p>
 
         </div>
 
         <button
           type="button"
-          className="progress-v3-refresh"
+          className="progress-v4-refresh"
           onClick={() =>
             loadProgress(
               true
@@ -966,10 +1957,10 @@ function Progress() {
         >
 
           <RefreshCw
-            size={16}
+            size={15}
             className={
               refreshing
-                ? "progress-v3-spin"
+                ? "progress-v4-spin"
                 : ""
             }
           />
@@ -982,23 +1973,21 @@ function Progress() {
 
       </header>
 
-      {/* =====================================================
+      {/* ===================================================
           ERROR
-      ===================================================== */}
+      =================================================== */}
 
       {error && (
-        <div className="progress-v3-error">
+        <div className="progress-v4-error">
 
           <div>
-
             <strong>
-              Couldn't load progress
+              Progress could not load
             </strong>
 
             <span>
               {error}
             </span>
-
           </div>
 
           <button
@@ -1015,289 +2004,276 @@ function Progress() {
         </div>
       )}
 
+      {/* ===================================================
+          LOADING
+      =================================================== */}
+
       {loading ? (
 
-        <div className="dashboard-card">
-          Loading progress...
+        <div className="dashboard-card progress-v4-loading">
+
+          <RefreshCw
+            size={22}
+            className="progress-v4-spin"
+          />
+
+          <strong>
+            Calculating your progress
+          </strong>
+
+          <span>
+            Reading Focus, tasks,
+            subjects and notes.
+          </span>
+
         </div>
 
       ) : (
 
         <>
-          {/* =================================================
+          {/* ===============================================
               HERO STATS
-          ================================================= */}
+          =============================================== */}
 
-          <section className="progress-v3-hero-stats">
+          <section className="progress-v4-hero-stats">
 
-            <div className="progress-v3-stat">
+            <ProgressStat
+              icon={
+                <Timer
+                  size={19}
+                />
+              }
+              label="Today"
+              value={
+                formatStudyTime(
+                  todayFocusSeconds
+                )
+              }
+              description={`${goalPercent}% of daily goal`}
+            />
 
-              <Clock3
-                size={20}
-              />
+            <ProgressStat
+              icon={
+                <BarChart3
+                  size={19}
+                />
+              }
+              label="Last 7 days"
+              value={
+                formatStudyTime(
+                  weekStudySeconds
+                )
+              }
+              description={
+                weekTrend.value ===
+                null
+                  ? weekTrend.label
+                  : `${weekTrend.value}% ${weekTrend.label}`
+              }
+              trend={
+                weekTrend.direction
+              }
+            />
 
-              <div>
+            <ProgressStat
+              icon={
+                <Flame
+                  size={19}
+                />
+              }
+              label="Focus streak"
+              value={`${currentStreak} ${
+                currentStreak ===
+                1
+                  ? "day"
+                  : "days"
+              }`}
+              description="Consecutive active days"
+            />
 
-                <span>
-                  Studied Today
-                </span>
-
-                <strong>
-                  {formatStudyTime(
-                    todayStudySeconds
-                  )}
-                </strong>
-
-                <small>
-                  {dailyGoalPercent}%
-                  of daily goal
-                </small>
-
-              </div>
-
-            </div>
-
-            <div className="progress-v3-stat">
-
-              <TrendingUp
-                size={20}
-              />
-
-              <div>
-
-                <span>
-                  Last 7 Days
-                </span>
-
-                <strong>
-                  {formatStudyTime(
-                    weekStudySeconds
-                  )}
-                </strong>
-
-                <small>
-                  focused this week
-                </small>
-
-              </div>
-
-            </div>
-
-            <div className="progress-v3-stat">
-
-              <Flame
-                size={20}
-              />
-
-              <div>
-
-                <span>
-                  Study Streak
-                </span>
-
-                <strong>
-                  {studyStreak}
-                </strong>
-
-                <small>
-                  {studyStreak ===
-                  1
-                    ? "active day"
-                    : "consecutive days"}
-                </small>
-
-              </div>
-
-            </div>
-
-            <div className="progress-v3-stat">
-
-              <CheckCircle2
-                size={20}
-              />
-
-              <div>
-
-                <span>
-                  Task Completion
-                </span>
-
-                <strong>
-                  {
-                    completionRate
-                  }
-                  %
-                </strong>
-
-                <small>
-                  {completedCount} of{" "}
-                  {totalTasks}
-                </small>
-
-              </div>
-
-            </div>
+            <ProgressStat
+              icon={
+                <CheckCircle2
+                  size={19}
+                />
+              }
+              label="Task completion"
+              value={`${completionRate}%`}
+              description={`${completedCount} of ${totalTasks} completed`}
+            />
 
           </section>
 
-          {/* =================================================
+          {/* ===============================================
               DAILY GOAL
-          ================================================= */}
+          =============================================== */}
 
-          <section className="dashboard-card progress-v3-goal-card">
+          <section className="dashboard-card progress-v4-goal-card">
 
-            <div className="progress-v3-goal-top">
+            <div className="progress-v4-goal-top">
 
               <div>
 
-                <span className="progress-v3-eyebrow">
-                  DAILY STUDY GOAL
+                <span className="progress-v4-eyebrow">
+                  TODAY'S TARGET
                 </span>
 
                 <h2>
-                  {formatStudyTime(
-                    todayStudySeconds
-                  )}{" "}
-                  /{" "}
-                  {
-                    dailyGoalMinutes /
-                    60
-                  }
-                  h
+                  Daily Focus goal
                 </h2>
 
                 <p>
-                  Keep stacking focused
-                  minutes today.
+                  {formatStudyTime(
+                    todayFocusSeconds
+                  )}
+                  {" completed · "}
+
+                  {remainingGoalMinutes >
+                  0
+                    ? `${formatStudyTime(
+                        remainingGoalMinutes *
+                          60
+                      )} remaining`
+                    : "Goal reached"}
                 </p>
 
               </div>
 
-              <div className="progress-v3-goal-percent">
+              <div className="progress-v4-goal-percent">
 
                 <Target
-                  size={18}
+                  size={16}
                 />
 
                 <strong>
-                  {
-                    dailyGoalPercent
-                  }
-                  %
+                  {goalPercent}%
                 </strong>
 
               </div>
 
             </div>
 
-            <div className="progress-v3-goal-track">
+            <div className="progress-v4-goal-track">
 
               <div
                 style={{
                   width:
-                    `${dailyGoalPercent}%`,
+                    `${goalBarPercent}%`,
                 }}
               />
 
             </div>
 
+            <div className="progress-v4-goal-footer">
+
+              <span>
+                0m
+              </span>
+
+              <strong>
+                Goal{" "}
+                {formatStudyTime(
+                  dailyGoalMinutes *
+                    60
+                )}
+              </strong>
+
+            </div>
+
           </section>
 
-          {/* =================================================
-              CHART + TASKS
-          ================================================= */}
+          {/* ===============================================
+              MAIN GRID
+          =============================================== */}
 
-          <section className="progress-v3-main-grid">
+          <section className="progress-v4-main-grid">
 
-            {/* 7 DAY STUDY CHART */}
+            {/* =============================================
+                WEEK CHART
+            ============================================== */}
 
-            <div className="dashboard-card progress-v3-chart-card">
+            <div className="dashboard-card progress-v4-panel">
 
-              <div className="progress-v3-section-header">
+              <div className="progress-v4-section-header">
 
                 <div>
 
-                  <span className="progress-v3-eyebrow">
-                    FOCUS ACTIVITY
+                  <span className="progress-v4-eyebrow">
+                    FOCUS TREND
                   </span>
 
                   <h2>
-                    Last 7 Days
+                    Last 7 days
                   </h2>
 
                 </div>
 
-                <span className="progress-v3-week-total">
+                <div
+                  className={`progress-v4-trend trend-${weekTrend.direction}`}
+                >
 
-                  <Clock3
-                    size={15}
+                  <TrendIcon
+                    size={14}
                   />
 
-                  {formatStudyTime(
-                    weekStudySeconds
-                  )}
+                  <span>
+                    {weekTrend.value ===
+                    null
+                      ? "New"
+                      : `${weekTrend.value}%`}
+                  </span>
 
-                </span>
+                </div>
 
               </div>
 
-              <div className="progress-v3-chart">
+              <div className="progress-v4-chart">
 
                 {weekActivity.map(
-                  (day) => {
-
-                    const height =
-                      day.studyMinutes <=
+                  (
+                    day
+                  ) => {
+                    const percent =
+                      day.focusSeconds >
                       0
-                        ? 4
-                        : Math.max(
-                            12,
-                            (day.studyMinutes /
-                              maxStudyMinutes) *
+                        ? Math.max(
+                            5,
+                            (
+                              day.focusSeconds /
+                              chartMax
+                            ) *
                               100
-                          );
-
-                    const today =
-                      isSameDay(
-                        day.date,
-                        new Date()
-                      );
+                          )
+                        : 0;
 
                     return (
                       <div
-                        className="progress-v3-chart-column"
+                        className="progress-v4-chart-column"
                         key={
                           day.key
                         }
                       >
 
-                        <span className="progress-v3-chart-value">
-
-                          {day.studyMinutes >=
-                          60
-                            ? `${(
-                                day.studyMinutes /
-                                60
-                              ).toFixed(
-                                1
-                              )}h`
-                            : `${Math.round(
-                                day.studyMinutes
-                              )}m`}
-
+                        <span className="progress-v4-chart-value">
+                          {day.focusSeconds >
+                          0
+                            ? formatChartValue(
+                                day.focusSeconds
+                              )
+                            : ""}
                         </span>
 
-                        <div className="progress-v3-chart-track">
+                        <div className="progress-v4-chart-track">
 
                           <div
-                            className={`progress-v3-chart-bar ${
-                              today
+                            className={`progress-v4-chart-bar ${
+                              day.isToday
                                 ? "today"
                                 : ""
                             }`}
                             style={{
                               height:
-                                `${height}%`,
+                                `${percent}%`,
                             }}
                           />
 
@@ -1305,21 +2281,16 @@ function Progress() {
 
                         <strong
                           className={
-                            today
+                            day.isToday
                               ? "today"
                               : ""
                           }
                         >
-                          {
-                            day.label
-                          }
+                          {day.label}
                         </strong>
 
                         <small>
-                          {
-                            day.tasksCompleted
-                          }{" "}
-                          tasks
+                          {day.shortDate}
                         </small>
 
                       </div>
@@ -1331,218 +2302,102 @@ function Progress() {
 
             </div>
 
-            {/* TASK OVERVIEW */}
+            {/* =============================================
+                SESSION SUMMARY
+            ============================================== */}
 
-            <div className="dashboard-card progress-v3-task-card">
+            <div className="dashboard-card progress-v4-panel">
 
-              <span className="progress-v3-eyebrow">
-                TASKS
-              </span>
+              <div className="progress-v4-section-header">
 
-              <h2>
-                Completion
-              </h2>
+                <div>
 
-              <div className="progress-v3-big-rate">
+                  <span className="progress-v4-eyebrow">
+                    FOCUS SESSIONS
+                  </span>
 
-                <strong>
-                  {
-                    completionRate
-                  }
-                  %
-                </strong>
+                  <h2>
+                    Study overview
+                  </h2>
 
-                <span>
-                  overall
-                </span>
+                </div>
 
-              </div>
-
-              <div className="progress-v3-task-track">
-
-                <div
-                  style={{
-                    width:
-                      `${completionRate}%`,
-                  }}
+                <Clock3
+                  size={18}
                 />
 
               </div>
 
-              <div className="progress-v3-task-breakdown">
-
-                <div>
-
-                  <span>
-                    Total
-                  </span>
-
-                  <strong>
-                    {
-                      totalTasks
-                    }
-                  </strong>
-
-                </div>
-
-                <div>
-
-                  <span>
-                    Completed
-                  </span>
-
-                  <strong>
-                    {
-                      completedCount
-                    }
-                  </strong>
-
-                </div>
-
-                <div>
-
-                  <span>
-                    Pending
-                  </span>
-
-                  <strong>
-                    {
-                      pendingCount
-                    }
-                  </strong>
-
-                </div>
-
-                <div>
-
-                  <span>
-                    Today
-                  </span>
-
-                  <strong>
-                    {
-                      completedToday
-                    }
-                  </strong>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </section>
-
-          {/* =================================================
-              INSIGHTS
-          ================================================= */}
-
-          <section className="progress-v3-insights">
-
-            <div className="progress-v3-insight">
-
-              <Timer
-                size={19}
-              />
-
-              <div>
-
-                <span>
-                  Sessions
-                </span>
-
-                <strong>
-                  {
-                    validSessions.length
-                  }
-                </strong>
-
-                <small>
-                  total focus blocks
-                </small>
-
-              </div>
-
-            </div>
-
-            <div className="progress-v3-insight">
-
-              <Trophy
-                size={19}
-              />
-
-              <div>
-
-                <span>
-                  Longest Session
-                </span>
-
-                <strong>
-                  {longestSession
-                    ? formatStudyTime(
-                        longestSession.durationSeconds
-                      )
-                    : "—"}
-                </strong>
-
-                <small>
-                  {longestSession
-                    ? longestSession.subjectName ||
-                      "General Study"
-                    : "No sessions yet"}
-                </small>
-
-              </div>
-
-            </div>
-
-            <div className="progress-v3-insight">
-
-              <Activity
-                size={19}
-              />
-
-              <div>
-
-                <span>
-                  Average Session
-                </span>
+              <div className="progress-v4-big-number">
 
                 <strong>
                   {formatStudyTime(
-                    averageSessionSeconds
+                    totalStudySeconds
                   )}
                 </strong>
 
-                <small>
-                  per focus block
-                </small>
+                <span>
+                  total Focus time
+                </span>
 
               </div>
 
-            </div>
+              <div className="progress-v4-overview-list">
 
-            <div className="progress-v3-insight">
+                <div>
+                  <span>
+                    Sessions
+                  </span>
 
-              <BarChart3
-                size={19}
-              />
+                  <strong>
+                    {validSessions.length}
+                  </strong>
+                </div>
 
-              <div>
+                <div>
+                  <span>
+                    Average
+                  </span>
 
-                <span>
-                  Active Days
-                </span>
+                  <strong>
+                    {formatStudyTime(
+                      averageSession
+                    )}
+                  </strong>
+                </div>
 
-                <strong>
-                  {
-                    activeStudyDays
-                  }
-                </strong>
+                <div>
+                  <span>
+                    Longest
+                  </span>
 
-                <small>
-                  days studied
-                </small>
+                  <strong>
+                    {formatStudyTime(
+                      longestSession
+                    )}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>
+                    Best day
+                  </span>
+
+                  <strong>
+                    {bestDay.date
+                      ? bestDay.date.toLocaleDateString(
+                          "en-IN",
+                          {
+                            day:
+                              "numeric",
+
+                            month:
+                              "short",
+                          }
+                        )
+                      : "—"}
+                  </strong>
+                </div>
 
               </div>
 
@@ -1550,40 +2405,209 @@ function Progress() {
 
           </section>
 
-          {/* =================================================
-              SUBJECTS + RECENT
-          ================================================= */}
+          {/* ===============================================
+              INSIGHTS
+          =============================================== */}
 
-          <section className="progress-v3-bottom-grid">
+          <section className="progress-v4-insights">
 
-            {/* SUBJECT BREAKDOWN */}
+            <ProgressInsight
+              icon={
+                <CalendarCheck2
+                  size={18}
+                />
+              }
+              label="Active days"
+              value={`${active30Days}/30`}
+              description="Study activity in last 30 days"
+            />
 
-            <div className="dashboard-card">
+            <ProgressInsight
+              icon={
+                <Target
+                  size={18}
+                />
+              }
+              label="Goal days"
+              value={
+                goalDays
+              }
+              description="Days daily Focus goal was reached"
+            />
 
-              <div className="progress-v3-section-header">
+            <ProgressInsight
+              icon={
+                <Award
+                  size={18}
+                />
+              }
+              label="Best Focus day"
+              value={
+                bestDay.seconds >
+                0
+                  ? formatStudyTime(
+                      bestDay.seconds
+                    )
+                  : "—"
+              }
+              description={
+                bestDay.date
+                  ? bestDay.date.toLocaleDateString(
+                      "en-IN",
+                      {
+                        day:
+                          "numeric",
+
+                        month:
+                          "short",
+                      }
+                    )
+                  : "No Focus data yet"
+              }
+            />
+
+            <ProgressInsight
+              icon={
+                <TrendingUp
+                  size={18}
+                />
+              }
+              label="Weekly direction"
+              value={
+                weekTrend.direction ===
+                "up"
+                  ? "Improving"
+                  : weekTrend.direction ===
+                      "down"
+                    ? "Lower"
+                    : "Stable"
+              }
+              description={
+                weekTrend.label
+              }
+            />
+
+          </section>
+
+          {/* ===============================================
+              CONSISTENCY
+          =============================================== */}
+
+          <section className="dashboard-card progress-v4-panel progress-v4-consistency-card">
+
+            <div className="progress-v4-section-header">
+
+              <div>
+
+                <span className="progress-v4-eyebrow">
+                  CONSISTENCY
+                </span>
+
+                <h2>
+                  Last 30 days
+                </h2>
+
+              </div>
+
+              <span className="progress-v4-consistency-count">
+                {active30Days}
+                {" active days"}
+              </span>
+
+            </div>
+
+            <div className="progress-v4-heatmap">
+
+              {consistencyDays.map(
+                (
+                  day
+                ) => (
+                  <div
+                    key={
+                      day.key
+                    }
+                    className={`progress-v4-heatmap-day level-${day.level}`}
+                    title={`${day.date.toLocaleDateString(
+                      "en-IN",
+                      {
+                        day:
+                          "numeric",
+
+                        month:
+                          "short",
+                      }
+                    )}: ${formatStudyTime(
+                      day.focusSeconds
+                    )}, ${day.taskCount} ${
+                      day.taskCount ===
+                      1
+                        ? "task"
+                        : "tasks"
+                    }`}
+                  >
+                    <span>
+                      {day.date.getDate()}
+                    </span>
+                  </div>
+                )
+              )}
+
+            </div>
+
+            <div className="progress-v4-heatmap-legend">
+
+              <span>
+                Less
+              </span>
+
+              <i className="level-0" />
+              <i className="level-1" />
+              <i className="level-2" />
+              <i className="level-3" />
+              <i className="level-4" />
+
+              <span>
+                Goal
+              </span>
+
+            </div>
+
+          </section>
+
+          {/* ===============================================
+              SUBJECT + SIDE STACK
+          =============================================== */}
+
+          <section className="progress-v4-subject-grid">
+
+            {/* =============================================
+                SUBJECT PERFORMANCE
+            ============================================== */}
+
+            <div className="dashboard-card progress-v4-panel">
+
+              <div className="progress-v4-section-header">
 
                 <div>
 
-                  <span className="progress-v3-eyebrow">
+                  <span className="progress-v4-eyebrow">
                     SUBJECTS
                   </span>
 
                   <h2>
-                    Study Distribution
+                    Study distribution
                   </h2>
 
                 </div>
 
                 {topSubject && (
-                  <span className="progress-v3-top-subject">
+                  <span className="progress-v4-top-subject">
 
                     <BookOpen
-                      size={14}
+                      size={13}
                     />
 
-                    {
-                      topSubject.name
-                    }
+                    {topSubject.name}
 
                   </span>
                 )}
@@ -1593,99 +2617,138 @@ function Progress() {
               {subjectBreakdown.length ===
               0 ? (
 
-                <div className="progress-v3-empty">
-
-                  <BookOpen
-                    size={26}
-                  />
-
-                  <strong>
-                    No subject data yet
-                  </strong>
-
-                  <p>
-                    Complete Focus
-                    sessions to build
-                    your subject
-                    breakdown.
-                  </p>
-
-                </div>
+                <ProgressEmpty
+                  icon={
+                    <BookOpen
+                      size={24}
+                    />
+                  }
+                  title="No subject activity"
+                  text="Link Focus sessions, tasks or notes to subjects to see their study profile here."
+                />
 
               ) : (
 
-                <div className="progress-v3-subject-list">
+                <div className="progress-v4-subject-list">
 
                   {subjectBreakdown.map(
-                    (subject) => {
-
-                      const percent =
-                        totalStudySeconds >
+                    (
+                      subject
+                    ) => {
+                      const focusPercent =
+                        totalSubjectFocus >
                         0
                           ? Math.round(
-                              (subject.seconds /
-                                totalStudySeconds) *
+                              (
+                                subject.focusSeconds /
+                                totalSubjectFocus
+                              ) *
+                                100
+                            )
+                          : 0;
+
+                      const taskPercent =
+                        subject.tasks >
+                        0
+                          ? Math.round(
+                              (
+                                subject.completedTasks /
+                                subject.tasks
+                              ) *
                                 100
                             )
                           : 0;
 
                       return (
                         <div
-                          className="progress-v3-subject-item"
+                          className="progress-v4-subject-row"
                           key={
-                            subject.name
+                            subject.id
                           }
+                          style={{
+                            "--progress-subject-color":
+                              subject.color,
+                          }}
                         >
 
-                          <div className="progress-v3-subject-top">
+                          <div className="progress-v4-subject-top">
 
-                            <div>
+                            <div className="progress-v4-subject-name">
 
-                              <strong>
-                                {
-                                  subject.name
-                                }
-                              </strong>
+                              <span className="progress-v4-subject-dot" />
 
-                              <span>
-                                {
-                                  subject.sessions
-                                }{" "}
-                                {subject.sessions ===
-                                1
-                                  ? "session"
-                                  : "sessions"}
-                              </span>
+                              <div>
+                                <strong>
+                                  {subject.name}
+                                </strong>
+
+                                <span>
+                                  {subject.sessions}
+                                  {" "}
+                                  {subject.sessions ===
+                                  1
+                                    ? "session"
+                                    : "sessions"}
+
+                                  {" · "}
+
+                                  {subject.notes}
+                                  {" "}
+                                  {subject.notes ===
+                                  1
+                                    ? "note"
+                                    : "notes"}
+                                </span>
+                              </div>
 
                             </div>
 
-                            <div>
+                            <div className="progress-v4-subject-focus">
 
                               <strong>
                                 {formatStudyTime(
-                                  subject.seconds
+                                  subject.focusSeconds
                                 )}
                               </strong>
 
                               <span>
-                                {
-                                  percent
-                                }
-                                %
+                                {focusPercent}%
                               </span>
 
                             </div>
 
                           </div>
 
-                          <div className="progress-v3-subject-track">
+                          <div className="progress-v4-subject-track">
 
                             <div
                               style={{
                                 width:
-                                  `${percent}%`,
+                                  `${focusPercent}%`,
                               }}
                             />
+
+                          </div>
+
+                          <div className="progress-v4-subject-meta">
+
+                            <span>
+                              <CheckCircle2
+                                size={12}
+                              />
+
+                              {subject.completedTasks}
+                              /
+                              {subject.tasks}
+                              {" tasks"}
+                            </span>
+
+                            <span>
+                              {subject.tasks >
+                              0
+                                ? `${taskPercent}% completion`
+                                : "No linked tasks"}
+                            </span>
 
                           </div>
 
@@ -1695,174 +2758,473 @@ function Progress() {
                   )}
 
                 </div>
-
               )}
 
             </div>
 
-            {/* RECENT SESSIONS */}
+            {/* =============================================
+                RIGHT STACK
+            ============================================== */}
 
-            <div className="dashboard-card">
+            <div className="progress-v4-side-stack">
 
-              <div className="progress-v3-section-header">
+              {/* TASKS */}
 
-                <div>
+              <div className="dashboard-card progress-v4-panel progress-v4-task-card">
 
-                  <span className="progress-v3-eyebrow">
-                    RECENT
+                <div className="progress-v4-section-header">
+
+                  <div>
+
+                    <span className="progress-v4-eyebrow">
+                      TASKS
+                    </span>
+
+                    <h2>
+                      Completion
+                    </h2>
+
+                  </div>
+
+                  <span className="progress-v4-rate-badge">
+                    {completionRate}%
                   </span>
 
-                  <h2>
-                    Focus Sessions
-                  </h2>
+                </div>
+
+                <div className="progress-v4-task-track">
+
+                  <div
+                    style={{
+                      width:
+                        `${completionRate}%`,
+                    }}
+                  />
+
+                </div>
+
+                <div className="progress-v4-task-grid">
+
+                  <div>
+                    <span>
+                      Total
+                    </span>
+
+                    <strong>
+                      {totalTasks}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      Completed
+                    </span>
+
+                    <strong>
+                      {completedCount}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      Pending
+                    </span>
+
+                    <strong>
+                      {pendingCount}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      Today
+                    </span>
+
+                    <strong>
+                      {completedToday}
+                    </strong>
+                  </div>
 
                 </div>
 
               </div>
 
-              {recentSessions.length ===
-              0 ? (
+              {/* NOTES */}
 
-                <div className="progress-v3-empty">
+              <div className="dashboard-card progress-v4-panel progress-v4-notes-card">
 
-                  <Timer
-                    size={26}
+                <div className="progress-v4-section-header">
+
+                  <div>
+
+                    <span className="progress-v4-eyebrow">
+                      NOTES
+                    </span>
+
+                    <h2>
+                      Knowledge base
+                    </h2>
+
+                  </div>
+
+                  <FileText
+                    size={18}
                   />
 
-                  <strong>
-                    No sessions yet
-                  </strong>
+                </div>
 
-                  <p>
-                    Start studying from
-                    the Focus page.
-                  </p>
+                <div className="progress-v4-note-grid">
+
+                  <div>
+
+                    <FileText
+                      size={15}
+                    />
+
+                    <span>
+                      Total
+                    </span>
+
+                    <strong>
+                      {notes.length}
+                    </strong>
+
+                  </div>
+
+                  <div>
+
+                    <Link2
+                      size={15}
+                    />
+
+                    <span>
+                      Linked
+                    </span>
+
+                    <strong>
+                      {linkedNotes}
+                    </strong>
+
+                  </div>
+
+                  <div>
+
+                    <Pin
+                      size={15}
+                    />
+
+                    <span>
+                      Pinned
+                    </span>
+
+                    <strong>
+                      {pinnedNotes}
+                    </strong>
+
+                  </div>
+
+                  <div>
+
+                    <TrendingUp
+                      size={15}
+                    />
+
+                    <span>
+                      Updated 7d
+                    </span>
+
+                    <strong>
+                      {notesUpdatedThisWeek}
+                    </strong>
+
+                  </div>
 
                 </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          {/* ===============================================
+              RECENT + INSIGHT
+          =============================================== */}
+
+          <section className="progress-v4-activity-insight-grid">
+
+            {/* RECENT */}
+
+            <div className="dashboard-card progress-v4-panel">
+
+              <div className="progress-v4-section-header">
+
+                <div>
+
+                  <span className="progress-v4-eyebrow">
+                    RECENT
+                  </span>
+
+                  <h2>
+                    Study activity
+                  </h2>
+
+                </div>
+
+                <Activity
+                  size={18}
+                />
+
+              </div>
+
+              {recentActivity.length ===
+              0 ? (
+
+                <ProgressEmpty
+                  icon={
+                    <Activity
+                      size={24}
+                    />
+                  }
+                  title="No activity yet"
+                  text="Focus sessions and completed tasks will appear here."
+                />
 
               ) : (
 
-                <div className="progress-v3-recent-list">
+                <div className="progress-v4-recent-list">
 
-                  {recentSessions.map(
-                    (session) => (
+                  {recentActivity.map(
+                    (
+                      item
+                    ) => {
+                      const ItemIcon =
+                        item.type ===
+                        "session"
+                          ? Timer
+                          : CheckCircle2;
 
-                      <div
-                        className="progress-v3-recent"
-                        key={
-                          session._id
-                        }
-                      >
+                      return (
+                        <div
+                          className="progress-v4-recent-item"
+                          key={
+                            item.id
+                          }
+                        >
 
-                        <div className="progress-v3-recent-icon">
+                          <span
+                            className={`progress-v4-recent-icon ${item.type}`}
+                          >
 
-                          <BookOpen
-                            size={16}
-                          />
+                            <ItemIcon
+                              size={15}
+                            />
 
-                        </div>
-
-                        <div className="progress-v3-recent-content">
-
-                          <strong>
-                            {session.subjectName ||
-                              "General Study"}
-                          </strong>
-
-                          <span>
-                            {formatSessionDate(
-                              session.endedAt
-                            )}
                           </span>
 
+                          <div className="progress-v4-recent-copy">
+
+                            <strong>
+                              {item.title}
+                            </strong>
+
+                            <span>
+                              {formatRelativeActivity(
+                                item.date
+                              )}
+                            </span>
+
+                          </div>
+
+                          <strong className="progress-v4-recent-meta">
+                            {item.meta}
+                          </strong>
+
                         </div>
-
-                        <strong className="progress-v3-recent-duration">
-
-                          {formatStudyTime(
-                            session.durationSeconds
-                          )}
-
-                        </strong>
-
-                      </div>
-
-                    )
+                      );
+                    }
                   )}
 
                 </div>
-
               )}
 
             </div>
 
-          </section>
+            {/* INSIGHT */}
 
-          {/* =================================================
-              INSIGHT MESSAGE
-          ================================================= */}
+            <div className="progress-v4-insight-card">
 
-          <section className="progress-v3-motivation">
+              <span className="progress-v4-insight-icon">
 
-            <div className="progress-v3-motivation-icon">
-              {
-                insight.icon
-              }
-            </div>
+                <InsightIcon
+                  size={22}
+                />
 
-            <div>
-
-              <span className="progress-v3-eyebrow">
-                STUDYOS INSIGHT
               </span>
 
-              <h2>
-                {
-                  insight.title
-                }
-              </h2>
+              <div className="progress-v4-insight-copy">
 
-              <p>
-                {
-                  insight.text
-                }
-              </p>
+                <span className="progress-v4-eyebrow">
+                  STUDYOS INSIGHT
+                </span>
+
+                <h2>
+                  {insight.title}
+                </h2>
+
+                <p>
+                  {insight.text}
+                </p>
+
+              </div>
+
+              <div className="progress-v4-insight-footer">
+
+                <span>
+
+                  <BarChart3
+                    size={13}
+                  />
+
+                  Total Focus
+
+                  <strong>
+                    {formatStudyTime(
+                      totalStudySeconds
+                    )}
+                  </strong>
+
+                </span>
+
+                <span>
+
+                  <CheckCircle2
+                    size={13}
+                  />
+
+                  Completed
+
+                  <strong>
+                    {completedCount}
+                  </strong>
+
+                </span>
+
+              </div>
 
             </div>
 
           </section>
-
-          {/* SMALL WEEK INFO */}
-
-          <div className="progress-v3-footnote">
-
-            <span>
-              This week:{" "}
-              <strong>
-                {
-                  weekTasksCompleted
-                }
-              </strong>{" "}
-              completed tasks
-            </span>
-
-            <span>
-              ·
-            </span>
-
-            <span>
-              Total focused:{" "}
-              <strong>
-                {formatStudyTime(
-                  totalStudySeconds
-                )}
-              </strong>
-            </span>
-
-          </div>
 
         </>
       )}
+
+    </div>
+  );
+}
+
+// =========================================================
+// HERO STAT
+// =========================================================
+
+function ProgressStat({
+  icon,
+  label,
+  value,
+  description,
+  trend,
+}) {
+  return (
+    <div className="progress-v4-stat">
+
+      <span className="progress-v4-stat-icon">
+        {icon}
+      </span>
+
+      <div>
+
+        <span>
+          {label}
+        </span>
+
+        <strong>
+          {value}
+        </strong>
+
+        <small
+          className={
+            trend
+              ? `trend-${trend}`
+              : ""
+          }
+        >
+          {description}
+        </small>
+
+      </div>
+
+    </div>
+  );
+}
+
+// =========================================================
+// SMALL INSIGHT
+// =========================================================
+
+function ProgressInsight({
+  icon,
+  label,
+  value,
+  description,
+}) {
+  return (
+    <div className="progress-v4-insight">
+
+      <span className="progress-v4-insight-small-icon">
+        {icon}
+      </span>
+
+      <div>
+
+        <span>
+          {label}
+        </span>
+
+        <strong>
+          {value}
+        </strong>
+
+        <small>
+          {description}
+        </small>
+
+      </div>
+
+    </div>
+  );
+}
+
+// =========================================================
+// EMPTY
+// =========================================================
+
+function ProgressEmpty({
+  icon,
+  title,
+  text,
+}) {
+  return (
+    <div className="progress-v4-empty">
+
+      {icon}
+
+      <strong>
+        {title}
+      </strong>
+
+      <p>
+        {text}
+      </p>
 
     </div>
   );

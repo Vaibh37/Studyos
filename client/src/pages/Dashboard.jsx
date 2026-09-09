@@ -1,20 +1,32 @@
-import { useEffect, useMemo, useState } from "react";
 import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  AlertTriangle,
+  Award,
+  BookOpen,
   CalendarDays,
   CheckCircle2,
+  Clock3,
   Flame,
   RefreshCw,
+  Sparkles,
+  Target,
+  Timer,
   TrendingUp,
+  Zap,
 } from "lucide-react";
 
-import StatCard from "../components/StatCard";
-import AddTask from "../components/AddTask";
+import {
+  useAuth,
+} from "../context/AuthContext";
 
-import { useAuth } from "../context/AuthContext";
 import apiRequest from "../services/api";
 
 import {
-  createLocalId,
   localDb,
 } from "../services/localDb";
 
@@ -22,653 +34,895 @@ import {
   getCalendarEvents,
 } from "../services/calendarData";
 
+import {
+  getStudySessions,
+} from "../services/studySessionData";
+
+import {
+  calculateGamification,
+  formatGamificationXp,
+} from "../services/gamification";
+
+// =========================================================
+// HELPERS
+// =========================================================
+
+const startOfDay = (
+  value = new Date()
+) => {
+  const date =
+    new Date(value);
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+};
+
+const getDateKey = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  return [
+    date.getFullYear(),
+
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    ),
+
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    ),
+  ].join("-");
+};
+
+const subtractDays = (
+  value,
+  amount
+) => {
+  const date =
+    startOfDay(
+      value
+    );
+
+  date.setDate(
+    date.getDate() -
+      amount
+  );
+
+  return date;
+};
+
+const formatStudyTime = (
+  seconds
+) => {
+  const safe =
+    Math.max(
+      0,
+      Number(
+        seconds
+      ) || 0
+    );
+
+  const totalMinutes =
+    Math.floor(
+      safe / 60
+    );
+
+  const hours =
+    Math.floor(
+      totalMinutes /
+        60
+    );
+
+  const minutes =
+    totalMinutes %
+    60;
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  if (
+    totalMinutes >
+    0
+  ) {
+    return `${totalMinutes}m`;
+  }
+
+  if (safe > 0) {
+    return `${Math.floor(
+      safe
+    )}s`;
+  }
+
+  return "0m";
+};
+
+const formatTaskTime = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  const [
+    hours,
+    minutes,
+  ] =
+    String(
+      value
+    )
+      .split(":")
+      .map(Number);
+
+  if (
+    Number.isNaN(
+      hours
+    ) ||
+    Number.isNaN(
+      minutes
+    )
+  ) {
+    return value;
+  }
+
+  const date =
+    new Date();
+
+  date.setHours(
+    hours,
+    minutes,
+    0,
+    0
+  );
+
+  return date.toLocaleTimeString(
+    "en-IN",
+    {
+      hour:
+        "numeric",
+
+      minute:
+        "2-digit",
+    }
+  );
+};
+
+const formatShortDate = (
+  value
+) => {
+  if (!value) {
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  return date.toLocaleDateString(
+    "en-IN",
+    {
+      day:
+        "numeric",
+
+      month:
+        "short",
+    }
+  );
+};
+
+const normalizePriority = (
+  value
+) => {
+  if (
+    value === "high" ||
+    value === "low"
+  ) {
+    return value;
+  }
+
+  return "medium";
+};
+
+const PRIORITY_ORDER = {
+  high: 0,
+  medium: 1,
+  low: 2,
+};
+
+// =========================================================
+// DASHBOARD
+// =========================================================
+
 function Dashboard() {
   const {
     isGuest,
+    firebaseUser,
   } = useAuth();
-  const [tasks, setTasks] = useState([]);
-  const [events, setEvents] = useState([]);
 
-  const [loadingTasks, setLoadingTasks] =
-    useState(true);
+  // =======================================================
+  // DATA
+  // =======================================================
 
-  const [loadingEvents, setLoadingEvents] =
-    useState(true);
+  const [
+    tasks,
+    setTasks,
+  ] = useState([]);
 
-  const [refreshing, setRefreshing] =
-    useState(false);
+  const [
+    subjects,
+    setSubjects,
+  ] = useState([]);
 
-  const [name, setName] = useState(
-    localStorage
-      .getItem("studyos_name")
-      ?.trim() || ""
+  const [
+    sessions,
+    setSessions,
+  ] = useState([]);
+
+  const [
+    calendarItems,
+    setCalendarItems,
+  ] = useState([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  // =======================================================
+  // PROFILE NAME
+  // =======================================================
+
+  const [
+    name,
+    setName,
+  ] = useState(
+    () =>
+      localStorage.getItem(
+        "studyos_name"
+      ) ||
+      firebaseUser?.displayName ||
+      ""
   );
 
-  // =========================================================
-  // DATE HELPERS
-  // =========================================================
+  // =======================================================
+  // DAILY GOAL
+  // =======================================================
 
-  const startOfDay = (date) => {
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    );
-  };
-
-  const subtractDays = (
-    date,
-    amount
-  ) => {
-    const copy = new Date(date);
-
-    copy.setDate(
-      copy.getDate() - amount
-    );
-
-    return startOfDay(copy);
-  };
-
-  const getDateKey = (date) => {
-    const year =
-      date.getFullYear();
-
-    const month = String(
-      date.getMonth() + 1
-    ).padStart(2, "0");
-
-    const day = String(
-      date.getDate()
-    ).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
-  const isSameDay = (a, b) => {
-    return (
-      getDateKey(a) ===
-      getDateKey(b)
-    );
-  };
-
-  // =========================================================
-  // SAFE EVENT DATE
-  // =========================================================
-
-  const parseEventDate = (
-    value
-  ) => {
-    if (!value) {
-      return null;
-    }
-
-    /*
-      Mongo may return:
-      2026-09-08T00:00:00.000Z
-
-      Or Calendar may send:
-      2026-09-08
-
-      We want the calendar DAY,
-      not timezone weirdness.
-    */
-
-    if (
-      typeof value === "string"
-    ) {
-      const match =
-        value.match(
-          /^(\d{4})-(\d{2})-(\d{2})/
+  const getGoalMinutes =
+    () => {
+      const hours =
+        Number(
+          localStorage.getItem(
+            "studyos_study_goal"
+          )
         );
 
-      if (match) {
-        const year =
-          Number(match[1]);
-
-        const month =
-          Number(match[2]);
-
-        const day =
-          Number(match[3]);
-
-        return new Date(
-          year,
-          month - 1,
-          day
+      if (
+        Number.isFinite(
+          hours
+        ) &&
+        hours > 0
+      ) {
+        return Math.round(
+          hours * 60
         );
       }
-    }
 
-    const date =
-      new Date(value);
+      return 120;
+    };
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return null;
-    }
+  const [
+    dailyGoalMinutes,
+    setDailyGoalMinutes,
+  ] = useState(
+    getGoalMinutes
+  );
 
-    return startOfDay(date);
-  };
-
-  // =========================================================
+  // =======================================================
   // GREETING
-  // =========================================================
+  // =======================================================
 
-  const getGreeting = () => {
-    const hour =
-      new Date().getHours();
+  const getGreeting =
+    () => {
+      const hour =
+        new Date()
+          .getHours();
 
-    if (hour < 12) {
-      return "Good morning";
-    }
+      if (hour < 12) {
+        return "Good morning";
+      }
 
-    if (hour < 17) {
-      return "Good afternoon";
-    }
+      if (hour < 17) {
+        return "Good afternoon";
+      }
 
-    return "Good evening";
-  };
+      return "Good evening";
+    };
 
-  // =========================================================
-  // FETCH TASKS
-  // =========================================================
+  // =======================================================
+  // LOAD DATA
+  // =======================================================
 
-  const fetchTasks =
-    async () => {
+  const loadDashboard =
+    async (
+      manual = false
+    ) => {
       try {
-        setLoadingTasks(true);
-
-        let data;
-
-        if (isGuest) {
-          data =
-            await localDb.getAll(
-              "tasks"
-            );
-
-          data = [
-            ...data,
-          ].sort(
-            (a, b) =>
-              new Date(
-                b.createdAt || 0
-              ) -
-              new Date(
-                a.createdAt || 0
-              )
+        if (manual) {
+          setRefreshing(
+            true
           );
         } else {
-          data =
-            await apiRequest(
-              "/api/tasks"
-            );
+          setLoading(
+            true
+          );
         }
 
+        setError("");
+
+        const tasksPromise =
+          isGuest
+            ? localDb.getAll(
+                "tasks"
+              )
+            : apiRequest(
+                "/api/tasks"
+              );
+
+        const subjectsPromise =
+          isGuest
+            ? localDb.getAll(
+                "subjects"
+              )
+            : apiRequest(
+                "/api/subjects"
+              );
+
+        const [
+          taskData,
+          subjectData,
+          sessionData,
+          calendarData,
+        ] =
+          await Promise.all([
+            tasksPromise,
+
+            subjectsPromise,
+
+            getStudySessions(
+              isGuest
+            ),
+
+            getCalendarEvents(
+              isGuest
+            ),
+          ]);
+
         setTasks(
-          Array.isArray(data)
-            ? data
-            : []
-        );
-      } catch (error) {
-        console.error(
-          "Failed to fetch tasks:",
-          error
-        );
-
-        setTasks([]);
-      } finally {
-        setLoadingTasks(false);
-      }
-    };
-
-  // =========================================================
-  // FETCH EVENTS
-  // =========================================================
-
-  const fetchEvents =
-    async () => {
-      try {
-        setLoadingEvents(true);
-
-        const data =
-          await getCalendarEvents(
-            isGuest
-          );
-
-        setEvents(
-          Array.isArray(data)
-            ? data
-            : []
-        );
-      } catch (error) {
-        console.error(
-          "Failed to fetch events:",
-          error
-        );
-
-        setEvents([]);
-      } finally {
-        setLoadingEvents(false);
-      }
-    };
-
-  // =========================================================
-  // INITIAL / ACCOUNT MODE LOAD
-  // =========================================================
-
-  useEffect(() => {
-    fetchTasks();
-    fetchEvents();
-  }, [isGuest]);
-
-  // =========================================================
-  // LIVE TASK / CALENDAR SYNC
-  // =========================================================
-
-  useEffect(() => {
-    const handleTasksUpdated =
-      () => {
-        fetchTasks();
-      };
-
-    const handleEventsUpdated =
-      () => {
-        fetchEvents();
-      };
-
-    window.addEventListener(
-      "studyos-tasks-updated",
-      handleTasksUpdated
-    );
-
-    window.addEventListener(
-      "studyos-events-updated",
-      handleEventsUpdated
-    );
-
-    return () => {
-      window.removeEventListener(
-        "studyos-tasks-updated",
-        handleTasksUpdated
-      );
-
-      window.removeEventListener(
-        "studyos-events-updated",
-        handleEventsUpdated
-      );
-    };
-  }, [isGuest]);
-
-  // =========================================================
-  // LIVE NAME UPDATE
-  // =========================================================
-
-  useEffect(() => {
-    const updateName = () => {
-      const savedName =
-        localStorage
-          .getItem(
-            "studyos_name"
+          Array.isArray(
+            taskData
           )
-          ?.trim() || "";
+            ? taskData
+            : []
+        );
 
-      setName(savedName);
+        setSubjects(
+          Array.isArray(
+            subjectData
+          )
+            ? subjectData
+            : []
+        );
+
+        setSessions(
+          Array.isArray(
+            sessionData
+          )
+            ? sessionData
+            : []
+        );
+
+        setCalendarItems(
+          Array.isArray(
+            calendarData
+          )
+            ? calendarData
+            : []
+        );
+
+        setDailyGoalMinutes(
+          getGoalMinutes()
+        );
+      } catch (
+        loadError
+      ) {
+        console.error(
+          "Dashboard load failed:",
+          loadError
+        );
+
+        setError(
+          loadError?.message ||
+            "Could not load dashboard data."
+        );
+      } finally {
+        setLoading(
+          false
+        );
+
+        setRefreshing(
+          false
+        );
+      }
     };
+
+  // =======================================================
+  // INITIAL LOAD
+  // =======================================================
+
+  useEffect(() => {
+    loadDashboard(
+      false
+    );
+  }, [
+    isGuest,
+  ]);
+
+  // =======================================================
+  // PROFILE UPDATES
+  // =======================================================
+
+  useEffect(() => {
+    const refreshName =
+      () => {
+        setName(
+          localStorage.getItem(
+            "studyos_name"
+          ) ||
+            firebaseUser?.displayName ||
+            ""
+        );
+      };
+
+    refreshName();
 
     window.addEventListener(
       "studyos-name-updated",
-      updateName
+      refreshName
     );
 
     return () => {
       window.removeEventListener(
         "studyos-name-updated",
-        updateName
+        refreshName
       );
     };
-  }, []);
+  }, [
+    firebaseUser?.displayName,
+  ]);
 
-  // =========================================================
-  // REFRESH DASHBOARD
-  // =========================================================
+  // =======================================================
+  // LIVE APP UPDATES
+  // =======================================================
 
-  const refreshDashboard =
-    async () => {
-      try {
-        setRefreshing(true);
-
-        await Promise.all([
-          fetchTasks(),
-          fetchEvents(),
-        ]);
-      } finally {
-        setRefreshing(false);
-      }
-    };
-
-  // =========================================================
-  // ADD TASK
-  // =========================================================
-
-  const addTask =
-    async (title) => {
-      const cleanTitle =
-        String(
-          title || ""
-        ).trim();
-
-      if (!cleanTitle) {
-        return;
-      }
-
-      try {
-        let newTask;
-
-        if (isGuest) {
-          const now =
-            new Date()
-              .toISOString();
-
-          newTask = {
-            _id:
-              createLocalId(),
-
-            title:
-              cleanTitle,
-
-            completed:
-              false,
-
-            completedAt:
-              null,
-
-            createdAt:
-              now,
-
-            updatedAt:
-              now,
-          };
-
-          await localDb.put(
-            "tasks",
-            newTask
-          );
-        } else {
-          newTask =
-            await apiRequest(
-              "/api/tasks",
-              {
-                method:
-                  "POST",
-
-                body:
-                  JSON.stringify({
-                    title:
-                      cleanTitle,
-                  }),
-              }
-            );
-        }
-
-        setTasks(
-          (currentTasks) => [
-            newTask,
-            ...currentTasks,
-          ]
+  useEffect(() => {
+    const refresh =
+      () => {
+        loadDashboard(
+          false
         );
+      };
 
-        window.dispatchEvent(
-          new Event(
-            "studyos-tasks-updated"
-          )
-        );
-      } catch (error) {
-        console.error(
-          "Failed to add task:",
-          error
+    const events = [
+      "studyos-tasks-updated",
+      "studyos-subjects-updated",
+      "studyos-events-updated",
+      "studyos-sessions-updated",
+      "studyos-preferences-updated",
+      "studyos-focus-settings-updated",
+    ];
+
+    events.forEach(
+      (eventName) => {
+        window.addEventListener(
+          eventName,
+          refresh
         );
       }
-    };
-
-  // =========================================================
-  // TOGGLE TASK
-  // =========================================================
-
-  const toggleTask =
-    async (id) => {
-      const task =
-        tasks.find(
-          (item) =>
-            item._id === id
-        );
-
-      if (!task) {
-        return;
-      }
-
-      const nextCompleted =
-        !task.completed;
-
-      try {
-        let updatedTask;
-
-        if (isGuest) {
-          const now =
-            new Date()
-              .toISOString();
-
-          updatedTask = {
-            ...task,
-
-            completed:
-              nextCompleted,
-
-            completedAt:
-              nextCompleted
-                ? task.completedAt ||
-                  now
-                : null,
-
-            updatedAt:
-              now,
-          };
-
-          await localDb.put(
-            "tasks",
-            updatedTask
-          );
-        } else {
-          updatedTask =
-            await apiRequest(
-              `/api/tasks/${id}`,
-              {
-                method:
-                  "PATCH",
-
-                body:
-                  JSON.stringify({
-                    completed:
-                      nextCompleted,
-                  }),
-              }
-            );
-        }
-
-        setTasks(
-          (currentTasks) =>
-            currentTasks.map(
-              (item) =>
-                item._id ===
-                updatedTask._id
-                  ? updatedTask
-                  : item
-            )
-        );
-
-        window.dispatchEvent(
-          new Event(
-            "studyos-tasks-updated"
-          )
-        );
-      } catch (error) {
-        console.error(
-          "Failed to toggle task:",
-          error
-        );
-      }
-    };
-
-  // =========================================================
-  // DELETE TASK
-  // =========================================================
-
-  const deleteTask =
-    async (id) => {
-      try {
-        if (isGuest) {
-          await localDb.remove(
-            "tasks",
-            id
-          );
-        } else {
-          await apiRequest(
-            `/api/tasks/${id}`,
-            {
-              method:
-                "DELETE",
-            }
-          );
-        }
-
-        setTasks(
-          (currentTasks) =>
-            currentTasks.filter(
-              (task) =>
-                task._id !== id
-            )
-        );
-
-        window.dispatchEvent(
-          new Event(
-            "studyos-tasks-updated"
-          )
-        );
-      } catch (error) {
-        console.error(
-          "Failed to delete task:",
-          error
-        );
-      }
-    };
-
-  // =========================================================
-  // TASK STATS
-  // =========================================================
-
-  const completedTasks =
-    tasks.filter(
-      (task) =>
-        task.completed === true
     );
 
-  const completedCount =
-    completedTasks.length;
+    return () => {
+      events.forEach(
+        (eventName) => {
+          window.removeEventListener(
+            eventName,
+            refresh
+          );
+        }
+      );
+    };
+  }, [
+    isGuest,
+  ]);
 
-  const pendingCount =
-    tasks.length -
-    completedCount;
+  // =======================================================
+  // TODAY
+  // =======================================================
 
-  const completionRate =
-    tasks.length > 0
-      ? Math.round(
-          (completedCount /
-            tasks.length) *
-            100
+  const today =
+    startOfDay(
+      new Date()
+    );
+
+  const todayKey =
+    getDateKey(
+      today
+    );
+
+  // =======================================================
+  // GAMIFICATION
+  // =======================================================
+
+  const gamification =
+    useMemo(
+      () =>
+        calculateGamification({
+          sessions,
+          tasks,
+          referenceDate:
+            new Date(),
+        }),
+      [
+        sessions,
+        tasks,
+      ]
+    );
+
+  // =======================================================
+  // TODAY'S FOCUS
+  // =======================================================
+
+  const todaySessions =
+    useMemo(() => {
+      return sessions.filter(
+        (session) => {
+          const date =
+            new Date(
+              session.startedAt ||
+                session.endedAt ||
+                session.createdAt
+            );
+
+          if (
+            Number.isNaN(
+              date.getTime()
+            )
+          ) {
+            return false;
+          }
+
+          return (
+            getDateKey(
+              date
+            ) ===
+            todayKey
+          );
+        }
+      );
+    }, [
+      sessions,
+      todayKey,
+    ]);
+
+  const todayFocusSeconds =
+    useMemo(() => {
+      return todaySessions.reduce(
+        (
+          total,
+          session
+        ) =>
+          total +
+          Number(
+            session.durationSeconds ||
+              0
+          ),
+        0
+      );
+    }, [
+      todaySessions,
+    ]);
+
+  const todayFocusMinutes =
+    Math.floor(
+      todayFocusSeconds /
+        60
+    );
+
+  const goalProgress =
+    dailyGoalMinutes > 0
+      ? Math.min(
+          100,
+          Math.round(
+            (
+              todayFocusMinutes /
+              dailyGoalMinutes
+            ) *
+              100
+          )
         )
       : 0;
 
-  // =========================================================
-  // COMPLETION HISTORY
-  // =========================================================
+  // =======================================================
+  // TASK STATS
+  // =======================================================
 
-  const timestampedTasks =
+  const pendingTasks =
     useMemo(() => {
-      return completedTasks.filter(
+      return tasks.filter(
+        (task) =>
+          !task.completed
+      );
+    }, [
+      tasks,
+    ]);
+
+  const completedToday =
+    useMemo(() => {
+      return tasks.filter(
         (task) => {
           if (
+            !task.completed ||
             !task.completedAt
           ) {
             return false;
           }
 
-          const date =
-            new Date(
+          return (
+            getDateKey(
               task.completedAt
+            ) ===
+            todayKey
+          );
+        }
+      ).length;
+    }, [
+      tasks,
+      todayKey,
+    ]);
+
+  const dueTodayTasks =
+    useMemo(() => {
+      return pendingTasks.filter(
+        (task) =>
+          getDateKey(
+            task.dueDate
+          ) ===
+          todayKey
+      );
+    }, [
+      pendingTasks,
+      todayKey,
+    ]);
+
+  const overdueTasks =
+    useMemo(() => {
+      return pendingTasks.filter(
+        (task) => {
+          const dueKey =
+            getDateKey(
+              task.dueDate
             );
 
-          return !Number.isNaN(
-            date.getTime()
+          return (
+            dueKey &&
+            dueKey <
+              todayKey
           );
         }
       );
-    }, [tasks]);
+    }, [
+      pendingTasks,
+      todayKey,
+    ]);
 
-  // =========================================================
-  // COMPLETED TODAY
-  // =========================================================
+  // =======================================================
+  // TODAY PLAN
+  // =======================================================
 
-  const completedToday =
+  const todayPlan =
     useMemo(() => {
-      const today =
-        new Date();
+      const candidates =
+        pendingTasks.filter(
+          (task) => {
+            const dueKey =
+              getDateKey(
+                task.dueDate
+              );
 
-      return timestampedTasks.filter(
-        (task) =>
-          isSameDay(
-            new Date(
-              task.completedAt
-            ),
-            today
-          )
-      ).length;
-    }, [timestampedTasks]);
+            return (
+              !dueKey ||
+              dueKey <=
+                todayKey
+            );
+          }
+        );
 
-  // =========================================================
-  // LAST 7 DAYS
-  // =========================================================
+      return [
+        ...candidates,
+      ]
+        .sort(
+          (
+            first,
+            second
+          ) => {
+            const firstDate =
+              getDateKey(
+                first.dueDate
+              );
+
+            const secondDate =
+              getDateKey(
+                second.dueDate
+              );
+
+            if (
+              firstDate &&
+              secondDate &&
+              firstDate !==
+                secondDate
+            ) {
+              return firstDate.localeCompare(
+                secondDate
+              );
+            }
+
+            if (
+              firstDate &&
+              !secondDate
+            ) {
+              return -1;
+            }
+
+            if (
+              !firstDate &&
+              secondDate
+            ) {
+              return 1;
+            }
+
+            return (
+              PRIORITY_ORDER[
+                normalizePriority(
+                  first.priority
+                )
+              ] -
+              PRIORITY_ORDER[
+                normalizePriority(
+                  second.priority
+                )
+              ]
+            );
+          }
+        )
+        .slice(
+          0,
+          6
+        );
+    }, [
+      pendingTasks,
+      todayKey,
+    ]);
+
+  // =======================================================
+  // WEEKLY FOCUS
+  // =======================================================
 
   const weeklyActivity =
     useMemo(() => {
       const result = [];
 
       for (
-        let i = 6;
-        i >= 0;
-        i--
+        let index = 6;
+        index >= 0;
+        index--
       ) {
         const date =
           subtractDays(
             new Date(),
-            i
+            index
           );
 
-        const count =
-          timestampedTasks.filter(
-            (task) =>
-              isSameDay(
+        const key =
+          getDateKey(
+            date
+          );
+
+        const daySeconds =
+          sessions.reduce(
+            (
+              total,
+              session
+            ) => {
+              const sessionDate =
                 new Date(
-                  task.completedAt
-                ),
-                date
-              )
-          ).length;
+                  session.startedAt ||
+                    session.endedAt ||
+                    session.createdAt
+                );
+
+              if (
+                Number.isNaN(
+                  sessionDate.getTime()
+                )
+              ) {
+                return total;
+              }
+
+              if (
+                getDateKey(
+                  sessionDate
+                ) !==
+                key
+              ) {
+                return total;
+              }
+
+              return (
+                total +
+                Number(
+                  session.durationSeconds ||
+                    0
+                )
+              );
+            },
+            0
+          );
 
         result.push({
           date,
-          count,
+          key,
+          seconds:
+            daySeconds,
 
           label:
             date.toLocaleDateString(
@@ -682,228 +936,268 @@ function Dashboard() {
       }
 
       return result;
-    }, [timestampedTasks]);
+    }, [
+      sessions,
+    ]);
 
-  const weeklyCompleted =
+  const weeklyFocusSeconds =
     weeklyActivity.reduce(
-      (total, day) =>
-        total + day.count,
+      (
+        total,
+        day
+      ) =>
+        total +
+        day.seconds,
       0
     );
 
-  const maxWeekValue =
+  const maxWeeklySeconds =
     Math.max(
       ...weeklyActivity.map(
         (day) =>
-          day.count
+          day.seconds
       ),
       1
     );
 
-  // =========================================================
-  // REAL STREAK
-  // =========================================================
+  // =======================================================
+  // TOP SUBJECT
+  // =======================================================
 
-  const currentStreak =
+  const topSubject =
     useMemo(() => {
-      const activeDates =
-        new Set();
+      const earliest =
+        subtractDays(
+          new Date(),
+          6
+        );
 
-      timestampedTasks.forEach(
-        (task) => {
-          activeDates.add(
-            getDateKey(
-              new Date(
-                task.completedAt
+      const totals =
+        new Map();
+
+      sessions.forEach(
+        (session) => {
+          const date =
+            new Date(
+              session.startedAt ||
+                session.endedAt ||
+                session.createdAt
+            );
+
+          if (
+            Number.isNaN(
+              date.getTime()
+            ) ||
+            date <
+              earliest
+          ) {
+            return;
+          }
+
+          const subjectName =
+            session.subjectName ||
+            "General Study";
+
+          totals.set(
+            subjectName,
+            (
+              totals.get(
+                subjectName
+              ) || 0
+            ) +
+              Number(
+                session.durationSeconds ||
+                  0
               )
-            )
           );
         }
       );
 
       if (
-        activeDates.size ===
+        totals.size ===
         0
       ) {
-        return 0;
+        return null;
       }
 
-      let cursor =
-        startOfDay(
-          new Date()
-        );
-
-      /*
-        Nothing completed today yet?
-
-        Yesterday may still be the
-        current streak.
-      */
-
-      if (
-        !activeDates.has(
-          getDateKey(cursor)
+      return [
+        ...totals.entries(),
+      ]
+        .sort(
+          (
+            first,
+            second
+          ) =>
+            second[1] -
+            first[1]
         )
-      ) {
-        cursor =
-          subtractDays(
-            cursor,
-            1
-          );
-      }
+        .map(
+          ([
+            subjectName,
+            seconds,
+          ]) => ({
+            subjectName,
+            seconds,
+          })
+        )[0];
+    }, [
+      sessions,
+    ]);
 
-      let streak = 0;
+  // =======================================================
+  // UPCOMING
+  // =======================================================
 
-      while (
-        activeDates.has(
-          getDateKey(cursor)
-        )
-      ) {
-        streak++;
-
-        cursor =
-          subtractDays(
-            cursor,
-            1
-          );
-      }
-
-      return streak;
-    }, [timestampedTasks]);
-
-  // =========================================================
-  // UPCOMING EVENTS
-  // =========================================================
-
-  const upcomingEvents =
+  const upcomingItems =
     useMemo(() => {
-      const today =
-        startOfDay(
-          new Date()
-        );
+      return calendarItems
+        .map(
+          (item) => ({
+            ...item,
 
-      return events
-        .map((event) => ({
-          ...event,
-
-          parsedDate:
-            parseEventDate(
-              event.date
-            ),
-        }))
+            parsedDate:
+              new Date(
+                item.date
+              ),
+          })
+        )
         .filter(
-          (event) =>
-            event.parsedDate &&
-            event.parsedDate >=
+          (item) => {
+            if (
+              Number.isNaN(
+                item.parsedDate.getTime()
+              )
+            ) {
+              return false;
+            }
+
+            return (
+              startOfDay(
+                item.parsedDate
+              ) >=
               today
+            );
+          }
         )
         .sort(
-          (a, b) =>
-            a.parsedDate -
-            b.parsedDate
+          (
+            first,
+            second
+          ) =>
+            first.parsedDate -
+            second.parsedDate
         )
-        .slice(0, 5);
-    }, [events]);
+        .slice(
+          0,
+          5
+        );
+    }, [
+      calendarItems,
+      todayKey,
+    ]);
 
-  // =========================================================
-  // EVENT DATE LABEL
-  // =========================================================
+  // =======================================================
+  // RECENT FOCUS
+  // =======================================================
 
-  const formatEventDate = (
-    date
-  ) => {
-    if (!date) {
-      return "Unknown date";
-    }
+  const recentSessions =
+    useMemo(() => {
+      return [
+        ...sessions,
+      ]
+        .sort(
+          (
+            first,
+            second
+          ) =>
+            new Date(
+              second.startedAt ||
+                second.endedAt ||
+                0
+            ) -
+            new Date(
+              first.startedAt ||
+                first.endedAt ||
+                0
+            )
+        )
+        .slice(
+          0,
+          4
+        );
+    }, [
+      sessions,
+    ]);
 
-    const today =
-      startOfDay(
-        new Date()
+  // =======================================================
+  // SUBJECT COLOR
+  // =======================================================
+
+  const getSubjectColor =
+    (
+      subjectName
+    ) => {
+      const subject =
+        subjects.find(
+          (item) =>
+            item.name ===
+            subjectName
+        );
+
+      return (
+        subject?.color ||
+        "#6366f1"
       );
+    };
 
-    const target =
-      startOfDay(date);
-
-    const difference =
-      Math.round(
-        (target - today) /
-          (1000 *
-            60 *
-            60 *
-            24)
-      );
-
-    if (difference === 0) {
-      return "Today";
-    }
-
-    if (difference === 1) {
-      return "Tomorrow";
-    }
-
-    if (
-      difference > 1 &&
-      difference < 7
-    ) {
-      return date.toLocaleDateString(
-        "en-IN",
-        {
-          weekday:
-            "long",
-        }
-      );
-    }
-
-    return date.toLocaleDateString(
-      "en-IN",
-      {
-        day: "numeric",
-        month: "short",
-      }
-    );
-  };
-
-  // =========================================================
+  // =======================================================
   // UI
-  // =========================================================
+  // =======================================================
 
   return (
-    <div className="dashboard dashboard-v2">
+    <div className="dashboard dashboard-v3">
 
       {/* HEADER */}
 
-      <header className="dashboard-header dashboard-v2-header">
+      <header className="dashboard-header dashboard-v3-header">
 
         <div>
 
+          <span className="dashboard-v3-eyebrow">
+            Overview
+          </span>
+
           <h1>
             {name
-              ? `${getGreeting()}, ${name} 👋`
-              : `${getGreeting()} 👋`}
+              ? `${getGreeting()}, ${name}`
+              : getGreeting()}
           </h1>
 
           <p>
-            Here's what's happening
-            with your studies today.
+            Your study activity,
+            priorities and progress
+            in one place.
           </p>
 
         </div>
 
         <button
           type="button"
-          className="dashboard-v2-refresh"
+          className="dashboard-v3-refresh"
           disabled={
             refreshing
           }
-          onClick={
-            refreshDashboard
+          onClick={() =>
+            loadDashboard(
+              true
+            )
           }
         >
           <RefreshCw
             size={16}
             className={
               refreshing
-                ? "dashboard-v2-spin"
+                ? "dashboard-v3-spin"
                 : ""
             }
           />
@@ -915,377 +1209,595 @@ function Dashboard() {
 
       </header>
 
-      {/* =====================================================
-          REAL STATS
-      ===================================================== */}
+      {/* ERROR */}
 
-      <section className="stats-grid">
+      {error && (
+        <div className="dashboard-v3-error">
 
-        <StatCard
-          label="Completed Today"
-          value={completedToday}
-          description={
-            completedToday === 1
-              ? "1 task finished today"
-              : `${completedToday} tasks finished today`
-          }
-        />
+          <AlertTriangle
+            size={16}
+          />
 
-        <StatCard
-          label="Completion Rate"
-          value={`${completionRate}%`}
-          description={
-            `${completedCount} of ${tasks.length} completed`
-          }
-        />
+          <span>
+            {error}
+          </span>
 
-        <StatCard
-          label="Study Streak"
-          value={`${currentStreak} 🔥`}
-          description={
-            currentStreak === 1
-              ? "1 active day"
-              : `${currentStreak} consecutive days`
-          }
-        />
+        </div>
+      )}
+
+      {/* ===================================================
+          GAMIFICATION HERO
+      =================================================== */}
+
+      <section className="dashboard-card dashboard-v3-level-card">
+
+        <div className="dashboard-v3-level-main">
+
+          <div className="dashboard-v3-level-badge">
+
+            <Award
+              size={25}
+            />
+
+            <span>
+              {gamification.level}
+            </span>
+
+          </div>
+
+          <div className="dashboard-v3-level-content">
+
+            <div className="dashboard-v3-level-heading">
+
+              <div>
+
+                <span className="dashboard-v3-eyebrow">
+                  Level {gamification.level}
+                </span>
+
+                <h2>
+                  {gamification.title}
+                </h2>
+
+              </div>
+
+              <strong>
+                {formatGamificationXp(
+                  gamification.totalXp
+                )}
+              </strong>
+
+            </div>
+
+            <div className="dashboard-v3-xp-track">
+
+              <div
+                className="dashboard-v3-xp-progress"
+                style={{
+                  width:
+                    `${gamification.progress}%`,
+                }}
+              />
+
+            </div>
+
+            <div className="dashboard-v3-level-footer">
+
+              <span>
+                {gamification.xpToNextLevel >
+                0
+                  ? `${gamification.xpToNextLevel} XP to Level ${
+                      gamification.level +
+                      1
+                    }`
+                  : "Maximum level reached"}
+              </span>
+
+              <span>
+                {gamification.progress}% complete
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div className="dashboard-v3-level-stats">
+
+          <div>
+
+            <Zap
+              size={15}
+            />
+
+            <span>
+              This week
+            </span>
+
+            <strong>
+              +{gamification.weeklyXp} XP
+            </strong>
+
+          </div>
+
+          <div>
+
+            <Flame
+              size={15}
+            />
+
+            <span>
+              Current streak
+            </span>
+
+            <strong>
+              {gamification.streak} days
+            </strong>
+
+          </div>
+
+          <div>
+
+            <Sparkles
+              size={15}
+            />
+
+            <span>
+              Today
+            </span>
+
+            <strong>
+              +{gamification.todayXp} XP
+            </strong>
+
+          </div>
+
+        </div>
 
       </section>
 
-      {/* =====================================================
-          QUICK SUMMARY
-      ===================================================== */}
+      {/* PRIMARY STATS */}
 
-      <section className="dashboard-v2-summary-grid">
+      <section className="dashboard-v3-stats">
 
-        <div className="dashboard-v2-summary-card">
+        <DashboardStat
+          icon={
+            <Timer
+              size={19}
+            />
+          }
+          label="Focus today"
+          value={
+            loading
+              ? "—"
+              : formatStudyTime(
+                  todayFocusSeconds
+                )
+          }
+          description={`${todaySessions.length} ${
+            todaySessions.length ===
+            1
+              ? "session"
+              : "sessions"
+          } today`}
+        />
 
-          <div className="dashboard-v2-summary-icon">
+        <DashboardStat
+          icon={
+            <Target
+              size={19}
+            />
+          }
+          label="Daily goal"
+          value={`${goalProgress}%`}
+          description={`${todayFocusMinutes} / ${dailyGoalMinutes} min`}
+        />
+
+        <DashboardStat
+          icon={
             <CheckCircle2
               size={19}
             />
-          </div>
+          }
+          label="Pending tasks"
+          value={
+            pendingTasks.length
+          }
+          description={`${completedToday} completed today`}
+        />
 
-          <div>
-            <span>
-              Pending
-            </span>
-
-            <strong>
-              {pendingCount}
-            </strong>
-          </div>
-
-        </div>
-
-        <div className="dashboard-v2-summary-card">
-
-          <div className="dashboard-v2-summary-icon">
-            <TrendingUp
-              size={19}
-            />
-          </div>
-
-          <div>
-            <span>
-              Last 7 Days
-            </span>
-
-            <strong>
-              {weeklyCompleted}
-            </strong>
-          </div>
-
-        </div>
-
-        <div className="dashboard-v2-summary-card">
-
-          <div className="dashboard-v2-summary-icon">
-            <CalendarDays
-              size={19}
-            />
-          </div>
-
-          <div>
-            <span>
-              Upcoming
-            </span>
-
-            <strong>
-              {
-                upcomingEvents.length
-              }
-            </strong>
-          </div>
-
-        </div>
-
-        <div className="dashboard-v2-summary-card">
-
-          <div className="dashboard-v2-summary-icon">
+        <DashboardStat
+          icon={
             <Flame
               size={19}
             />
-          </div>
+          }
+          label="Study streak"
+          value={
+            gamification.streak
+          }
+          description={`Best: ${gamification.longestStreak} days`}
+        />
+
+      </section>
+
+      {/* DAILY GOAL */}
+
+      <section className="dashboard-card dashboard-v3-goal-card">
+
+        <div className="dashboard-v3-goal-header">
 
           <div>
-            <span>
-              Current Streak
+
+            <span className="dashboard-v3-eyebrow">
+              Today
             </span>
 
-            <strong>
-              {currentStreak}
-            </strong>
+            <h2>
+              Daily focus goal
+            </h2>
+
           </div>
+
+          <strong>
+            {formatStudyTime(
+              todayFocusSeconds
+            )}
+          </strong>
+
+        </div>
+
+        <div className="dashboard-v3-goal-track">
+
+          <div
+            className="dashboard-v3-goal-progress"
+            style={{
+              width:
+                `${goalProgress}%`,
+            }}
+          />
+
+        </div>
+
+        <div className="dashboard-v3-goal-footer">
+
+          <span>
+            {goalProgress >=
+            100
+              ? "Daily goal completed"
+              : `${Math.max(
+                  0,
+                  dailyGoalMinutes -
+                    todayFocusMinutes
+                )} min remaining`}
+          </span>
+
+          <span>
+            Goal:{" "}
+            {dailyGoalMinutes} min
+          </span>
 
         </div>
 
       </section>
 
-      {/* =====================================================
-          MAIN CONTENT
-      ===================================================== */}
+      {/* MAIN GRID */}
 
-      <section className="dashboard-grid">
+      <section className="dashboard-v3-main-grid">
 
-        {/* TODAY TASKS */}
+        <div className="dashboard-card dashboard-v3-panel">
 
-        <div className="dashboard-card">
-
-          <div className="card-header">
+          <div className="dashboard-v3-panel-header">
 
             <div>
+
+              <span className="dashboard-v3-eyebrow">
+                Plan
+              </span>
+
               <h2>
-                Today's Tasks
+                Today's tasks
               </h2>
 
-              <span className="dashboard-v2-card-subtitle">
-                Keep the momentum
-                moving.
-              </span>
             </div>
 
-            <span className="task-count">
-              {tasks.length}{" "}
-              {tasks.length ===
-              1
-                ? "task"
-                : "tasks"}
+            <span className="dashboard-v3-count">
+              {todayPlan.length}
             </span>
 
           </div>
 
-          <AddTask
-            onAdd={addTask}
-          />
+          <div className="dashboard-v3-task-list">
 
-          <div className="task-list">
+            {loading ? (
 
-            {loadingTasks ? (
+              <DashboardEmpty
+                icon={
+                  <Clock3
+                    size={22}
+                  />
+                }
+                title="Loading tasks"
+                description="Getting today's plan ready."
+              />
 
-              <p>
-                Loading tasks...
-              </p>
-
-            ) : tasks.length ===
+            ) : todayPlan.length ===
               0 ? (
 
-              <div className="dashboard-v2-empty">
-
-                <CheckCircle2
-                  size={26}
-                />
-
-                <strong>
-                  Nothing on the list
-                </strong>
-
-                <span>
-                  Add your first study
-                  task above.
-                </span>
-
-              </div>
+              <DashboardEmpty
+                icon={
+                  <CheckCircle2
+                    size={23}
+                  />
+                }
+                title="You're clear"
+                description="No overdue or unscheduled tasks need attention."
+              />
 
             ) : (
 
-              tasks
-                .slice(0, 6)
-                .map((task) => (
+              todayPlan.map(
+                (task) => {
+                  const dueKey =
+                    getDateKey(
+                      task.dueDate
+                    );
 
-                  <div
-                    className={`task ${
-                      task.completed
-                        ? "completed"
-                        : ""
-                    }`}
-                    key={
-                      task._id
-                    }
-                  >
+                  const overdue =
+                    Boolean(
+                      dueKey &&
+                        dueKey <
+                          todayKey
+                    );
 
-                    <input
-                      type="checkbox"
-                      checked={Boolean(
-                        task.completed
-                      )}
-                      onChange={() =>
-                        toggleTask(
-                          task._id
-                        )
+                  return (
+                    <div
+                      className={`dashboard-v3-task ${
+                        overdue
+                          ? "overdue"
+                          : ""
+                      }`}
+                      key={
+                        task._id
                       }
-                      aria-label={
-                        task.completed
-                          ? `Mark ${task.title} as incomplete`
-                          : `Mark ${task.title} as complete`
-                      }
-                    />
-
-                    <span className="task-title">
-                      {task.title}
-                    </span>
-
-                    <button
-                      type="button"
-                      className="task-action delete-task"
-                      onClick={() =>
-                        deleteTask(
-                          task._id
-                        )
-                      }
-                      aria-label={`Delete ${task.title}`}
                     >
-                      ×
-                    </button>
 
-                  </div>
+                      <div
+                        className={`dashboard-v3-priority priority-${normalizePriority(
+                          task.priority
+                        )}`}
+                      />
 
-                ))
+                      <div className="dashboard-v3-task-content">
 
-            )}
+                        <strong>
+                          {task.title}
+                        </strong>
 
-            {tasks.length >
-              6 && (
-              <div className="dashboard-v2-more">
-                +{" "}
-                {tasks.length -
-                  6}{" "}
-                more tasks in Tasks
-              </div>
-            )}
+                        <div className="dashboard-v3-task-meta">
 
-          </div>
+                          {task.subjectName && (
+                            <span>
 
-        </div>
+                              <BookOpen
+                                size={12}
+                              />
 
-        {/* UPCOMING EVENTS */}
+                              {
+                                task.subjectName
+                              }
 
-        <div className="dashboard-card">
+                            </span>
+                          )}
 
-          <div className="card-header">
+                          {task.dueDate && (
+                            <span
+                              className={
+                                overdue
+                                  ? "overdue"
+                                  : ""
+                              }
+                            >
 
-            <div>
-              <h2>
-                Upcoming
-              </h2>
+                              <CalendarDays
+                                size={12}
+                              />
 
-              <span className="dashboard-v2-card-subtitle">
-                Your nearest
-                deadlines and events.
-              </span>
-            </div>
+                              {overdue
+                                ? "Overdue · "
+                                : ""}
 
-            <span className="task-count">
-              {
-                upcomingEvents.length
-              }{" "}
-              {upcomingEvents.length ===
-              1
-                ? "event"
-                : "events"}
-            </span>
+                              {formatShortDate(
+                                task.dueDate
+                              )}
 
-          </div>
+                            </span>
+                          )}
 
-          <div className="upcoming-list">
+                          {task.dueTime && (
+                            <span>
 
-            {loadingEvents ? (
+                              <Clock3
+                                size={12}
+                              />
 
-              <p>
-                Loading events...
-              </p>
+                              {formatTaskTime(
+                                task.dueTime
+                              )}
 
-            ) : upcomingEvents.length ===
-              0 ? (
+                            </span>
+                          )}
 
-              <div className="dashboard-v2-empty">
+                        </div>
 
-                <CalendarDays
-                  size={26}
-                />
+                      </div>
 
-                <strong>
-                  Nothing upcoming
-                </strong>
-
-                <span>
-                  Add an exam,
-                  assignment or study
-                  event from Calendar.
-                </span>
-
-              </div>
-
-            ) : (
-
-              upcomingEvents.map(
-                (event) => (
-
-                  <div
-                    className="upcoming-item dashboard-v2-event"
-                    key={
-                      event._id
-                    }
-                  >
-
-                    <div className="dashboard-v2-event-date">
-
-                      <strong>
-                        {event.parsedDate.getDate()}
-                      </strong>
-
-                      <span>
-                        {event.parsedDate.toLocaleDateString(
-                          "en-IN",
-                          {
-                            month:
-                              "short",
-                          }
+                      <span
+                        className={`dashboard-v3-priority-label ${normalizePriority(
+                          task.priority
+                        )}`}
+                      >
+                        {normalizePriority(
+                          task.priority
                         )}
                       </span>
 
                     </div>
+                  );
+                }
+              )
 
-                    <div className="dashboard-v2-event-content">
+            )}
 
-                      <strong>
-                        {
-                          event.title
-                        }
-                      </strong>
+          </div>
 
-                      <span>
-                        {formatEventDate(
-                          event.parsedDate
-                        )}{" "}
-                        ·{" "}
-                        {event.type}
-                      </span>
+          {(dueTodayTasks.length >
+            0 ||
+            overdueTasks.length >
+              0) && (
+            <div className="dashboard-v3-task-summary">
+
+              <span>
+                {dueTodayTasks.length} due today
+              </span>
+
+              <span>
+                {overdueTasks.length} overdue
+              </span>
+
+            </div>
+          )}
+
+        </div>
+
+        {/* UPCOMING */}
+
+        <div className="dashboard-card dashboard-v3-panel">
+
+          <div className="dashboard-v3-panel-header">
+
+            <div>
+
+              <span className="dashboard-v3-eyebrow">
+                Schedule
+              </span>
+
+              <h2>
+                Upcoming
+              </h2>
+
+            </div>
+
+            <span className="dashboard-v3-count">
+              {
+                upcomingItems.length
+              }
+            </span>
+
+          </div>
+
+          <div className="dashboard-v3-upcoming-list">
+
+            {upcomingItems.length ===
+            0 ? (
+
+              <DashboardEmpty
+                icon={
+                  <CalendarDays
+                    size={23}
+                  />
+                }
+                title="Nothing upcoming"
+                description="Tasks with deadlines and Calendar events appear here."
+              />
+
+            ) : (
+
+              upcomingItems.map(
+                (item) => {
+                  const taskItem =
+                    item.source ===
+                      "task" ||
+                    item.type ===
+                      "task";
+
+                  return (
+                    <div
+                      className={`dashboard-v3-upcoming-item ${
+                        taskItem
+                          ? "task"
+                          : ""
+                      }`}
+                      key={
+                        item._id
+                      }
+                    >
+
+                      <div className="dashboard-v3-date-box">
+
+                        <strong>
+                          {item.parsedDate.getDate()}
+                        </strong>
+
+                        <span>
+                          {item.parsedDate.toLocaleDateString(
+                            "en-IN",
+                            {
+                              month:
+                                "short",
+                            }
+                          )}
+                        </span>
+
+                      </div>
+
+                      <div className="dashboard-v3-upcoming-content">
+
+                        <strong>
+                          {item.title}
+                        </strong>
+
+                        <div>
+
+                          <span>
+                            {taskItem
+                              ? "Task"
+                              : item.type ||
+                                "Event"}
+                          </span>
+
+                          {item.subjectName && (
+                            <>
+                              <span>·</span>
+
+                              <span>
+                                {
+                                  item.subjectName
+                                }
+                              </span>
+                            </>
+                          )}
+
+                          {item.dueTime && (
+                            <>
+                              <span>·</span>
+
+                              <span>
+                                {formatTaskTime(
+                                  item.dueTime
+                                )}
+                              </span>
+                            </>
+                          )}
+
+                        </div>
+
+                      </div>
 
                     </div>
-
-                  </div>
-
-                )
+                  );
+                }
               )
 
             )}
@@ -1296,122 +1808,416 @@ function Dashboard() {
 
       </section>
 
-      {/* =====================================================
-          WEEK ACTIVITY
-      ===================================================== */}
+      {/* SECONDARY GRID */}
 
-      <section className="dashboard-card dashboard-v2-week-card">
+      <section className="dashboard-v3-secondary-grid">
 
-        <div className="dashboard-v2-week-header">
+        <div className="dashboard-card dashboard-v3-week-card">
 
-          <div>
+          <div className="dashboard-v3-panel-header">
 
-            <span className="dashboard-v2-eyebrow">
-              ACTIVITY
-            </span>
+            <div>
 
-            <h2>
-              Last 7 days
-            </h2>
+              <span className="dashboard-v3-eyebrow">
+                Activity
+              </span>
 
-            <p>
-              Tasks completed each
-              day.
-            </p>
+              <h2>
+                Last 7 days
+              </h2>
+
+              <p>
+                Focus time recorded through StudyOS.
+              </p>
+
+            </div>
+
+            <div className="dashboard-v3-week-total">
+
+              <TrendingUp
+                size={16}
+              />
+
+              <strong>
+                {formatStudyTime(
+                  weeklyFocusSeconds
+                )}
+              </strong>
+
+            </div>
 
           </div>
 
-          <div className="dashboard-v2-week-total">
+          <div className="dashboard-v3-week-chart">
 
-            <TrendingUp
-              size={17}
-            />
+            {weeklyActivity.map(
+              (day) => {
+                const percentage =
+                  day.seconds ===
+                  0
+                    ? 4
+                    : Math.max(
+                        10,
+                        (
+                          day.seconds /
+                          maxWeeklySeconds
+                        ) *
+                          100
+                      );
 
-            <strong>
-              {weeklyCompleted}
-            </strong>
+                const currentDay =
+                  day.key ===
+                  todayKey;
 
-            <span>
-              completed
-            </span>
+                return (
+                  <div
+                    className="dashboard-v3-week-column"
+                    key={
+                      day.key
+                    }
+                  >
+
+                    <span className="dashboard-v3-week-value">
+                      {day.seconds >
+                      0
+                        ? formatStudyTime(
+                            day.seconds
+                          )
+                        : "0"}
+                    </span>
+
+                    <div className="dashboard-v3-week-track">
+
+                      <div
+                        className={`dashboard-v3-week-bar ${
+                          currentDay
+                            ? "today"
+                            : ""
+                        }`}
+                        style={{
+                          height:
+                            `${percentage}%`,
+                        }}
+                      />
+
+                    </div>
+
+                    <span
+                      className={`dashboard-v3-week-label ${
+                        currentDay
+                          ? "today"
+                          : ""
+                      }`}
+                    >
+                      {
+                        day.label
+                      }
+                    </span>
+
+                  </div>
+                );
+              }
+            )}
 
           </div>
 
         </div>
 
-        <div className="dashboard-v2-week-chart">
+        {/* STUDY OVERVIEW */}
 
-          {weeklyActivity.map(
-            (day) => {
+        <div className="dashboard-card dashboard-v3-insight-card">
 
-              const height =
-                day.count === 0
-                  ? 5
-                  : Math.max(
-                      18,
-                      (day.count /
-                        maxWeekValue) *
-                        100
-                    );
+          <div className="dashboard-v3-panel-header">
 
-              const today =
-                isSameDay(
-                  day.date,
-                  new Date()
-                );
+            <div>
 
-              return (
-                <div
-                  className="dashboard-v2-week-column"
-                  key={
-                    getDateKey(
-                      day.date
+              <span className="dashboard-v3-eyebrow">
+                Insight
+              </span>
+
+              <h2>
+                Study overview
+              </h2>
+
+            </div>
+
+          </div>
+
+          <div className="dashboard-v3-insight-list">
+
+            <InsightRow
+              icon={
+                <BookOpen
+                  size={17}
+                />
+              }
+              label="Top subject"
+              value={
+                topSubject
+                  ? topSubject.subjectName
+                  : "No data"
+              }
+              description={
+                topSubject
+                  ? formatStudyTime(
+                      topSubject.seconds
                     )
-                  }
-                >
+                  : "Complete Focus sessions to build insights."
+              }
+              color={
+                topSubject
+                  ? getSubjectColor(
+                      topSubject.subjectName
+                    )
+                  : undefined
+              }
+            />
 
-                  <span className="dashboard-v2-week-value">
-                    {
-                      day.count
-                    }
-                  </span>
+            <InsightRow
+              icon={
+                <Zap
+                  size={17}
+                />
+              }
+              label="XP this week"
+              value={
+                formatGamificationXp(
+                  gamification.weeklyXp
+                )
+              }
+              description={`${gamification.weeklyFocusXp} from Focus · ${gamification.weeklyTaskXp} from tasks`}
+            />
 
-                  <div className="dashboard-v2-week-track">
+            <InsightRow
+              icon={
+                <CheckCircle2
+                  size={17}
+                />
+              }
+              label="Completed today"
+              value={
+                completedToday
+              }
+              description="Tasks finished today"
+            />
 
-                    <div
-                      className={`dashboard-v2-week-bar ${
-                        today
-                          ? "today"
-                          : ""
-                      }`}
-                      style={{
-                        height:
-                          `${height}%`,
-                      }}
-                    />
-
-                  </div>
-
-                  <span
-                    className={`dashboard-v2-week-label ${
-                      today
-                        ? "today"
-                        : ""
-                    }`}
-                  >
-                    {
-                      day.label
-                    }
-                  </span>
-
-                </div>
-              );
-            }
-          )}
+          </div>
 
         </div>
 
       </section>
+
+      {/* RECENT FOCUS */}
+
+      <section className="dashboard-card dashboard-v3-recent-card">
+
+        <div className="dashboard-v3-panel-header">
+
+          <div>
+
+            <span className="dashboard-v3-eyebrow">
+              Focus
+            </span>
+
+            <h2>
+              Recent sessions
+            </h2>
+
+          </div>
+
+          <span className="dashboard-v3-count">
+            {
+              recentSessions.length
+            }
+          </span>
+
+        </div>
+
+        {recentSessions.length ===
+        0 ? (
+
+          <DashboardEmpty
+            icon={
+              <Timer
+                size={23}
+              />
+            }
+            title="No Focus sessions yet"
+            description="Your latest study sessions will appear here."
+          />
+
+        ) : (
+
+          <div className="dashboard-v3-recent-grid">
+
+            {recentSessions.map(
+              (session) => (
+                <div
+                  className="dashboard-v3-session"
+                  key={
+                    session._id
+                  }
+                >
+
+                  <div
+                    className="dashboard-v3-session-icon"
+                    style={{
+                      "--dashboard-subject-color":
+                        getSubjectColor(
+                          session.subjectName ||
+                            "General Study"
+                        ),
+                    }}
+                  >
+
+                    <BookOpen
+                      size={16}
+                    />
+
+                  </div>
+
+                  <div className="dashboard-v3-session-content">
+
+                    <strong>
+                      {session.subjectName ||
+                        "General Study"}
+                    </strong>
+
+                    <span>
+                      {formatShortDate(
+                        session.startedAt ||
+                          session.endedAt
+                      )}
+                    </span>
+
+                  </div>
+
+                  <strong className="dashboard-v3-session-duration">
+                    {formatStudyTime(
+                      session.durationSeconds
+                    )}
+                  </strong>
+
+                </div>
+              )
+            )}
+
+          </div>
+
+        )}
+
+      </section>
+
+    </div>
+  );
+}
+
+// =========================================================
+// STAT
+// =========================================================
+
+function DashboardStat({
+  icon,
+  label,
+  value,
+  description,
+}) {
+  return (
+    <div className="dashboard-v3-stat">
+
+      <div className="dashboard-v3-stat-top">
+
+        <span className="dashboard-v3-stat-icon">
+          {icon}
+        </span>
+
+        <span>
+          {label}
+        </span>
+
+      </div>
+
+      <strong>
+        {value}
+      </strong>
+
+      <small>
+        {description}
+      </small>
+
+    </div>
+  );
+}
+
+// =========================================================
+// INSIGHT
+// =========================================================
+
+function InsightRow({
+  icon,
+  label,
+  value,
+  description,
+  color,
+}) {
+  return (
+    <div className="dashboard-v3-insight-row">
+
+      <span
+        className="dashboard-v3-insight-icon"
+        style={
+          color
+            ? {
+                "--dashboard-subject-color":
+                  color,
+              }
+            : undefined
+        }
+      >
+        {icon}
+      </span>
+
+      <div>
+
+        <span>
+          {label}
+        </span>
+
+        <strong>
+          {value}
+        </strong>
+
+        <small>
+          {description}
+        </small>
+
+      </div>
+
+    </div>
+  );
+}
+
+// =========================================================
+// EMPTY
+// =========================================================
+
+function DashboardEmpty({
+  icon,
+  title,
+  description,
+}) {
+  return (
+    <div className="dashboard-v3-empty">
+
+      {icon}
+
+      <strong>
+        {title}
+      </strong>
+
+      <span>
+        {description}
+      </span>
 
     </div>
   );

@@ -3,6 +3,11 @@ import {
   useState,
 } from "react";
 
+import {
+  Cloud,
+  Menu,
+} from "lucide-react";
+
 import "./App.css";
 
 import Sidebar from "./components/Sidebar";
@@ -14,6 +19,7 @@ import Notes from "./pages/Notes";
 import Calendar from "./pages/Calendar";
 import Focus from "./pages/Focus";
 import Progress from "./pages/Progress";
+import Leaderboard from "./pages/Leaderboard";
 import Settings from "./pages/Settings";
 import Welcome from "./pages/Welcome";
 
@@ -38,8 +44,21 @@ const VALID_PAGES = [
   "calendar",
   "focus",
   "progress",
+  "leaderboard",
   "settings",
 ];
+
+const PAGE_LABELS = {
+  dashboard: "Dashboard",
+  tasks: "Tasks",
+  subjects: "Subjects",
+  notes: "Notes",
+  calendar: "Calendar",
+  focus: "Focus",
+  progress: "Progress",
+  leaderboard: "Leaderboard",
+  settings: "Settings",
+};
 
 // =========================================================
 // STARTUP PAGE
@@ -76,12 +95,6 @@ const getSnapshotCount = (
 
 // =========================================================
 // GUEST SNAPSHOT SIGNATURE
-//
-// Used so "Start fresh" doesn't annoy the same account
-// every single reload.
-//
-// If the guest data later changes, the signature changes
-// and StudyOS can offer migration again.
 // =========================================================
 
 const buildGuestSignature = (
@@ -136,15 +149,17 @@ const buildGuestSignature = (
 function App() {
   const {
     mode,
+
     loading:
       authLoading,
 
     firebaseUser,
+
     isAuthenticated,
   } = useAuth();
 
   // =======================================================
-  // PAGE
+  // ACTIVE PAGE
   // =======================================================
 
   const [
@@ -153,6 +168,15 @@ function App() {
   ] = useState(
     getStartupPage
   );
+
+  // =======================================================
+  // MOBILE NAVIGATION
+  // =======================================================
+
+  const [
+    sidebarOpen,
+    setSidebarOpen,
+  ] = useState(false);
 
   // =======================================================
   // GUEST MIGRATION
@@ -223,7 +247,108 @@ function App() {
   }, []);
 
   // =======================================================
-  // CHECK FOR GUEST DATA AFTER ACCOUNT LOGIN
+  // MOBILE DRAWER BEHAVIOR
+  // =======================================================
+
+  useEffect(() => {
+    const media =
+      window.matchMedia(
+        "(max-width: 900px)"
+      );
+
+    const closeOnDesktop =
+      () => {
+        if (!media.matches) {
+          setSidebarOpen(
+            false
+          );
+        }
+      };
+
+    closeOnDesktop();
+
+    media.addEventListener(
+      "change",
+      closeOnDesktop
+    );
+
+    return () => {
+      media.removeEventListener(
+        "change",
+        closeOnDesktop
+      );
+    };
+  }, []);
+
+  // =======================================================
+  // LOCK PAGE WHILE MOBILE DRAWER IS OPEN
+  // =======================================================
+
+  useEffect(() => {
+    const media =
+      window.matchMedia(
+        "(max-width: 900px)"
+      );
+
+    if (
+      sidebarOpen &&
+      media.matches
+    ) {
+      document.body.style.overflow =
+        "hidden";
+    } else {
+      document.body.style.overflow =
+        "";
+    }
+
+    return () => {
+      document.body.style.overflow =
+        "";
+    };
+  }, [
+    sidebarOpen,
+  ]);
+
+  // =======================================================
+  // ESC CLOSE
+  // =======================================================
+
+  useEffect(() => {
+    if (
+      !sidebarOpen
+    ) {
+      return undefined;
+    }
+
+    const handleKeyDown =
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          setSidebarOpen(
+            false
+          );
+        }
+      };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+    };
+  }, [
+    sidebarOpen,
+  ]);
+
+  // =======================================================
+  // CHECK GUEST DATA AFTER LOGIN
   // =======================================================
 
   useEffect(() => {
@@ -232,14 +357,13 @@ function App() {
 
     const checkGuestData =
       async () => {
-        // Only signed-in accounts
-        // need the migration prompt.
-
         if (
           !isAuthenticated ||
           !firebaseUser?.uid
         ) {
-          if (!cancelled) {
+          if (
+            !cancelled
+          ) {
             setShowGuestMigration(
               false
             );
@@ -264,7 +388,9 @@ function App() {
           const snapshot =
             await getGuestDataSnapshot();
 
-          if (cancelled) {
+          if (
+            cancelled
+          ) {
             return;
           }
 
@@ -273,7 +399,9 @@ function App() {
               snapshot
             );
 
-          if (count === 0) {
+          if (
+            count === 0
+          ) {
             setShowGuestMigration(
               false
             );
@@ -314,10 +442,6 @@ function App() {
             ""
           );
 
-          // If this exact guest
-          // snapshot was already skipped
-          // for this account, don't
-          // keep showing the modal.
           setShowGuestMigration(
             skippedSignature !==
               signature
@@ -330,7 +454,9 @@ function App() {
             guestDataError
           );
 
-          if (!cancelled) {
+          if (
+            !cancelled
+          ) {
             setShowGuestMigration(
               false
             );
@@ -341,7 +467,8 @@ function App() {
     checkGuestData();
 
     return () => {
-      cancelled = true;
+      cancelled =
+        true;
     };
   }, [
     isAuthenticated,
@@ -397,6 +524,10 @@ function App() {
         setActivePage(
           "dashboard"
         );
+
+        setSidebarOpen(
+          false
+        );
       } catch (
         migrationFailure
       ) {
@@ -418,12 +549,6 @@ function App() {
 
   // =======================================================
   // START FRESH
-  //
-  // IMPORTANT:
-  // This does NOT delete guest data.
-  //
-  // It simply tells this account:
-  // "don't import this exact guest snapshot right now".
   // =======================================================
 
   const startFresh =
@@ -451,6 +576,35 @@ function App() {
       setShowGuestMigration(
         false
       );
+    };
+
+  // =======================================================
+  // NAVIGATE
+  // =======================================================
+
+  const handleNavigate =
+    (page) => {
+      if (
+        !VALID_PAGES.includes(
+          page
+        )
+      ) {
+        return;
+      }
+
+      setActivePage(
+        page
+      );
+
+      setSidebarOpen(
+        false
+      );
+
+      window.scrollTo({
+        top: 0,
+        behavior:
+          "instant",
+      });
     };
 
   // =======================================================
@@ -496,6 +650,11 @@ function App() {
           <Progress />
         );
 
+      case "leaderboard":
+        return (
+          <Leaderboard />
+        );
+
       case "settings":
         return (
           <Settings />
@@ -512,7 +671,9 @@ function App() {
   // AUTH LOADING
   // =======================================================
 
-  if (authLoading) {
+  if (
+    authLoading
+  ) {
     return (
       <div className="auth-v1-loading">
         StudyOS
@@ -538,22 +699,114 @@ function App() {
 
   return (
     <>
-      <div className="app">
+      <div className="app app-shell-v2">
+
+        {/* =================================================
+            MOBILE BACKDROP
+        ================================================= */}
+
+        <button
+          type="button"
+          className={`app-shell-v2-backdrop ${
+            sidebarOpen
+              ? "is-visible"
+              : ""
+          }`}
+          onClick={() =>
+            setSidebarOpen(
+              false
+            )
+          }
+          aria-label="Close navigation"
+          tabIndex={
+            sidebarOpen
+              ? 0
+              : -1
+          }
+        />
+
+        {/* =================================================
+            SIDEBAR
+        ================================================= */}
 
         <Sidebar
           activePage={
             activePage
           }
           onNavigate={
-            setActivePage
+            handleNavigate
+          }
+          isOpen={
+            sidebarOpen
+          }
+          onClose={() =>
+            setSidebarOpen(
+              false
+            )
           }
         />
 
-        <main className="main-content">
+        {/* =================================================
+            MAIN SHELL
+        ================================================= */}
 
-          {renderPage()}
+        <div className="app-shell-v2-content">
 
-        </main>
+          {/* ===============================================
+              MOBILE TOP BAR
+          ================================================ */}
+
+          <header className="app-shell-v2-mobile-bar">
+
+            <button
+              type="button"
+              className="app-shell-v2-menu-button"
+              onClick={() =>
+                setSidebarOpen(
+                  true
+                )
+              }
+              aria-label="Open navigation"
+              aria-expanded={
+                sidebarOpen
+              }
+            >
+              <Menu
+                size={20}
+              />
+            </button>
+
+            <div className="app-shell-v2-mobile-brand">
+
+              <div className="app-shell-v2-mobile-logo">
+                S
+              </div>
+
+              <strong>
+                StudyOS
+              </strong>
+
+            </div>
+
+            <span className="app-shell-v2-mobile-page">
+              {PAGE_LABELS[
+                activePage
+              ]}
+            </span>
+
+          </header>
+
+          {/* ===============================================
+              PAGE
+          ================================================ */}
+
+          <main className="main-content app-shell-v2-main">
+
+            {renderPage()}
+
+          </main>
+
+        </div>
 
       </div>
 
@@ -562,9 +815,7 @@ function App() {
       =================================================== */}
 
       {showGuestMigration && (
-        <div
-          className="delete-modal-overlay"
-        >
+        <div className="delete-modal-overlay">
 
           <div
             className="settings-v2-modal"
@@ -576,7 +827,11 @@ function App() {
           >
 
             <div className="settings-v2-modal-icon settings-v2-modal-icon-neutral">
-              ☁️
+
+              <Cloud
+                size={22}
+              />
+
             </div>
 
             <h2>
@@ -617,6 +872,7 @@ function App() {
               <div className="settings-v2-notice settings-v2-notice-error">
 
                 <div>
+
                   <strong>
                     Migration failed
                   </strong>
@@ -624,6 +880,7 @@ function App() {
                   <span>
                     {migrationError}
                   </span>
+
                 </div>
 
               </div>
@@ -661,21 +918,7 @@ function App() {
 
             </div>
 
-            <p
-              style={{
-                marginTop:
-                  "12px",
-
-                fontSize:
-                  "11px",
-
-                opacity:
-                  0.65,
-
-                textAlign:
-                  "center",
-              }}
-            >
+            <p className="app-shell-v2-migration-note">
               “Start fresh” does not
               delete your guest data.
               It stays in this browser.

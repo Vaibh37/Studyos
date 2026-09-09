@@ -1,0 +1,583 @@
+/* =========================================================
+   STUDYOS SETTINGS — MOBILE NAV + CUSTOM SELECT
+========================================================= */
+
+.settings-v2-mobile-picker {
+  display: none;
+}
+
+
+/* =========================================================
+   STARTUP PAGE CUSTOM SELECT
+========================================================= */
+
+.settings-v2-startup-select {
+  width: 190px;
+  min-width: 0;
+}
+
+.settings-v2-startup-select
+.study-select-trigger {
+  width: 100%;
+  min-height: 42px;
+
+  padding:
+    0 12px;
+
+  border-color:
+    var(--sv2-border-strong);
+
+  border-radius: 10px;
+
+  background:
+    var(--sv2-surface-2);
+
+  color:
+    var(--sv2-text);
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.settings-v2-startup-select
+.study-select-trigger:hover:not(:disabled),
+.settings-v2-startup-select
+.study-select-trigger.open {
+  border-color:
+    var(--sv2-accent-border);
+
+  background:
+    var(--sv2-surface-3);
+}
+
+.settings-v2-startup-select
+.study-select-trigger.open {
+  border-color:
+    var(--sv2-accent);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      99,
+      102,
+      241,
+      0.1
+    );
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+========================================================= */
+
+@media (
+  max-width: 760px
+) {
+
+  /* =======================================================
+     SETTINGS SHELL
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-shell {
+    display: block;
+
+    overflow: visible;
+
+    border-radius: 14px;
+  }
+
+
+  /* =======================================================
+     SETTINGS NAV CONTAINER
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-nav {
+    overflow: visible;
+
+    padding: 12px;
+
+    border-right: 0;
+
+    border-bottom:
+      1px solid
+      var(--sv2-border);
+  }
+
+
+  /* =======================================================
+     HIDE OLD MOBILE HORIZONTAL NAV
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-nav-heading,
+  .settings-v2-page
+  .settings-v2-nav-footer,
+  .settings-v2-page
+  .settings-v2-nav-list {
+    display: none;
+  }
+
+
+  /* =======================================================
+     MOBILE SECTION PICKER
+  ======================================================= */
+
+  .settings-v2-mobile-picker {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-v2-section-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger {
+    width: 100%;
+    min-height: 46px;
+
+    padding:
+      0 12px;
+
+    border:
+      1px solid
+      var(--sv2-border-strong);
+
+    border-radius: 10px;
+
+    background:
+      var(--sv2-surface-2);
+
+    color:
+      var(--sv2-text);
+
+    font-size: 11.5px;
+    font-weight: 680;
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger:hover:not(:disabled),
+  .settings-v2-section-select
+  .study-select-trigger.open {
+    border-color:
+      var(--sv2-accent-border);
+
+    background:
+      var(--sv2-surface-3);
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger.open {
+    border-color:
+      var(--sv2-accent);
+
+    box-shadow:
+      0 0 0 3px
+      rgba(
+        99,
+        102,
+        241,
+        0.1
+      );
+  }
+
+
+  /* =======================================================
+     CONTENT
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-content {
+    padding: 18px;
+  }
+
+
+  /* =======================================================
+     ROW ACTIONS
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-row-actions {
+    width: 100%;
+    min-width: 0;
+
+    justify-content:
+      flex-start;
+
+    flex-wrap: wrap;
+  }
+
+
+  /* =======================================================
+     STARTUP SELECT
+  ======================================================= */
+
+  .settings-v2-startup-select {
+    width: 100%;
+  }
+
+  .settings-v2-startup-select
+  .study-select-trigger {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   PHONE
+========================================================= */
+
+@media (
+  max-width: 520px
+) {
+
+  .settings-v2-page
+  .settings-v2-nav {
+    padding: 10px;
+  }
+
+  .settings-v2-page
+  .settings-v2-content {
+    padding: 14px;
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger {
+    min-height: 44px;
+
+    padding:
+      0 11px;
+  }
+
+  .settings-v2-startup-select
+  .study-select-trigger {
+    min-height: 42px;
+  }
+}
+
+
+/* =========================================================
+   LIGHT THEME
+========================================================= */
+
+.light-theme
+.settings-v2-section-select
+.study-select-trigger,
+.light-theme
+.settings-v2-startup-select
+.study-select-trigger {
+  border-color:
+    var(--sv2-border-strong);
+
+  background:
+    var(--sv2-surface-2);
+
+  color:
+    var(--sv2-text);
+}
+
+.light-theme
+.settings-v2-section-select
+.study-select-trigger:hover:not(:disabled),
+.light-theme
+.settings-v2-startup-select
+.study-select-trigger:hover:not(:disabled) {
+  background:
+    var(--sv2-surface-3);
+}/* =========================================================
+   STUDYOS SETTINGS — MOBILE NAV + CUSTOM SELECT
+========================================================= */
+
+.settings-v2-mobile-picker {
+  display: none;
+}
+
+
+/* =========================================================
+   STARTUP PAGE CUSTOM SELECT
+========================================================= */
+
+.settings-v2-startup-select {
+  width: 190px;
+  min-width: 0;
+}
+
+.settings-v2-startup-select
+.study-select-trigger {
+  width: 100%;
+  min-height: 42px;
+
+  padding:
+    0 12px;
+
+  border-color:
+    var(--sv2-border-strong);
+
+  border-radius: 10px;
+
+  background:
+    var(--sv2-surface-2);
+
+  color:
+    var(--sv2-text);
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.settings-v2-startup-select
+.study-select-trigger:hover:not(:disabled),
+.settings-v2-startup-select
+.study-select-trigger.open {
+  border-color:
+    var(--sv2-accent-border);
+
+  background:
+    var(--sv2-surface-3);
+}
+
+.settings-v2-startup-select
+.study-select-trigger.open {
+  border-color:
+    var(--sv2-accent);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      99,
+      102,
+      241,
+      0.1
+    );
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+========================================================= */
+
+@media (
+  max-width: 760px
+) {
+
+  /* =======================================================
+     SETTINGS SHELL
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-shell {
+    display: block;
+
+    overflow: visible;
+
+    border-radius: 14px;
+  }
+
+
+  /* =======================================================
+     SETTINGS NAV CONTAINER
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-nav {
+    overflow: visible;
+
+    padding: 12px;
+
+    border-right: 0;
+
+    border-bottom:
+      1px solid
+      var(--sv2-border);
+  }
+
+
+  /* =======================================================
+     HIDE OLD MOBILE HORIZONTAL NAV
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-nav-heading,
+  .settings-v2-page
+  .settings-v2-nav-footer,
+  .settings-v2-page
+  .settings-v2-nav-list {
+    display: none;
+  }
+
+
+  /* =======================================================
+     MOBILE SECTION PICKER
+  ======================================================= */
+
+  .settings-v2-mobile-picker {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-v2-section-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger {
+    width: 100%;
+    min-height: 46px;
+
+    padding:
+      0 12px;
+
+    border:
+      1px solid
+      var(--sv2-border-strong);
+
+    border-radius: 10px;
+
+    background:
+      var(--sv2-surface-2);
+
+    color:
+      var(--sv2-text);
+
+    font-size: 11.5px;
+    font-weight: 680;
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger:hover:not(:disabled),
+  .settings-v2-section-select
+  .study-select-trigger.open {
+    border-color:
+      var(--sv2-accent-border);
+
+    background:
+      var(--sv2-surface-3);
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger.open {
+    border-color:
+      var(--sv2-accent);
+
+    box-shadow:
+      0 0 0 3px
+      rgba(
+        99,
+        102,
+        241,
+        0.1
+      );
+  }
+
+
+  /* =======================================================
+     CONTENT
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-content {
+    padding: 18px;
+  }
+
+
+  /* =======================================================
+     ROW ACTIONS
+  ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-row-actions {
+    width: 100%;
+    min-width: 0;
+
+    justify-content:
+      flex-start;
+
+    flex-wrap: wrap;
+  }
+
+
+  /* =======================================================
+     STARTUP SELECT
+  ======================================================= */
+
+  .settings-v2-startup-select {
+    width: 100%;
+  }
+
+  .settings-v2-startup-select
+  .study-select-trigger {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   PHONE
+========================================================= */
+
+@media (
+  max-width: 520px
+) {
+
+  .settings-v2-page
+  .settings-v2-nav {
+    padding: 10px;
+  }
+
+  .settings-v2-page
+  .settings-v2-content {
+    padding: 14px;
+  }
+
+  .settings-v2-section-select
+  .study-select-trigger {
+    min-height: 44px;
+
+    padding:
+      0 11px;
+  }
+
+  .settings-v2-startup-select
+  .study-select-trigger {
+    min-height: 42px;
+  }
+}
+
+
+/* =========================================================
+   LIGHT THEME
+========================================================= */
+
+.light-theme
+.settings-v2-section-select
+.study-select-trigger,
+.light-theme
+.settings-v2-startup-select
+.study-select-trigger {
+  border-color:
+    var(--sv2-border-strong);
+
+  background:
+    var(--sv2-surface-2);
+
+  color:
+    var(--sv2-text);
+}
+
+.light-theme
+.settings-v2-section-select
+.study-select-trigger:hover:not(:disabled),
+.light-theme
+.settings-v2-startup-select
+.study-select-trigger:hover:not(:disabled) {
+  background:
+    var(--sv2-surface-3);
+}

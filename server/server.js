@@ -8,19 +8,32 @@ const cors =
 // LOAD ENV FIRST
 // =========================================
 
-require("dotenv").config();
+require(
+  "dotenv"
+).config();
 
-// Now files that use process.env
-// can safely be imported.
+// =========================================
+// CONFIG
+// =========================================
 
 const corsOptions =
-  require("./config/corsOptions");
+  require(
+    "./config/corsOptions"
+  );
 
 const connectDB =
-  require("./config/db");
+  require(
+    "./config/db"
+  );
+
+// =========================================
+// ROUTES
+// =========================================
 
 const taskRoutes =
-  require("./routes/taskRoutes");
+  require(
+    "./routes/taskRoutes"
+  );
 
 const subjectRoutes =
   require(
@@ -28,10 +41,14 @@ const subjectRoutes =
   );
 
 const noteRoutes =
-  require("./routes/noteRoutes");
+  require(
+    "./routes/noteRoutes"
+  );
 
 const eventRoutes =
-  require("./routes/eventRoutes");
+  require(
+    "./routes/eventRoutes"
+  );
 
 const studySessionRoutes =
   require(
@@ -39,7 +56,14 @@ const studySessionRoutes =
   );
 
 const authRoutes =
-  require("./routes/authRoutes");
+  require(
+    "./routes/authRoutes"
+  );
+
+const leaderboardRoutes =
+  require(
+    "./routes/leaderboardRoutes"
+  );
 
 // =========================================
 // APP
@@ -63,7 +87,9 @@ connectDB();
 // =========================================
 
 app.use(
-  cors(corsOptions)
+  cors(
+    corsOptions
+  )
 );
 
 app.use(
@@ -76,10 +102,13 @@ app.use(
 
 app.get(
   "/",
-  (req, res) => {
+  (
+    req,
+    res
+  ) => {
     res.json({
       message:
-        "StudyOS API is running 🚀",
+        "StudyOS API is running",
     });
   }
 );
@@ -90,7 +119,10 @@ app.get(
 
 app.get(
   "/api/health",
-  (req, res) => {
+  (
+    req,
+    res
+  ) => {
     res.json({
       status:
         "ok",
@@ -140,6 +172,15 @@ app.use(
 );
 
 // =========================================
+// LEADERBOARD
+// =========================================
+
+app.use(
+  "/api/leaderboard",
+  leaderboardRoutes
+);
+
+// =========================================
 // START SERVER
 // =========================================
 
@@ -147,7 +188,7 @@ app.listen(
   PORT,
   () => {
     console.log(
-      `StudyOS server running on port ${PORT} 🚀`
+      `StudyOS server running on port ${PORT}`
     );
   }
 );

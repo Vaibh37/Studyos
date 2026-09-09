@@ -1,45 +1,320 @@
-const express = require("express");
-const mongoose = require("mongoose");
+const express =
+  require("express");
 
-const Note = require("../models/Note");
+const mongoose =
+  require("mongoose");
 
-const firebaseAuth = require(
-  "../middleware/firebaseAuth"
+const Note =
+  require("../models/Note");
+
+const Subject =
+  require("../models/Subject");
+
+const firebaseAuth =
+  require(
+    "../middleware/firebaseAuth"
+  );
+
+const router =
+  express.Router();
+
+// =========================================================
+// ALL ROUTES REQUIRE LOGIN
+// =========================================================
+
+router.use(
+  firebaseAuth
 );
 
-const router = express.Router();
-
 // =========================================================
-// ALL NOTE ROUTES REQUIRE LOGIN
+// HELPERS
 // =========================================================
 
-router.use(firebaseAuth);
+const createHttpError = (
+  status,
+  message
+) => {
+  const error =
+    new Error(message);
+
+  error.status =
+    status;
+
+  return error;
+};
 
 // =========================================================
-// GET ALL NOTES FOR CURRENT USER
+// ESCAPE SEARCH REGEX
 // =========================================================
 
-router.get("/", async (req, res) => {
-  try {
-    const notes = await Note.find({
-      userId: req.user.uid,
-    }).sort({
-      updatedAt: -1,
-    });
+const escapeRegExp = (
+  value
+) => {
+  return String(
+    value
+  ).replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
+};
 
-    res.status(200).json(notes);
-  } catch (error) {
+// =========================================================
+// CLEAN TITLE
+// =========================================================
+
+const cleanTitle = (
+  value
+) => {
+  if (
+    typeof value !==
+    "string"
+  ) {
+    return "";
+  }
+
+  return value
+    .trim()
+    .replace(
+      /\s+/g,
+      " "
+    );
+};
+
+// =========================================================
+// RESOLVE OWNED SUBJECT
+// =========================================================
+
+const resolveOwnedSubject =
+  async (
+    userId,
+    rawSubjectId
+  ) => {
+    // Null / empty means:
+    // note is intentionally unassigned.
+
+    if (
+      rawSubjectId ===
+        null ||
+      rawSubjectId ===
+        undefined ||
+      rawSubjectId ===
+        ""
+    ) {
+      return null;
+    }
+
+    const subjectId =
+      String(
+        rawSubjectId
+      ).trim();
+
+    if (
+      !mongoose.Types
+        .ObjectId
+        .isValid(
+          subjectId
+        )
+    ) {
+      throw createHttpError(
+        400,
+        "Invalid subject ID"
+      );
+    }
+
+    const subject =
+      await Subject.findOne({
+        _id:
+          subjectId,
+
+        userId,
+      });
+
+    if (!subject) {
+      throw createHttpError(
+        404,
+        "Subject not found"
+      );
+    }
+
+    return subject;
+  };
+
+// =========================================================
+// SEND ROUTE ERROR
+// =========================================================
+
+const sendRouteError = (
+  res,
+  error,
+  fallbackMessage
+) => {
+  const status =
+    Number(
+      error?.status
+    ) || 500;
+
+  if (
+    status >= 500
+  ) {
     console.error(
-      "GET NOTES ERROR:",
+      fallbackMessage,
       error
     );
-
-    res.status(500).json({
-      message:
-        "Failed to fetch notes",
-    });
   }
-});
+
+  return res
+    .status(status)
+    .json({
+      message:
+        status >= 500
+          ? fallbackMessage
+          : error.message,
+    });
+};
+
+// =========================================================
+// GET ALL NOTES
+//
+// Optional query parameters:
+//
+// ?q=biology
+// ?subjectId=<id>
+// ?subjectId=none
+// ?pinned=true
+// =========================================================
+
+router.get(
+  "/",
+  async (
+    req,
+    res
+  ) => {
+    try {
+      const filter = {
+        userId:
+          req.user.uid,
+      };
+
+      // ===================================================
+      // SUBJECT FILTER
+      // ===================================================
+
+      const rawSubjectId =
+        req.query
+          .subjectId;
+
+      if (
+        rawSubjectId ===
+        "none"
+      ) {
+        filter.subjectId =
+          null;
+      } else if (
+        rawSubjectId
+      ) {
+        if (
+          !mongoose.Types
+            .ObjectId
+            .isValid(
+              rawSubjectId
+            )
+        ) {
+          return res
+            .status(400)
+            .json({
+              message:
+                "Invalid subject ID",
+            });
+        }
+
+        filter.subjectId =
+          rawSubjectId;
+      }
+
+      // ===================================================
+      // PIN FILTER
+      // ===================================================
+
+      if (
+        req.query.pinned ===
+        "true"
+      ) {
+        filter.pinned =
+          true;
+      }
+
+      if (
+        req.query.pinned ===
+        "false"
+      ) {
+        filter.pinned =
+          false;
+      }
+
+      // ===================================================
+      // SEARCH
+      // ===================================================
+
+      const search =
+        typeof req.query.q ===
+          "string"
+          ? req.query.q
+              .trim()
+          : "";
+
+      if (search) {
+        const regex =
+          new RegExp(
+            escapeRegExp(
+              search
+            ),
+            "i"
+          );
+
+        filter.$or = [
+          {
+            title:
+              regex,
+          },
+
+          {
+            content:
+              regex,
+          },
+
+          {
+            subjectName:
+              regex,
+          },
+        ];
+      }
+
+      // ===================================================
+      // FIND
+      // ===================================================
+
+      const notes =
+        await Note.find(
+          filter
+        ).sort({
+          pinned: -1,
+          updatedAt: -1,
+        });
+
+      return res
+        .status(200)
+        .json(
+          notes
+        );
+    } catch (error) {
+      return sendRouteError(
+        res,
+        error,
+        "Failed to fetch notes"
+      );
+    }
+  }
+);
 
 // =========================================================
 // GET ONE NOTE
@@ -47,49 +322,60 @@ router.get("/", async (req, res) => {
 
 router.get(
   "/:id",
-  async (req, res) => {
+  async (
+    req,
+    res
+  ) => {
     try {
-      const { id } =
+      const {
+        id,
+      } =
         req.params;
 
       if (
-        !mongoose.Types.ObjectId.isValid(
-          id
-        )
+        !mongoose.Types
+          .ObjectId
+          .isValid(
+            id
+          )
       ) {
-        return res.status(400).json({
-          message:
-            "Invalid note ID",
-        });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Invalid note ID",
+          });
       }
 
       const note =
         await Note.findOne({
-          _id: id,
+          _id:
+            id,
+
           userId:
             req.user.uid,
         });
 
       if (!note) {
-        return res.status(404).json({
-          message:
-            "Note not found",
-        });
+        return res
+          .status(404)
+          .json({
+            message:
+              "Note not found",
+          });
       }
 
-      res.status(200).json(
-        note
-      );
+      return res
+        .status(200)
+        .json(
+          note
+        );
     } catch (error) {
-      console.error(
-        "GET NOTE ERROR:",
-        error
+      return sendRouteError(
+        res,
+        error,
+        "Failed to fetch note"
       );
-
-      res.status(500).json({
-        message:
-          "Failed to fetch note",
-      });
     }
   }
 );
@@ -100,23 +386,104 @@ router.get(
 
 router.post(
   "/",
-  async (req, res) => {
+  async (
+    req,
+    res
+  ) => {
     try {
       const {
         title,
         content,
-      } = req.body;
+        subjectId,
+        pinned,
+      } =
+        req.body;
+
+      // ===================================================
+      // TITLE
+      // ===================================================
+
+      const safeTitle =
+        cleanTitle(
+          title
+        );
 
       if (
-        typeof title !==
-          "string" ||
-        !title.trim()
+        !safeTitle
       ) {
-        return res.status(400).json({
-          message:
-            "Note title is required",
-        });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Note title is required",
+          });
       }
+
+      if (
+        safeTitle.length >
+        160
+      ) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Note title cannot exceed 160 characters",
+          });
+      }
+
+      // ===================================================
+      // CONTENT
+      // ===================================================
+
+      const safeContent =
+        typeof content ===
+        "string"
+          ? content
+          : "";
+
+      if (
+        safeContent.length >
+        200000
+      ) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Note content is too large",
+          });
+      }
+
+      // ===================================================
+      // PINNED
+      // ===================================================
+
+      if (
+        pinned !==
+          undefined &&
+        typeof pinned !==
+          "boolean"
+      ) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Pinned must be true or false",
+          });
+      }
+
+      // ===================================================
+      // SUBJECT
+      // ===================================================
+
+      const subject =
+        await resolveOwnedSubject(
+          req.user.uid,
+          subjectId
+        );
+
+      // ===================================================
+      // CREATE
+      // ===================================================
 
       const note =
         await Note.create({
@@ -124,28 +491,36 @@ router.post(
             req.user.uid,
 
           title:
-            title.trim(),
+            safeTitle,
 
           content:
-            typeof content ===
-            "string"
-              ? content
-              : "",
+            safeContent,
+
+          subjectId:
+            subject?._id ||
+            null,
+
+          subjectName:
+            subject?.name ||
+            "",
+
+          pinned:
+            Boolean(
+              pinned
+            ),
         });
 
-      res.status(201).json(
-        note
-      );
+      return res
+        .status(201)
+        .json(
+          note
+        );
     } catch (error) {
-      console.error(
-        "CREATE NOTE ERROR:",
-        error
+      return sendRouteError(
+        res,
+        error,
+        "Failed to create note"
       );
-
-      res.status(500).json({
-        message:
-          "Failed to create note",
-      });
     }
   }
 );
@@ -156,85 +531,201 @@ router.post(
 
 router.put(
   "/:id",
-  async (req, res) => {
+  async (
+    req,
+    res
+  ) => {
     try {
-      const { id } =
+      const {
+        id,
+      } =
         req.params;
 
       if (
-        !mongoose.Types.ObjectId.isValid(
-          id
-        )
+        !mongoose.Types
+          .ObjectId
+          .isValid(
+            id
+          )
       ) {
-        return res.status(400).json({
-          message:
-            "Invalid note ID",
-        });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Invalid note ID",
+          });
       }
+
+      // ===================================================
+      // OWN NOTE
+      // ===================================================
 
       const note =
         await Note.findOne({
-          _id: id,
+          _id:
+            id,
+
           userId:
             req.user.uid,
         });
 
       if (!note) {
-        return res.status(404).json({
-          message:
-            "Note not found",
-        });
+        return res
+          .status(404)
+          .json({
+            message:
+              "Note not found",
+          });
       }
 
       const {
         title,
         content,
-      } = req.body;
+        subjectId,
+        pinned,
+      } =
+        req.body;
+
+      // ===================================================
+      // TITLE
+      // ===================================================
 
       if (
-        title !== undefined
+        title !==
+        undefined
       ) {
+        const safeTitle =
+          cleanTitle(
+            title
+          );
+
         if (
-          typeof title !==
-            "string" ||
-          !title.trim()
+          !safeTitle
         ) {
-          return res.status(400).json({
-            message:
-              "Note title cannot be empty",
-          });
+          return res
+            .status(400)
+            .json({
+              message:
+                "Note title cannot be empty",
+            });
+        }
+
+        if (
+          safeTitle.length >
+          160
+        ) {
+          return res
+            .status(400)
+            .json({
+              message:
+                "Note title cannot exceed 160 characters",
+            });
         }
 
         note.title =
-          title.trim();
+          safeTitle;
       }
+
+      // ===================================================
+      // CONTENT
+      // ===================================================
 
       if (
         content !==
         undefined
       ) {
-        note.content =
-          typeof content ===
+        if (
+          typeof content !==
           "string"
-            ? content
-            : "";
+        ) {
+          return res
+            .status(400)
+            .json({
+              message:
+                "Note content must be text",
+            });
+        }
+
+        if (
+          content.length >
+          200000
+        ) {
+          return res
+            .status(400)
+            .json({
+              message:
+                "Note content is too large",
+            });
+        }
+
+        note.content =
+          content;
       }
+
+      // ===================================================
+      // PINNED
+      // ===================================================
+
+      if (
+        pinned !==
+        undefined
+      ) {
+        if (
+          typeof pinned !==
+          "boolean"
+        ) {
+          return res
+            .status(400)
+            .json({
+              message:
+                "Pinned must be true or false",
+            });
+        }
+
+        note.pinned =
+          pinned;
+      }
+
+      // ===================================================
+      // SUBJECT
+      // ===================================================
+
+      if (
+        subjectId !==
+        undefined
+      ) {
+        const subject =
+          await resolveOwnedSubject(
+            req.user.uid,
+            subjectId
+          );
+
+        note.subjectId =
+          subject?._id ||
+          null;
+
+        note.subjectName =
+          subject?.name ||
+          "";
+      }
+
+      // ===================================================
+      // SAVE
+      // ===================================================
 
       await note.save();
 
-      res.status(200).json(
-        note
-      );
+      return res
+        .status(200)
+        .json(
+          note
+        );
     } catch (error) {
-      console.error(
-        "UPDATE NOTE ERROR:",
-        error
+      return sendRouteError(
+        res,
+        error,
+        "Failed to update note"
       );
-
-      res.status(500).json({
-        message:
-          "Failed to update note",
-      });
     }
   }
 );
@@ -245,52 +736,68 @@ router.put(
 
 router.delete(
   "/:id",
-  async (req, res) => {
+  async (
+    req,
+    res
+  ) => {
     try {
-      const { id } =
+      const {
+        id,
+      } =
         req.params;
 
       if (
-        !mongoose.Types.ObjectId.isValid(
-          id
-        )
+        !mongoose.Types
+          .ObjectId
+          .isValid(
+            id
+          )
       ) {
-        return res.status(400).json({
-          message:
-            "Invalid note ID",
-        });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Invalid note ID",
+          });
       }
 
       const note =
-        await Note.findOneAndDelete({
-          _id: id,
-          userId:
-            req.user.uid,
-        });
+        await Note
+          .findOneAndDelete({
+            _id:
+              id,
+
+            userId:
+              req.user.uid,
+          });
 
       if (!note) {
-        return res.status(404).json({
-          message:
-            "Note not found",
-        });
+        return res
+          .status(404)
+          .json({
+            message:
+              "Note not found",
+          });
       }
 
-      res.status(200).json({
-        message:
-          "Note deleted successfully",
-      });
-    } catch (error) {
-      console.error(
-        "DELETE NOTE ERROR:",
-        error
-      );
+      return res
+        .status(200)
+        .json({
+          message:
+            "Note deleted successfully",
 
-      res.status(500).json({
-        message:
-          "Failed to delete note",
-      });
+          deletedId:
+            note._id,
+        });
+    } catch (error) {
+      return sendRouteError(
+        res,
+        error,
+        "Failed to delete note"
+      );
     }
   }
 );
 
-module.exports = router;
+module.exports =
+  router;
