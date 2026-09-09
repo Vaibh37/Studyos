@@ -1,344 +1,561 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/StudyOS-Study%20without%20the%20chaos-6366F1?style=for-the-badge" alt="StudyOS" />
-
 # StudyOS
 
-### Plan. Focus. Track. Compete.
+### Your study workflow. One place. Less friction.
 
-A full-stack study workspace that brings **tasks, subjects, notes, calendar, focus sessions, progress analytics, gamification and a study leaderboard** into one connected system.
-
-<br />
-
-[![Launch StudyOS](https://img.shields.io/badge/Launch_StudyOS-Live_App-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos-one-omega.vercel.app/)
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Vaibh37/Studyos)
+Plan your work, organize subjects, take notes, stay focused, track progress,  
+and compete with other students — without jumping between five different apps.
 
 <br />
 
-![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=111827)
-![Vite](https://img.shields.io/badge/Vite-8.2-646CFF?style=flat-square&logo=vite&logoColor=white)
-![Express](https://img.shields.io/badge/Express-5.2-111827?style=flat-square&logo=express&logoColor=white)
+[![Live App](https://img.shields.io/badge/Live_App-Open_StudyOS-6366f1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos-one-omega.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Vaibh37-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Vaibh37/Studyos)
+
+<br />
+
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?style=flat-square&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=flat-square&logo=mongodb&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?style=flat-square&logo=firebase&logoColor=111827)
-![IndexedDB](https://img.shields.io/badge/Guest_Mode-IndexedDB-8B5CF6?style=flat-square)
+![Firebase](https://img.shields.io/badge/Firebase-Authentication-FFCA28?style=flat-square&logo=firebase&logoColor=black)
+
+<br />
+
+**Live:** [studyos-one-omega.vercel.app](https://studyos-one-omega.vercel.app/)
 
 </div>
 
+---
+
+## What is StudyOS?
+
+**StudyOS** is a full-stack productivity platform built around one simple idea:
+
+> Studying should not require a separate app for tasks, notes, focus sessions, calendars, and progress tracking.
+
+Instead, StudyOS connects them.
+
+A task can belong to a subject.  
+A deadline can appear in your calendar.  
+A Focus session contributes to your progress.  
+Your real study activity earns XP.  
+And if you choose to participate, that progress can place you on the StudyOS leaderboard.
+
+StudyOS is designed to work both as a **personal study workspace** and as a more motivating, gamified study experience.
+
+---
+
+# Preview
+
+<div align="center">
+
+## Dashboard
+
+<img
+  src="./docs/screenshots/dashboard.png"
+  alt="StudyOS Dashboard"
+  width="100%"
+/>
+
+<br />
 <br />
 
-<img src="./docs/screenshots/dashboard.png" alt="StudyOS dashboard" width="100%" />
+## Tasks
+
+<img
+  src="./docs/screenshots/tasks.png"
+  alt="StudyOS Tasks"
+  width="100%"
+/>
 
 <br />
+<br />
 
-> **StudyOS is built around one idea:** studying should not require five disconnected apps.
+## Focus
 
-Tasks understand subjects. Deadlines appear in the calendar. Focus sessions become progress data. Real activity earns XP. And students who opt in can compete on the leaderboard.
+<img
+  src="./docs/screenshots/focus.png"
+  alt="StudyOS Focus"
+  width="100%"
+/>
 
----
+<br />
+<br />
 
-## Why StudyOS?
+## Progress
 
-Most productivity apps solve one piece of the problem. StudyOS connects the pieces.
+<img
+  src="./docs/screenshots/progress.png"
+  alt="StudyOS Progress"
+  width="100%"
+/>
 
-| Plan | Study | Understand your progress |
-| --- | --- | --- |
-| Tasks with priorities and deadlines | Focus sessions linked to subjects | Daily and weekly Focus analytics |
-| Subjects as the organizing layer | Notes connected to subjects | Task completion and study streaks |
-| Calendar events + task deadlines | Custom Focus durations | XP, levels and leaderboard ranking |
+<br />
+<br />
 
-The goal is simple: **less switching, more studying.**
+## Study Leaderboard
 
----
+<img
+  src="./docs/screenshots/leaderboard.png"
+  alt="StudyOS Leaderboard"
+  width="100%"
+/>
 
-## Core features
+<br />
+<br />
 
-### Dashboard
+## Mobile
 
-Your study activity, priorities and progress in one place.
+<img
+  src="./docs/screenshots/mobile-dashboard.jpg"
+  alt="StudyOS Mobile Dashboard"
+  width="340"
+/>
 
-- XP, level and streak overview
-- Today's Focus progress
-- Pending and completed task stats
-- Daily Focus goal
-- Upcoming deadlines and events
-- 7-day activity view
-- Study insights and recent sessions
-
-### Tasks
-
-A study planner rather than a plain todo list.
-
-- Create, edit and complete tasks
-- Low, medium and high priority
-- Subject linking
-- Due dates and due times
-- Today / Upcoming / Completed views
-- Search and filtering
-- Automatic calendar deadline integration
-
-### Subjects
-
-The layer that connects your StudyOS data.
-
-- Custom subject names, codes and colors
-- Search and sorting
-- Task, note and Focus relationships
-- Subject-level activity metrics
-- Rename-safe linked data
-- Safe deletion without destroying linked tasks or notes
-
-### Notes
-
-A lightweight knowledge base that stays connected to your study system.
-
-- Create and edit notes
-- Link notes to subjects
-- Pin important notes
-- Search, filter and sort
-- Guest and cloud persistence
-
-### Calendar
-
-See events and deadlines together.
-
-- Monthly calendar
-- Custom study events
-- Task deadlines shown automatically
-- Edit and delete events
-- Custom StudyOS date picker
-
-### Focus
-
-A Focus timer that creates real study data.
-
-- 25 / 50 / 90 minute presets
-- Custom duration
-- Subject selection
-- Pause and resume
-- Persistent timer behavior across StudyOS navigation
-- Focus session history
-- Session statistics
-
-### Progress
-
-A real view of your study habits.
-
-- Today and 7-day Focus totals
-- Focus streaks
-- Daily-goal progress
-- 7-day Focus trend
-- 30-day consistency view
-- Subject study distribution
-- Task completion metrics
-- Notes activity
-- Recent study activity
-
-### Leaderboard
-
-A weekly competition based on actual StudyOS activity.
-
-- Opt-in participation
-- Last-7-days ranking
-- Server-calculated scores
-- Verified Focus time
-- Completed-task contribution
-- Anti-spam limits
-- Public display name controls
-- Aggregate stats only
-
-Private task titles, note content, subject content and email addresses are **not** exposed on the leaderboard.
+</div>
 
 ---
 
-## Product showcase
+# Everything in one study workspace
 
 <table>
 <tr>
-<td width="50%">
+
+<td width="50%" valign="top">
+
+### Dashboard
+
+See the state of your study life without digging through pages.
+
+- Today's overview
+- Task progress
+- Focus statistics
+- Daily study goal
+- XP and level progress
+- Study streaks
+- Recent activity
+- Subject insights
+
+</td>
+
+<td width="50%" valign="top">
 
 ### Tasks
-<img src="./docs/screenshots/tasks.png" alt="StudyOS Tasks" width="100%" />
+
+More than a basic todo list.
+
+- Create and edit tasks
+- Subject linking
+- Low / Medium / High priority
+- Due dates
+- Due times
+- Completion tracking
+- Search and filtering
+- Calendar deadline integration
 
 </td>
-<td width="50%">
+
+</tr>
+
+<tr>
+
+<td width="50%" valign="top">
+
+### Subjects
+
+Subjects act as the structure connecting StudyOS.
+
+- Custom subjects
+- Subject colors
+- Descriptions
+- Task statistics
+- Focus statistics
+- Note statistics
+- Search
+- Sorting
+- Rename-safe relationships
+- Safe subject deletion
+
+</td>
+
+<td width="50%" valign="top">
+
+### Notes
+
+A focused writing space connected to your subjects.
+
+- Create and edit notes
+- Subject linking
+- Pinned notes
+- Search
+- Filtering
+- Sorting
+- Persistent storage
+- Account and guest support
+
+</td>
+
+</tr>
+
+<tr>
+
+<td width="50%" valign="top">
+
+### Calendar
+
+Deadlines and study events live together.
+
+- Monthly calendar
+- Custom study events
+- Event categories
+- Task deadline integration
+- Event editing
+- Event deletion
+- Read-only task deadline entries
+- Custom StudyOS date picker
+
+</td>
+
+<td width="50%" valign="top">
 
 ### Focus
-<img src="./docs/screenshots/focus.png" alt="StudyOS Focus" width="100%" />
+
+Turn planned studying into actual activity.
+
+- Focus timer
+- Quick duration presets
+- Custom duration
+- Subject selection
+- Pause / resume
+- Session history
+- Completed Focus tracking
+- Subject-based statistics
 
 </td>
+
 </tr>
+
 <tr>
-<td width="50%">
+
+<td width="50%" valign="top">
 
 ### Progress
-<img src="./docs/screenshots/progress.png" alt="StudyOS Progress" width="100%" />
+
+See what your work actually adds up to.
+
+- Focus time
+- Task completion
+- Notes activity
+- Study distribution
+- Subject breakdown
+- Recent activity
+- Streak insights
+- Progress summaries
 
 </td>
-<td width="50%">
+
+<td width="50%" valign="top">
 
 ### Leaderboard
-<img src="./docs/screenshots/leaderboard.png" alt="StudyOS Leaderboard" width="100%" />
+
+StudyOS can also make studying competitive.
+
+- Opt-in participation
+- Public display name
+- Study-based ranking
+- XP-driven progression
+- Privacy controls
+- Aggregate study statistics only
+
+Private tasks, notes, subject content and calendar details are not exposed on the leaderboard.
 
 </td>
+
 </tr>
 </table>
 
 ---
 
-## Mobile experience
+# Gamification
 
-StudyOS uses a responsive app shell with a mobile top bar, drawer navigation and layouts that adapt instead of simply shrinking the desktop interface.
+StudyOS does not award XP just for clicking buttons.
+
+Progress is based on **real study activity**.
+
+### XP comes from
+
+| Activity | Reward |
+| --- | ---: |
+| Focus time | **1 XP / minute** |
+| Completed task | **15 XP** |
+| Priority tasks | Additional priority bonus |
+| Study streak | Daily streak XP |
+
+Focus XP is capped per session to reduce abuse.
+
+StudyOS turns real activity into:
+
+- XP
+- Levels
+- Titles
+- Study streaks
+- Progress milestones
+- Leaderboard position
+
+The goal is not to turn studying into a game.
+
+The goal is to make **showing up consistently feel visible**.
+
+---
+
+# Study Leaderboard
+
+The StudyOS leaderboard adds a competitive layer to studying.
+
+Instead of competing over meaningless clicks, rankings are based on actual activity generated inside StudyOS.
+
+Users can:
+
+- Build XP through studying
+- Increase their level
+- Maintain streaks
+- Compare progress with others
+- Climb the global StudyOS leaderboard
+
+Participation is completely optional.
 
 <div align="center">
-  <img src="./docs/screenshots/mobile-dashboard.jpg" alt="StudyOS mobile dashboard" width="360" />
+
+### Study. Earn XP. Climb the leaderboard.
+
+[Open StudyOS →](https://studyos-one-omega.vercel.app/)
+
 </div>
 
 ---
 
-## Gamification that reflects real work
+# Guest mode or account mode
 
-StudyOS rewards study activity instead of meaningless button clicks.
+You can start using StudyOS without creating an account.
 
-```text
-Focus sessions ───────┐
-                      ├──> XP ──> Levels ──> Titles
-Completed tasks ──────┤
-                      └──> Streaks ──> Weekly Leaderboard
-```
+## Guest Mode
 
-The leaderboard is calculated on the server and uses verified Focus sessions and completed tasks from the current ranking window, with limits designed to reduce trivial score farming.
+Guest data stays inside the browser using **IndexedDB**.
 
----
+Useful for:
 
-## Guest mode + account mode
+- Trying StudyOS immediately
+- Personal local use
+- Testing features without signing in
 
-You can use StudyOS immediately without creating an account.
+## Account Mode
 
-### Guest mode
+Sign in using Firebase Authentication and your study data is stored through the StudyOS API in MongoDB.
 
-Guest study data is stored locally in the browser with **IndexedDB**.
+Useful for:
 
-- No account required
-- Local tasks, subjects, notes, events and Focus sessions
-- Great for trying StudyOS immediately
+- Persistent cloud data
+- Account-based study history
+- Leaderboard participation
+- Long-term usage
 
-### Account mode
-
-StudyOS supports Firebase Authentication with:
-
-- Google sign-in
-- Email/password accounts
-
-Authenticated study data is stored through the StudyOS API in MongoDB.
-
-If StudyOS finds local guest data after you sign in, it can offer to move that data into your account.
+StudyOS can also detect existing guest data after login and offer to move it into your account.
 
 ---
 
-## Architecture
+# Privacy-first leaderboard
+
+The leaderboard is deliberately **opt-in**.
+
+StudyOS does not publish:
+
+- Email addresses
+- Tasks
+- Notes
+- Subject content
+- Calendar event details
+- Private account data
+
+Only information required for ranking and public study progress is exposed.
+
+If you do not want to participate, you do not have to.
+
+---
+
+# Responsive by design
+
+StudyOS is designed for both desktop and mobile use.
+
+The interface includes:
+
+- Responsive sidebar
+- Mobile navigation drawer
+- Mobile top bar
+- Mobile Settings navigation
+- Adaptive page layouts
+- Responsive cards
+- Touch-friendly interactions
+- Custom dropdown controls
+- Custom date picker
+
+The goal is for StudyOS to feel like an actual application on smaller screens rather than a desktop dashboard squeezed into a phone.
+
+---
+
+# Custom UI components
+
+StudyOS includes reusable controls built specifically for the interface instead of relying entirely on native browser UI.
+
+## StudySelect
+
+A reusable custom dropdown / listbox system with:
+
+- Portal rendering
+- Viewport-aware positioning
+- Automatic upward / downward placement
+- Keyboard dismissal
+- Option descriptions
+- Disabled states
+- Subject colors
+- Consistent StudyOS styling
+
+## StudyDatePicker
+
+A reusable StudyOS calendar picker with:
+
+- Custom calendar interface
+- Portal positioning
+- Viewport-aware placement
+- Month navigation
+- Dark / light styling
+- Consistent design across pages
+
+---
+
+# Architecture
 
 ```mermaid
 flowchart LR
-    U[Student]
 
-    subgraph Frontend[React + Vite]
+    USER[User]
+
+    subgraph CLIENT["React + Vite Client"]
         UI[StudyOS UI]
         AUTH[Firebase Auth]
-        LOCAL[IndexedDB Guest Storage]
-        GAME[Gamification]
+        GUEST[IndexedDB Guest Storage]
+        GAME[Gamification Engine]
     end
 
-    subgraph Backend[Express API]
+    subgraph SERVER["Express API"]
         VERIFY[Firebase Token Verification]
-        ROUTES[StudyOS REST API]
-        SCORE[Leaderboard Scoring]
+        ROUTES[StudyOS Routes]
+        LEADERBOARD[Leaderboard Engine]
     end
 
-    DB[(MongoDB)]
+    DATABASE[(MongoDB)]
 
-    U --> UI
-    UI --> LOCAL
+    USER --> UI
+
     UI --> AUTH
+    UI --> GUEST
     UI --> GAME
+
     AUTH --> VERIFY
+
     UI --> ROUTES
     VERIFY --> ROUTES
-    ROUTES --> DB
-    SCORE --> DB
+
+    ROUTES --> DATABASE
+    LEADERBOARD --> DATABASE
 ```
 
 ---
 
-## Tech stack
+# Tech Stack
 
-### Frontend
+## Frontend
 
-| Technology | Role |
+| Technology | Purpose |
 | --- | --- |
-| React 19 | UI and application state |
-| Vite 8 | Development and production builds |
+| React | User interface |
+| Vite | Development and production build |
 | Lucide React | Interface icons |
 | Firebase Web SDK | Authentication |
-| IndexedDB | Guest-mode persistence |
-| CSS | StudyOS design system and responsive UI |
+| IndexedDB | Guest/local data persistence |
+| CSS | StudyOS design system and responsive interface |
 
-### Backend
+## Backend
 
-| Technology | Role |
+| Technology | Purpose |
 | --- | --- |
 | Node.js | Server runtime |
-| Express 5 | REST API |
-| MongoDB | Cloud study data |
-| Mongoose | Database models and queries |
-| Firebase Admin | ID-token verification |
-| CORS | Frontend/API origin control |
+| Express | REST API |
+| MongoDB | Cloud data storage |
+| Mongoose | Database models |
+| Firebase Admin | Authentication verification |
+| CORS | Frontend/API access control |
 | dotenv | Environment configuration |
 
 ---
 
-## API overview
+# API
+
+StudyOS exposes API routes for core study data and platform functionality.
 
 ```text
-GET  /api/health
-
-     /api/auth
-     /api/tasks
-     /api/subjects
-     /api/notes
-     /api/events
-     /api/study-sessions
-     /api/leaderboard
+/api/tasks
+/api/subjects
+/api/notes
+/api/events
+/api/study-sessions
+/api/leaderboard
+/api/health
 ```
 
-Authenticated requests use a Firebase ID token in the `Authorization` header and private study resources are scoped to the signed-in user.
+Authenticated resources are scoped to the current authenticated Firebase user.
 
 ---
 
-## Custom StudyOS controls
-
-StudyOS uses reusable UI components instead of leaning on default browser controls for important interactions.
-
-**StudySelect** provides a consistent custom dropdown with portal rendering, viewport-aware placement and accessible dismissal behavior.
-
-**StudyDatePicker** provides a StudyOS-styled calendar picker with custom positioning and responsive behavior.
-
-The result is a more consistent interface across Tasks, Calendar, Focus, Settings and other pages.
-
----
-
-## Project structure
+# Project Structure
 
 ```text
-StudyOS/
+Studyos/
+│
 ├── client/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── App.jsx
-│   │   └── App.css
-│   └── package.json
+│   │
+│   ├── components/
+│   │   ├── AddTask.jsx
+│   │   ├── LeaderboardSettings.jsx
+│   │   ├── Sidebar.jsx
+│   │   ├── StudyDatePicker.jsx
+│   │   ├── StudySelect.jsx
+│   │   └── TaskItem.jsx
+│   │
+│   ├── context/
+│   │   └── AuthContext.jsx
+│   │
+│   ├── pages/
+│   │   ├── Calendar.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Focus.jsx
+│   │   ├── Leaderboard.jsx
+│   │   ├── Notes.jsx
+│   │   ├── Progress.jsx
+│   │   ├── Settings.jsx
+│   │   ├── Subjects.jsx
+│   │   └── Tasks.jsx
+│   │
+│   ├── services/
+│   │   ├── api.js
+│   │   ├── calendarData.js
+│   │   ├── gamification.js
+│   │   ├── guestMigration.js
+│   │   └── localDb.js
+│   │
+│   ├── App.jsx
+│   └── App.css
 │
 ├── server/
 │   ├── config/
@@ -351,41 +568,58 @@ StudyOS/
 │
 ├── docs/
 │   └── screenshots/
+│       ├── dashboard.png
+│       ├── tasks.png
+│       ├── focus.png
+│       ├── progress.png
+│       ├── leaderboard.png
+│       └── mobile-dashboard.jpg
 │
 └── README.md
 ```
 
 ---
 
-## Run locally
+# Run StudyOS locally
 
-### Requirements
-
-- Node.js **20.19+**
-- npm
-- MongoDB database
-- Firebase project with Authentication enabled
-
-### 1. Clone StudyOS
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/Vaibh37/Studyos.git
 cd Studyos
 ```
 
-### 2. Install dependencies
+---
+
+## 2. Install frontend dependencies
 
 ```bash
 cd client
 npm install
+```
 
+---
+
+## 3. Install backend dependencies
+
+```bash
 cd ../server
 npm install
 ```
 
-### 3. Frontend environment
+---
 
-Create `client/.env`:
+# Environment Variables
+
+## Frontend
+
+Create:
+
+```text
+client/.env
+```
+
+Example:
 
 ```env
 VITE_API_URL=http://localhost:5000
@@ -398,71 +632,97 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=your_value
 VITE_FIREBASE_APP_ID=your_value
 ```
 
-### 4. Backend environment
+---
 
-Create `server/.env`:
+## Backend
+
+Create:
+
+```text
+server/.env
+```
+
+Example:
 
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 FRONTEND_URL=http://localhost:5173
-
-FIREBASE_PROJECT_ID=your_firebase_project_id
-FIREBASE_CLIENT_EMAIL=your_firebase_client_email
-FIREBASE_PRIVATE_KEY="your_firebase_private_key"
 ```
 
-For local development, the backend can alternatively read a `server/firebase-service-account.json` file.
+Firebase Admin credentials are also required by the backend.
 
-> **Never commit** `.env` files, database credentials or Firebase service-account credentials.
+> Never commit `.env` files, database credentials, API secrets, or Firebase service-account credentials to Git.
 
-### 5. Start the backend
+---
+
+# Start the backend
 
 ```bash
 cd server
 npm run dev
 ```
 
-The API runs on `http://localhost:5000` by default.
+The backend will run on the configured port.
 
-### 6. Start the frontend
+For example:
 
-In another terminal:
+```text
+http://localhost:5000
+```
+
+Health endpoint:
+
+```text
+http://localhost:5000/api/health
+```
+
+---
+
+# Start the frontend
+
+Open another terminal:
 
 ```bash
 cd client
 npm run dev
 ```
 
-Open the Vite URL shown in the terminal.
+Vite will provide the local development URL.
 
----
+Typically:
 
-## Useful scripts
-
-### Client
-
-```bash
-npm run dev
-npm run build
-npm run lint
-npm run preview
-```
-
-### Server
-
-```bash
-npm run dev
-npm start
+```text
+http://localhost:5173
 ```
 
 ---
 
-## Backup and data portability
+# Production
 
-StudyOS includes JSON backup and restore tools from Settings for study data and local preferences.
+The frontend reads its API address from:
 
-Backups can include:
+```env
+VITE_API_URL
+```
+
+For local development this can point to:
+
+```text
+http://localhost:5000
+```
+
+For production it should point to the deployed StudyOS API.
+
+The backend should also have the production frontend origin configured appropriately.
+
+---
+
+# Backup & Restore
+
+StudyOS includes portable JSON backups from Settings.
+
+A backup can contain:
 
 - Tasks
 - Subjects
@@ -471,82 +731,172 @@ Backups can include:
 - Focus sessions
 - StudyOS preferences
 
-Backup/restore and guest-to-account migration are still receiving additional edge-case hardening as StudyOS evolves.
+Backup and migration systems are continuing to receive additional edge-case testing and hardening as StudyOS evolves.
 
 ---
 
-## Roadmap
+# Data relationships
 
-### Shipped
+StudyOS keeps different areas of the application connected.
+
+For example:
+
+```text
+Subject
+   │
+   ├── Tasks
+   │
+   ├── Notes
+   │
+   └── Focus Sessions
+```
+
+Renaming a subject updates linked records.
+
+Deleting a subject does not destroy unrelated study history.
+
+Instead, linked items are safely detached where appropriate.
+
+This allows StudyOS to keep historical data while avoiding broken subject references.
+
+---
+
+# Roadmap
+
+StudyOS is actively evolving.
+
+## Current
 
 - [x] Dashboard
-- [x] Tasks with priorities, subjects and deadlines
+- [x] Tasks
 - [x] Subjects
 - [x] Notes
-- [x] Calendar + task deadline integration
-- [x] Focus timer + session history
+- [x] Calendar
+- [x] Focus timer
 - [x] Progress analytics
-- [x] Guest mode with IndexedDB
-- [x] Google + email authentication
-- [x] MongoDB account persistence
-- [x] Guest-to-account migration
-- [x] Backup and restore
-- [x] XP, levels and study streaks
-- [x] Opt-in weekly study leaderboard
-- [x] Responsive desktop/mobile shell
-- [x] Custom dropdown and date-picker components
+- [x] Firebase authentication
+- [x] Guest mode
+- [x] MongoDB persistence
+- [x] Guest → account migration
+- [x] Backup & restore
+- [x] XP system
+- [x] Levels
+- [x] Study streaks
+- [x] Study leaderboard
+- [x] Responsive mobile interface
+- [x] Custom StudyOS controls
+- [x] Subject relationship integrity
 
-### Next
+## Next
 
 - [ ] More backup/restore edge-case testing
-- [ ] More migration and account-isolation testing
-- [ ] Performance optimization and code splitting
-- [ ] CSS cleanup / design-system consolidation
+- [ ] More guest migration testing
+- [ ] Production hardening
+- [ ] Performance optimization
+- [ ] Bundle code splitting
+- [ ] CSS cleanup and modularization
 - [ ] PWA / installable StudyOS
-- [ ] Explore native mobile and desktop versions
-- [ ] X authentication
+- [ ] Mobile app exploration
 
 ---
 
-## Product principles
+# Product Philosophy
 
-**Useful before flashy.**  
-A feature should solve a real study problem.
+StudyOS is being built around a few simple rules.
 
-**Real work should drive gamification.**  
-XP should represent studying, not button spam.
+### Useful before flashy
 
-**Private means private.**  
-Competition should never require publishing personal study content.
+Features should solve an actual study problem.
 
-**Connected beats scattered.**  
-Tasks, subjects, notes, Focus, calendar and progress should understand each other.
+### Gamification should reflect real work
+
+XP should represent actual studying — not button spam.
+
+### Private data stays private
+
+Competition should never require exposing personal notes or tasks.
+
+### Everything should connect
+
+Tasks, subjects, Focus sessions, calendar events and progress should work together instead of behaving like unrelated tools.
+
+### Keep improving
+
+StudyOS is not being treated as a finished one-time project.
+
+It is being continuously tested, used, changed and improved based on real feedback.
 
 ---
 
-## Acknowledgements
+# Acknowledgements
 
-Special thanks to **Keshav** for exploring an earlier StudyOS build and giving direct product feedback around UI polish, removing unnecessary clutter, responsiveness, gamification and the study leaderboard.
+A big shoutout to **[Keshav](https://github.com/Keshavcodes3)** for exploring an earlier version of StudyOS and giving direct product feedback around:
 
-That feedback directly shaped the next major StudyOS update. 🤝
+- UI polish
+- Removing unnecessary visual clutter
+- Better responsiveness
+- Gamification
+- A study leaderboard
+
+That feedback directly influenced one of StudyOS's biggest updates.
+
+The suggestions were taken seriously, implemented, tested, and shipped into the live version.
+
+**Good feedback deserves credit. 🤝**
 
 ---
 
-## Author
+# Feedback
+
+StudyOS is still evolving.
+
+If you try it and notice something that could be better, feedback is genuinely welcome.
+
+You can:
+
+- Open the live app
+- Explore the features
+- Join the leaderboard
+- Compete with other StudyOS users
+- Report bugs
+- Suggest improvements
+- Open an issue on GitHub
 
 <div align="center">
 
-### Vaibh37
+### Try StudyOS
 
-Independent developer building full-stack products and learning by shipping real projects.
+[![Launch StudyOS](https://img.shields.io/badge/Launch-StudyOS-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos-one-omega.vercel.app/)
 
-[![GitHub](https://img.shields.io/badge/GitHub-Vaibh37-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Vaibh37)
-[![Live StudyOS](https://img.shields.io/badge/Try-StudyOS-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos-one-omega.vercel.app/)
+</div>
+
+---
+
+# Author
+
+<div align="center">
+
+## Vaibh37
+
+Independent developer focused on full-stack development, building real projects, and learning by shipping.
 
 <br />
 
-### Explore StudyOS. Build your streak. Climb the leaderboard.
+[![GitHub](https://img.shields.io/badge/GitHub-Vaibh37-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Vaibh37)
 
-If you like the project, consider leaving a ⭐ on the repository.
+<br />
+<br />
+
+### If StudyOS helps you, consider starring the repository.
+
+It helps more people discover the project.
+
+<br />
+
+**Plan. Focus. Track. Improve. Compete.**
+
+<br />
+
+[Launch StudyOS →](https://studyos-one-omega.vercel.app/)
 
 </div>
