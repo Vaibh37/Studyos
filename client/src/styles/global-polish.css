@@ -1,0 +1,1674 @@
+/* =========================================================
+   STUDYOS V2 — GLOBAL POLISH
+
+   Final shared shell:
+   - typography
+   - spacing
+   - sidebar
+   - light/dark theme
+   - mobile navigation
+   - focus states
+   - scrollbars
+   - shared selects
+   - legacy shell cleanup
+   ========================================================= */
+
+
+/* =========================================================
+   GLOBAL FOUNDATION
+   ========================================================= */
+
+html {
+  color-scheme: dark;
+
+  background:
+    var(
+      --color-bg,
+      #0a0a0a
+    );
+
+  scroll-behavior:
+    smooth;
+
+  text-rendering:
+    optimizeLegibility;
+
+  -webkit-font-smoothing:
+    antialiased;
+
+  -moz-osx-font-smoothing:
+    grayscale;
+}
+
+
+html:has(
+  body.light-theme
+) {
+  color-scheme: light;
+}
+
+
+html,
+body,
+#root {
+  width: 100%;
+
+  min-width: 0;
+  min-height: 100%;
+}
+
+
+html body {
+  margin: 0;
+
+  background:
+    var(
+      --color-bg,
+      #0a0a0a
+    );
+
+  color:
+    var(
+      --color-text,
+      #f5f5f5
+    );
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  font-size: 14px;
+
+  font-weight: 400;
+
+  line-height: 1.5;
+
+  letter-spacing:
+    -0.006em;
+}
+
+
+body.light-theme {
+  background:
+    var(
+      --color-bg,
+      #ffffff
+    );
+
+  color:
+    var(
+      --color-text,
+      #0a0a0a
+    );
+}
+
+
+/* =========================================================
+   BOX MODEL
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing:
+    border-box;
+}
+
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong {
+  text-wrap:
+    pretty;
+}
+
+
+p {
+  text-wrap:
+    pretty;
+}
+
+
+/* =========================================================
+   SELECTION
+   ========================================================= */
+
+::selection {
+  background:
+    var(
+      --color-solid,
+      #f5f5f5
+    );
+
+  color:
+    var(
+      --color-solid-text,
+      #0a0a0a
+    );
+}
+
+
+/* =========================================================
+   FORM FONT
+   ========================================================= */
+
+button,
+input,
+textarea,
+select {
+  font:
+    inherit;
+}
+
+
+button {
+  border: 0;
+
+  cursor:
+    pointer;
+
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  cursor:
+    not-allowed;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY FOCUS
+   ========================================================= */
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 0;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    color-mix(
+      in srgb,
+      var(--color-text)
+      18%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+* {
+  scrollbar-width:
+    thin;
+
+  scrollbar-color:
+    var(--color-border-strong)
+    transparent;
+}
+
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+
+*::-webkit-scrollbar-track {
+  background:
+    transparent;
+}
+
+
+*::-webkit-scrollbar-thumb {
+  border:
+    3px solid
+    transparent;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--color-border-strong);
+
+  background-clip:
+    padding-box;
+}
+
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--color-text-faint);
+
+  background-clip:
+    padding-box;
+}
+
+
+/* =========================================================
+   APP SHELL
+   ========================================================= */
+
+.app-shell-v2 {
+  position:
+    relative;
+
+  display:
+    flex;
+
+  width:
+    100%;
+
+  min-height:
+    100vh;
+
+  min-height:
+    100dvh;
+
+  overflow:
+    visible;
+
+  background:
+    var(--color-bg) !important;
+
+  color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   CONTENT COLUMN
+   ========================================================= */
+
+.app-shell-v2-content {
+  display:
+    flex;
+
+  min-width:
+    0;
+
+  min-height:
+    100vh;
+
+  min-height:
+    100dvh;
+
+  flex:
+    1;
+
+  flex-direction:
+    column;
+
+  background:
+    var(--color-bg);
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-main {
+  width:
+    100%;
+
+  min-width:
+    0;
+
+  flex:
+    1;
+
+  padding:
+    clamp(
+      28px,
+      2.7vw,
+      42px
+    );
+
+  background:
+    var(--color-bg) !important;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-sidebar {
+  position:
+    sticky;
+
+  top:
+    0;
+
+  z-index:
+    40;
+
+  display:
+    flex;
+
+  width:
+    236px;
+
+  height:
+    100vh;
+
+  height:
+    100dvh;
+
+  min-height:
+    100vh;
+
+  min-height:
+    100dvh;
+
+  flex:
+    0
+    0
+    236px;
+
+  flex-direction:
+    column;
+
+  overflow:
+    hidden;
+
+  padding:
+    20px
+    12px
+    14px;
+
+  border-right:
+    1px solid
+    var(--color-border) !important;
+
+  background:
+    var(--color-surface) !important;
+
+  background-image:
+    none !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* =========================================================
+   SIDEBAR HEADER
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-sidebar-header {
+  display:
+    flex;
+
+  min-width:
+    0;
+
+  flex:
+    0
+    0
+    auto;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    10px;
+
+  margin-bottom:
+    26px;
+
+  padding:
+    0
+    7px;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-brand {
+  display:
+    inline-flex;
+
+  min-width:
+    0;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  padding:
+    0;
+
+  border:
+    0;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--color-text) !important;
+
+  text-align:
+    left;
+}
+
+
+.app-shell-v2
+.app-shell-v2-brand:hover {
+  opacity:
+    0.88;
+}
+
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.logo-mark {
+  display:
+    inline-flex;
+
+  width:
+    36px;
+
+  height:
+    36px;
+
+  flex:
+    0
+    0
+    36px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border:
+    1px solid
+    var(--color-solid) !important;
+
+  border-radius:
+    9px;
+
+  background:
+    var(--color-solid) !important;
+
+  background-image:
+    none !important;
+
+  color:
+    var(--color-solid-text) !important;
+
+  font-size:
+    14px;
+
+  font-weight:
+    700;
+
+  line-height:
+    1;
+
+  box-shadow:
+    none !important;
+}
+
+
+.app-shell-v2-brand-name {
+  overflow:
+    hidden;
+
+  color:
+    var(--color-text);
+
+  font-size:
+    18px;
+
+  font-weight:
+    650;
+
+  line-height:
+    1.2;
+
+  letter-spacing:
+    -0.035em;
+
+  white-space:
+    nowrap;
+
+  text-overflow:
+    ellipsis;
+}
+
+
+/* =========================================================
+   NAV SECTION
+   ========================================================= */
+
+.app-shell-v2-nav-section {
+  display:
+    flex;
+
+  min-height:
+    0;
+
+  flex:
+    1;
+
+  flex-direction:
+    column;
+}
+
+
+/* =========================================================
+   NAV LABEL
+   ========================================================= */
+
+.app-shell-v2-nav-label {
+  display:
+    block;
+
+  padding:
+    0
+    10px;
+
+  margin-bottom:
+    7px;
+
+  color:
+    var(--color-text-faint);
+
+  font-size:
+    10px;
+
+  font-weight:
+    600;
+
+  line-height:
+    1.3;
+
+  letter-spacing:
+    0.095em;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* =========================================================
+   NAV
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-nav {
+  display:
+    flex;
+
+  min-height:
+    0;
+
+  flex:
+    1;
+
+  flex-direction:
+    column;
+
+  gap:
+    3px;
+
+  overflow-x:
+    hidden;
+
+  overflow-y:
+    auto;
+
+  padding:
+    0
+    2px
+    4px;
+
+  scrollbar-width:
+    none;
+}
+
+
+.app-shell-v2
+.app-shell-v2-nav::-webkit-scrollbar {
+  display:
+    none;
+}
+
+
+/* =========================================================
+   NAV ITEMS
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item {
+  position:
+    relative;
+
+  display:
+    flex;
+
+  width:
+    100%;
+
+  min-height:
+    43px;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  margin:
+    0;
+
+  padding:
+    9px
+    10px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    8px;
+
+  background:
+    transparent !important;
+
+  background-image:
+    none !important;
+
+  color:
+    var(--color-text-muted) !important;
+
+  font-size:
+    13.5px;
+
+  font-weight:
+    500;
+
+  line-height:
+    1;
+
+  text-align:
+    left;
+
+  box-shadow:
+    none !important;
+
+  transition:
+    background
+    var(--transition-fast),
+    border-color
+    var(--transition-fast),
+    color
+    var(--transition-fast),
+    transform
+    var(--transition-fast);
+}
+
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item svg {
+  flex:
+    0
+    0
+    auto;
+
+  color:
+    inherit !important;
+
+  stroke-width:
+    1.8;
+}
+
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item
+> span {
+  overflow:
+    hidden;
+
+  min-width:
+    0;
+
+  white-space:
+    nowrap;
+
+  text-overflow:
+    ellipsis;
+}
+
+
+/* =========================================================
+   NAV HOVER
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item:hover {
+  border-color:
+    var(--color-border);
+
+  background:
+    var(--color-surface-hover) !important;
+
+  color:
+    var(--color-text) !important;
+}
+
+
+/* =========================================================
+   ACTIVE NAV
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item.active {
+  border-color:
+    var(--color-border-strong) !important;
+
+  background:
+    var(--color-surface-hover) !important;
+
+  color:
+    var(--color-text) !important;
+
+  font-weight:
+    600;
+
+  box-shadow:
+    none !important;
+}
+
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item.active::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    50%;
+
+  left:
+    -1px;
+
+  width:
+    2px;
+
+  height:
+    18px;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--color-solid);
+
+  transform:
+    translateY(
+      -50%
+    );
+}
+
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item.active svg,
+.light-theme
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item.active svg {
+  color:
+    var(--color-text) !important;
+}
+
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.nav-item:active {
+  transform:
+    scale(
+      0.985
+    );
+}
+
+
+/* =========================================================
+   SIDEBAR BOTTOM
+   ========================================================= */
+
+.app-shell-v2
+.app-shell-v2-sidebar
+.sidebar-bottom {
+  display:
+    flex;
+
+  flex:
+    0
+    0
+    auto;
+
+  flex-direction:
+    column;
+
+  margin-top:
+    12px;
+
+  padding:
+    13px
+    2px
+    0;
+
+  border-top:
+    1px solid
+    var(--color-border) !important;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.app-shell-v2-sidebar-close {
+  display:
+    none;
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  flex:
+    0
+    0
+    auto;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    0;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius:
+    8px;
+
+  background:
+    var(--color-surface-subtle) !important;
+
+  color:
+    var(--color-text-muted);
+
+  box-shadow:
+    none;
+}
+
+
+.app-shell-v2-sidebar-close:hover {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface-hover) !important;
+
+  color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   BACKDROP
+   ========================================================= */
+
+.app-shell-v2-backdrop {
+  position:
+    fixed;
+
+  inset:
+    0;
+
+  z-index:
+    80;
+
+  display:
+    none;
+
+  padding:
+    0;
+
+  border:
+    0;
+
+  background:
+    rgba(
+      0,
+      0,
+      0,
+      0.56
+    ) !important;
+
+  opacity:
+    0;
+
+  pointer-events:
+    none;
+
+  transition:
+    opacity
+    180ms
+    ease;
+}
+
+
+.app-shell-v2-backdrop.is-visible {
+  opacity:
+    1;
+
+  pointer-events:
+    auto;
+}
+
+
+/* =========================================================
+   MOBILE BAR
+   ========================================================= */
+
+.app-shell-v2-mobile-bar {
+  display:
+    none;
+}
+
+
+/* =========================================================
+   SHARED STUDY SELECT
+   ========================================================= */
+
+.study-select-menu {
+  border:
+    1px solid
+    var(--color-border) !important;
+
+  border-radius:
+    9px !important;
+
+  background:
+    var(--color-surface) !important;
+
+  background-image:
+    none !important;
+
+  color:
+    var(--color-text) !important;
+
+  box-shadow:
+    var(--shadow-md) !important;
+}
+
+
+.study-select-option {
+  min-height:
+    43px !important;
+
+  padding:
+    9px
+    11px !important;
+
+  border-radius:
+    7px !important;
+
+  background:
+    transparent !important;
+
+  background-image:
+    none !important;
+
+  color:
+    var(--color-text-secondary) !important;
+
+  font-size:
+    13px !important;
+}
+
+
+.study-select-option:hover:not(
+  :disabled
+) {
+  background:
+    var(--color-surface-hover) !important;
+
+  color:
+    var(--color-text) !important;
+}
+
+
+.study-select-option.active {
+  border-color:
+    var(--color-border-strong) !important;
+
+  background:
+    var(--color-surface-subtle) !important;
+
+  color:
+    var(--color-text) !important;
+}
+
+
+.study-select-option.active
+svg {
+  color:
+    var(--color-text) !important;
+}
+
+
+/* =========================================================
+   AUTOFILL
+   ========================================================= */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color:
+    var(--color-text);
+
+  transition:
+    background-color
+    9999s
+    ease-in-out
+    0s;
+
+  caret-color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   IMAGE / SVG
+   ========================================================= */
+
+img,
+svg {
+  max-width:
+    100%;
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+   ========================================================= */
+
+@media (
+  max-width: 900px
+) {
+
+  /* =======================================================
+     SHELL
+     ======================================================= */
+
+  .app-shell-v2 {
+    display:
+      block;
+
+    min-height:
+      100dvh;
+  }
+
+
+  .app-shell-v2-content {
+    min-height:
+      100dvh;
+  }
+
+
+  /* =======================================================
+     SIDEBAR DRAWER
+     ======================================================= */
+
+  .app-shell-v2
+  .app-shell-v2-sidebar {
+    position:
+      fixed;
+
+    top:
+      0;
+
+    bottom:
+      0;
+
+    left:
+      0;
+
+    z-index:
+      100;
+
+    width:
+      min(
+        82vw,
+        290px
+      );
+
+    height:
+      100dvh;
+
+    min-height:
+      100dvh;
+
+    flex-basis:
+      auto;
+
+    padding:
+      max(
+        17px,
+        env(
+          safe-area-inset-top
+        )
+      )
+      12px
+      max(
+        14px,
+        env(
+          safe-area-inset-bottom
+        )
+      );
+
+    border-right:
+      1px solid
+      var(--color-border) !important;
+
+    background:
+      var(--color-surface) !important;
+
+    box-shadow:
+      18px
+      0
+      50px
+      rgba(
+        0,
+        0,
+        0,
+        0.3
+      ) !important;
+
+    transform:
+      translateX(
+        -105%
+      );
+
+    visibility:
+      hidden;
+
+    transition:
+      transform
+      220ms
+      ease,
+      visibility
+      220ms
+      ease;
+  }
+
+
+  .app-shell-v2
+  .app-shell-v2-sidebar.is-open {
+    transform:
+      translateX(
+        0
+      );
+
+    visibility:
+      visible;
+  }
+
+
+  /* =======================================================
+     CLOSE
+     ======================================================= */
+
+  .app-shell-v2-sidebar-close {
+    display:
+      inline-flex;
+  }
+
+
+  /* =======================================================
+     DRAWER HEADER
+     ======================================================= */
+
+  .app-shell-v2
+  .app-shell-v2-sidebar-header {
+    margin-bottom:
+      24px;
+  }
+
+
+  /* =======================================================
+     BACKDROP
+     ======================================================= */
+
+  .app-shell-v2-backdrop {
+    display:
+      block;
+  }
+
+
+  /* =======================================================
+     MOBILE TOP BAR
+     ======================================================= */
+
+  .app-shell-v2-mobile-bar {
+    position:
+      sticky;
+
+    top:
+      0;
+
+    z-index:
+      60;
+
+    display:
+      grid;
+
+    min-height:
+      60px;
+
+    grid-template-columns:
+      auto
+      minmax(
+        0,
+        1fr
+      )
+      auto;
+
+    align-items:
+      center;
+
+    gap:
+      10px;
+
+    padding:
+      max(
+        9px,
+        env(
+          safe-area-inset-top
+        )
+      )
+      16px
+      9px;
+
+    border-bottom:
+      1px solid
+      var(--color-border);
+
+    background:
+      var(--color-bg) !important;
+
+    color:
+      var(--color-text);
+
+    box-shadow:
+      none !important;
+  }
+
+
+  /* =======================================================
+     MENU
+     ======================================================= */
+
+  .app-shell-v2-menu-button {
+    display:
+      inline-flex;
+
+    width:
+      38px;
+
+    height:
+      38px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    padding:
+      0;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      8px;
+
+    background:
+      var(--color-surface) !important;
+
+    color:
+      var(--color-text-secondary);
+
+    box-shadow:
+      none !important;
+  }
+
+
+  .app-shell-v2-menu-button:hover {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-hover) !important;
+
+    color:
+      var(--color-text);
+  }
+
+
+  /* =======================================================
+     MOBILE BRAND
+     ======================================================= */
+
+  .app-shell-v2-mobile-brand {
+    display:
+      flex;
+
+    min-width:
+      0;
+
+    align-items:
+      center;
+
+    gap:
+      8px;
+  }
+
+
+  .app-shell-v2-mobile-logo {
+    display:
+      inline-flex;
+
+    width:
+      30px;
+
+    height:
+      30px;
+
+    flex:
+      0
+      0
+      30px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    border-radius:
+      7px;
+
+    background:
+      var(--color-solid) !important;
+
+    color:
+      var(--color-solid-text);
+
+    font-size:
+      12px;
+
+    font-weight:
+      700;
+  }
+
+
+  .app-shell-v2-mobile-brand
+  strong {
+    overflow:
+      hidden;
+
+    color:
+      var(--color-text);
+
+    font-size:
+      15px;
+
+    font-weight:
+      650;
+
+    letter-spacing:
+      -0.025em;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  /* =======================================================
+     PAGE LABEL
+     ======================================================= */
+
+  .app-shell-v2-mobile-page {
+    max-width:
+      120px;
+
+    overflow:
+      hidden;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      12px;
+
+    font-weight:
+      500;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  /* =======================================================
+     MAIN
+     ======================================================= */
+
+  .app-shell-v2
+  .app-shell-v2-main {
+    padding:
+      24px
+      20px
+      34px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (
+  max-width: 600px
+) {
+  html body {
+    font-size:
+      14px;
+  }
+
+
+  .app-shell-v2
+  .app-shell-v2-main {
+    padding:
+      20px
+      16px
+      30px;
+  }
+
+
+  .app-shell-v2-mobile-bar {
+    padding-left:
+      14px;
+
+    padding-right:
+      14px;
+  }
+
+
+  .app-shell-v2-mobile-brand
+  strong {
+    font-size:
+      14px;
+  }
+
+
+  .app-shell-v2-mobile-page {
+    max-width:
+      95px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (
+  max-width: 400px
+) {
+  .app-shell-v2
+  .app-shell-v2-main {
+    padding:
+      18px
+      14px
+      28px;
+  }
+
+
+  .app-shell-v2-mobile-brand
+  strong {
+    display:
+      none;
+  }
+
+
+  .app-shell-v2-mobile-page {
+    max-width:
+      130px;
+  }
+}
+
+
+/* =========================================================
+   LARGE SCREENS
+   ========================================================= */
+
+@media (
+  min-width: 1700px
+) {
+  .app-shell-v2
+  .app-shell-v2-main {
+    padding:
+      42px
+      48px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:
+      auto !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+  }
+}

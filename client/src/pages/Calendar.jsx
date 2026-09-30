@@ -7,6 +7,7 @@ import {
 import {
   BookOpen,
   CalendarDays,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Clock3,
@@ -33,7 +34,8 @@ import {
 import StudyDatePicker from "../components/StudyDatePicker";
 import StudySelect from "../components/StudySelect";
 
-import "./Calendar.selects.css";
+import "../styles/calendar-v2.css";
+
 
 // =========================================================
 // EVENT TYPES
@@ -67,6 +69,7 @@ const EVENT_TYPES = [
   },
 ];
 
+
 // =========================================================
 // DATE HELPERS
 // =========================================================
@@ -96,6 +99,7 @@ const getDateKey = (
   return `${year}-${month}-${day}`;
 };
 
+
 const parseEventDate = (
   value
 ) => {
@@ -114,16 +118,23 @@ const parseEventDate = (
 
     if (match) {
       return new Date(
-        Number(match[1]),
-        Number(match[2]) -
-          1,
-        Number(match[3])
+        Number(
+          match[1]
+        ),
+        Number(
+          match[2]
+        ) - 1,
+        Number(
+          match[3]
+        )
       );
     }
   }
 
   const date =
-    new Date(value);
+    new Date(
+      value
+    );
 
   if (
     Number.isNaN(
@@ -140,6 +151,7 @@ const parseEventDate = (
   );
 };
 
+
 const parseDateInput = (
   value
 ) => {
@@ -155,22 +167,33 @@ const parseDateInput = (
   }
 
   return new Date(
-    Number(match[1]),
-    Number(match[2]) -
-      1,
-    Number(match[3])
+    Number(
+      match[1]
+    ),
+    Number(
+      match[2]
+    ) - 1,
+    Number(
+      match[3]
+    )
   );
 };
+
 
 const isSameDay = (
   first,
   second
 ) => {
   return (
-    getDateKey(first) ===
-    getDateKey(second)
+    getDateKey(
+      first
+    ) ===
+    getDateKey(
+      second
+    )
   );
 };
+
 
 const formatSelectedDate = (
   date
@@ -185,6 +208,7 @@ const formatSelectedDate = (
     }
   );
 };
+
 
 // =========================================================
 // STUDY HELPERS
@@ -202,7 +226,9 @@ const getSessionDate = (
   }
 
   const date =
-    new Date(value);
+    new Date(
+      value
+    );
 
   if (
     Number.isNaN(
@@ -215,14 +241,16 @@ const getSessionDate = (
   return date;
 };
 
+
 const formatStudyTime = (
   seconds
 ) => {
   const safe =
     Math.max(
       0,
-      Number(seconds) ||
-        0
+      Number(
+        seconds
+      ) || 0
     );
 
   const totalMinutes =
@@ -238,7 +266,9 @@ const formatStudyTime = (
   const minutes =
     totalMinutes % 60;
 
-  if (hours > 0) {
+  if (
+    hours > 0
+  ) {
     return `${hours}h ${minutes}m`;
   }
 
@@ -248,7 +278,9 @@ const formatStudyTime = (
     return `${totalMinutes}m`;
   }
 
-  if (safe > 0) {
+  if (
+    safe > 0
+  ) {
     return `${Math.floor(
       safe
     )}s`;
@@ -256,6 +288,7 @@ const formatStudyTime = (
 
   return "0m";
 };
+
 
 const formatSessionTime = (
   value
@@ -265,7 +298,9 @@ const formatSessionTime = (
   }
 
   const date =
-    new Date(value);
+    new Date(
+      value
+    );
 
   if (
     Number.isNaN(
@@ -284,6 +319,7 @@ const formatSessionTime = (
   );
 };
 
+
 const formatTaskTime = (
   value
 ) => {
@@ -295,13 +331,21 @@ const formatTaskTime = (
     hour,
     minute,
   ] =
-    String(value)
+    String(
+      value
+    )
       .split(":")
-      .map(Number);
+      .map(
+        Number
+      );
 
   if (
-    Number.isNaN(hour) ||
-    Number.isNaN(minute)
+    Number.isNaN(
+      hour
+    ) ||
+    Number.isNaN(
+      minute
+    )
   ) {
     return value;
   }
@@ -325,6 +369,7 @@ const formatTaskTime = (
   );
 };
 
+
 // =========================================================
 // EVENT HELPERS
 // =========================================================
@@ -333,7 +378,8 @@ const getTypeClass = (
   eventType
 ) => {
   return String(
-    eventType || "other"
+    eventType ||
+      "other"
   )
     .toLowerCase()
     .replace(
@@ -341,6 +387,7 @@ const getTypeClass = (
       "-"
     );
 };
+
 
 const getTypeLabel = (
   eventType
@@ -370,6 +417,7 @@ const getTypeLabel = (
   );
 };
 
+
 const isTaskEvent = (
   calendarEvent
 ) => {
@@ -381,6 +429,7 @@ const isTaskEvent = (
   );
 };
 
+
 // =========================================================
 // CALENDAR
 // =========================================================
@@ -389,6 +438,7 @@ function Calendar() {
   const {
     isGuest,
   } = useAuth();
+
 
   // =======================================================
   // DATA
@@ -414,8 +464,9 @@ function Calendar() {
     setRefreshing,
   ] = useState(false);
 
+
   // =======================================================
-  // CALENDAR
+  // CALENDAR STATE
   // =======================================================
 
   const [
@@ -432,8 +483,9 @@ function Calendar() {
     new Date()
   );
 
+
   // =======================================================
-  // EVENT FORM
+  // FORM
   // =======================================================
 
   const [
@@ -468,6 +520,7 @@ function Calendar() {
     setSaving,
   ] = useState(false);
 
+
   // =======================================================
   // DELETE
   // =======================================================
@@ -481,6 +534,7 @@ function Calendar() {
     deleting,
     setDeleting,
   ] = useState(false);
+
 
   // =======================================================
   // MESSAGES
@@ -496,30 +550,35 @@ function Calendar() {
     setError,
   ] = useState("");
 
-  // =======================================================
-  // MESSAGE HELPERS
-  // =======================================================
 
-  const showSuccess = (
-    text
-  ) => {
-    setError("");
-    setMessage(text);
+  const showSuccess =
+    (
+      text
+    ) => {
+      setError("");
+      setMessage(
+        text
+      );
 
-    window.setTimeout(
-      () => {
-        setMessage("");
-      },
-      3000
-    );
-  };
+      window.setTimeout(
+        () => {
+          setMessage("");
+        },
+        3000
+      );
+    };
 
-  const showError = (
-    text
-  ) => {
-    setMessage("");
-    setError(text);
-  };
+
+  const showError =
+    (
+      text
+    ) => {
+      setMessage("");
+      setError(
+        text
+      );
+    };
+
 
   // =======================================================
   // LOAD
@@ -530,7 +589,9 @@ function Calendar() {
       manual = false
     ) => {
       try {
-        if (manual) {
+        if (
+          manual
+        ) {
           setRefreshing(
             true
           );
@@ -572,7 +633,9 @@ function Calendar() {
             : []
         );
 
-        if (manual) {
+        if (
+          manual
+        ) {
           showSuccess(
             "Calendar refreshed"
           );
@@ -600,28 +663,18 @@ function Calendar() {
       }
     };
 
-  // =======================================================
-  // INITIAL LOAD
-  // =======================================================
 
   useEffect(() => {
-    loadCalendarData(
-      false
-    );
+    loadCalendarData();
   }, [
     isGuest,
   ]);
 
-  // =======================================================
-  // LIVE UPDATES
-  // =======================================================
 
   useEffect(() => {
     const refresh =
       () => {
-        loadCalendarData(
-          false
-        );
+        loadCalendarData();
       };
 
     const eventNames = [
@@ -657,8 +710,9 @@ function Calendar() {
     isGuest,
   ]);
 
+
   // =======================================================
-  // SORT EVENTS
+  // SORTED EVENTS
   // =======================================================
 
   const sortedEvents =
@@ -687,11 +741,15 @@ function Calendar() {
             return 0;
           }
 
-          if (!firstDate) {
+          if (
+            !firstDate
+          ) {
             return 1;
           }
 
-          if (!secondDate) {
+          if (
+            !secondDate
+          ) {
             return -1;
           }
 
@@ -705,8 +763,9 @@ function Calendar() {
       events,
     ]);
 
+
   // =======================================================
-  // CALENDAR DAYS
+  // DAYS
   // =======================================================
 
   const calendarDays =
@@ -807,88 +866,87 @@ function Calendar() {
       currentDate,
     ]);
 
-  // =======================================================
-  // EVENTS FOR DATE
-  // =======================================================
-
-  const getEventsForDate = (
-    date
-  ) => {
-    return sortedEvents.filter(
-      (
-        calendarEvent
-      ) => {
-        const eventDate =
-          parseEventDate(
-            calendarEvent.date
-          );
-
-        return (
-          eventDate &&
-          isSameDay(
-            eventDate,
-            date
-          )
-        );
-      }
-    );
-  };
 
   // =======================================================
-  // SESSIONS FOR DATE
+  // DAY DATA
   // =======================================================
 
-  const getSessionsForDate = (
-    date
-  ) => {
-    return sessions
-      .filter(
+  const getEventsForDate =
+    (
+      date
+    ) => {
+      return sortedEvents.filter(
         (
-          session
+          calendarEvent
         ) => {
-          const sessionDate =
-            getSessionDate(
-              session
+          const eventDate =
+            parseEventDate(
+              calendarEvent.date
             );
 
           return (
-            sessionDate &&
+            eventDate &&
             isSameDay(
-              sessionDate,
+              eventDate,
               date
             )
           );
         }
-      )
-      .sort(
-        (
-          first,
-          second
-        ) =>
-          new Date(
-            second.startedAt ||
-              second.endedAt
-          ) -
-          new Date(
-            first.startedAt ||
-              first.endedAt
-          )
       );
-  };
+    };
 
-  // =======================================================
-  // SELECTED DATE DATA
-  // =======================================================
+
+  const getSessionsForDate =
+    (
+      date
+    ) => {
+      return sessions
+        .filter(
+          (
+            session
+          ) => {
+            const sessionDate =
+              getSessionDate(
+                session
+              );
+
+            return (
+              sessionDate &&
+              isSameDay(
+                sessionDate,
+                date
+              )
+            );
+          }
+        )
+        .sort(
+          (
+            first,
+            second
+          ) =>
+            new Date(
+              second.startedAt ||
+                second.endedAt
+            ) -
+            new Date(
+              first.startedAt ||
+                first.endedAt
+            )
+        );
+    };
+
 
   const selectedDateEvents =
     getEventsForDate(
       selectedDate
     );
 
+
   const selectedDateSessions =
     getSessionsForDate(
       selectedDate
     );
+
 
   const selectedStudySeconds =
     selectedDateSessions.reduce(
@@ -904,8 +962,9 @@ function Calendar() {
       0
     );
 
+
   // =======================================================
-  // MONTH FOCUS
+  // MONTH STATS
   // =======================================================
 
   const monthStudySeconds =
@@ -920,7 +979,9 @@ function Calendar() {
               session
             );
 
-          if (!date) {
+          if (
+            !date
+          ) {
             return total;
           }
 
@@ -948,6 +1009,7 @@ function Calendar() {
       currentDate,
     ]);
 
+
   const monthEventCount =
     useMemo(() => {
       return events.filter(
@@ -973,14 +1035,19 @@ function Calendar() {
       currentDate,
     ]);
 
+
   const monthName =
     currentDate.toLocaleDateString(
       "en-IN",
       {
-        month: "long",
-        year: "numeric",
+        month:
+          "long",
+
+        year:
+          "numeric",
       }
     );
+
 
   // =======================================================
   // NAVIGATION
@@ -998,6 +1065,7 @@ function Calendar() {
       );
     };
 
+
   const nextMonth =
     () => {
       setCurrentDate(
@@ -1009,6 +1077,7 @@ function Calendar() {
         )
       );
     };
+
 
   const goToToday =
     () => {
@@ -1032,46 +1101,45 @@ function Calendar() {
       );
     };
 
-  // =======================================================
-  // SELECT DATE
-  // =======================================================
 
-  const selectDate = (
-    date
-  ) => {
-    setSelectedDate(
+  const selectDate =
+    (
       date
-    );
-
-    if (
-      date.getMonth() !==
-        currentDate.getMonth() ||
-      date.getFullYear() !==
-        currentDate.getFullYear()
-    ) {
-      setCurrentDate(
-        new Date(
-          date.getFullYear(),
-          date.getMonth(),
-          1
-        )
+    ) => {
+      setSelectedDate(
+        date
       );
-    }
 
-    if (
-      showForm &&
-      !editingEventId
-    ) {
-      setFormDate(
-        getDateKey(
-          date
-        )
-      );
-    }
-  };
+      if (
+        date.getMonth() !==
+          currentDate.getMonth() ||
+        date.getFullYear() !==
+          currentDate.getFullYear()
+      ) {
+        setCurrentDate(
+          new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            1
+          )
+        );
+      }
+
+      if (
+        showForm &&
+        !editingEventId
+      ) {
+        setFormDate(
+          getDateKey(
+            date
+          )
+        );
+      }
+    };
+
 
   // =======================================================
-  // RESET FORM
+  // FORM
   // =======================================================
 
   const resetForm =
@@ -1085,19 +1153,20 @@ function Calendar() {
       );
 
       setTitle("");
+
       setType(
         "assignment"
       );
+
       setFormDate("");
     };
 
-  // =======================================================
-  // ADD EVENT
-  // =======================================================
 
   const openAddForm =
     () => {
-      if (saving) {
+      if (
+        saving
+      ) {
         return;
       }
 
@@ -1124,74 +1193,69 @@ function Calendar() {
       setError("");
     };
 
-  // =======================================================
-  // EDIT EVENT
-  // =======================================================
 
-  const openEditForm = (
-    calendarEvent
-  ) => {
-    if (
-      saving ||
-      isTaskEvent(
-        calendarEvent
-      )
-    ) {
-      return;
-    }
+  const openEditForm =
+    (
+      calendarEvent
+    ) => {
+      if (
+        saving ||
+        isTaskEvent(
+          calendarEvent
+        )
+      ) {
+        return;
+      }
 
-    const eventDate =
-      parseEventDate(
-        calendarEvent.date
+      const eventDate =
+        parseEventDate(
+          calendarEvent.date
+        );
+
+      const normalizedType =
+        String(
+          calendarEvent.type ||
+            "other"
+        ).toLowerCase();
+
+      setEditingEventId(
+        calendarEvent._id
       );
 
-    const normalizedType =
-      String(
-        calendarEvent.type ||
-          "other"
-      ).toLowerCase();
+      setTitle(
+        calendarEvent.title ||
+          ""
+      );
 
-    setEditingEventId(
-      calendarEvent._id
-    );
+      setType(
+        EVENT_TYPES.some(
+          (
+            item
+          ) =>
+            item.value ===
+            normalizedType
+        )
+          ? normalizedType
+          : "other"
+      );
 
-    setTitle(
-      calendarEvent.title ||
-        ""
-    );
+      setFormDate(
+        eventDate
+          ? getDateKey(
+              eventDate
+            )
+          : getDateKey(
+              selectedDate
+            )
+      );
 
-    setType(
-      EVENT_TYPES.some(
-        (
-          item
-        ) =>
-          item.value ===
-          normalizedType
-      )
-        ? normalizedType
-        : "other"
-    );
+      setShowForm(
+        true
+      );
 
-    setFormDate(
-      eventDate
-        ? getDateKey(
-            eventDate
-          )
-        : getDateKey(
-            selectedDate
-          )
-    );
+      setError("");
+    };
 
-    setShowForm(
-      true
-    );
-
-    setError("");
-  };
-
-  // =======================================================
-  // SAVE EVENT
-  // =======================================================
 
   const saveEvent =
     async (
@@ -1199,14 +1263,18 @@ function Calendar() {
     ) => {
       submitEvent.preventDefault();
 
-      if (saving) {
+      if (
+        saving
+      ) {
         return;
       }
 
       const cleanTitle =
         title.trim();
 
-      if (!cleanTitle) {
+      if (
+        !cleanTitle
+      ) {
         showError(
           "Event title is required."
         );
@@ -1219,7 +1287,9 @@ function Calendar() {
           formDate
         );
 
-      if (!chosenDate) {
+      if (
+        !chosenDate
+      ) {
         showError(
           "Choose a valid event date."
         );
@@ -1269,7 +1339,9 @@ function Calendar() {
                 eventData
               );
 
-        if (editing) {
+        if (
+          editing
+        ) {
           setEvents(
             (
               currentEvents
@@ -1341,30 +1413,35 @@ function Calendar() {
       }
     };
 
+
   // =======================================================
-  // DELETE EVENT
+  // DELETE
   // =======================================================
 
-  const openDeleteModal = (
-    calendarEvent
-  ) => {
-    if (
-      deleting ||
-      isTaskEvent(
-        calendarEvent
-      )
-    ) {
-      return;
-    }
+  const openDeleteModal =
+    (
+      calendarEvent
+    ) => {
+      if (
+        deleting ||
+        isTaskEvent(
+          calendarEvent
+        )
+      ) {
+        return;
+      }
 
-    setDeleteEventId(
-      calendarEvent._id
-    );
-  };
+      setDeleteEventId(
+        calendarEvent._id
+      );
+    };
+
 
   const closeDeleteModal =
     () => {
-      if (deleting) {
+      if (
+        deleting
+      ) {
         return;
       }
 
@@ -1372,6 +1449,7 @@ function Calendar() {
         null
       );
     };
+
 
   const eventBeingDeleted =
     events.find(
@@ -1381,6 +1459,7 @@ function Calendar() {
         calendarEvent._id ===
         deleteEventId
     );
+
 
   const deleteEvent =
     async () => {
@@ -1453,37 +1532,41 @@ function Calendar() {
       }
     };
 
+
   // =======================================================
   // UI
   // =======================================================
 
   return (
-    <div className="calendar-page calendar-v3-page">
+    <div className="v2c-page">
 
-      {/* ===================================================
-          HEADER
-      =================================================== */}
+      {/* HEADER */}
 
-      <header className="dashboard-header calendar-v3-header">
+      <header className="v2c-header">
 
         <div>
+
+          <span className="v2c-eyebrow">
+            Schedule
+          </span>
 
           <h1>
             Calendar
           </h1>
 
           <p>
-            Plan upcoming work and see
-            what you actually studied.
+            Plan upcoming work and see what you
+            actually studied throughout the month.
           </p>
 
         </div>
 
-        <div className="calendar-v3-header-actions">
+
+        <div className="v2c-header-actions">
 
           <button
             type="button"
-            className="calendar-v3-refresh"
+            className="v2c-secondary-button"
             disabled={
               refreshing
             }
@@ -1498,20 +1581,21 @@ function Calendar() {
               size={16}
               className={
                 refreshing
-                  ? "calendar-v3-spin"
+                  ? "v2c-spin"
                   : ""
               }
             />
 
             {refreshing
-              ? "Refreshing..."
+              ? "Refreshing"
               : "Refresh"}
 
           </button>
 
+
           <button
             type="button"
-            className="add-event-button"
+            className="v2c-primary-button"
             onClick={
               openAddForm
             }
@@ -1521,7 +1605,7 @@ function Calendar() {
               size={17}
             />
 
-            Add Event
+            Add event
 
           </button>
 
@@ -1529,18 +1613,26 @@ function Calendar() {
 
       </header>
 
-      {/* ===================================================
-          MESSAGES
-      =================================================== */}
+
+      {/* MESSAGES */}
 
       {message && (
-        <div className="calendar-v2-message success">
-          {message}
+        <div className="v2c-message is-success">
+
+          <CheckCircle2
+            size={17}
+          />
+
+          <span>
+            {message}
+          </span>
+
         </div>
       )}
 
+
       {error && (
-        <div className="calendar-v2-message error">
+        <div className="v2c-message is-error">
 
           <span>
             {error}
@@ -1552,44 +1644,50 @@ function Calendar() {
               setError("")
             }
           >
-            Dismiss
+            <X
+              size={16}
+            />
           </button>
 
         </div>
       )}
 
-      {/* ===================================================
-          EVENT FORM
-      =================================================== */}
+
+      {/* EVENT FORM */}
 
       {showForm && (
-        <div className="calendar-form-card dashboard-card">
+        <section className="v2c-form-card">
 
-          <div className="card-header">
+          <div className="v2c-form-header">
 
             <div>
 
+              <span className="v2c-eyebrow">
+                {editingEventId
+                  ? "Edit event"
+                  : "New event"}
+              </span>
+
               <h2>
                 {editingEventId
-                  ? "Edit Event"
-                  : "Add Event"}
+                  ? "Update event"
+                  : "Add to your schedule"}
               </h2>
 
-              <p className="selected-date-label">
-
+              <p>
                 {editingEventId
-                  ? "Update the scheduled event."
+                  ? "Update the event details below."
                   : formatSelectedDate(
                       selectedDate
                     )}
-
               </p>
 
             </div>
 
+
             <button
               type="button"
-              className="close-form-button"
+              className="v2c-icon-button"
               onClick={
                 resetForm
               }
@@ -1600,29 +1698,30 @@ function Calendar() {
             >
 
               <X
-                size={17}
+                size={18}
               />
 
             </button>
 
           </div>
 
+
           <form
-            className="calendar-event-form calendar-v2-form"
+            className="v2c-form"
             onSubmit={
               saveEvent
             }
           >
 
-            {/* TITLE */}
+            <label className="v2c-field">
 
-            <label>
-
-              Event title
+              <span>
+                Event title
+              </span>
 
               <input
                 type="text"
-                placeholder="e.g. Physics Exam"
+                placeholder="e.g. Physics exam"
                 value={
                   title
                 }
@@ -1634,8 +1733,7 @@ function Calendar() {
                   event
                 ) =>
                   setTitle(
-                    event.target
-                      .value
+                    event.target.value
                   )
                 }
                 autoFocus
@@ -1643,9 +1741,8 @@ function Calendar() {
 
             </label>
 
-            {/* DATE */}
 
-            <div className="calendar-v3-form-field">
+            <div className="v2c-field">
 
               <span>
                 Date
@@ -1666,9 +1763,8 @@ function Calendar() {
 
             </div>
 
-            {/* EVENT TYPE */}
 
-            <div className="calendar-v3-form-field">
+            <div className="v2c-field">
 
               <span>
                 Event type
@@ -1685,7 +1781,7 @@ function Calendar() {
                   EVENT_TYPES
                 }
                 placeholder="Assignment"
-                className="calendar-v3-type-select"
+                className="v2c-type-select"
                 disabled={
                   saving
                 }
@@ -1694,13 +1790,12 @@ function Calendar() {
 
             </div>
 
-            {/* ACTIONS */}
 
-            <div className="calendar-v2-form-actions">
+            <div className="v2c-form-actions">
 
               <button
                 type="button"
-                className="calendar-v2-cancel"
+                className="v2c-secondary-button"
                 onClick={
                   resetForm
                 }
@@ -1713,7 +1808,7 @@ function Calendar() {
 
               <button
                 type="submit"
-                className="calendar-v2-save"
+                className="v2c-primary-button"
                 disabled={
                   saving
                 }
@@ -1722,8 +1817,8 @@ function Calendar() {
                 {saving
                   ? "Saving..."
                   : editingEventId
-                    ? "Save Changes"
-                    : "Add Event"}
+                    ? "Save changes"
+                    : "Add event"}
 
               </button>
 
@@ -1731,69 +1826,74 @@ function Calendar() {
 
           </form>
 
-        </div>
+        </section>
       )}
 
-      {/* ===================================================
-          MONTH SUMMARY
-      =================================================== */}
 
-      <section className="calendar-v3-summary">
+      {/* MONTH SUMMARY */}
 
-        <div>
+      <section className="v2c-summary">
 
-          <CalendarDays
-            size={18}
-          />
+        <article>
 
-          <span>
-            Scheduled this month
+          <span className="v2c-summary-icon">
+            <CalendarDays
+              size={19}
+            />
           </span>
 
-          <strong>
-            {monthEventCount}
-          </strong>
+          <div>
+            <span>
+              Scheduled this month
+            </span>
 
-        </div>
+            <strong>
+              {monthEventCount}
+            </strong>
+          </div>
 
-        <div>
+        </article>
 
-          <Timer
-            size={18}
-          />
 
-          <span>
-            Focus this month
+        <article>
+
+          <span className="v2c-summary-icon">
+            <Timer
+              size={19}
+            />
           </span>
 
-          <strong>
-            {formatStudyTime(
-              monthStudySeconds
-            )}
-          </strong>
+          <div>
+            <span>
+              Focus this month
+            </span>
 
-        </div>
+            <strong>
+              {formatStudyTime(
+                monthStudySeconds
+              )}
+            </strong>
+          </div>
+
+        </article>
 
       </section>
 
-      {/* ===================================================
-          MAIN LAYOUT
-      =================================================== */}
 
-      <section className="calendar-layout">
+      {/* MAIN */}
 
-        {/* =================================================
-            MONTH
-        ================================================= */}
+      <section className="v2c-layout">
 
-        <div className="calendar-card dashboard-card">
+        {/* MONTH CALENDAR */}
 
-          <div className="calendar-header">
+        <section className="v2c-calendar">
+
+          <div className="v2c-calendar-header">
 
             <div>
 
-              <span className="calendar-small-label">
-                MONTH
+              <span className="v2c-eyebrow">
+                Month
               </span>
 
               <h2>
@@ -1802,7 +1902,8 @@ function Calendar() {
 
             </div>
 
-            <div className="calendar-navigation">
+
+            <div className="v2c-navigation">
 
               <button
                 type="button"
@@ -1812,19 +1913,21 @@ function Calendar() {
                 aria-label="Previous month"
               >
                 <ChevronLeft
-                  size={17}
+                  size={18}
                 />
               </button>
 
+
               <button
                 type="button"
-                className="today-button"
+                className="v2c-today"
                 onClick={
                   goToToday
                 }
               >
                 Today
               </button>
+
 
               <button
                 type="button"
@@ -1834,7 +1937,7 @@ function Calendar() {
                 aria-label="Next month"
               >
                 <ChevronRight
-                  size={17}
+                  size={18}
                 />
               </button>
 
@@ -1842,9 +1945,10 @@ function Calendar() {
 
           </div>
 
+
           {/* WEEKDAYS */}
 
-          <div className="calendar-weekdays">
+          <div className="v2c-weekdays">
 
             <span>Sun</span>
             <span>Mon</span>
@@ -1856,9 +1960,10 @@ function Calendar() {
 
           </div>
 
+
           {/* DAYS */}
 
-          <div className="calendar-grid">
+          <div className="v2c-grid">
 
             {calendarDays.map(
               (
@@ -1911,18 +2016,18 @@ function Calendar() {
                       date
                     )}-${index}`}
                     className={[
-                      "calendar-day",
+                      "v2c-day",
 
                       !currentMonth
-                        ? "other-month"
+                        ? "is-other-month"
                         : "",
 
                       today
-                        ? "today"
+                        ? "is-today"
                         : "",
 
                       selected
-                        ? "selected"
+                        ? "is-selected"
                         : "",
                     ]
                       .filter(
@@ -1936,13 +2041,25 @@ function Calendar() {
                     }
                   >
 
-                    <span className="calendar-day-number">
-                      {date.getDate()}
-                    </span>
+                    <div className="v2c-day-top">
+
+                      <span className="v2c-day-number">
+                        {date.getDate()}
+                      </span>
+
+                      {dayEvents.length >
+                        0 && (
+                        <span className="v2c-day-count">
+                          {dayEvents.length}
+                        </span>
+                      )}
+
+                    </div>
+
 
                     {dayEvents.length >
                       0 && (
-                      <div className="calendar-event-dots">
+                      <div className="v2c-event-dots">
 
                         {dayEvents
                           .slice(
@@ -1957,7 +2074,7 @@ function Calendar() {
                                 key={
                                   calendarEvent._id
                                 }
-                                className={`calendar-event-dot calendar-dot-${getTypeClass(
+                                className={`v2c-event-dot is-${getTypeClass(
                                   calendarEvent.type
                                 )}`}
                               />
@@ -1967,12 +2084,13 @@ function Calendar() {
                       </div>
                     )}
 
+
                     {daySessions.length >
                       0 && (
-                      <div className="calendar-v3-focus-indicator">
+                      <div className="v2c-day-focus">
 
                         <Timer
-                          size={10}
+                          size={12}
                         />
 
                         <span>
@@ -1984,13 +2102,6 @@ function Calendar() {
                       </div>
                     )}
 
-                    {dayEvents.length >
-                      0 && (
-                      <span className="calendar-event-count">
-                        {dayEvents.length}
-                      </span>
-                    )}
-
                   </button>
                 );
               }
@@ -1998,19 +2109,18 @@ function Calendar() {
 
           </div>
 
-        </div>
+        </section>
 
-        {/* =================================================
-            SELECTED DATE
-        ================================================= */}
 
-        <aside className="selected-date-card dashboard-card calendar-v3-selected">
+        {/* SELECTED DAY */}
 
-          <div className="selected-date-header">
+        <aside className="v2c-selected">
+
+          <div className="v2c-selected-header">
 
             <div>
 
-              <span>
+              <span className="v2c-eyebrow">
                 Selected date
               </span>
 
@@ -2018,405 +2128,417 @@ function Calendar() {
                 {selectedDate.toLocaleDateString(
                   "en-IN",
                   {
-                    day: "numeric",
-                    month: "short",
+                    day:
+                      "numeric",
+
+                    month:
+                      "short",
                   }
                 )}
               </h2>
 
             </div>
 
+
             <button
               type="button"
-              className="small-add-event-button"
+              className="v2c-add-small"
               onClick={
                 openAddForm
               }
               aria-label="Add event"
             >
-
               <Plus
-                size={17}
+                size={18}
               />
-
             </button>
 
           </div>
 
-          <p className="selected-full-date">
+
+          <p className="v2c-full-date">
             {formatSelectedDate(
               selectedDate
             )}
           </p>
 
-          {/* DAILY SUMMARY */}
 
-          <div className="calendar-v3-day-summary">
+          {/* DAY SUMMARY */}
+
+          <div className="v2c-day-summary">
 
             <div>
 
               <CalendarDays
-                size={15}
+                size={16}
               />
 
               <span>
-                {selectedDateEvents.length}
-                {" scheduled"}
+                {selectedDateEvents.length} scheduled
               </span>
 
             </div>
 
+
             <div>
 
-              <Clock3
-                size={15}
+              <Timer
+                size={16}
               />
 
               <span>
                 {formatStudyTime(
                   selectedStudySeconds
-                )}
-                {" focused"}
+                )} focused
               </span>
 
             </div>
 
           </div>
 
-          {/* =================================================
-              SCHEDULED
-          ================================================= */}
 
-          <div className="calendar-v3-section">
+          {/* SCHEDULED */}
 
-            <div className="calendar-v3-section-title">
+          <section className="v2c-section">
+
+            <div className="v2c-section-header">
+
+              <h3>
+                Scheduled
+              </h3>
 
               <span>
-                SCHEDULED
-              </span>
-
-              <strong>
                 {selectedDateEvents.length}
-              </strong>
+              </span>
 
             </div>
 
+
             {loading ? (
 
-              <p className="calendar-empty">
-                Loading...
-              </p>
+              <div className="v2c-empty-small">
+                Loading schedule...
+              </div>
 
             ) : selectedDateEvents.length ===
               0 ? (
 
-              <div className="calendar-v3-mini-empty">
+              <div className="v2c-empty-small">
 
                 <CalendarDays
-                  size={20}
+                  size={22}
                 />
 
+                <strong>
+                  Nothing scheduled
+                </strong>
+
                 <span>
-                  Nothing scheduled.
+                  This day is clear.
                 </span>
 
               </div>
 
             ) : (
 
-              selectedDateEvents.map(
-                (
-                  calendarEvent
-                ) => {
-                  const task =
-                    isTaskEvent(
-                      calendarEvent
+              <div className="v2c-event-list">
+
+                {selectedDateEvents.map(
+                  (
+                    calendarEvent
+                  ) => {
+                    const task =
+                      isTaskEvent(
+                        calendarEvent
+                      );
+
+                    const typeClass =
+                      getTypeClass(
+                        calendarEvent.type
+                      );
+
+                    return (
+                      <article
+                        className="v2c-event"
+                        key={
+                          calendarEvent._id
+                        }
+                      >
+
+                        <span
+                          className={`v2c-event-marker is-${typeClass}`}
+                        />
+
+
+                        <div className="v2c-event-content">
+
+                          <strong>
+                            {calendarEvent.title}
+                          </strong>
+
+
+                          <div className="v2c-event-meta">
+
+                            <span
+                              className={`v2c-type is-${typeClass}`}
+                            >
+                              {getTypeLabel(
+                                calendarEvent.type
+                              )}
+                            </span>
+
+
+                            {task &&
+                              calendarEvent.subjectName && (
+                                <span>
+
+                                  <BookOpen
+                                    size={13}
+                                  />
+
+                                  {calendarEvent.subjectName}
+
+                                </span>
+                              )}
+
+
+                            {task &&
+                              calendarEvent.priority && (
+                                <span
+                                  className={`v2c-priority is-${calendarEvent.priority}`}
+                                >
+                                  {calendarEvent.priority}
+                                </span>
+                              )}
+
+
+                            {task &&
+                              calendarEvent.dueTime && (
+                                <span>
+
+                                  <Clock3
+                                    size={13}
+                                  />
+
+                                  {formatTaskTime(
+                                    calendarEvent.dueTime
+                                  )}
+
+                                </span>
+                              )}
+
+                          </div>
+
+                        </div>
+
+
+                        {!task && (
+                          <div className="v2c-event-actions">
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openEditForm(
+                                  calendarEvent
+                                )
+                              }
+                              aria-label={`Edit ${calendarEvent.title}`}
+                            >
+                              <Pencil
+                                size={16}
+                              />
+                            </button>
+
+
+                            <button
+                              type="button"
+                              className="is-danger"
+                              onClick={() =>
+                                openDeleteModal(
+                                  calendarEvent
+                                )
+                              }
+                              aria-label={`Delete ${calendarEvent.title}`}
+                            >
+                              <Trash2
+                                size={16}
+                              />
+                            </button>
+
+                          </div>
+                        )}
+
+                      </article>
                     );
+                  }
+                )}
 
-                  return (
-                    <div
-                      className={[
-                        "calendar-event-item",
-                        "calendar-v2-event-item",
-
-                        task
-                          ? "calendar-task-event"
-                          : "",
-                      ]
-                        .filter(
-                          Boolean
-                        )
-                        .join(" ")}
-                      key={
-                        calendarEvent._id
-                      }
-                    >
-
-                      {/* TYPE MARKER */}
-
-                      <div
-                        className={`calendar-v2-type-marker ${getTypeClass(
-                          calendarEvent.type
-                        )}`}
-                      />
-
-                      {/* CONTENT */}
-
-                      <div className="calendar-event-info">
-
-                        <strong className="calendar-event-title">
-                          {calendarEvent.title}
-                        </strong>
-
-                        <div className="calendar-task-meta">
-
-                          <span
-                            className={`calendar-v2-type ${getTypeClass(
-                              calendarEvent.type
-                            )}`}
-                          >
-                            {getTypeLabel(
-                              calendarEvent.type
-                            )}
-                          </span>
-
-                          {task &&
-                            calendarEvent.subjectName && (
-                              <span className="calendar-task-subject">
-
-                                <BookOpen
-                                  size={11}
-                                />
-
-                                {calendarEvent.subjectName}
-
-                              </span>
-                            )}
-
-                          {task &&
-                            calendarEvent.priority && (
-                              <span
-                                className={`calendar-task-priority ${calendarEvent.priority}`}
-                              >
-                                {calendarEvent.priority}
-                              </span>
-                            )}
-
-                          {task &&
-                            calendarEvent.dueTime && (
-                              <span className="calendar-task-time">
-
-                                <Clock3
-                                  size={11}
-                                />
-
-                                {formatTaskTime(
-                                  calendarEvent.dueTime
-                                )}
-
-                              </span>
-                            )}
-
-                        </div>
-
-                      </div>
-
-                      {/* NORMAL EVENT ACTIONS */}
-
-                      {!task && (
-                        <div className="calendar-v2-event-actions">
-
-                          <button
-                            type="button"
-                            className="calendar-v2-edit"
-                            onClick={() =>
-                              openEditForm(
-                                calendarEvent
-                              )
-                            }
-                            aria-label={`Edit ${calendarEvent.title}`}
-                          >
-
-                            <Pencil
-                              size={15}
-                            />
-
-                          </button>
-
-                          <button
-                            type="button"
-                            className="calendar-v2-delete"
-                            onClick={() =>
-                              openDeleteModal(
-                                calendarEvent
-                              )
-                            }
-                            aria-label={`Delete ${calendarEvent.title}`}
-                          >
-
-                            <Trash2
-                              size={15}
-                            />
-
-                          </button>
-
-                        </div>
-                      )}
-
-                    </div>
-                  );
-                }
-              )
+              </div>
 
             )}
 
-          </div>
+          </section>
 
-          {/* =================================================
-              FOCUS HISTORY
-          ================================================= */}
 
-          <div className="calendar-v3-section calendar-v3-focus-section">
+          {/* FOCUS HISTORY */}
 
-            <div className="calendar-v3-section-title">
+          <section className="v2c-section">
+
+            <div className="v2c-section-header">
+
+              <h3>
+                Focus history
+              </h3>
 
               <span>
-                STUDIED
+                {selectedDateSessions.length}
               </span>
 
-              <strong>
-                {selectedDateSessions.length}
-              </strong>
-
             </div>
+
 
             {selectedDateSessions.length ===
             0 ? (
 
-              <div className="calendar-v3-mini-empty">
+              <div className="v2c-empty-small">
 
                 <Timer
-                  size={20}
+                  size={22}
                 />
 
+                <strong>
+                  No focus sessions
+                </strong>
+
                 <span>
-                  No Focus sessions.
+                  Nothing recorded for this day.
                 </span>
 
               </div>
 
             ) : (
 
-              selectedDateSessions.map(
-                (
-                  session
-                ) => (
-                  <div
-                    className="calendar-v3-session"
-                    key={
-                      session._id
-                    }
-                  >
+              <div className="v2c-session-list">
 
-                    <div className="calendar-v3-session-icon">
+                {selectedDateSessions.map(
+                  (
+                    session
+                  ) => (
+                    <article
+                      className="v2c-session"
+                      key={
+                        session._id
+                      }
+                    >
 
-                      <BookOpen
-                        size={15}
-                      />
+                      <span className="v2c-session-icon">
 
-                    </div>
+                        <BookOpen
+                          size={16}
+                        />
 
-                    <div className="calendar-v3-session-content">
-
-                      <strong>
-                        {session.subjectName ||
-                          "General Study"}
-                      </strong>
-
-                      <span>
-                        {formatSessionTime(
-                          session.startedAt ||
-                            session.endedAt
-                        )}
                       </span>
 
-                    </div>
 
-                    <strong className="calendar-v3-session-duration">
+                      <div>
 
-                      {formatStudyTime(
-                        session.durationSeconds
-                      )}
+                        <strong>
+                          {session.subjectName ||
+                            "General Study"}
+                        </strong>
 
-                    </strong>
+                        <span>
+                          {formatSessionTime(
+                            session.startedAt ||
+                              session.endedAt
+                          )}
+                        </span>
 
-                  </div>
-                )
-              )
+                      </div>
+
+
+                      <strong className="v2c-session-duration">
+                        {formatStudyTime(
+                          session.durationSeconds
+                        )}
+                      </strong>
+
+                    </article>
+                  )
+                )}
+
+              </div>
 
             )}
 
-          </div>
+          </section>
 
         </aside>
 
       </section>
 
-      {/* ===================================================
-          DELETE MODAL
-      =================================================== */}
+
+      {/* DELETE MODAL */}
 
       {deleteEventId && (
-
         <div
-          className="delete-modal-overlay"
-          onClick={
-            closeDeleteModal
-          }
+          className="v2c-delete-overlay"
+          onMouseDown={(
+            event
+          ) => {
+            if (
+              event.target ===
+                event.currentTarget &&
+              !deleting
+            ) {
+              closeDeleteModal();
+            }
+          }}
         >
 
           <div
-            className="delete-modal"
+            className="v2c-delete-modal"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="calendar-delete-title"
-            onClick={(
-              event
-            ) =>
-              event.stopPropagation()
-            }
+            aria-labelledby="v2c-delete-title"
           >
 
-            <div className="delete-modal-icon">
+            <span className="v2c-delete-icon">
 
               <Trash2
-                size={21}
+                size={22}
               />
+
+            </span>
+
+
+            <div className="v2c-delete-copy">
+
+              <h2 id="v2c-delete-title">
+                Delete event?
+              </h2>
+
+              <p>
+                Permanently delete{" "}
+                <strong>
+                  {eventBeingDeleted?.title ||
+                    "this event"}
+                </strong>
+                ?
+              </p>
+
+              <span>
+                This action cannot be undone.
+              </span>
 
             </div>
 
-            <h2 id="calendar-delete-title">
-              Delete this event?
-            </h2>
 
-            <p>
-              This will permanently
-              delete{" "}
-
-              <strong>
-                "
-                {eventBeingDeleted?.title ||
-                  "this event"}
-                "
-              </strong>
-              .
-            </p>
-
-            <div className="delete-modal-actions">
+            <div className="v2c-delete-actions">
 
               <button
                 type="button"
-                className="cancel-delete-button"
+                className="v2c-secondary-button"
                 disabled={
                   deleting
                 }
@@ -2427,9 +2549,10 @@ function Calendar() {
                 Cancel
               </button>
 
+
               <button
                 type="button"
-                className="confirm-delete-button"
+                className="v2c-danger-button"
                 disabled={
                   deleting
                 }
@@ -2438,9 +2561,13 @@ function Calendar() {
                 }
               >
 
+                <Trash2
+                  size={16}
+                />
+
                 {deleting
                   ? "Deleting..."
-                  : "Delete Event"}
+                  : "Delete event"}
 
               </button>
 
@@ -2454,5 +2581,6 @@ function Calendar() {
     </div>
   );
 }
+
 
 export default Calendar;

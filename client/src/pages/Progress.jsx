@@ -39,6 +39,9 @@ import {
   getStudySessions,
 } from "../services/studySessionData";
 
+import "../styles/progress-v2.css";
+
+
 // =========================================================
 // DATE HELPERS
 // =========================================================
@@ -64,6 +67,7 @@ const safeDate = (
   return date;
 };
 
+
 const startOfDay = (
   value = new Date()
 ) => {
@@ -79,6 +83,7 @@ const startOfDay = (
 
   return date;
 };
+
 
 const addDays = (
   value,
@@ -97,20 +102,18 @@ const addDays = (
   );
 };
 
+
 const dateKey = (
   value
 ) => {
   const date =
-    startOfDay(
-      value
-    );
+    startOfDay(value);
 
   return [
     date.getFullYear(),
 
     String(
-      date.getMonth() +
-        1
+      date.getMonth() + 1
     ).padStart(
       2,
       "0"
@@ -124,6 +127,7 @@ const dateKey = (
     ),
   ].join("-");
 };
+
 
 // =========================================================
 // GENERAL HELPERS
@@ -147,10 +151,9 @@ const getSubjectId = (
     );
   }
 
-  return String(
-    value
-  );
+  return String(value);
 };
+
 
 const formatStudyTime = (
   seconds
@@ -158,8 +161,7 @@ const formatStudyTime = (
   const safe =
     Math.max(
       0,
-      Number(seconds) ||
-        0
+      Number(seconds) || 0
     );
 
   const minutes =
@@ -175,15 +177,21 @@ const formatStudyTime = (
   const remaining =
     minutes % 60;
 
-  if (hours > 0) {
+  if (
+    hours > 0
+  ) {
     return `${hours}h ${remaining}m`;
   }
 
-  if (minutes > 0) {
+  if (
+    minutes > 0
+  ) {
     return `${minutes}m`;
   }
 
-  if (safe > 0) {
+  if (
+    safe > 0
+  ) {
     return `${Math.floor(
       safe
     )}s`;
@@ -192,6 +200,7 @@ const formatStudyTime = (
   return "0m";
 };
 
+
 const formatChartValue = (
   seconds
 ) => {
@@ -199,8 +208,7 @@ const formatChartValue = (
     Math.round(
       Math.max(
         0,
-        Number(seconds) ||
-          0
+        Number(seconds) || 0
       ) / 60
     );
 
@@ -220,13 +228,12 @@ const formatChartValue = (
   return `${minutes}m`;
 };
 
+
 const formatRelativeActivity = (
   value
 ) => {
   const date =
-    safeDate(
-      value
-    );
+    safeDate(value);
 
   if (!date) {
     return "";
@@ -236,14 +243,10 @@ const formatRelativeActivity = (
     new Date();
 
   const today =
-    startOfDay(
-      now
-    );
+    startOfDay(now);
 
   const target =
-    startOfDay(
-      date
-    );
+    startOfDay(date);
 
   const diffDays =
     Math.round(
@@ -258,11 +261,8 @@ const formatRelativeActivity = (
     date.toLocaleTimeString(
       "en-IN",
       {
-        hour:
-          "2-digit",
-
-        minute:
-          "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
       }
     );
 
@@ -281,14 +281,12 @@ const formatRelativeActivity = (
   return date.toLocaleDateString(
     "en-IN",
     {
-      day:
-        "numeric",
-
-      month:
-        "short",
+      day: "numeric",
+      month: "short",
     }
   );
 };
+
 
 // =========================================================
 // PROGRESS
@@ -299,9 +297,6 @@ function Progress() {
     isGuest,
   } = useAuth();
 
-  // =======================================================
-  // DATA
-  // =======================================================
 
   const [
     tasks,
@@ -359,6 +354,7 @@ function Progress() {
     );
   });
 
+
   // =======================================================
   // LOAD
   // =======================================================
@@ -368,7 +364,9 @@ function Progress() {
       manual = false
     ) => {
       try {
-        if (manual) {
+        if (
+          manual
+        ) {
           setRefreshing(
             true
           );
@@ -495,28 +493,18 @@ function Progress() {
       }
     };
 
-  // =======================================================
-  // INITIAL LOAD
-  // =======================================================
 
   useEffect(() => {
-    loadProgress(
-      false
-    );
+    loadProgress();
   }, [
     isGuest,
   ]);
 
-  // =======================================================
-  // LIVE UPDATES
-  // =======================================================
 
   useEffect(() => {
     const refresh =
       () => {
-        loadProgress(
-          false
-        );
+        loadProgress();
       };
 
     const events = [
@@ -555,6 +543,7 @@ function Progress() {
     isGuest,
   ]);
 
+
   // =======================================================
   // NORMALIZED SESSIONS
   // =======================================================
@@ -569,8 +558,7 @@ function Progress() {
             const duration =
               Number(
                 session.durationSeconds
-              ) ||
-              0;
+              ) || 0;
 
             const activityDate =
               safeDate(
@@ -605,6 +593,7 @@ function Progress() {
       sessions,
     ]);
 
+
   // =======================================================
   // TASKS
   // =======================================================
@@ -624,6 +613,7 @@ function Progress() {
         tasks,
       ]
     );
+
 
   const completedTimestamped =
     useMemo(() => {
@@ -650,15 +640,14 @@ function Progress() {
       completedTasks,
     ]);
 
-  // =======================================================
-  // BASIC TASK STATS
-  // =======================================================
 
   const totalTasks =
     tasks.length;
 
+
   const completedCount =
     completedTasks.length;
+
 
   const pendingCount =
     Math.max(
@@ -666,6 +655,7 @@ function Progress() {
       totalTasks -
         completedCount
     );
+
 
   const completionRate =
     totalTasks > 0
@@ -678,8 +668,9 @@ function Progress() {
         )
       : 0;
 
+
   // =======================================================
-  // TIME PERIODS
+  // PERIODS
   // =======================================================
 
   const today =
@@ -687,11 +678,13 @@ function Progress() {
       new Date()
     );
 
+
   const currentWeekStart =
     addDays(
       today,
       -6
     );
+
 
   const previousWeekStart =
     addDays(
@@ -699,11 +692,13 @@ function Progress() {
       -13
     );
 
+
   const previousWeekEnd =
     addDays(
       today,
       -7
     );
+
 
   const thirtyDayStart =
     addDays(
@@ -711,8 +706,9 @@ function Progress() {
       -29
     );
 
+
   // =======================================================
-  // DAILY ACTIVITY MAP
+  // DAILY ACTIVITY
   // =======================================================
 
   const focusByDay =
@@ -734,8 +730,7 @@ function Progress() {
             (
               map.get(
                 key
-              ) ||
-              0
+              ) || 0
             ) +
               session._duration
           );
@@ -746,6 +741,7 @@ function Progress() {
     }, [
       validSessions,
     ]);
+
 
   const tasksByDay =
     useMemo(() => {
@@ -766,10 +762,8 @@ function Progress() {
             (
               map.get(
                 key
-              ) ||
-              0
-            ) +
-              1
+              ) || 0
+            ) + 1
           );
         }
       );
@@ -779,16 +773,16 @@ function Progress() {
       completedTimestamped,
     ]);
 
+
   // =======================================================
-  // CURRENT WEEK
+  // WEEK ACTIVITY
   // =======================================================
 
   const weekActivity =
     useMemo(() => {
       return Array.from(
         {
-          length:
-            7,
+          length: 7,
         },
         (
           _,
@@ -807,7 +801,6 @@ function Progress() {
 
           return {
             key,
-
             date,
 
             label:
@@ -831,14 +824,12 @@ function Progress() {
             focusSeconds:
               focusByDay.get(
                 key
-              ) ||
-              0,
+              ) || 0,
 
             tasks:
               tasksByDay.get(
                 key
-              ) ||
-              0,
+              ) || 0,
 
             isToday:
               key ===
@@ -851,11 +842,10 @@ function Progress() {
     }, [
       focusByDay,
       tasksByDay,
+      currentWeekStart,
+      today,
     ]);
 
-  // =======================================================
-  // WEEK TOTAL
-  // =======================================================
 
   const weekStudySeconds =
     useMemo(
@@ -873,6 +863,7 @@ function Progress() {
         weekActivity,
       ]
     );
+
 
   // =======================================================
   // PREVIOUS WEEK
@@ -908,7 +899,10 @@ function Progress() {
       );
     }, [
       validSessions,
+      previousWeekStart,
+      previousWeekEnd,
     ]);
+
 
   // =======================================================
   // TREND
@@ -1011,8 +1005,9 @@ function Progress() {
       previousWeekSeconds,
     ]);
 
+
   // =======================================================
-  // TODAY
+  // TODAY GOAL
   // =======================================================
 
   const todayFocusSeconds =
@@ -1020,12 +1015,13 @@ function Progress() {
       dateKey(
         today
       )
-    ) ||
-    0;
+    ) || 0;
+
 
   const todayFocusMinutes =
     todayFocusSeconds /
     60;
+
 
   const goalPercent =
     dailyGoalMinutes > 0
@@ -1038,6 +1034,7 @@ function Progress() {
         )
       : 0;
 
+
   const goalBarPercent =
     Math.min(
       100,
@@ -1047,6 +1044,7 @@ function Progress() {
       )
     );
 
+
   const remainingGoalMinutes =
     Math.max(
       0,
@@ -1055,6 +1053,7 @@ function Progress() {
           todayFocusMinutes
       )
     );
+
 
   // =======================================================
   // TOTAL STUDY
@@ -1077,8 +1076,9 @@ function Progress() {
       ]
     );
 
+
   // =======================================================
-  // CURRENT STREAK
+  // STREAK
   // =======================================================
 
   const currentStreak =
@@ -1129,8 +1129,7 @@ function Progress() {
           )
         )
       ) {
-        streak +=
-          1;
+        streak += 1;
 
         cursor =
           addDays(
@@ -1142,7 +1141,9 @@ function Progress() {
       return streak;
     }, [
       validSessions,
+      today,
     ]);
+
 
   // =======================================================
   // 30 DAY CONSISTENCY
@@ -1152,8 +1153,7 @@ function Progress() {
     useMemo(() => {
       return Array.from(
         {
-          length:
-            30,
+          length: 30,
         },
         (
           _,
@@ -1173,14 +1173,12 @@ function Progress() {
           const focusSeconds =
             focusByDay.get(
               key
-            ) ||
-            0;
+            ) || 0;
 
           const taskCount =
             tasksByDay.get(
               key
-            ) ||
-            0;
+            ) || 0;
 
           const minutes =
             focusSeconds /
@@ -1190,37 +1188,29 @@ function Progress() {
             0;
 
           if (
-            focusSeconds >
-              0 ||
-            taskCount >
-              0
+            focusSeconds > 0 ||
+            taskCount > 0
           ) {
-            level =
-              1;
+            level = 1;
           }
 
           if (
-            minutes >=
-            30
+            minutes >= 30
           ) {
-            level =
-              2;
+            level = 2;
           }
 
           if (
-            minutes >=
-            60
+            minutes >= 60
           ) {
-            level =
-              3;
+            level = 3;
           }
 
           if (
             minutes >=
             dailyGoalMinutes
           ) {
-            level =
-              4;
+            level = 4;
           }
 
           return {
@@ -1233,10 +1223,12 @@ function Progress() {
         }
       );
     }, [
+      thirtyDayStart,
       focusByDay,
       tasksByDay,
       dailyGoalMinutes,
     ]);
+
 
   const active30Days =
     consistencyDays.filter(
@@ -1249,6 +1241,7 @@ function Progress() {
           0
     ).length;
 
+
   const goalDays =
     consistencyDays.filter(
       (
@@ -1258,6 +1251,7 @@ function Progress() {
           60 >=
         dailyGoalMinutes
     ).length;
+
 
   // =======================================================
   // SESSION INSIGHTS
@@ -1280,6 +1274,7 @@ function Progress() {
       validSessions,
     ]);
 
+
   const averageSession =
     validSessions.length >
     0
@@ -1288,6 +1283,7 @@ function Progress() {
             validSessions.length
         )
       : 0;
+
 
   // =======================================================
   // BEST DAY
@@ -1329,6 +1325,7 @@ function Progress() {
       focusByDay,
     ]);
 
+
   // =======================================================
   // COMPLETED TODAY
   // =======================================================
@@ -1346,32 +1343,6 @@ function Progress() {
         )
     ).length;
 
-  // =======================================================
-  // SUBJECT LOOKUP
-  // =======================================================
-
-  const subjectById =
-    useMemo(() => {
-      const map =
-        new Map();
-
-      subjects.forEach(
-        (
-          subject
-        ) => {
-          map.set(
-            String(
-              subject._id
-            ),
-            subject
-          );
-        }
-      );
-
-      return map;
-    }, [
-      subjects,
-    ]);
 
   // =======================================================
   // SUBJECT ANALYTICS
@@ -1401,7 +1372,7 @@ function Progress() {
 
               color:
                 subject.color ||
-                "#6366f1",
+                "#64748b",
 
               focusSeconds:
                 0,
@@ -1421,6 +1392,7 @@ function Progress() {
           );
         }
       );
+
 
       const general = {
         id:
@@ -1447,6 +1419,7 @@ function Progress() {
         notes:
           0,
       };
+
 
       validSessions.forEach(
         (
@@ -1493,7 +1466,9 @@ function Progress() {
             }
           }
 
-          if (!entry) {
+          if (
+            !entry
+          ) {
             general.focusSeconds +=
               session._duration;
 
@@ -1511,6 +1486,7 @@ function Progress() {
         }
       );
 
+
       tasks.forEach(
         (
           task
@@ -1527,7 +1503,9 @@ function Progress() {
                 )
               : null;
 
-          if (!entry) {
+          if (
+            !entry
+          ) {
             return;
           }
 
@@ -1542,6 +1520,7 @@ function Progress() {
           }
         }
       );
+
 
       notes.forEach(
         (
@@ -1597,19 +1576,22 @@ function Progress() {
         }
       );
 
+
       const result =
         Array.from(
           map.values()
         );
 
+
       if (
         general.focusSeconds >
-          0
+        0
       ) {
         result.push(
           general
         );
       }
+
 
       return result.sort(
         (
@@ -1621,11 +1603,11 @@ function Progress() {
       );
     }, [
       subjects,
-      subjectById,
       validSessions,
       tasks,
       notes,
     ]);
+
 
   const totalSubjectFocus =
     subjectBreakdown.reduce(
@@ -1638,6 +1620,7 @@ function Progress() {
       0
     );
 
+
   const topSubject =
     subjectBreakdown.find(
       (
@@ -1645,11 +1628,11 @@ function Progress() {
       ) =>
         subject.focusSeconds >
         0
-    ) ||
-    null;
+    ) || null;
+
 
   // =======================================================
-  // NOTE STATS
+  // NOTES
   // =======================================================
 
   const linkedNotes =
@@ -1664,6 +1647,7 @@ function Progress() {
         )
     ).length;
 
+
   const pinnedNotes =
     notes.filter(
       (
@@ -1673,6 +1657,7 @@ function Progress() {
           note.pinned
         )
     ).length;
+
 
   const notesUpdatedThisWeek =
     notes.filter(
@@ -1685,7 +1670,9 @@ function Progress() {
               note.createdAt
           );
 
-        if (!date) {
+        if (
+          !date
+        ) {
           return false;
         }
 
@@ -1698,8 +1685,9 @@ function Progress() {
       }
     ).length;
 
+
   // =======================================================
-  // RECENT ACTIVITY
+  // RECENT
   // =======================================================
 
   const recentActivity =
@@ -1710,7 +1698,11 @@ function Progress() {
             session
           ) => ({
             id:
-              `session-${session._id || session.id || session._date.getTime()}`,
+              `session-${
+                session._id ||
+                session.id ||
+                session._date.getTime()
+              }`,
 
             type:
               "session",
@@ -1729,13 +1721,17 @@ function Progress() {
           })
         );
 
+
       const taskItems =
         completedTimestamped.map(
           (
             task
           ) => ({
             id:
-              `task-${task._id || task.id}`,
+              `task-${
+                task._id ||
+                task.id
+              }`,
 
             type:
               "task",
@@ -1751,6 +1747,7 @@ function Progress() {
               "Completed",
           })
         );
+
 
       return [
         ...sessionItems,
@@ -1773,8 +1770,9 @@ function Progress() {
       completedTimestamped,
     ]);
 
+
   // =======================================================
-  // CHART MAX
+  // CHART
   // =======================================================
 
   const chartMax =
@@ -1787,6 +1785,7 @@ function Progress() {
       ),
       1
     );
+
 
   // =======================================================
   // INSIGHT
@@ -1810,6 +1809,7 @@ function Progress() {
         };
       }
 
+
       if (
         goalPercent >=
         100
@@ -1826,6 +1826,7 @@ function Progress() {
         };
       }
 
+
       if (
         currentStreak >=
         7
@@ -1841,6 +1842,7 @@ function Progress() {
             `Your current Focus streak is ${currentStreak} days. Protect the habit before chasing bigger sessions.`,
         };
       }
+
 
       if (
         weekTrend.direction ===
@@ -1861,6 +1863,7 @@ function Progress() {
         };
       }
 
+
       if (
         topSubject
       ) {
@@ -1877,6 +1880,7 @@ function Progress() {
             )} in this subject. Check the subject distribution below for balance.`,
         };
       }
+
 
       return {
         icon:
@@ -1896,12 +1900,10 @@ function Progress() {
       topSubject,
     ]);
 
+
   const InsightIcon =
     insight.icon;
 
-  // =======================================================
-  // TREND ICON
-  // =======================================================
 
   const TrendIcon =
     weekTrend.direction ===
@@ -1912,23 +1914,20 @@ function Progress() {
         ? ArrowDownRight
         : Minus;
 
+
   // =======================================================
   // UI
   // =======================================================
 
   return (
-    <div className="dashboard progress-v4-page">
+    <div className="v2p-page">
 
-      {/* ===================================================
-          HEADER
-      =================================================== */}
-
-      <header className="dashboard-header progress-v4-header">
+      <header className="v2p-header">
 
         <div>
 
-          <span className="progress-v4-page-eyebrow">
-            STUDY ANALYTICS
+          <span className="v2p-eyebrow">
+            Study analytics
           </span>
 
           <h1>
@@ -1936,51 +1935,50 @@ function Progress() {
           </h1>
 
           <p>
-            A real view of your Focus,
-            task completion, consistency,
-            subjects and study habits.
+            Understand your focus time,
+            consistency, task completion and
+            overall study patterns.
           </p>
 
         </div>
 
+
         <button
           type="button"
-          className="progress-v4-refresh"
+          className="v2p-refresh"
+          disabled={
+            refreshing
+          }
           onClick={() =>
             loadProgress(
               true
             )
           }
-          disabled={
-            refreshing
-          }
         >
 
           <RefreshCw
-            size={15}
+            size={16}
             className={
               refreshing
-                ? "progress-v4-spin"
+                ? "v2p-spin"
                 : ""
             }
           />
 
           {refreshing
-            ? "Refreshing..."
+            ? "Refreshing"
             : "Refresh"}
 
         </button>
 
       </header>
 
-      {/* ===================================================
-          ERROR
-      =================================================== */}
 
       {error && (
-        <div className="progress-v4-error">
+        <div className="v2p-error">
 
           <div>
+
             <strong>
               Progress could not load
             </strong>
@@ -1988,7 +1986,9 @@ function Progress() {
             <span>
               {error}
             </span>
+
           </div>
+
 
           <button
             type="button"
@@ -2004,17 +2004,14 @@ function Progress() {
         </div>
       )}
 
-      {/* ===================================================
-          LOADING
-      =================================================== */}
 
       {loading ? (
 
-        <div className="dashboard-card progress-v4-loading">
+        <section className="v2p-loading">
 
           <RefreshCw
-            size={22}
-            className="progress-v4-spin"
+            size={23}
+            className="v2p-spin"
           />
 
           <strong>
@@ -2026,16 +2023,16 @@ function Progress() {
             subjects and notes.
           </span>
 
-        </div>
+        </section>
 
       ) : (
-
         <>
-          {/* ===============================================
-              HERO STATS
-          =============================================== */}
 
-          <section className="progress-v4-hero-stats">
+          {/* =================================================
+              TOP STATS
+              ================================================= */}
+
+          <section className="v2p-stats">
 
             <ProgressStat
               icon={
@@ -2051,6 +2048,7 @@ function Progress() {
               }
               description={`${goalPercent}% of daily goal`}
             />
+
 
             <ProgressStat
               icon={
@@ -2075,6 +2073,7 @@ function Progress() {
               }
             />
 
+
             <ProgressStat
               icon={
                 <Flame
@@ -2091,6 +2090,7 @@ function Progress() {
               description="Consecutive active days"
             />
 
+
             <ProgressStat
               icon={
                 <CheckCircle2
@@ -2104,29 +2104,30 @@ function Progress() {
 
           </section>
 
-          {/* ===============================================
+
+          {/* =================================================
               DAILY GOAL
-          =============================================== */}
+              ================================================= */}
 
-          <section className="dashboard-card progress-v4-goal-card">
+          <section className="v2p-goal">
 
-            <div className="progress-v4-goal-top">
+            <div className="v2p-goal-top">
 
               <div>
 
-                <span className="progress-v4-eyebrow">
-                  TODAY'S TARGET
+                <span className="v2p-eyebrow">
+                  Today's target
                 </span>
 
                 <h2>
-                  Daily Focus goal
+                  Daily focus goal
                 </h2>
 
                 <p>
                   {formatStudyTime(
                     todayFocusSeconds
-                  )}
-                  {" completed · "}
+                  )} completed
+                  {" · "}
 
                   {remainingGoalMinutes >
                   0
@@ -2139,10 +2140,11 @@ function Progress() {
 
               </div>
 
-              <div className="progress-v4-goal-percent">
+
+              <div className="v2p-goal-value">
 
                 <Target
-                  size={16}
+                  size={18}
                 />
 
                 <strong>
@@ -2153,7 +2155,8 @@ function Progress() {
 
             </div>
 
-            <div className="progress-v4-goal-track">
+
+            <div className="v2p-goal-track">
 
               <div
                 style={{
@@ -2164,7 +2167,8 @@ function Progress() {
 
             </div>
 
-            <div className="progress-v4-goal-footer">
+
+            <div className="v2p-goal-footer">
 
               <span>
                 0m
@@ -2182,38 +2186,40 @@ function Progress() {
 
           </section>
 
-          {/* ===============================================
-              MAIN GRID
-          =============================================== */}
 
-          <section className="progress-v4-main-grid">
+          {/* =================================================
+              WEEK
+              ================================================= */}
 
-            {/* =============================================
-                WEEK CHART
-            ============================================== */}
+          <section className="v2p-main-grid">
 
-            <div className="dashboard-card progress-v4-panel">
+            <article className="v2p-panel">
 
-              <div className="progress-v4-section-header">
+              <div className="v2p-panel-header">
 
                 <div>
 
-                  <span className="progress-v4-eyebrow">
-                    FOCUS TREND
+                  <span className="v2p-eyebrow">
+                    Focus trend
                   </span>
 
                   <h2>
                     Last 7 days
                   </h2>
 
+                  <p>
+                    Daily focused study time.
+                  </p>
+
                 </div>
 
+
                 <div
-                  className={`progress-v4-trend trend-${weekTrend.direction}`}
+                  className={`v2p-trend is-${weekTrend.direction}`}
                 >
 
                   <TrendIcon
-                    size={14}
+                    size={16}
                   />
 
                   <span>
@@ -2227,7 +2233,8 @@ function Progress() {
 
               </div>
 
-              <div className="progress-v4-chart">
+
+              <div className="v2p-chart">
 
                 {weekActivity.map(
                   (
@@ -2237,7 +2244,7 @@ function Progress() {
                       day.focusSeconds >
                       0
                         ? Math.max(
-                            5,
+                            6,
                             (
                               day.focusSeconds /
                               chartMax
@@ -2248,27 +2255,28 @@ function Progress() {
 
                     return (
                       <div
-                        className="progress-v4-chart-column"
+                        className="v2p-chart-column"
                         key={
                           day.key
                         }
                       >
 
-                        <span className="progress-v4-chart-value">
+                        <span className="v2p-chart-value">
                           {day.focusSeconds >
                           0
                             ? formatChartValue(
                                 day.focusSeconds
                               )
-                            : ""}
+                            : "0"}
                         </span>
 
-                        <div className="progress-v4-chart-track">
+
+                        <div className="v2p-chart-track">
 
                           <div
-                            className={`progress-v4-chart-bar ${
+                            className={`v2p-chart-bar ${
                               day.isToday
-                                ? "today"
+                                ? "is-today"
                                 : ""
                             }`}
                             style={{
@@ -2279,10 +2287,11 @@ function Progress() {
 
                         </div>
 
+
                         <strong
                           className={
                             day.isToday
-                              ? "today"
+                              ? "is-today"
                               : ""
                           }
                         >
@@ -2300,20 +2309,17 @@ function Progress() {
 
               </div>
 
-            </div>
+            </article>
 
-            {/* =============================================
-                SESSION SUMMARY
-            ============================================== */}
 
-            <div className="dashboard-card progress-v4-panel">
+            <article className="v2p-panel v2p-overview">
 
-              <div className="progress-v4-section-header">
+              <div className="v2p-panel-header">
 
                 <div>
 
-                  <span className="progress-v4-eyebrow">
-                    FOCUS SESSIONS
+                  <span className="v2p-eyebrow">
+                    Focus sessions
                   </span>
 
                   <h2>
@@ -2323,12 +2329,13 @@ function Progress() {
                 </div>
 
                 <Clock3
-                  size={18}
+                  size={20}
                 />
 
               </div>
 
-              <div className="progress-v4-big-number">
+
+              <div className="v2p-total-focus">
 
                 <strong>
                   {formatStudyTime(
@@ -2337,12 +2344,13 @@ function Progress() {
                 </strong>
 
                 <span>
-                  total Focus time
+                  total focus time
                 </span>
 
               </div>
 
-              <div className="progress-v4-overview-list">
+
+              <div className="v2p-overview-list">
 
                 <div>
                   <span>
@@ -2353,6 +2361,7 @@ function Progress() {
                     {validSessions.length}
                   </strong>
                 </div>
+
 
                 <div>
                   <span>
@@ -2366,6 +2375,7 @@ function Progress() {
                   </strong>
                 </div>
 
+
                 <div>
                   <span>
                     Longest
@@ -2377,6 +2387,7 @@ function Progress() {
                     )}
                   </strong>
                 </div>
+
 
                 <div>
                   <span>
@@ -2401,20 +2412,21 @@ function Progress() {
 
               </div>
 
-            </div>
+            </article>
 
           </section>
 
-          {/* ===============================================
-              INSIGHTS
-          =============================================== */}
 
-          <section className="progress-v4-insights">
+          {/* =================================================
+              INSIGHTS
+              ================================================= */}
+
+          <section className="v2p-insights">
 
             <ProgressInsight
               icon={
                 <CalendarCheck2
-                  size={18}
+                  size={19}
                 />
               }
               label="Active days"
@@ -2422,26 +2434,28 @@ function Progress() {
               description="Study activity in last 30 days"
             />
 
+
             <ProgressInsight
               icon={
                 <Target
-                  size={18}
+                  size={19}
                 />
               }
               label="Goal days"
               value={
                 goalDays
               }
-              description="Days daily Focus goal was reached"
+              description="Days your daily focus goal was reached"
             />
+
 
             <ProgressInsight
               icon={
                 <Award
-                  size={18}
+                  size={19}
                 />
               }
-              label="Best Focus day"
+              label="Best focus day"
               value={
                 bestDay.seconds >
                 0
@@ -2462,14 +2476,15 @@ function Progress() {
                           "short",
                       }
                     )
-                  : "No Focus data yet"
+                  : "No focus data yet"
               }
             />
+
 
             <ProgressInsight
               icon={
                 <TrendingUp
-                  size={18}
+                  size={19}
                 />
               }
               label="Weekly direction"
@@ -2489,34 +2504,40 @@ function Progress() {
 
           </section>
 
-          {/* ===============================================
+
+          {/* =================================================
               CONSISTENCY
-          =============================================== */}
+              ================================================= */}
 
-          <section className="dashboard-card progress-v4-panel progress-v4-consistency-card">
+          <section className="v2p-panel v2p-consistency">
 
-            <div className="progress-v4-section-header">
+            <div className="v2p-panel-header">
 
               <div>
 
-                <span className="progress-v4-eyebrow">
-                  CONSISTENCY
+                <span className="v2p-eyebrow">
+                  Consistency
                 </span>
 
                 <h2>
                   Last 30 days
                 </h2>
 
+                <p>
+                  Focus and completed-task activity.
+                </p>
+
               </div>
 
-              <span className="progress-v4-consistency-count">
-                {active30Days}
-                {" active days"}
+
+              <span className="v2p-count-badge">
+                {active30Days} active days
               </span>
 
             </div>
 
-            <div className="progress-v4-heatmap">
+
+            <div className="v2p-heatmap">
 
               {consistencyDays.map(
                 (
@@ -2526,7 +2547,7 @@ function Progress() {
                     key={
                       day.key
                     }
-                    className={`progress-v4-heatmap-day level-${day.level}`}
+                    className={`v2p-heatmap-day level-${day.level}`}
                     title={`${day.date.toLocaleDateString(
                       "en-IN",
                       {
@@ -2545,16 +2566,19 @@ function Progress() {
                         : "tasks"
                     }`}
                   >
+
                     <span>
                       {day.date.getDate()}
                     </span>
+
                   </div>
                 )
               )}
 
             </div>
 
-            <div className="progress-v4-heatmap-legend">
+
+            <div className="v2p-heatmap-legend">
 
               <span>
                 Less
@@ -2574,210 +2598,332 @@ function Progress() {
 
           </section>
 
-          {/* ===============================================
-              SUBJECT + SIDE STACK
-          =============================================== */}
 
-          <section className="progress-v4-subject-grid">
+          {/* =================================================
+              LOWER FLOW
+              ================================================= */}
 
-            {/* =============================================
-                SUBJECT PERFORMANCE
-            ============================================== */}
+          <section className="v2p-lower-grid">
 
-            <div className="dashboard-card progress-v4-panel">
+            {/* LEFT COLUMN */}
 
-              <div className="progress-v4-section-header">
+            <div className="v2p-lower-column">
 
-                <div>
+              {/* SUBJECT DISTRIBUTION */}
 
-                  <span className="progress-v4-eyebrow">
-                    SUBJECTS
-                  </span>
+              <article className="v2p-panel">
 
-                  <h2>
-                    Study distribution
-                  </h2>
+                <div className="v2p-panel-header">
+
+                  <div>
+
+                    <span className="v2p-eyebrow">
+                      Subjects
+                    </span>
+
+                    <h2>
+                      Study distribution
+                    </h2>
+
+                    <p>
+                      Where your focused time is going.
+                    </p>
+
+                  </div>
+
+
+                  {topSubject && (
+                    <span className="v2p-top-subject">
+
+                      <BookOpen
+                        size={14}
+                      />
+
+                      {topSubject.name}
+
+                    </span>
+                  )}
 
                 </div>
 
-                {topSubject && (
-                  <span className="progress-v4-top-subject">
 
-                    <BookOpen
-                      size={13}
-                    />
+                {subjectBreakdown.length ===
+                0 ? (
 
-                    {topSubject.name}
+                  <ProgressEmpty
+                    icon={
+                      <BookOpen
+                        size={26}
+                      />
+                    }
+                    title="No subject activity"
+                    text="Link focus sessions, tasks or notes to subjects to build this view."
+                  />
 
-                  </span>
-                )}
+                ) : (
 
-              </div>
+                  <div className="v2p-subject-list">
 
-              {subjectBreakdown.length ===
-              0 ? (
+                    {subjectBreakdown.map(
+                      (
+                        subject
+                      ) => {
+                        const focusPercent =
+                          totalSubjectFocus >
+                          0
+                            ? Math.round(
+                                (
+                                  subject.focusSeconds /
+                                  totalSubjectFocus
+                                ) *
+                                  100
+                              )
+                            : 0;
 
-                <ProgressEmpty
-                  icon={
-                    <BookOpen
-                      size={24}
-                    />
-                  }
-                  title="No subject activity"
-                  text="Link Focus sessions, tasks or notes to subjects to see their study profile here."
-                />
 
-              ) : (
+                        const taskPercent =
+                          subject.tasks >
+                          0
+                            ? Math.round(
+                                (
+                                  subject.completedTasks /
+                                  subject.tasks
+                                ) *
+                                  100
+                              )
+                            : 0;
 
-                <div className="progress-v4-subject-list">
 
-                  {subjectBreakdown.map(
-                    (
-                      subject
-                    ) => {
-                      const focusPercent =
-                        totalSubjectFocus >
-                        0
-                          ? Math.round(
-                              (
-                                subject.focusSeconds /
-                                totalSubjectFocus
-                              ) *
-                                100
-                            )
-                          : 0;
+                        return (
+                          <div
+                            className="v2p-subject"
+                            key={
+                              subject.id
+                            }
+                            style={{
+                              "--subject-progress-color":
+                                subject.color,
+                            }}
+                          >
 
-                      const taskPercent =
-                        subject.tasks >
-                        0
-                          ? Math.round(
-                              (
-                                subject.completedTasks /
-                                subject.tasks
-                              ) *
-                                100
-                            )
-                          : 0;
+                            <div className="v2p-subject-top">
 
-                      return (
-                        <div
-                          className="progress-v4-subject-row"
-                          key={
-                            subject.id
-                          }
-                          style={{
-                            "--progress-subject-color":
-                              subject.color,
-                          }}
-                        >
+                              <div className="v2p-subject-name">
 
-                          <div className="progress-v4-subject-top">
+                                <span className="v2p-subject-dot" />
 
-                            <div className="progress-v4-subject-name">
 
-                              <span className="progress-v4-subject-dot" />
+                                <div>
 
-                              <div>
+                                  <strong>
+                                    {subject.name}
+                                  </strong>
+
+                                  <span>
+                                    {subject.sessions}{" "}
+                                    {subject.sessions ===
+                                    1
+                                      ? "session"
+                                      : "sessions"}
+                                    {" · "}
+                                    {subject.notes}{" "}
+                                    {subject.notes ===
+                                    1
+                                      ? "note"
+                                      : "notes"}
+                                  </span>
+
+                                </div>
+
+                              </div>
+
+
+                              <div className="v2p-subject-focus">
+
                                 <strong>
-                                  {subject.name}
+                                  {formatStudyTime(
+                                    subject.focusSeconds
+                                  )}
                                 </strong>
 
                                 <span>
-                                  {subject.sessions}
-                                  {" "}
-                                  {subject.sessions ===
-                                  1
-                                    ? "session"
-                                    : "sessions"}
-
-                                  {" · "}
-
-                                  {subject.notes}
-                                  {" "}
-                                  {subject.notes ===
-                                  1
-                                    ? "note"
-                                    : "notes"}
+                                  {focusPercent}%
                                 </span>
+
                               </div>
 
                             </div>
 
-                            <div className="progress-v4-subject-focus">
 
-                              <strong>
-                                {formatStudyTime(
-                                  subject.focusSeconds
-                                )}
-                              </strong>
+                            <div className="v2p-subject-track">
+
+                              <div
+                                style={{
+                                  width:
+                                    `${focusPercent}%`,
+                                }}
+                              />
+
+                            </div>
+
+
+                            <div className="v2p-subject-meta">
 
                               <span>
-                                {focusPercent}%
+
+                                <CheckCircle2
+                                  size={14}
+                                />
+
+                                {subject.completedTasks}
+                                /
+                                {subject.tasks}
+                                {" tasks"}
+
+                              </span>
+
+                              <span>
+                                {subject.tasks >
+                                0
+                                  ? `${taskPercent}% completion`
+                                  : "No linked tasks"}
                               </span>
 
                             </div>
 
                           </div>
+                        );
+                      }
+                    )}
 
-                          <div className="progress-v4-subject-track">
+                  </div>
+                )}
 
-                            <div
-                              style={{
-                                width:
-                                  `${focusPercent}%`,
-                              }}
-                            />
+              </article>
 
-                          </div>
 
-                          <div className="progress-v4-subject-meta">
+              {/* RECENT ACTIVITY */}
 
-                            <span>
-                              <CheckCircle2
-                                size={12}
-                              />
+              <article className="v2p-panel">
 
-                              {subject.completedTasks}
-                              /
-                              {subject.tasks}
-                              {" tasks"}
-                            </span>
-
-                            <span>
-                              {subject.tasks >
-                              0
-                                ? `${taskPercent}% completion`
-                                : "No linked tasks"}
-                            </span>
-
-                          </div>
-
-                        </div>
-                      );
-                    }
-                  )}
-
-                </div>
-              )}
-
-            </div>
-
-            {/* =============================================
-                RIGHT STACK
-            ============================================== */}
-
-            <div className="progress-v4-side-stack">
-
-              {/* TASKS */}
-
-              <div className="dashboard-card progress-v4-panel progress-v4-task-card">
-
-                <div className="progress-v4-section-header">
+                <div className="v2p-panel-header">
 
                   <div>
 
-                    <span className="progress-v4-eyebrow">
-                      TASKS
+                    <span className="v2p-eyebrow">
+                      Recent
+                    </span>
+
+                    <h2>
+                      Study activity
+                    </h2>
+
+                    <p>
+                      Your latest focus sessions and completed tasks.
+                    </p>
+
+                  </div>
+
+
+                  <Activity
+                    size={20}
+                  />
+
+                </div>
+
+
+                {recentActivity.length ===
+                0 ? (
+
+                  <ProgressEmpty
+                    icon={
+                      <Activity
+                        size={26}
+                      />
+                    }
+                    title="No activity yet"
+                    text="Focus sessions and completed tasks will appear here."
+                  />
+
+                ) : (
+
+                  <div className="v2p-recent-list">
+
+                    {recentActivity.map(
+                      (
+                        item
+                      ) => {
+                        const ItemIcon =
+                          item.type ===
+                          "session"
+                            ? Timer
+                            : CheckCircle2;
+
+                        return (
+                          <div
+                            className="v2p-recent-item"
+                            key={
+                              item.id
+                            }
+                          >
+
+                            <span
+                              className={`v2p-recent-icon is-${item.type}`}
+                            >
+
+                              <ItemIcon
+                                size={16}
+                              />
+
+                            </span>
+
+
+                            <div className="v2p-recent-copy">
+
+                              <strong>
+                                {item.title}
+                              </strong>
+
+                              <span>
+                                {formatRelativeActivity(
+                                  item.date
+                                )}
+                              </span>
+
+                            </div>
+
+
+                            <strong className="v2p-recent-meta">
+                              {item.meta}
+                            </strong>
+
+                          </div>
+                        );
+                      }
+                    )}
+
+                  </div>
+                )}
+
+              </article>
+
+            </div>
+
+
+            {/* RIGHT COLUMN */}
+
+            <div className="v2p-lower-column">
+
+              {/* TASKS */}
+
+              <article className="v2p-panel">
+
+                <div className="v2p-panel-header">
+
+                  <div>
+
+                    <span className="v2p-eyebrow">
+                      Tasks
                     </span>
 
                     <h2>
@@ -2786,13 +2932,15 @@ function Progress() {
 
                   </div>
 
-                  <span className="progress-v4-rate-badge">
+
+                  <span className="v2p-rate">
                     {completionRate}%
                   </span>
 
                 </div>
 
-                <div className="progress-v4-task-track">
+
+                <div className="v2p-task-track">
 
                   <div
                     style={{
@@ -2803,7 +2951,8 @@ function Progress() {
 
                 </div>
 
-                <div className="progress-v4-task-grid">
+
+                <div className="v2p-small-grid">
 
                   <div>
                     <span>
@@ -2815,6 +2964,7 @@ function Progress() {
                     </strong>
                   </div>
 
+
                   <div>
                     <span>
                       Completed
@@ -2825,6 +2975,7 @@ function Progress() {
                     </strong>
                   </div>
 
+
                   <div>
                     <span>
                       Pending
@@ -2834,6 +2985,7 @@ function Progress() {
                       {pendingCount}
                     </strong>
                   </div>
+
 
                   <div>
                     <span>
@@ -2847,18 +2999,19 @@ function Progress() {
 
                 </div>
 
-              </div>
+              </article>
+
 
               {/* NOTES */}
 
-              <div className="dashboard-card progress-v4-panel progress-v4-notes-card">
+              <article className="v2p-panel">
 
-                <div className="progress-v4-section-header">
+                <div className="v2p-panel-header">
 
                   <div>
 
-                    <span className="progress-v4-eyebrow">
-                      NOTES
+                    <span className="v2p-eyebrow">
+                      Notes
                     </span>
 
                     <h2>
@@ -2867,18 +3020,20 @@ function Progress() {
 
                   </div>
 
+
                   <FileText
-                    size={18}
+                    size={20}
                   />
 
                 </div>
 
-                <div className="progress-v4-note-grid">
+
+                <div className="v2p-note-grid">
 
                   <div>
 
                     <FileText
-                      size={15}
+                      size={17}
                     />
 
                     <span>
@@ -2891,10 +3046,11 @@ function Progress() {
 
                   </div>
 
+
                   <div>
 
                     <Link2
-                      size={15}
+                      size={17}
                     />
 
                     <span>
@@ -2907,10 +3063,11 @@ function Progress() {
 
                   </div>
 
+
                   <div>
 
                     <Pin
-                      size={15}
+                      size={17}
                     />
 
                     <span>
@@ -2923,10 +3080,11 @@ function Progress() {
 
                   </div>
 
+
                   <div>
 
                     <TrendingUp
-                      size={15}
+                      size={17}
                     />
 
                     <span>
@@ -2941,176 +3099,75 @@ function Progress() {
 
                 </div>
 
-              </div>
+              </article>
 
-            </div>
 
-          </section>
+              {/* STUDYOS INSIGHT */}
 
-          {/* ===============================================
-              RECENT + INSIGHT
-          =============================================== */}
+              <article className="v2p-study-insight">
 
-          <section className="progress-v4-activity-insight-grid">
+                <span className="v2p-study-insight-icon">
 
-            {/* RECENT */}
+                  <InsightIcon
+                    size={24}
+                  />
 
-            <div className="dashboard-card progress-v4-panel">
+                </span>
 
-              <div className="progress-v4-section-header">
 
-                <div>
+                <div className="v2p-study-insight-copy">
 
-                  <span className="progress-v4-eyebrow">
-                    RECENT
+                  <span className="v2p-eyebrow">
+                    StudyOS insight
                   </span>
 
                   <h2>
-                    Study activity
+                    {insight.title}
                   </h2>
 
+                  <p>
+                    {insight.text}
+                  </p>
+
                 </div>
 
-                <Activity
-                  size={18}
-                />
 
-              </div>
+                <div className="v2p-study-insight-footer">
 
-              {recentActivity.length ===
-              0 ? (
+                  <span>
 
-                <ProgressEmpty
-                  icon={
-                    <Activity
-                      size={24}
+                    <BarChart3
+                      size={15}
                     />
-                  }
-                  title="No activity yet"
-                  text="Focus sessions and completed tasks will appear here."
-                />
 
-              ) : (
+                    Total focus
 
-                <div className="progress-v4-recent-list">
+                    <strong>
+                      {formatStudyTime(
+                        totalStudySeconds
+                      )}
+                    </strong>
 
-                  {recentActivity.map(
-                    (
-                      item
-                    ) => {
-                      const ItemIcon =
-                        item.type ===
-                        "session"
-                          ? Timer
-                          : CheckCircle2;
+                  </span>
 
-                      return (
-                        <div
-                          className="progress-v4-recent-item"
-                          key={
-                            item.id
-                          }
-                        >
 
-                          <span
-                            className={`progress-v4-recent-icon ${item.type}`}
-                          >
+                  <span>
 
-                            <ItemIcon
-                              size={15}
-                            />
+                    <CheckCircle2
+                      size={15}
+                    />
 
-                          </span>
+                    Completed
 
-                          <div className="progress-v4-recent-copy">
+                    <strong>
+                      {completedCount}
+                    </strong>
 
-                            <strong>
-                              {item.title}
-                            </strong>
-
-                            <span>
-                              {formatRelativeActivity(
-                                item.date
-                              )}
-                            </span>
-
-                          </div>
-
-                          <strong className="progress-v4-recent-meta">
-                            {item.meta}
-                          </strong>
-
-                        </div>
-                      );
-                    }
-                  )}
+                  </span>
 
                 </div>
-              )}
 
-            </div>
-
-            {/* INSIGHT */}
-
-            <div className="progress-v4-insight-card">
-
-              <span className="progress-v4-insight-icon">
-
-                <InsightIcon
-                  size={22}
-                />
-
-              </span>
-
-              <div className="progress-v4-insight-copy">
-
-                <span className="progress-v4-eyebrow">
-                  STUDYOS INSIGHT
-                </span>
-
-                <h2>
-                  {insight.title}
-                </h2>
-
-                <p>
-                  {insight.text}
-                </p>
-
-              </div>
-
-              <div className="progress-v4-insight-footer">
-
-                <span>
-
-                  <BarChart3
-                    size={13}
-                  />
-
-                  Total Focus
-
-                  <strong>
-                    {formatStudyTime(
-                      totalStudySeconds
-                    )}
-                  </strong>
-
-                </span>
-
-                <span>
-
-                  <CheckCircle2
-                    size={13}
-                  />
-
-                  Completed
-
-                  <strong>
-                    {completedCount}
-                  </strong>
-
-                </span>
-
-              </div>
+              </article>
 
             </div>
 
@@ -3122,6 +3179,7 @@ function Progress() {
     </div>
   );
 }
+
 
 // =========================================================
 // HERO STAT
@@ -3135,15 +3193,16 @@ function ProgressStat({
   trend,
 }) {
   return (
-    <div className="progress-v4-stat">
+    <article className="v2p-stat">
 
-      <span className="progress-v4-stat-icon">
+      <span className="v2p-stat-icon">
         {icon}
       </span>
 
+
       <div>
 
-        <span>
+        <span className="v2p-stat-label">
           {label}
         </span>
 
@@ -3154,7 +3213,7 @@ function ProgressStat({
         <small
           className={
             trend
-              ? `trend-${trend}`
+              ? `is-${trend}`
               : ""
           }
         >
@@ -3163,12 +3222,13 @@ function ProgressStat({
 
       </div>
 
-    </div>
+    </article>
   );
 }
 
+
 // =========================================================
-// SMALL INSIGHT
+// INSIGHT
 // =========================================================
 
 function ProgressInsight({
@@ -3178,11 +3238,12 @@ function ProgressInsight({
   description,
 }) {
   return (
-    <div className="progress-v4-insight">
+    <article className="v2p-insight">
 
-      <span className="progress-v4-insight-small-icon">
+      <span className="v2p-insight-icon">
         {icon}
       </span>
+
 
       <div>
 
@@ -3200,9 +3261,10 @@ function ProgressInsight({
 
       </div>
 
-    </div>
+    </article>
   );
 }
+
 
 // =========================================================
 // EMPTY
@@ -3214,7 +3276,7 @@ function ProgressEmpty({
   text,
 }) {
   return (
-    <div className="progress-v4-empty">
+    <div className="v2p-empty">
 
       {icon}
 
@@ -3229,5 +3291,6 @@ function ProgressEmpty({
     </div>
   );
 }
+
 
 export default Progress;

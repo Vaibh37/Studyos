@@ -1,6 +1,662 @@
 /* =========================================================
-   STUDYOS SETTINGS — MOBILE NAV + CUSTOM SELECT
-========================================================= */
+   STUDYOS V2 — SETTINGS
+   COMPLETE DESKTOP + TABLET + MOBILE
+   ========================================================= */
+
+
+/* =========================================================
+   LEGACY RESET
+   ========================================================= */
+
+.settings-v2-page,
+.settings-v2-page *,
+.settings-v2-page *::before,
+.settings-v2-page *::after {
+  box-sizing: border-box;
+
+  background-image:
+    none !important;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.settings-v2-page {
+  width: 100%;
+  max-width: 1380px;
+
+  margin: 0 auto;
+
+  color:
+    var(--color-text);
+
+  background:
+    transparent;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-header {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 28px;
+
+  margin-bottom: 30px;
+}
+
+.settings-v2-page
+.settings-v2-header
+> div:first-child {
+  min-width: 0;
+}
+
+.settings-v2-page
+.settings-v2-eyebrow {
+  display: block;
+
+  margin: 0;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.3;
+
+  letter-spacing:
+    0.09em;
+
+  text-transform:
+    uppercase;
+}
+
+.settings-v2-page
+.settings-v2-header h1 {
+  margin:
+    6px
+    0
+    10px;
+
+  color:
+    var(--color-text);
+
+  font-size:
+    clamp(
+      36px,
+      4vw,
+      42px
+    );
+
+  font-weight: 600;
+
+  line-height: 1.08;
+
+  letter-spacing:
+    -0.045em;
+}
+
+.settings-v2-page
+.settings-v2-header
+> div:first-child
+> p:last-child {
+  max-width: 720px;
+
+  margin: 0;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 15px;
+
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   API STATUS
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-api-pill {
+  display: inline-flex;
+
+  min-height: 36px;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding:
+    0
+    11px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 999px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.settings-v2-page
+.settings-v2-status-dot {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 auto;
+
+  border-radius: 999px;
+
+  background:
+    var(--color-text-faint);
+}
+
+.settings-v2-page
+.settings-v2-api-online
+.settings-v2-status-dot,
+.settings-v2-page
+.settings-v2-backend-online
+.settings-v2-status-dot {
+  background:
+    var(--color-success);
+}
+
+.settings-v2-page
+.settings-v2-api-offline
+.settings-v2-status-dot,
+.settings-v2-page
+.settings-v2-backend-offline
+.settings-v2-status-dot {
+  background:
+    var(--color-danger);
+}
+
+.settings-v2-page
+.settings-v2-api-checking
+.settings-v2-status-dot,
+.settings-v2-page
+.settings-v2-backend-checking
+.settings-v2-status-dot {
+  background:
+    var(--color-warning);
+}
+
+
+/* =========================================================
+   NOTICES
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-notice {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+
+  padding:
+    12px
+    14px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+}
+
+.settings-v2-page
+.settings-v2-notice-success {
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-success)
+      30%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-success-bg);
+
+  color:
+    var(--color-success);
+}
+
+.settings-v2-page
+.settings-v2-notice-error {
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-danger)
+      30%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-danger-bg);
+
+  color:
+    var(--color-danger);
+}
+
+.settings-v2-page
+.settings-v2-notice-error
+> div {
+  display: flex;
+
+  min-width: 0;
+
+  flex: 1;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.settings-v2-page
+.settings-v2-notice-error strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-notice-error button {
+  flex: 0 0 auto;
+
+  padding:
+    7px
+    10px;
+
+  border-radius: 7px;
+
+  color:
+    var(--color-danger);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   SHELL
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-shell {
+  display: grid;
+
+  grid-template-columns:
+    250px
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items: start;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 12px;
+
+  background:
+    var(--color-surface);
+}
+
+
+/* =========================================================
+   SETTINGS NAV
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-nav {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  padding: 16px;
+
+  border-right:
+    1px solid
+    var(--color-border);
+
+  background:
+    var(--color-surface-subtle);
+}
+
+.settings-v2-page
+.settings-v2-nav-heading {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  min-height: 42px;
+
+  padding:
+    0
+    8px
+    12px;
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.settings-v2-page
+.settings-v2-nav-heading
+> span {
+  color:
+    var(--color-text);
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-nav-heading
+> small {
+  color:
+    var(--color-text-muted);
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   NAV LIST
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-nav-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding:
+    12px
+    0;
+}
+
+.settings-v2-page
+.settings-v2-nav-item {
+  display: grid;
+
+  width: 100%;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items: center;
+
+  gap: 10px;
+
+  min-height: 54px;
+
+  padding:
+    8px
+    10px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius: 8px;
+
+  background:
+    transparent;
+
+  color:
+    var(--color-text-secondary);
+
+  text-align: left;
+
+  transition:
+    background
+    var(--transition-fast),
+    border-color
+    var(--transition-fast),
+    color
+    var(--transition-fast);
+}
+
+.settings-v2-page
+.settings-v2-nav-item:hover {
+  background:
+    var(--color-surface-hover);
+
+  color:
+    var(--color-text);
+}
+
+.settings-v2-page
+.settings-v2-nav-item.active {
+  border-color:
+    var(--color-solid);
+
+  background:
+    var(--color-solid);
+
+  color:
+    var(--color-solid-text);
+}
+
+.settings-v2-page
+.settings-v2-nav-icon {
+  display: inline-flex;
+
+  width: 34px;
+  height: 34px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text-muted);
+}
+
+.settings-v2-page
+.settings-v2-nav-item.active
+.settings-v2-nav-icon {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-solid-text)
+      18%,
+      transparent
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      var(--color-solid-text)
+      8%,
+      transparent
+    );
+
+  color:
+    var(--color-solid-text);
+}
+
+.settings-v2-page
+.settings-v2-nav-copy {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+}
+
+.settings-v2-page
+.settings-v2-nav-copy strong {
+  color: inherit;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.3;
+}
+
+.settings-v2-page
+.settings-v2-nav-copy small {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.settings-v2-page
+.settings-v2-nav-item.active
+.settings-v2-nav-copy small {
+  color:
+    color-mix(
+      in srgb,
+      var(--color-solid-text)
+      64%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   NAV FOOTER
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-nav-footer {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 8px;
+
+  padding:
+    15px
+    8px
+    2px;
+
+  border-top:
+    1px solid
+    var(--color-border);
+}
+
+.settings-v2-page
+.settings-v2-nav-footer-mark {
+  display: inline-flex;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-v2-page
+.settings-v2-nav-footer
+> div:last-child {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+}
+
+.settings-v2-page
+.settings-v2-nav-footer strong {
+  color:
+    var(--color-text);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-nav-footer span {
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 10px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   MOBILE PICKER
+   ========================================================= */
 
 .settings-v2-mobile-picker {
   display: none;
@@ -8,89 +664,1865 @@
 
 
 /* =========================================================
-   STARTUP PAGE CUSTOM SELECT
-========================================================= */
+   CONTENT
+   ========================================================= */
 
-.settings-v2-startup-select {
-  width: 190px;
+.settings-v2-page
+.settings-v2-content {
+  min-width: 0;
+
+  padding:
+    26px
+    28px;
+
+  background:
+    var(--color-surface);
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-section-heading {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 24px;
+
+  padding-bottom: 20px;
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.settings-v2-page
+.settings-v2-section-icon {
+  display: inline-flex;
+
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 9px;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text);
+}
+
+.settings-v2-page
+.settings-v2-section-heading
+h2 {
+  color:
+    var(--color-text);
+
+  font-size: 22px;
+  font-weight: 600;
+
+  line-height: 1.2;
+
+  letter-spacing:
+    -0.03em;
+}
+
+.settings-v2-page
+.settings-v2-section-heading
+p {
+  margin-top: 4px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   SECTION STACK
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-section-stack {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-panel {
+  min-width: 0;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 11px;
+
+  background:
+    var(--color-surface);
+}
+
+
+/* =========================================================
+   PANEL HEADER
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-panel-header {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding:
+    19px
+    20px;
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+
+  background:
+    var(--color-surface);
+}
+
+.settings-v2-page
+.settings-v2-panel-header
+> div {
   min-width: 0;
 }
 
+.settings-v2-page
+.settings-v2-panel-header h3 {
+  color:
+    var(--color-text);
+
+  font-size: 16px;
+  font-weight: 600;
+
+  line-height: 1.35;
+
+  letter-spacing:
+    -0.015em;
+}
+
+.settings-v2-page
+.settings-v2-panel-header p {
+  max-width: 650px;
+
+  margin-top: 5px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.settings-v2-page
+.settings-v2-panel-header
+> svg {
+  flex: 0 0 auto;
+
+  color:
+    var(--color-text-muted);
+}
+
+
+/* =========================================================
+   ROWS
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-row {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 22px;
+
+  min-height: 76px;
+
+  padding:
+    16px
+    20px;
+
+  border-bottom:
+    1px solid
+    var(--color-border);
+}
+
+.settings-v2-page
+.settings-v2-panel
+> .settings-v2-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-v2-page
+.settings-v2-row-copy {
+  display: flex;
+
+  min-width: 0;
+
+  flex: 1;
+  flex-direction: column;
+}
+
+.settings-v2-page
+.settings-v2-row-copy strong {
+  color:
+    var(--color-text);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+.settings-v2-page
+.settings-v2-row-copy
+> span:not(.settings-v2-status-badge) {
+  max-width: 620px;
+
+  margin-top: 4px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.settings-v2-page
+.settings-v2-row-actions {
+  display: flex;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-primary-button,
+.settings-v2-page
+.settings-v2-secondary-button,
+.settings-v2-page
+.settings-v2-danger-outline,
+.settings-v2-page
+.settings-v2-danger-solid {
+  display: inline-flex;
+
+  min-height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding:
+    0
+    14px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  transition:
+    background
+    var(--transition-fast),
+    border-color
+    var(--transition-fast),
+    color
+    var(--transition-fast);
+}
+
+.settings-v2-page
+.settings-v2-primary-button {
+  border:
+    1px solid
+    var(--color-solid);
+
+  background:
+    var(--color-solid);
+
+  color:
+    var(--color-solid-text);
+}
+
+.settings-v2-page
+.settings-v2-primary-button:hover:not(:disabled) {
+  background:
+    var(--color-solid-hover);
+}
+
+.settings-v2-page
+.settings-v2-secondary-button {
+  border:
+    1px solid
+    var(--color-border);
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text-secondary);
+}
+
+.settings-v2-page
+.settings-v2-secondary-button:hover:not(:disabled) {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface-hover);
+
+  color:
+    var(--color-text);
+}
+
+.settings-v2-page
+.settings-v2-danger-outline {
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-danger)
+      38%,
+      var(--color-border)
+    );
+
+  background:
+    transparent;
+
+  color:
+    var(--color-danger);
+}
+
+.settings-v2-page
+.settings-v2-danger-outline:hover:not(:disabled) {
+  background:
+    var(--color-danger-bg);
+}
+
+.settings-v2-page
+.settings-v2-danger-solid {
+  border:
+    1px solid
+    var(--color-danger);
+
+  background:
+    var(--color-danger);
+
+  color: #ffffff;
+}
+
+.settings-v2-page
+button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.52;
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
+
+  padding: 20px;
+}
+
+.settings-v2-page
+.settings-v2-field {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.settings-v2-page
+.settings-v2-field
+> span {
+  color:
+    var(--color-text);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-field
+> small {
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+.settings-v2-page
+.settings-v2-field
+> input,
+.settings-v2-page
+.settings-v2-delete-field
+input {
+  width: 100%;
+  min-height: 44px;
+
+  padding:
+    0
+    12px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  outline: 0;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text);
+
+  font-family:
+    var(--font-sans);
+
+  font-size: 14px;
+
+  transition:
+    border-color
+    var(--transition-fast),
+    background
+    var(--transition-fast);
+}
+
+.settings-v2-page
+.settings-v2-field
+> input:focus,
+.settings-v2-page
+.settings-v2-delete-field
+input:focus {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface);
+}
+
+.settings-v2-page
+.settings-v2-field
+input::placeholder,
+.settings-v2-page
+.settings-v2-delete-field
+input::placeholder {
+  color:
+    var(--color-text-faint);
+}
+
+
+/* =========================================================
+   UNIT INPUT
+   ========================================================= */
+
+.settings-v2-page
+.settings-v3-unit-field {
+  display: flex;
+
+  width: 100%;
+
+  align-items: center;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--color-surface-subtle);
+}
+
+.settings-v2-page
+.settings-v3-unit-field:focus-within {
+  border-color:
+    var(--color-border-strong);
+}
+
+.settings-v2-page
+.settings-v3-unit-field input {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+
+  padding:
+    0
+    12px;
+
+  border: 0;
+
+  outline: 0;
+
+  background:
+    transparent;
+
+  color:
+    var(--color-text);
+
+  font-size: 14px;
+}
+
+.settings-v2-page
+.settings-v3-unit-field
+> span {
+  flex: 0 0 auto;
+
+  padding:
+    0
+    12px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   FORM FOOTER
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-form-footer {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding-top: 4px;
+}
+
+.settings-v2-page
+.settings-v2-form-hint {
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   INFO PANEL
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-info-panel,
+.settings-v2-page
+.settings-v2-warning-panel {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding:
+    14px
+    16px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 9px;
+
+  background:
+    var(--color-surface-subtle);
+}
+
+.settings-v2-page
+.settings-v2-panel
+> .settings-v2-info-panel {
+  margin:
+    16px
+    20px;
+}
+
+.settings-v2-page
+.settings-v2-info-panel
+> svg,
+.settings-v2-page
+.settings-v2-warning-panel
+> svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+
+  color:
+    var(--color-text-muted);
+}
+
+.settings-v2-page
+.settings-v2-info-panel strong,
+.settings-v2-page
+.settings-v2-warning-panel strong {
+  color:
+    var(--color-text);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-info-panel p,
+.settings-v2-page
+.settings-v2-warning-panel p {
+  margin-top: 4px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+
+  line-height: 1.55;
+}
+
+.settings-v2-page
+.settings-v2-warning-panel {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-warning)
+      28%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-warning-bg);
+}
+
+.settings-v2-page
+.settings-v2-warning-panel
+> svg {
+  color:
+    var(--color-warning);
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-status-badge {
+  display: inline-flex;
+
+  min-height: 30px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 999px;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.settings-v2-page
+.settings-v2-notification-granted {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-success)
+      25%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-success-bg);
+
+  color:
+    var(--color-success);
+}
+
+.settings-v2-page
+.settings-v2-notification-denied {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-danger)
+      25%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-danger-bg);
+
+  color:
+    var(--color-danger);
+}
+
+
+/* =========================================================
+   TOGGLE
+   ========================================================= */
+
+.settings-v2-page
+.toggle-button {
+  display: inline-flex;
+
+  min-width: 58px;
+  min-height: 34px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 999px;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.toggle-button:hover:not(:disabled) {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface-hover);
+}
+
+.settings-v2-page
+.toggle-button.on {
+  border-color:
+    var(--color-solid);
+
+  background:
+    var(--color-solid);
+
+  color:
+    var(--color-solid-text);
+}
+
+
+/* =========================================================
+   THEME GRID
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-theme-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 12px;
+
+  padding: 20px;
+}
+
+.settings-v2-page
+.settings-v2-theme-card {
+  position: relative;
+
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  align-items: stretch;
+
+  padding: 12px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 10px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text);
+
+  text-align: left;
+
+  transition:
+    border-color
+    var(--transition-fast),
+    background
+    var(--transition-fast);
+}
+
+.settings-v2-page
+.settings-v2-theme-card:hover {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface-hover);
+}
+
+.settings-v2-page
+.settings-v2-theme-card.active {
+  border-color:
+    var(--color-solid);
+
+  box-shadow:
+    inset
+    0
+    0
+    0
+    1px
+    var(--color-solid);
+}
+
+.settings-v2-page
+.settings-v2-theme-card
+> svg {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  z-index: 2;
+
+  color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   THEME PREVIEW
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-theme-preview {
+  position: relative;
+
+  display: grid;
+
+  height: 120px;
+
+  grid-template-columns:
+    30%
+    1fr;
+
+  gap: 7px;
+
+  margin-bottom: 13px;
+
+  padding: 10px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview-dark {
+  border-color: #303030;
+
+  background: #0a0a0a !important;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview-light {
+  border-color: #dedede;
+
+  background: #ffffff !important;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview
+span {
+  display: block;
+
+  border-radius: 5px;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview
+span:nth-child(1) {
+  grid-row:
+    1 / span 2;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview-dark
+span:nth-child(1) {
+  background: #171717;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview-dark
+span:nth-child(2),
+.settings-v2-page
+.settings-v2-theme-preview-dark
+span:nth-child(3) {
+  background: #242424;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview-light
+span:nth-child(1) {
+  background: #f1f1f1;
+}
+
+.settings-v2-page
+.settings-v2-theme-preview-light
+span:nth-child(2),
+.settings-v2-page
+.settings-v2-theme-preview-light
+span:nth-child(3) {
+  background: #e6e6e6;
+}
+
+
+/* =========================================================
+   THEME COPY
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-theme-copy {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.settings-v2-page
+.settings-v2-theme-icon {
+  display: inline-flex;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text);
+}
+
+.settings-v2-page
+.settings-v2-theme-copy
+> div {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+}
+
+.settings-v2-page
+.settings-v2-theme-copy strong {
+  color:
+    var(--color-text);
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-theme-copy small {
+  margin-top: 2px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   STARTUP SELECT
+   ========================================================= */
+
+.settings-v2-startup-select {
+  width: 210px;
+
+  min-width: 0;
+}
+
+.settings-v2-page
 .settings-v2-startup-select
+.study-select-trigger,
+.settings-v2-page
+.settings-v2-section-select
 .study-select-trigger {
   width: 100%;
   min-height: 42px;
 
   padding:
-    0 12px;
+    0
+    11px;
 
-  border-color:
-    var(--sv2-border-strong);
+  border:
+    1px solid
+    var(--color-border) !important;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
   background:
-    var(--sv2-surface-2);
+    var(--color-surface-subtle) !important;
 
   color:
-    var(--sv2-text);
+    var(--color-text) !important;
 
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.settings-v2-startup-select
-.study-select-trigger:hover:not(:disabled),
-.settings-v2-startup-select
-.study-select-trigger.open {
-  border-color:
-    var(--sv2-accent-border);
-
-  background:
-    var(--sv2-surface-3);
-}
-
-.settings-v2-startup-select
-.study-select-trigger.open {
-  border-color:
-    var(--sv2-accent);
+  font-size: 13px;
 
   box-shadow:
-    0 0 0 3px
+    none !important;
+}
+
+.settings-v2-page
+.settings-v2-startup-select
+.study-select-trigger:hover:not(:disabled),
+.settings-v2-page
+.settings-v2-startup-select
+.study-select-trigger.open,
+.settings-v2-page
+.settings-v2-section-select
+.study-select-trigger:hover:not(:disabled),
+.settings-v2-page
+.settings-v2-section-select
+.study-select-trigger.open {
+  border-color:
+    var(--color-border-strong) !important;
+
+  background:
+    var(--color-surface-hover) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* =========================================================
+   OVERVIEW STATS
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-stat-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 8px;
+
+  padding: 20px;
+}
+
+.settings-v2-page
+.settings-v2-stat-card {
+  min-width: 0;
+
+  padding: 14px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--color-surface-subtle);
+}
+
+.settings-v2-page
+.settings-v2-stat-card
+> span {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.settings-v2-page
+.settings-v2-stat-card strong {
+  display: block;
+
+  margin-top: 10px;
+
+  color:
+    var(--color-text);
+
+  font-size: 22px;
+  font-weight: 600;
+
+  line-height: 1;
+
+  letter-spacing:
+    -0.035em;
+}
+
+
+/* =========================================================
+   DATA LIST
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-data-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 8px;
+
+  padding: 20px;
+}
+
+.settings-v2-page
+.settings-v2-data-item {
+  display: grid;
+
+  min-width: 0;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items: center;
+
+  gap:
+    5px
+    8px;
+
+  padding: 13px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--color-surface-subtle);
+}
+
+.settings-v2-page
+.settings-v2-data-item
+> svg {
+  grid-row:
+    1 / span 2;
+
+  color:
+    var(--color-text-muted);
+}
+
+.settings-v2-page
+.settings-v2-data-item span {
+  overflow: hidden;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.settings-v2-page
+.settings-v2-data-item strong {
+  color:
+    var(--color-text);
+
+  font-size: 17px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   MONO
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-mono {
+  overflow-wrap: anywhere;
+
+  color:
+    var(--color-text-secondary) !important;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  font-size: 12px !important;
+}
+
+
+/* =========================================================
+   DANGER ZONE
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-danger-panel {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding: 20px;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-danger)
+      22%,
+      var(--color-border)
+    );
+
+  border-radius: 11px;
+
+  background:
+    var(--color-surface);
+}
+
+.settings-v2-page
+.settings-v2-danger-panel-critical {
+  background:
+    var(--color-danger-bg);
+}
+
+.settings-v2-page
+.settings-v2-danger-copy {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+.settings-v2-page
+.settings-v2-danger-icon {
+  display: inline-flex;
+
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 auto;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-danger)
+      28%,
+      var(--color-border)
+    );
+
+  border-radius: 9px;
+
+  background:
+    var(--color-danger-bg);
+
+  color:
+    var(--color-danger);
+}
+
+.settings-v2-page
+.settings-v2-danger-copy h3 {
+  color:
+    var(--color-text);
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-v2-page
+.settings-v2-danger-copy p {
+  max-width: 680px;
+
+  margin-top: 5px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.settings-v2-page
+.delete-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 10000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
     rgba(
-      99,
-      102,
-      241,
-      0.1
+      0,
+      0,
+      0,
+      0.6
+    );
+
+  backdrop-filter:
+    blur(
+      3px
     );
 }
 
 
 /* =========================================================
-   TABLET / MOBILE
-========================================================= */
+   MODAL
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-modal {
+  width:
+    min(
+      480px,
+      100%
+    );
+
+  padding: 24px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 12px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text);
+
+  box-shadow:
+    var(--shadow-md);
+}
+
+.settings-v2-page
+.settings-v2-modal-icon {
+  display: inline-flex;
+
+  width: 44px;
+  height: 44px;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 10px;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text);
+}
+
+.settings-v2-page
+.settings-v2-modal-icon-warning {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-warning)
+      28%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-warning-bg);
+
+  color:
+    var(--color-warning);
+}
+
+.settings-v2-page
+.settings-v2-modal-icon-danger {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-danger)
+      28%,
+      var(--color-border)
+    );
+
+  background:
+    var(--color-danger-bg);
+
+  color:
+    var(--color-danger);
+}
+
+.settings-v2-page
+.settings-v2-modal h2 {
+  color:
+    var(--color-text);
+
+  font-size: 21px;
+  font-weight: 600;
+
+  line-height: 1.25;
+
+  letter-spacing:
+    -0.03em;
+}
+
+.settings-v2-page
+.settings-v2-modal
+> p {
+  margin-top: 8px;
+
+  color:
+    var(--color-text-muted);
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   DELETE FIELD
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-delete-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 20px;
+}
+
+.settings-v2-page
+.settings-v2-delete-field
+> span {
+  color:
+    var(--color-text-secondary);
+
+  font-size: 13px;
+}
+
+.settings-v2-page
+.settings-v2-delete-field strong {
+  color:
+    var(--color-danger);
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   MODAL ACTIONS
+   ========================================================= */
+
+.settings-v2-page
+.settings-v2-modal-actions {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin-top: 22px;
+}
+
+
+/* =========================================================
+   HIDDEN FILE INPUT
+   ========================================================= */
+
+.settings-v2-hidden-input {
+  display: none !important;
+}
+
+
+/* =========================================================
+   STUDY SELECT PORTAL
+   ========================================================= */
+
+.study-select-menu {
+  border:
+    1px solid
+    var(--color-border) !important;
+
+  background:
+    var(--color-surface) !important;
+
+  background-image:
+    none !important;
+
+  color:
+    var(--color-text) !important;
+
+  box-shadow:
+    var(--shadow-md) !important;
+}
+
+.study-select-option {
+  min-height: 43px !important;
+
+  padding:
+    9px
+    11px !important;
+
+  background:
+    transparent !important;
+
+  background-image:
+    none !important;
+
+  color:
+    var(--color-text-secondary) !important;
+}
+
+.study-select-option:hover:not(:disabled) {
+  background:
+    var(--color-surface-hover) !important;
+
+  color:
+    var(--color-text) !important;
+}
+
+.study-select-option.active {
+  border-color:
+    var(--color-border-strong) !important;
+
+  background:
+    var(--color-surface-subtle) !important;
+
+  color:
+    var(--color-text) !important;
+}
+
+.study-select-option.active
+> svg {
+  color:
+    var(--color-text) !important;
+}
+
+.study-select-option-copy strong {
+  font-size:
+    13px !important;
+}
+
+.study-select-option-copy small {
+  color:
+    var(--color-text-muted) !important;
+
+  font-size:
+    11px !important;
+}
+
+
+/* =========================================================
+   SPIN
+   ========================================================= */
+
+.settings-v2-spin {
+  animation:
+    settings-v2-spin
+    0.75s
+    linear
+    infinite;
+}
+
+@keyframes settings-v2-spin {
+  to {
+    transform:
+      rotate(
+        360deg
+      );
+  }
+}
+
+
+/* =========================================================
+   MEDIUM DESKTOP
+   ========================================================= */
+
+@media (
+  max-width: 1180px
+) {
+  .settings-v2-page
+  .settings-v2-stat-grid,
+  .settings-v2-page
+  .settings-v2-data-list {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (
+  max-width: 900px
+) {
+  .settings-v2-page
+  .settings-v2-shell {
+    grid-template-columns:
+      215px
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+  .settings-v2-page
+  .settings-v2-nav {
+    padding: 12px;
+  }
+
+  .settings-v2-page
+  .settings-v2-content {
+    padding: 22px;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-grid,
+  .settings-v2-page
+  .settings-v2-data-list {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-grid {
+    grid-template-columns:
+      1fr;
+  }
+}
+
+
+/* =========================================================
+   MOBILE SETTINGS NAV
+   ========================================================= */
 
 @media (
   max-width: 760px
 ) {
+  .settings-v2-page
+  .settings-v2-header {
+    flex-direction: column;
+
+    margin-bottom: 24px;
+  }
+
+  .settings-v2-page
+  .settings-v2-header h1 {
+    font-size: 32px;
+  }
+
+  .settings-v2-page
+  .settings-v2-api-pill {
+    align-self: flex-start;
+  }
+
 
   /* =======================================================
-     SETTINGS SHELL
-  ======================================================= */
+     SHELL
+     ======================================================= */
 
   .settings-v2-page
   .settings-v2-shell {
     display: block;
 
     overflow: visible;
-
-    border-radius: 14px;
   }
 
 
   /* =======================================================
-     SETTINGS NAV CONTAINER
-  ======================================================= */
+     NAV
+     ======================================================= */
 
   .settings-v2-page
   .settings-v2-nav {
@@ -102,13 +2534,13 @@
 
     border-bottom:
       1px solid
-      var(--sv2-border);
+      var(--color-border);
   }
 
 
   /* =======================================================
-     HIDE OLD MOBILE HORIZONTAL NAV
-  ======================================================= */
+     HIDE DESKTOP NAV
+     ======================================================= */
 
   .settings-v2-page
   .settings-v2-nav-heading,
@@ -121,93 +2553,56 @@
 
 
   /* =======================================================
-     MOBILE SECTION PICKER
-  ======================================================= */
+     MOBILE PICKER
+     ======================================================= */
 
   .settings-v2-mobile-picker {
     display: block;
 
     width: 100%;
-    min-width: 0;
   }
 
   .settings-v2-section-select {
     width: 100%;
-    min-width: 0;
   }
 
+  .settings-v2-page
   .settings-v2-section-select
   .study-select-trigger {
-    width: 100%;
-    min-height: 46px;
-
-    padding:
-      0 12px;
-
-    border:
-      1px solid
-      var(--sv2-border-strong);
-
-    border-radius: 10px;
-
-    background:
-      var(--sv2-surface-2);
-
-    color:
-      var(--sv2-text);
-
-    font-size: 11.5px;
-    font-weight: 680;
-  }
-
-  .settings-v2-section-select
-  .study-select-trigger:hover:not(:disabled),
-  .settings-v2-section-select
-  .study-select-trigger.open {
-    border-color:
-      var(--sv2-accent-border);
-
-    background:
-      var(--sv2-surface-3);
-  }
-
-  .settings-v2-section-select
-  .study-select-trigger.open {
-    border-color:
-      var(--sv2-accent);
-
-    box-shadow:
-      0 0 0 3px
-      rgba(
-        99,
-        102,
-        241,
-        0.1
-      );
+    min-height: 44px;
   }
 
 
   /* =======================================================
      CONTENT
-  ======================================================= */
+     ======================================================= */
 
   .settings-v2-page
   .settings-v2-content {
-    padding: 18px;
+    padding:
+      20px
+      18px;
   }
 
 
   /* =======================================================
-     ROW ACTIONS
-  ======================================================= */
+     ROWS
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 14px;
+  }
 
   .settings-v2-page
   .settings-v2-row-actions {
     width: 100%;
-    min-width: 0;
 
-    justify-content:
-      flex-start;
+    justify-content: flex-start;
 
     flex-wrap: wrap;
   }
@@ -215,369 +2610,140 @@
 
   /* =======================================================
      STARTUP SELECT
-  ======================================================= */
+     ======================================================= */
 
   .settings-v2-startup-select {
     width: 100%;
   }
 
-  .settings-v2-startup-select
-  .study-select-trigger {
-    width: 100%;
+
+  /* =======================================================
+     DANGER
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-danger-panel {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  /* =======================================================
+     FORM
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-form-footer {
+    align-items: flex-start;
+
+    flex-direction: column;
   }
 }
 
 
 /* =========================================================
    PHONE
-========================================================= */
+   ========================================================= */
 
 @media (
-  max-width: 520px
+  max-width: 560px
 ) {
-
-  .settings-v2-page
-  .settings-v2-nav {
-    padding: 10px;
-  }
-
   .settings-v2-page
   .settings-v2-content {
     padding: 14px;
   }
 
-  .settings-v2-section-select
-  .study-select-trigger {
-    min-height: 44px;
+  .settings-v2-page
+  .settings-v2-section-heading {
+    margin-bottom: 18px;
 
+    padding-bottom: 16px;
+  }
+
+  .settings-v2-page
+  .settings-v2-section-heading h2 {
+    font-size: 20px;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel-header {
     padding:
-      0 11px;
+      17px
+      16px;
   }
-
-  .settings-v2-startup-select
-  .study-select-trigger {
-    min-height: 42px;
-  }
-}
-
-
-/* =========================================================
-   LIGHT THEME
-========================================================= */
-
-.light-theme
-.settings-v2-section-select
-.study-select-trigger,
-.light-theme
-.settings-v2-startup-select
-.study-select-trigger {
-  border-color:
-    var(--sv2-border-strong);
-
-  background:
-    var(--sv2-surface-2);
-
-  color:
-    var(--sv2-text);
-}
-
-.light-theme
-.settings-v2-section-select
-.study-select-trigger:hover:not(:disabled),
-.light-theme
-.settings-v2-startup-select
-.study-select-trigger:hover:not(:disabled) {
-  background:
-    var(--sv2-surface-3);
-}/* =========================================================
-   STUDYOS SETTINGS — MOBILE NAV + CUSTOM SELECT
-========================================================= */
-
-.settings-v2-mobile-picker {
-  display: none;
-}
-
-
-/* =========================================================
-   STARTUP PAGE CUSTOM SELECT
-========================================================= */
-
-.settings-v2-startup-select {
-  width: 190px;
-  min-width: 0;
-}
-
-.settings-v2-startup-select
-.study-select-trigger {
-  width: 100%;
-  min-height: 42px;
-
-  padding:
-    0 12px;
-
-  border-color:
-    var(--sv2-border-strong);
-
-  border-radius: 10px;
-
-  background:
-    var(--sv2-surface-2);
-
-  color:
-    var(--sv2-text);
-
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.settings-v2-startup-select
-.study-select-trigger:hover:not(:disabled),
-.settings-v2-startup-select
-.study-select-trigger.open {
-  border-color:
-    var(--sv2-accent-border);
-
-  background:
-    var(--sv2-surface-3);
-}
-
-.settings-v2-startup-select
-.study-select-trigger.open {
-  border-color:
-    var(--sv2-accent);
-
-  box-shadow:
-    0 0 0 3px
-    rgba(
-      99,
-      102,
-      241,
-      0.1
-    );
-}
-
-
-/* =========================================================
-   TABLET / MOBILE
-========================================================= */
-
-@media (
-  max-width: 760px
-) {
-
-  /* =======================================================
-     SETTINGS SHELL
-  ======================================================= */
 
   .settings-v2-page
-  .settings-v2-shell {
-    display: block;
-
-    overflow: visible;
-
-    border-radius: 14px;
-  }
-
-
-  /* =======================================================
-     SETTINGS NAV CONTAINER
-  ======================================================= */
-
-  .settings-v2-page
-  .settings-v2-nav {
-    overflow: visible;
-
-    padding: 12px;
-
-    border-right: 0;
-
-    border-bottom:
-      1px solid
-      var(--sv2-border);
-  }
-
-
-  /* =======================================================
-     HIDE OLD MOBILE HORIZONTAL NAV
-  ======================================================= */
-
-  .settings-v2-page
-  .settings-v2-nav-heading,
-  .settings-v2-page
-  .settings-v2-nav-footer,
-  .settings-v2-page
-  .settings-v2-nav-list {
-    display: none;
-  }
-
-
-  /* =======================================================
-     MOBILE SECTION PICKER
-  ======================================================= */
-
-  .settings-v2-mobile-picker {
-    display: block;
-
-    width: 100%;
-    min-width: 0;
-  }
-
-  .settings-v2-section-select {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .settings-v2-section-select
-  .study-select-trigger {
-    width: 100%;
-    min-height: 46px;
-
+  .settings-v2-row {
     padding:
-      0 12px;
-
-    border:
-      1px solid
-      var(--sv2-border-strong);
-
-    border-radius: 10px;
-
-    background:
-      var(--sv2-surface-2);
-
-    color:
-      var(--sv2-text);
-
-    font-size: 11.5px;
-    font-weight: 680;
+      15px
+      16px;
   }
-
-  .settings-v2-section-select
-  .study-select-trigger:hover:not(:disabled),
-  .settings-v2-section-select
-  .study-select-trigger.open {
-    border-color:
-      var(--sv2-accent-border);
-
-    background:
-      var(--sv2-surface-3);
-  }
-
-  .settings-v2-section-select
-  .study-select-trigger.open {
-    border-color:
-      var(--sv2-accent);
-
-    box-shadow:
-      0 0 0 3px
-      rgba(
-        99,
-        102,
-        241,
-        0.1
-      );
-  }
-
-
-  /* =======================================================
-     CONTENT
-  ======================================================= */
 
   .settings-v2-page
-  .settings-v2-content {
-    padding: 18px;
+  .settings-v2-form {
+    padding: 16px;
   }
-
-
-  /* =======================================================
-     ROW ACTIONS
-  ======================================================= */
 
   .settings-v2-page
-  .settings-v2-row-actions {
-    width: 100%;
-    min-width: 0;
-
-    justify-content:
-      flex-start;
-
-    flex-wrap: wrap;
+  .settings-v2-theme-grid {
+    padding: 16px;
   }
 
+  .settings-v2-page
+  .settings-v2-stat-grid,
+  .settings-v2-page
+  .settings-v2-data-list {
+    grid-template-columns:
+      1fr;
 
-  /* =======================================================
-     STARTUP SELECT
-  ======================================================= */
+    padding: 16px;
+  }
 
-  .settings-v2-startup-select {
+  .settings-v2-page
+  .settings-v2-primary-button,
+  .settings-v2-page
+  .settings-v2-secondary-button,
+  .settings-v2-page
+  .settings-v2-danger-outline,
+  .settings-v2-page
+  .settings-v2-danger-solid {
     width: 100%;
   }
 
-  .settings-v2-startup-select
-  .study-select-trigger {
+  .settings-v2-page
+  .settings-v2-row-actions
+  .settings-v2-status-badge {
+    width: auto;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel
+  > .settings-v2-info-panel {
+    margin:
+      14px
+      16px;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal {
+    padding: 20px;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal-actions {
+    align-items: stretch;
+
+    flex-direction: column-reverse;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal-actions button {
     width: 100%;
   }
-}
-
-
-/* =========================================================
-   PHONE
-========================================================= */
-
-@media (
-  max-width: 520px
-) {
 
   .settings-v2-page
-  .settings-v2-nav {
-    padding: 10px;
+  .settings-v2-theme-preview {
+    height: 105px;
   }
-
-  .settings-v2-page
-  .settings-v2-content {
-    padding: 14px;
-  }
-
-  .settings-v2-section-select
-  .study-select-trigger {
-    min-height: 44px;
-
-    padding:
-      0 11px;
-  }
-
-  .settings-v2-startup-select
-  .study-select-trigger {
-    min-height: 42px;
-  }
-}
-
-
-/* =========================================================
-   LIGHT THEME
-========================================================= */
-
-.light-theme
-.settings-v2-section-select
-.study-select-trigger,
-.light-theme
-.settings-v2-startup-select
-.study-select-trigger {
-  border-color:
-    var(--sv2-border-strong);
-
-  background:
-    var(--sv2-surface-2);
-
-  color:
-    var(--sv2-text);
-}
-
-.light-theme
-.settings-v2-section-select
-.study-select-trigger:hover:not(:disabled),
-.light-theme
-.settings-v2-startup-select
-.study-select-trigger:hover:not(:disabled) {
-  background:
-    var(--sv2-surface-3);
 }

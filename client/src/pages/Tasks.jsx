@@ -27,7 +27,8 @@ import {
   useAuth,
 } from "../context/AuthContext";
 
-import "./Tasks.selects.css";
+import "../styles/tasks-v2.css";
+
 
 // =========================================================
 // HELPERS
@@ -39,54 +40,40 @@ const PRIORITY_ORDER = {
   low: 2,
 };
 
+
 const PRIORITY_FILTER_OPTIONS = [
   {
-    value:
-      "all",
-
-    label:
-      "All priorities",
+    value: "all",
+    label: "All priorities",
   },
-
   {
-    value:
-      "high",
-
-    label:
-      "High priority",
+    value: "high",
+    label: "High priority",
   },
-
   {
-    value:
-      "medium",
-
-    label:
-      "Medium priority",
+    value: "medium",
+    label: "Medium priority",
   },
-
   {
-    value:
-      "low",
-
-    label:
-      "Low priority",
+    value: "low",
+    label: "Low priority",
   },
 ];
+
 
 const normalizePriority = (
   priority
 ) => {
   if (
-    priority ===
-      "high" ||
-    priority ===
-      "low"
+    priority === "high" ||
+    priority === "low"
   ) {
     return priority;
   }
 
   return "medium";
 };
+
 
 const getSubjectId = (
   value
@@ -106,10 +93,9 @@ const getSubjectId = (
     );
   }
 
-  return String(
-    value
-  );
+  return String(value);
 };
+
 
 const getDateKey = (
   value
@@ -119,9 +105,7 @@ const getDateKey = (
   }
 
   try {
-    return new Date(
-      value
-    )
+    return new Date(value)
       .toISOString()
       .slice(
         0,
@@ -131,6 +115,7 @@ const getDateKey = (
     return "";
   }
 };
+
 
 const getTodayKey =
   () => {
@@ -142,8 +127,7 @@ const getTodayKey =
 
     const month =
       String(
-        now.getMonth() +
-          1
+        now.getMonth() + 1
       ).padStart(
         2,
         "0"
@@ -159,6 +143,7 @@ const getTodayKey =
 
     return `${year}-${month}-${day}`;
   };
+
 
 const normalizeTaskPayload = (
   value
@@ -212,6 +197,7 @@ const normalizeTaskPayload = (
   };
 };
 
+
 // =========================================================
 // TASKS
 // =========================================================
@@ -221,33 +207,30 @@ function Tasks() {
     isGuest,
   } = useAuth();
 
-  // =======================================================
-  // DATA
-  // =======================================================
 
   const [
     tasks,
     setTasks,
   ] = useState([]);
 
+
   const [
     subjects,
     setSubjects,
   ] = useState([]);
+
 
   const [
     loading,
     setLoading,
   ] = useState(true);
 
+
   const [
     error,
     setError,
   ] = useState("");
 
-  // =======================================================
-  // FILTERS
-  // =======================================================
 
   const [
     activeView,
@@ -256,10 +239,12 @@ function Tasks() {
     "all"
   );
 
+
   const [
     searchQuery,
     setSearchQuery,
   ] = useState("");
+
 
   const [
     priorityFilter,
@@ -268,6 +253,7 @@ function Tasks() {
     "all"
   );
 
+
   const [
     subjectFilter,
     setSubjectFilter,
@@ -275,16 +261,15 @@ function Tasks() {
     "all"
   );
 
+
   // =======================================================
-  // FETCH PAGE DATA
+  // FETCH
   // =======================================================
 
   const fetchPageData =
     async () => {
       try {
-        setLoading(
-          true
-        );
+        setLoading(true);
 
         setError("");
 
@@ -383,15 +368,10 @@ function Tasks() {
             "Could not load your tasks."
         );
       } finally {
-        setLoading(
-          false
-        );
+        setLoading(false);
       }
     };
 
-  // =======================================================
-  // LOAD
-  // =======================================================
 
   useEffect(() => {
     fetchPageData();
@@ -399,8 +379,9 @@ function Tasks() {
     isGuest,
   ]);
 
+
   // =======================================================
-  // SUBJECT HELPER
+  // SUBJECT
   // =======================================================
 
   const getSubjectById =
@@ -412,9 +393,7 @@ function Tasks() {
           subjectId
         );
 
-      if (
-        !id
-      ) {
+      if (!id) {
         return null;
       }
 
@@ -432,8 +411,9 @@ function Tasks() {
       );
     };
 
+
   // =======================================================
-  // ADD TASK
+  // ADD
   // =======================================================
 
   const addTask =
@@ -455,10 +435,6 @@ function Tasks() {
         setError("");
 
         let newTask;
-
-        // =================================================
-        // GUEST
-        // =================================================
 
         if (
           isGuest
@@ -494,8 +470,7 @@ function Tasks() {
               payload.dueDate
                 ? new Date(
                     payload.dueDate
-                  )
-                    .toISOString()
+                  ).toISOString()
                 : null,
 
             dueTime:
@@ -520,13 +495,7 @@ function Tasks() {
             "tasks",
             newTask
           );
-        }
-
-        // =================================================
-        // ACCOUNT
-        // =================================================
-
-        else {
+        } else {
           newTask =
             await apiRequest(
               "/api/tasks",
@@ -591,6 +560,7 @@ function Tasks() {
       }
     };
 
+
   // =======================================================
   // TOGGLE
   // =======================================================
@@ -607,14 +577,10 @@ function Tasks() {
             String(
               item._id
             ) ===
-            String(
-              id
-            )
+            String(id)
         );
 
-      if (
-        !task
-      ) {
+      if (!task) {
         return;
       }
 
@@ -706,8 +672,9 @@ function Tasks() {
       }
     };
 
+
   // =======================================================
-  // UPDATE TASK
+  // UPDATE
   // =======================================================
 
   const updateTask =
@@ -720,10 +687,6 @@ function Tasks() {
 
         let updatedTask;
 
-        // =================================================
-        // GUEST
-        // =================================================
-
         if (
           isGuest
         ) {
@@ -735,9 +698,7 @@ function Tasks() {
                 String(
                   task._id
                 ) ===
-                String(
-                  id
-                )
+                String(id)
             );
 
           if (
@@ -751,8 +712,6 @@ function Tasks() {
           const nextUpdates = {
             ...updates,
           };
-
-          // TITLE
 
           if (
             updates.title !==
@@ -775,8 +734,6 @@ function Tasks() {
               cleanTitle;
           }
 
-          // PRIORITY
-
           if (
             updates.priority !==
             undefined
@@ -786,8 +743,6 @@ function Tasks() {
                 updates.priority
               );
           }
-
-          // SUBJECT
 
           if (
             updates.subjectId !==
@@ -807,8 +762,6 @@ function Tasks() {
               "";
           }
 
-          // DUE DATE
-
           if (
             updates.dueDate !==
             undefined
@@ -817,8 +770,7 @@ function Tasks() {
               updates.dueDate
                 ? new Date(
                     updates.dueDate
-                  )
-                    .toISOString()
+                  ).toISOString()
                 : null;
 
             if (
@@ -828,8 +780,6 @@ function Tasks() {
                 "";
             }
           }
-
-          // DUE TIME
 
           if (
             updates.dueTime !==
@@ -841,8 +791,6 @@ function Tasks() {
                 ? updates.dueTime
                 : "";
           }
-
-          // COMPLETION
 
           if (
             updates.completed !==
@@ -872,13 +820,7 @@ function Tasks() {
             "tasks",
             updatedTask
           );
-        }
-
-        // =================================================
-        // ACCOUNT
-        // =================================================
-
-        else {
+        } else {
           updatedTask =
             await apiRequest(
               `/api/tasks/${id}`,
@@ -937,8 +879,9 @@ function Tasks() {
       }
     };
 
+
   // =======================================================
-  // DELETE TASK
+  // DELETE
   // =======================================================
 
   const deleteTask =
@@ -976,9 +919,7 @@ function Tasks() {
                 String(
                   task._id
                 ) !==
-                String(
-                  id
-                )
+                String(id)
             )
         );
 
@@ -1004,12 +945,14 @@ function Tasks() {
       }
     };
 
+
   // =======================================================
   // STATS
   // =======================================================
 
   const todayKey =
     getTodayKey();
+
 
   const stats =
     useMemo(() => {
@@ -1063,11 +1006,8 @@ function Tasks() {
           tasks.length,
 
         pending,
-
         completed,
-
         dueToday,
-
         overdue,
       };
     }, [
@@ -1075,8 +1015,9 @@ function Tasks() {
       todayKey,
     ]);
 
+
   // =======================================================
-  // FILTER OPTIONS
+  // OPTIONS
   // =======================================================
 
   const subjectFilterOptions =
@@ -1106,7 +1047,7 @@ function Tasks() {
 
             color:
               subject.color ||
-              "#6366f1",
+              "#737373",
           })
         ),
       ],
@@ -1115,8 +1056,9 @@ function Tasks() {
       ]
     );
 
+
   // =======================================================
-  // FILTER TASKS
+  // FILTERING
   // =======================================================
 
   const filteredTasks =
@@ -1131,8 +1073,6 @@ function Tasks() {
           (
             task
           ) => {
-            // SEARCH
-
             if (
               cleanSearch &&
               !String(
@@ -1147,8 +1087,6 @@ function Tasks() {
               return false;
             }
 
-            // PRIORITY
-
             if (
               priorityFilter !==
                 "all" &&
@@ -1159,8 +1097,6 @@ function Tasks() {
             ) {
               return false;
             }
-
-            // SUBJECT
 
             if (
               subjectFilter !==
@@ -1177,8 +1113,6 @@ function Tasks() {
                 return false;
               }
             }
-
-            // VIEW
 
             const taskDate =
               getDateKey(
@@ -1230,8 +1164,6 @@ function Tasks() {
           first,
           second
         ) => {
-          // Completed last
-
           if (
             first.completed !==
             second.completed
@@ -1240,8 +1172,6 @@ function Tasks() {
               ? 1
               : -1;
           }
-
-          // Due date
 
           const firstDate =
             getDateKey(
@@ -1278,8 +1208,6 @@ function Tasks() {
             );
           }
 
-          // Priority
-
           const priorityDifference =
             PRIORITY_ORDER[
               normalizePriority(
@@ -1298,8 +1226,6 @@ function Tasks() {
           ) {
             return priorityDifference;
           }
-
-          // Newest first
 
           return (
             new Date(
@@ -1322,9 +1248,6 @@ function Tasks() {
       todayKey,
     ]);
 
-  // =======================================================
-  // CLEAR FILTERS
-  // =======================================================
 
   const clearFilters =
     () => {
@@ -1343,6 +1266,7 @@ function Tasks() {
       );
     };
 
+
   const filtersActive =
     Boolean(
       searchQuery.trim()
@@ -1354,23 +1278,22 @@ function Tasks() {
     activeView !==
       "all";
 
+
   // =======================================================
   // UI
   // =======================================================
 
   return (
-    <div className="dashboard tasks-page">
+    <div className="v2t-page">
 
-      {/* ===================================================
-          HEADER
-      =================================================== */}
+      {/* HEADER */}
 
-      <header className="dashboard-header">
+      <header className="v2t-header">
 
         <div>
 
-          <span className="page-eyebrow">
-            Study planning
+          <span className="v2t-eyebrow">
+            Plan
           </span>
 
           <h1>
@@ -1378,26 +1301,24 @@ function Tasks() {
           </h1>
 
           <p>
-            Plan what matters,
-            prioritize your work,
-            and keep deadlines
-            under control.
+            Organize your work,
+            prioritize what matters,
+            and stay ahead of deadlines.
           </p>
 
         </div>
 
       </header>
 
-      {/* ===================================================
-          STATS
-      =================================================== */}
 
-      <section className="stats-grid tasks-stats-grid">
+      {/* STATS */}
 
-        <StatBox
+      <section className="v2t-stats">
+
+        <TaskStat
           icon={
             <ListTodo
-              size={19}
+              size={18}
             />
           }
           label="Pending"
@@ -1407,15 +1328,15 @@ function Tasks() {
           description={
             stats.pending ===
             1
-              ? "Task left"
-              : "Tasks left"
+              ? "Task remaining"
+              : "Tasks remaining"
           }
         />
 
-        <StatBox
+        <TaskStat
           icon={
             <CalendarClock
-              size={19}
+              size={18}
             />
           }
           label="Due today"
@@ -1425,10 +1346,10 @@ function Tasks() {
           description="Needs attention today"
         />
 
-        <StatBox
+        <TaskStat
           icon={
             <AlertTriangle
-              size={19}
+              size={18}
             />
           }
           label="Overdue"
@@ -1442,10 +1363,10 @@ function Tasks() {
           }
         />
 
-        <StatBox
+        <TaskStat
           icon={
             <CheckCircle2
-              size={19}
+              size={18}
             />
           }
           label="Completed"
@@ -1457,17 +1378,16 @@ function Tasks() {
 
       </section>
 
-      {/* ===================================================
-          MAIN CARD
-      =================================================== */}
 
-      <section className="dashboard-card tasks-main-card">
+      {/* WORKSPACE */}
 
-        <div className="card-header tasks-card-header">
+      <section className="v2t-workspace">
+
+        <div className="v2t-workspace-header">
 
           <div>
 
-            <span className="page-eyebrow">
+            <span className="v2t-eyebrow">
               Planner
             </span>
 
@@ -1477,23 +1397,18 @@ function Tasks() {
 
           </div>
 
-          <span className="tasks-result-count">
-
-            {filteredTasks.length}
-            {" "}
-
+          <span className="v2t-result-count">
+            {filteredTasks.length}{" "}
             {filteredTasks.length ===
             1
               ? "task"
               : "tasks"}
-
           </span>
 
         </div>
 
-        {/* =================================================
-            ADD TASK
-        ================================================= */}
+
+        {/* ADD */}
 
         <AddTask
           onAdd={
@@ -1504,18 +1419,17 @@ function Tasks() {
           }
         />
 
-        {/* =================================================
-            VIEW TABS
-        ================================================= */}
 
-        <div className="task-view-tabs">
+        {/* TABS */}
+
+        <div className="v2t-tabs">
 
           <button
             type="button"
             className={
               activeView ===
               "all"
-                ? "active"
+                ? "is-active"
                 : ""
             }
             onClick={() =>
@@ -1532,7 +1446,7 @@ function Tasks() {
             className={
               activeView ===
               "today"
-                ? "active"
+                ? "is-active"
                 : ""
             }
             onClick={() =>
@@ -1541,16 +1455,14 @@ function Tasks() {
               )
             }
           >
-
             Today
 
             {stats.dueToday >
               0 && (
-              <span className="task-tab-count">
+              <span>
                 {stats.dueToday}
               </span>
             )}
-
           </button>
 
           <button
@@ -1558,7 +1470,7 @@ function Tasks() {
             className={
               activeView ===
               "upcoming"
-                ? "active"
+                ? "is-active"
                 : ""
             }
             onClick={() =>
@@ -1575,7 +1487,7 @@ function Tasks() {
             className={
               activeView ===
               "completed"
-                ? "active"
+                ? "is-active"
                 : ""
             }
             onClick={() =>
@@ -1589,16 +1501,15 @@ function Tasks() {
 
         </div>
 
-        {/* =================================================
-            FILTER BAR
-        ================================================= */}
 
-        <div className="task-filter-bar">
+        {/* FILTERS */}
 
-          <label className="task-search-field">
+        <div className="v2t-filters">
+
+          <label className="v2t-search">
 
             <Search
-              size={17}
+              size={16}
             />
 
             <input
@@ -1629,7 +1540,7 @@ function Tasks() {
               PRIORITY_FILTER_OPTIONS
             }
             placeholder="All priorities"
-            className="task-study-select task-filter-study-select"
+            className="v2t-select"
             ariaLabel="Filter by priority"
           />
 
@@ -1644,14 +1555,14 @@ function Tasks() {
               subjectFilterOptions
             }
             placeholder="All subjects"
-            className="task-study-select task-filter-study-select"
+            className="v2t-select"
             ariaLabel="Filter by subject"
           />
 
           {filtersActive && (
             <button
               type="button"
-              className="task-clear-filters"
+              className="v2t-clear"
               onClick={
                 clearFilters
               }
@@ -1662,64 +1573,61 @@ function Tasks() {
 
         </div>
 
-        {/* =================================================
-            ERROR
-        ================================================= */}
+
+        {/* ERROR */}
 
         {error && (
           <div
-            className="task-error-message"
+            className="v2t-error"
             role="alert"
           >
+            <AlertTriangle
+              size={15}
+            />
+
             {error}
           </div>
         )}
 
-        {/* =================================================
-            TASK LIST
-        ================================================= */}
 
-        <div className="task-list">
+        {/* LIST */}
+
+        <div className="v2t-list">
 
           {loading ? (
 
-            <div className="tasks-empty-state">
+            <div className="v2t-empty">
 
-              <div className="tasks-loading-line" />
+              <span className="v2t-loading-line" />
+              <span className="v2t-loading-line is-short" />
 
-              <div className="tasks-loading-line short" />
-
-              <span>
+              <p>
                 Loading tasks...
-              </span>
+              </p>
 
             </div>
 
           ) : filteredTasks.length ===
             0 ? (
 
-            <div className="tasks-empty-state">
+            <div className="v2t-empty">
 
               <ListTodo
-                size={28}
+                size={26}
               />
 
               <h3>
-
                 {tasks.length ===
                 0
                   ? "No tasks yet"
                   : "Nothing matches this view"}
-
               </h3>
 
               <p>
-
                 {tasks.length ===
                 0
                   ? "Create your first task and start planning your study work."
-                  : "Try another filter or clear your current search."}
-
+                  : "Try another filter or clear the current search."}
               </p>
 
               {tasks.length >
@@ -1727,7 +1635,7 @@ function Tasks() {
                 filtersActive && (
                   <button
                     type="button"
-                    className="task-clear-filters"
+                    className="v2t-clear"
                     onClick={
                       clearFilters
                     }
@@ -1777,26 +1685,27 @@ function Tasks() {
   );
 }
 
+
 // =========================================================
-// STAT BOX
+// STAT
 // =========================================================
 
-function StatBox({
+function TaskStat({
   icon,
   label,
   value,
   description,
 }) {
   return (
-    <div className="stat-card task-stat-card">
+    <article className="v2t-stat">
 
-      <div className="task-stat-heading">
+      <div className="v2t-stat-heading">
 
-        <span className="task-stat-icon">
+        <span className="v2t-stat-icon">
           {icon}
         </span>
 
-        <span className="stat-label">
+        <span>
           {label}
         </span>
 
@@ -1806,12 +1715,13 @@ function StatBox({
         {value}
       </strong>
 
-      <span className="stat-description">
+      <small>
         {description}
-      </span>
+      </small>
 
-    </div>
+    </article>
   );
 }
+
 
 export default Tasks;

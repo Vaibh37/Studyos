@@ -1,0 +1,1009 @@
+/* =========================================================
+   STUDYOS V2 — TYPOGRAPHY + PRESENTATION SYSTEM
+   ========================================================= */
+
+
+/* =========================================================
+   GLOBAL READABILITY
+   ========================================================= */
+
+body {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   PAGE TITLES
+   ========================================================= */
+
+.v2d-title,
+.v2t-header h1 {
+  font-size:
+    clamp(
+      36px,
+      4vw,
+      42px
+    ) !important;
+
+  font-weight:
+    600 !important;
+
+  line-height:
+    1.08 !important;
+
+  letter-spacing:
+    -0.045em !important;
+}
+
+
+/* =========================================================
+   PAGE DESCRIPTION
+   ========================================================= */
+
+.v2d-description,
+.v2t-header p {
+  max-width:
+    680px !important;
+
+  font-size:
+    15px !important;
+
+  line-height:
+    1.65 !important;
+
+  color:
+    var(--color-text-muted) !important;
+}
+
+
+/* =========================================================
+   EYEBROWS
+   ========================================================= */
+
+.v2d-eyebrow,
+.v2d-kicker,
+.v2t-eyebrow {
+  font-size:
+    12px !important;
+
+  font-weight:
+    600 !important;
+
+  line-height:
+    1.3 !important;
+
+  letter-spacing:
+    0.09em !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — LEVEL
+   ========================================================= */
+
+.v2d-level {
+  padding:
+    26px !important;
+
+  gap:
+    30px !important;
+}
+
+.v2d-level-mark {
+  width:
+    70px !important;
+
+  height:
+    70px !important;
+
+  border-radius:
+    16px !important;
+}
+
+.v2d-level-mark span {
+  font-size:
+    17px !important;
+}
+
+.v2d-level-heading h2 {
+  font-size:
+    20px !important;
+
+  line-height:
+    1.25 !important;
+}
+
+.v2d-level-heading > strong {
+  font-size:
+    15px !important;
+}
+
+.v2d-level-footer {
+  margin-top:
+    10px !important;
+
+  font-size:
+    13px !important;
+}
+
+.v2d-level-metrics span {
+  font-size:
+    13px !important;
+}
+
+.v2d-level-metrics strong {
+  font-size:
+    21px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — STATS
+   ========================================================= */
+
+.v2d-stats {
+  gap:
+    16px !important;
+
+  margin-bottom:
+    22px !important;
+}
+
+.v2d-metric {
+  min-height:
+    150px;
+
+  padding:
+    22px !important;
+}
+
+.v2d-metric-label {
+  margin-bottom:
+    18px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2d-metric-icon {
+  width:
+    34px !important;
+
+  height:
+    34px !important;
+}
+
+.v2d-metric-value {
+  margin-bottom:
+    7px !important;
+
+  font-size:
+    30px !important;
+
+  line-height:
+    1.1 !important;
+}
+
+.v2d-metric-detail {
+  font-size:
+    13px !important;
+
+  line-height:
+    1.45 !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — DAILY GOAL
+   ========================================================= */
+
+.v2d-goal {
+  padding:
+    24px !important;
+
+  margin-bottom:
+    22px !important;
+}
+
+.v2d-goal-copy h2 {
+  font-size:
+    18px !important;
+}
+
+.v2d-goal-copy > strong {
+  font-size:
+    23px !important;
+}
+
+.v2d-goal-track {
+  height:
+    8px !important;
+}
+
+.v2d-goal-meta {
+  margin-top:
+    11px !important;
+
+  font-size:
+    13px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — PANELS
+   ========================================================= */
+
+.v2d-main-grid,
+.v2d-review-grid {
+  gap:
+    20px !important;
+
+  margin-bottom:
+    20px !important;
+}
+
+.v2d-panel {
+  padding:
+    24px !important;
+}
+
+.v2d-panel-heading {
+  margin-bottom:
+    20px !important;
+}
+
+.v2d-panel-heading h2 {
+  font-size:
+    19px !important;
+
+  line-height:
+    1.25 !important;
+}
+
+.v2d-panel-heading p {
+  margin-top:
+    7px !important;
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.5 !important;
+}
+
+.v2d-count {
+  min-width:
+    28px !important;
+
+  height:
+    28px !important;
+
+  padding:
+    0 8px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — TASK LIST
+   ========================================================= */
+
+.v2d-task-list {
+  gap:
+    9px !important;
+}
+
+.v2d-task {
+  min-height:
+    66px;
+
+  padding:
+    14px 15px !important;
+
+  gap:
+    13px !important;
+}
+
+.v2d-task-copy > strong {
+  font-size:
+    14px !important;
+
+  line-height:
+    1.45 !important;
+}
+
+.v2d-task-meta {
+  margin-top:
+    7px !important;
+
+  gap:
+    7px 12px !important;
+}
+
+.v2d-task-meta span {
+  font-size:
+    12px !important;
+}
+
+.v2d-priority-label {
+  padding:
+    5px 9px !important;
+
+  font-size:
+    10px !important;
+}
+
+.v2d-task-summary {
+  margin-top:
+    15px !important;
+
+  padding-top:
+    13px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — UPCOMING
+   ========================================================= */
+
+.v2d-upcoming-list {
+  gap:
+    10px !important;
+}
+
+.v2d-upcoming {
+  min-height:
+    66px;
+
+  padding:
+    13px !important;
+}
+
+.v2d-date {
+  width:
+    48px !important;
+
+  height:
+    48px !important;
+}
+
+.v2d-date strong {
+  font-size:
+    16px !important;
+}
+
+.v2d-date span {
+  font-size:
+    10px !important;
+}
+
+.v2d-upcoming-copy > strong {
+  font-size:
+    14px !important;
+}
+
+.v2d-upcoming-copy > div {
+  margin-top:
+    6px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — CHART
+   ========================================================= */
+
+.v2d-week-total {
+  padding:
+    8px 11px !important;
+}
+
+.v2d-week-total strong {
+  font-size:
+    13px !important;
+}
+
+.v2d-chart-value {
+  font-size:
+    11px !important;
+}
+
+.v2d-chart-label {
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — INSIGHTS
+   ========================================================= */
+
+.v2d-insights {
+  gap:
+    10px !important;
+}
+
+.v2d-insight {
+  min-height:
+    74px;
+
+  padding:
+    14px !important;
+}
+
+.v2d-insight-icon {
+  width:
+    38px !important;
+
+  height:
+    38px !important;
+}
+
+.v2d-insight > div > span {
+  font-size:
+    12px !important;
+}
+
+.v2d-insight > div > strong {
+  margin-top:
+    3px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2d-insight > div > small {
+  margin-top:
+    4px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DASHBOARD — RECENT SESSIONS
+   ========================================================= */
+
+.v2d-session-grid {
+  gap:
+    10px !important;
+}
+
+.v2d-session {
+  min-height:
+    66px;
+
+  padding:
+    13px 14px !important;
+}
+
+.v2d-session-icon {
+  width:
+    38px !important;
+
+  height:
+    38px !important;
+}
+
+.v2d-session-copy strong {
+  font-size:
+    14px !important;
+}
+
+.v2d-session-copy span {
+  margin-top:
+    4px !important;
+
+  font-size:
+    12px !important;
+}
+
+.v2d-session-time {
+  font-size:
+    13px !important;
+}
+
+
+/* =========================================================
+   EMPTY STATES
+   ========================================================= */
+
+.v2d-empty,
+.v2t-empty {
+  min-height:
+    200px !important;
+}
+
+.v2d-empty strong,
+.v2t-empty h3 {
+  font-size:
+    15px !important;
+}
+
+.v2d-empty span,
+.v2t-empty p {
+  margin-top:
+    6px !important;
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.55 !important;
+}
+
+
+/* =========================================================
+   TASKS — STATS
+   ========================================================= */
+
+.v2t-stats {
+  gap:
+    16px !important;
+
+  margin-bottom:
+    22px !important;
+}
+
+.v2t-stat {
+  min-height:
+    150px;
+
+  padding:
+    22px !important;
+}
+
+.v2t-stat-heading {
+  margin-bottom:
+    18px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2t-stat-icon {
+  width:
+    34px !important;
+
+  height:
+    34px !important;
+}
+
+.v2t-stat > strong {
+  margin-bottom:
+    7px !important;
+
+  font-size:
+    30px !important;
+}
+
+.v2t-stat > small {
+  font-size:
+    13px !important;
+
+  line-height:
+    1.45 !important;
+}
+
+
+/* =========================================================
+   TASKS — WORKSPACE
+   ========================================================= */
+
+.v2t-workspace {
+  padding:
+    26px !important;
+}
+
+.v2t-workspace-header {
+  margin-bottom:
+    22px !important;
+}
+
+.v2t-workspace-header h2 {
+  margin-top:
+    5px !important;
+
+  font-size:
+    20px !important;
+}
+
+.v2t-result-count {
+  min-height:
+    30px !important;
+
+  padding:
+    0 10px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   TASKS — ADD TASK
+   ========================================================= */
+
+.v2t-page
+.add-task-title-field input {
+  min-height:
+    44px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2t-page
+.add-task-submit {
+  min-height:
+    44px !important;
+
+  padding:
+    0 17px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2t-page
+.add-task-details {
+  padding:
+    17px !important;
+
+  gap:
+    13px !important;
+}
+
+.v2t-page
+.add-task-field-label {
+  font-size:
+    13px !important;
+}
+
+.v2t-page
+.add-task-field
+input[type="time"] {
+  min-height:
+    42px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2t-page
+.add-task-error {
+  font-size:
+    12px !important;
+}
+
+.v2t-page
+.add-task-reset,
+.v2t-page
+.add-task-collapse {
+  min-height:
+    34px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   TASKS — TABS
+   ========================================================= */
+
+.v2t-tabs {
+  gap:
+    6px !important;
+
+  margin-bottom:
+    17px !important;
+
+  padding-bottom:
+    17px !important;
+}
+
+.v2t-tabs button {
+  min-height:
+    38px !important;
+
+  padding:
+    0 13px !important;
+
+  font-size:
+    13px !important;
+}
+
+.v2t-tabs button span {
+  min-width:
+    20px !important;
+
+  height:
+    20px !important;
+
+  font-size:
+    10px !important;
+}
+
+
+/* =========================================================
+   TASKS — FILTERS
+   ========================================================= */
+
+.v2t-filters {
+  gap:
+    11px !important;
+
+  margin-bottom:
+    20px !important;
+}
+
+.v2t-search {
+  min-height:
+    43px !important;
+}
+
+.v2t-search input {
+  font-size:
+    14px !important;
+}
+
+.v2t-select
+.study-select-trigger {
+  min-height:
+    43px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2t-clear {
+  min-height:
+    39px !important;
+
+  padding:
+    0 13px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   TASK ITEM
+   ========================================================= */
+
+.v2t-page
+.task-v2 {
+  min-height:
+    68px;
+
+  padding:
+    15px !important;
+
+  gap:
+    14px !important;
+}
+
+.v2t-page
+.task-v2
+.task-title {
+  font-size:
+    14px !important;
+
+  line-height:
+    1.45 !important;
+}
+
+.v2t-page
+.task-priority-badge {
+  min-height:
+    23px !important;
+
+  padding:
+    0 8px !important;
+
+  font-size:
+    10px !important;
+}
+
+.v2t-page
+.task-meta-item {
+  font-size:
+    12px !important;
+}
+
+.v2t-page
+.task-icon-button {
+  width:
+    34px !important;
+
+  height:
+    34px !important;
+}
+
+
+/* =========================================================
+   TASK EDIT
+   ========================================================= */
+
+.v2t-page
+.task-editing-v2 {
+  padding:
+    18px !important;
+}
+
+.v2t-page
+.task-edit-title,
+.v2t-page
+.task-edit-field > span {
+  font-size:
+    13px !important;
+}
+
+.v2t-page
+.task-edit-title input,
+.v2t-page
+.task-edit-field input {
+  min-height:
+    42px !important;
+
+  font-size:
+    14px !important;
+}
+
+.v2t-page
+.task-action-button {
+  min-height:
+    38px !important;
+
+  padding:
+    0 13px !important;
+
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DROPDOWNS
+   ========================================================= */
+
+.study-select-option {
+  min-height:
+    42px !important;
+
+  padding:
+    9px 11px !important;
+}
+
+.study-select-option-copy strong {
+  font-size:
+    13px !important;
+}
+
+.study-select-option-copy small {
+  margin-top:
+    2px !important;
+
+  font-size:
+    11px !important;
+}
+
+.study-select-empty {
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   DATE PICKER
+   ========================================================= */
+
+.study-date-popover {
+  padding:
+    14px !important;
+}
+
+.study-date-header strong {
+  font-size:
+    14px !important;
+}
+
+.study-date-weekdays span {
+  font-size:
+    11px !important;
+}
+
+.study-date-day {
+  font-size:
+    12px !important;
+}
+
+.study-date-footer button {
+  font-size:
+    12px !important;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.task-delete-modal-header h3 {
+  font-size:
+    20px !important;
+}
+
+.task-delete-modal-content p {
+  font-size:
+    14px !important;
+
+  line-height:
+    1.6 !important;
+}
+
+.task-modal-cancel,
+.task-modal-delete {
+  min-height:
+    39px !important;
+
+  padding:
+    0 14px !important;
+
+  font-size:
+    13px !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (
+  max-width: 700px
+) {
+  .v2d-title,
+  .v2t-header h1 {
+    font-size:
+      32px !important;
+  }
+
+  .v2d-description,
+  .v2t-header p {
+    font-size:
+      14px !important;
+  }
+
+  .v2d-level,
+  .v2d-panel,
+  .v2d-goal,
+  .v2t-workspace {
+    padding:
+      18px !important;
+  }
+
+  .v2d-metric,
+  .v2t-stat {
+    min-height:
+      auto;
+
+    padding:
+      18px !important;
+  }
+
+  .v2d-metric-value,
+  .v2t-stat > strong {
+    font-size:
+      27px !important;
+  }
+}

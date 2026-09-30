@@ -1,11 +1,2 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Inter, system-ui, sans-serif;
-  background: #0f1117;
-  color: #f5f5f5;
-}
+@import "./styles/tokens.css";
+@import "./styles/base.css";

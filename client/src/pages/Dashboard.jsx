@@ -13,7 +13,6 @@ import {
   Clock3,
   Flame,
   RefreshCw,
-  Sparkles,
   Target,
   Timer,
   TrendingUp,
@@ -43,6 +42,7 @@ import {
   formatGamificationXp,
 } from "../services/gamification";
 
+
 // =========================================================
 // HELPERS
 // =========================================================
@@ -59,6 +59,7 @@ const startOfDay = (
     date.getDate()
   );
 };
+
 
 const getDateKey = (
   value
@@ -97,14 +98,13 @@ const getDateKey = (
   ].join("-");
 };
 
+
 const subtractDays = (
   value,
   amount
 ) => {
   const date =
-    startOfDay(
-      value
-    );
+    startOfDay(value);
 
   date.setDate(
     date.getDate() -
@@ -114,15 +114,14 @@ const subtractDays = (
   return date;
 };
 
+
 const formatStudyTime = (
   seconds
 ) => {
   const safe =
     Math.max(
       0,
-      Number(
-        seconds
-      ) || 0
+      Number(seconds) || 0
     );
 
   const totalMinutes =
@@ -132,22 +131,17 @@ const formatStudyTime = (
 
   const hours =
     Math.floor(
-      totalMinutes /
-        60
+      totalMinutes / 60
     );
 
   const minutes =
-    totalMinutes %
-    60;
+    totalMinutes % 60;
 
   if (hours > 0) {
     return `${hours}h ${minutes}m`;
   }
 
-  if (
-    totalMinutes >
-    0
-  ) {
+  if (totalMinutes > 0) {
     return `${totalMinutes}m`;
   }
 
@@ -160,6 +154,7 @@ const formatStudyTime = (
   return "0m";
 };
 
+
 const formatTaskTime = (
   value
 ) => {
@@ -171,19 +166,13 @@ const formatTaskTime = (
     hours,
     minutes,
   ] =
-    String(
-      value
-    )
+    String(value)
       .split(":")
       .map(Number);
 
   if (
-    Number.isNaN(
-      hours
-    ) ||
-    Number.isNaN(
-      minutes
-    )
+    Number.isNaN(hours) ||
+    Number.isNaN(minutes)
   ) {
     return value;
   }
@@ -209,6 +198,7 @@ const formatTaskTime = (
     }
   );
 };
+
 
 const formatShortDate = (
   value
@@ -240,6 +230,7 @@ const formatShortDate = (
   );
 };
 
+
 const normalizePriority = (
   value
 ) => {
@@ -253,11 +244,13 @@ const normalizePriority = (
   return "medium";
 };
 
+
 const PRIORITY_ORDER = {
   high: 0,
   medium: 1,
   low: 2,
 };
+
 
 // =========================================================
 // DASHBOARD
@@ -268,6 +261,7 @@ function Dashboard() {
     isGuest,
     firebaseUser,
   } = useAuth();
+
 
   // =======================================================
   // DATA
@@ -308,8 +302,9 @@ function Dashboard() {
     setError,
   ] = useState("");
 
+
   // =======================================================
-  // PROFILE NAME
+  // NAME
   // =======================================================
 
   const [
@@ -323,6 +318,7 @@ function Dashboard() {
       firebaseUser?.displayName ||
       ""
   );
+
 
   // =======================================================
   // DAILY GOAL
@@ -338,9 +334,7 @@ function Dashboard() {
         );
 
       if (
-        Number.isFinite(
-          hours
-        ) &&
+        Number.isFinite(hours) &&
         hours > 0
       ) {
         return Math.round(
@@ -351,12 +345,14 @@ function Dashboard() {
       return 120;
     };
 
+
   const [
     dailyGoalMinutes,
     setDailyGoalMinutes,
   ] = useState(
     getGoalMinutes
   );
+
 
   // =======================================================
   // GREETING
@@ -379,8 +375,9 @@ function Dashboard() {
       return "Good evening";
     };
 
+
   // =======================================================
-  // LOAD DATA
+  // LOAD
   // =======================================================
 
   const loadDashboard =
@@ -496,6 +493,7 @@ function Dashboard() {
       }
     };
 
+
   // =======================================================
   // INITIAL LOAD
   // =======================================================
@@ -508,8 +506,9 @@ function Dashboard() {
     isGuest,
   ]);
 
+
   // =======================================================
-  // PROFILE UPDATES
+  // NAME UPDATES
   // =======================================================
 
   useEffect(() => {
@@ -541,8 +540,9 @@ function Dashboard() {
     firebaseUser?.displayName,
   ]);
 
+
   // =======================================================
-  // LIVE APP UPDATES
+  // LIVE DATA UPDATES
   // =======================================================
 
   useEffect(() => {
@@ -563,7 +563,9 @@ function Dashboard() {
     ];
 
     events.forEach(
-      (eventName) => {
+      (
+        eventName
+      ) => {
         window.addEventListener(
           eventName,
           refresh
@@ -573,7 +575,9 @@ function Dashboard() {
 
     return () => {
       events.forEach(
-        (eventName) => {
+        (
+          eventName
+        ) => {
           window.removeEventListener(
             eventName,
             refresh
@@ -584,6 +588,7 @@ function Dashboard() {
   }, [
     isGuest,
   ]);
+
 
   // =======================================================
   // TODAY
@@ -598,6 +603,7 @@ function Dashboard() {
     getDateKey(
       today
     );
+
 
   // =======================================================
   // GAMIFICATION
@@ -618,14 +624,17 @@ function Dashboard() {
       ]
     );
 
+
   // =======================================================
-  // TODAY'S FOCUS
+  // TODAY FOCUS
   // =======================================================
 
   const todaySessions =
     useMemo(() => {
       return sessions.filter(
-        (session) => {
+        (
+          session
+        ) => {
           const date =
             new Date(
               session.startedAt ||
@@ -654,6 +663,7 @@ function Dashboard() {
       todayKey,
     ]);
 
+
   const todayFocusSeconds =
     useMemo(() => {
       return todaySessions.reduce(
@@ -672,11 +682,13 @@ function Dashboard() {
       todaySessions,
     ]);
 
+
   const todayFocusMinutes =
     Math.floor(
       todayFocusSeconds /
         60
     );
+
 
   const goalProgress =
     dailyGoalMinutes > 0
@@ -692,24 +704,30 @@ function Dashboard() {
         )
       : 0;
 
+
   // =======================================================
-  // TASK STATS
+  // TASKS
   // =======================================================
 
   const pendingTasks =
     useMemo(() => {
       return tasks.filter(
-        (task) =>
+        (
+          task
+        ) =>
           !task.completed
       );
     }, [
       tasks,
     ]);
 
+
   const completedToday =
     useMemo(() => {
       return tasks.filter(
-        (task) => {
+        (
+          task
+        ) => {
           if (
             !task.completed ||
             !task.completedAt
@@ -730,10 +748,13 @@ function Dashboard() {
       todayKey,
     ]);
 
+
   const dueTodayTasks =
     useMemo(() => {
       return pendingTasks.filter(
-        (task) =>
+        (
+          task
+        ) =>
           getDateKey(
             task.dueDate
           ) ===
@@ -744,10 +765,13 @@ function Dashboard() {
       todayKey,
     ]);
 
+
   const overdueTasks =
     useMemo(() => {
       return pendingTasks.filter(
-        (task) => {
+        (
+          task
+        ) => {
           const dueKey =
             getDateKey(
               task.dueDate
@@ -765,6 +789,7 @@ function Dashboard() {
       todayKey,
     ]);
 
+
   // =======================================================
   // TODAY PLAN
   // =======================================================
@@ -773,7 +798,9 @@ function Dashboard() {
     useMemo(() => {
       const candidates =
         pendingTasks.filter(
-          (task) => {
+          (
+            task
+          ) => {
             const dueKey =
               getDateKey(
                 task.dueDate
@@ -853,13 +880,15 @@ function Dashboard() {
       todayKey,
     ]);
 
+
   // =======================================================
-  // WEEKLY FOCUS
+  // WEEK
   // =======================================================
 
   const weeklyActivity =
     useMemo(() => {
-      const result = [];
+      const result =
+        [];
 
       for (
         let index = 6;
@@ -921,6 +950,7 @@ function Dashboard() {
         result.push({
           date,
           key,
+
           seconds:
             daySeconds,
 
@@ -940,6 +970,7 @@ function Dashboard() {
       sessions,
     ]);
 
+
   const weeklyFocusSeconds =
     weeklyActivity.reduce(
       (
@@ -951,14 +982,18 @@ function Dashboard() {
       0
     );
 
+
   const maxWeeklySeconds =
     Math.max(
       ...weeklyActivity.map(
-        (day) =>
+        (
+          day
+        ) =>
           day.seconds
       ),
       1
     );
+
 
   // =======================================================
   // TOP SUBJECT
@@ -976,7 +1011,9 @@ function Dashboard() {
         new Map();
 
       sessions.forEach(
-        (session) => {
+        (
+          session
+        ) => {
           const date =
             new Date(
               session.startedAt ||
@@ -1014,8 +1051,7 @@ function Dashboard() {
       );
 
       if (
-        totals.size ===
-        0
+        totals.size === 0
       ) {
         return null;
       }
@@ -1042,7 +1078,9 @@ function Dashboard() {
         )[0];
     }, [
       sessions,
+      subjects,
     ]);
+
 
   // =======================================================
   // UPCOMING
@@ -1052,7 +1090,9 @@ function Dashboard() {
     useMemo(() => {
       return calendarItems
         .map(
-          (item) => ({
+          (
+            item
+          ) => ({
             ...item,
 
             parsedDate:
@@ -1062,7 +1102,9 @@ function Dashboard() {
           })
         )
         .filter(
-          (item) => {
+          (
+            item
+          ) => {
             if (
               Number.isNaN(
                 item.parsedDate.getTime()
@@ -1095,6 +1137,7 @@ function Dashboard() {
       calendarItems,
       todayKey,
     ]);
+
 
   // =======================================================
   // RECENT FOCUS
@@ -1129,62 +1172,44 @@ function Dashboard() {
       sessions,
     ]);
 
-  // =======================================================
-  // SUBJECT COLOR
-  // =======================================================
-
-  const getSubjectColor =
-    (
-      subjectName
-    ) => {
-      const subject =
-        subjects.find(
-          (item) =>
-            item.name ===
-            subjectName
-        );
-
-      return (
-        subject?.color ||
-        "#6366f1"
-      );
-    };
 
   // =======================================================
-  // UI
+  // RENDER
   // =======================================================
 
   return (
-    <div className="dashboard dashboard-v3">
+    <div className="v2d-page">
 
       {/* HEADER */}
 
-      <header className="dashboard-header dashboard-v3-header">
+      <header className="v2d-header">
 
-        <div>
+        <div className="v2d-header-copy">
 
-          <span className="dashboard-v3-eyebrow">
-            Overview
+          <span className="v2d-eyebrow">
+            Workspace
           </span>
 
-          <h1>
+          <h1 className="v2d-title">
+            {getGreeting()}
             {name
-              ? `${getGreeting()}, ${name}`
-              : getGreeting()}
+              ? `, ${name}`
+              : ""}
+            .
           </h1>
 
-          <p>
-            Your study activity,
-            priorities and progress
-            in one place.
+          <p className="v2d-description">
+            Plan what matters, focus on the work,
+            and review your progress.
           </p>
 
         </div>
 
         <button
           type="button"
-          className="dashboard-v3-refresh"
+          className="v2d-refresh"
           disabled={
+            loading ||
             refreshing
           }
           onClick={() =>
@@ -1194,25 +1219,28 @@ function Dashboard() {
           }
         >
           <RefreshCw
-            size={16}
+            size={15}
             className={
               refreshing
-                ? "dashboard-v3-spin"
+                ? "v2d-spin"
                 : ""
             }
           />
 
-          {refreshing
-            ? "Refreshing..."
-            : "Refresh"}
+          <span>
+            {refreshing
+              ? "Refreshing"
+              : "Refresh"}
+          </span>
         </button>
 
       </header>
 
+
       {/* ERROR */}
 
       {error && (
-        <div className="dashboard-v3-error">
+        <div className="v2d-error">
 
           <AlertTriangle
             size={16}
@@ -1225,18 +1253,17 @@ function Dashboard() {
         </div>
       )}
 
-      {/* ===================================================
-          GAMIFICATION HERO
-      =================================================== */}
 
-      <section className="dashboard-card dashboard-v3-level-card">
+      {/* LEVEL */}
 
-        <div className="dashboard-v3-level-main">
+      <section className="v2d-level">
 
-          <div className="dashboard-v3-level-badge">
+        <div className="v2d-level-main">
+
+          <div className="v2d-level-mark">
 
             <Award
-              size={25}
+              size={20}
             />
 
             <span>
@@ -1245,14 +1272,14 @@ function Dashboard() {
 
           </div>
 
-          <div className="dashboard-v3-level-content">
+          <div className="v2d-level-content">
 
-            <div className="dashboard-v3-level-heading">
+            <div className="v2d-level-heading">
 
               <div>
 
-                <span className="dashboard-v3-eyebrow">
-                  Level {gamification.level}
+                <span className="v2d-kicker">
+                  Current level
                 </span>
 
                 <h2>
@@ -1269,10 +1296,10 @@ function Dashboard() {
 
             </div>
 
-            <div className="dashboard-v3-xp-track">
+            <div className="v2d-progress-track">
 
               <div
-                className="dashboard-v3-xp-progress"
+                className="v2d-progress-fill"
                 style={{
                   width:
                     `${gamification.progress}%`,
@@ -1281,20 +1308,25 @@ function Dashboard() {
 
             </div>
 
-            <div className="dashboard-v3-level-footer">
+            <div className="v2d-level-footer">
 
               <span>
-                {gamification.xpToNextLevel >
-                0
-                  ? `${gamification.xpToNextLevel} XP to Level ${
-                      gamification.level +
-                      1
-                    }`
-                  : "Maximum level reached"}
+                {gamification.xpIntoLevel.toLocaleString(
+                  "en-IN"
+                )}{" "}
+                /{" "}
+                {gamification.xpRequiredForLevel.toLocaleString(
+                  "en-IN"
+                )} XP
               </span>
 
               <span>
-                {gamification.progress}% complete
+                {gamification.xpToNextLevel.toLocaleString(
+                  "en-IN"
+                )}{" "}
+                XP to level{" "}
+                {gamification.level +
+                  1}
               </span>
 
             </div>
@@ -1303,68 +1335,53 @@ function Dashboard() {
 
         </div>
 
-        <div className="dashboard-v3-level-stats">
+        <div className="v2d-level-metrics">
 
           <div>
-
-            <Zap
-              size={15}
-            />
-
             <span>
-              This week
+              XP this week
             </span>
 
             <strong>
-              +{gamification.weeklyXp} XP
+              {gamification.weeklyXp.toLocaleString(
+                "en-IN"
+              )}
             </strong>
-
           </div>
 
           <div>
-
-            <Flame
-              size={15}
-            />
-
             <span>
               Current streak
             </span>
 
             <strong>
-              {gamification.streak} days
+              {gamification.streak}d
             </strong>
-
           </div>
 
           <div>
-
-            <Sparkles
-              size={15}
-            />
-
             <span>
-              Today
+              Total sessions
             </span>
 
             <strong>
-              +{gamification.todayXp} XP
+              {gamification.sessionCount}
             </strong>
-
           </div>
 
         </div>
 
       </section>
 
-      {/* PRIMARY STATS */}
 
-      <section className="dashboard-v3-stats">
+      {/* STATS */}
 
-        <DashboardStat
+      <section className="v2d-stats">
+
+        <MetricCard
           icon={
             <Timer
-              size={19}
+              size={18}
             />
           }
           label="Focus today"
@@ -1375,62 +1392,61 @@ function Dashboard() {
                   todayFocusSeconds
                 )
           }
-          description={`${todaySessions.length} ${
+          detail={`${todaySessions.length} ${
             todaySessions.length ===
             1
               ? "session"
               : "sessions"
-          } today`}
+          }`}
         />
 
-        <DashboardStat
+        <MetricCard
           icon={
             <Target
-              size={19}
+              size={18}
             />
           }
           label="Daily goal"
           value={`${goalProgress}%`}
-          description={`${todayFocusMinutes} / ${dailyGoalMinutes} min`}
+          detail={`${todayFocusMinutes} / ${dailyGoalMinutes} min`}
         />
 
-        <DashboardStat
+        <MetricCard
           icon={
             <CheckCircle2
-              size={19}
+              size={18}
             />
           }
-          label="Pending tasks"
+          label="Pending"
           value={
             pendingTasks.length
           }
-          description={`${completedToday} completed today`}
+          detail={`${completedToday} completed today`}
         />
 
-        <DashboardStat
+        <MetricCard
           icon={
             <Flame
-              size={19}
+              size={18}
             />
           }
           label="Study streak"
-          value={
-            gamification.streak
-          }
-          description={`Best: ${gamification.longestStreak} days`}
+          value={`${gamification.streak}d`}
+          detail={`Best ${gamification.longestStreak} days`}
         />
 
       </section>
 
+
       {/* DAILY GOAL */}
 
-      <section className="dashboard-card dashboard-v3-goal-card">
+      <section className="v2d-goal">
 
-        <div className="dashboard-v3-goal-header">
+        <div className="v2d-goal-copy">
 
           <div>
 
-            <span className="dashboard-v3-eyebrow">
+            <span className="v2d-kicker">
               Today
             </span>
 
@@ -1448,10 +1464,10 @@ function Dashboard() {
 
         </div>
 
-        <div className="dashboard-v3-goal-track">
+        <div className="v2d-goal-track">
 
           <div
-            className="dashboard-v3-goal-progress"
+            className="v2d-goal-fill"
             style={{
               width:
                 `${goalProgress}%`,
@@ -1460,12 +1476,12 @@ function Dashboard() {
 
         </div>
 
-        <div className="dashboard-v3-goal-footer">
+        <div className="v2d-goal-meta">
 
           <span>
             {goalProgress >=
             100
-              ? "Daily goal completed"
+              ? "Goal completed"
               : `${Math.max(
                   0,
                   dailyGoalMinutes -
@@ -1474,48 +1490,36 @@ function Dashboard() {
           </span>
 
           <span>
-            Goal:{" "}
-            {dailyGoalMinutes} min
+            Goal {dailyGoalMinutes} min
           </span>
 
         </div>
 
       </section>
 
-      {/* MAIN GRID */}
 
-      <section className="dashboard-v3-main-grid">
+      {/* PLAN */}
 
-        <div className="dashboard-card dashboard-v3-panel">
+      <section className="v2d-main-grid">
 
-          <div className="dashboard-v3-panel-header">
+        <div className="v2d-panel">
 
-            <div>
+          <PanelHeader
+            eyebrow="Plan"
+            title="Today's tasks"
+            count={
+              todayPlan.length
+            }
+          />
 
-              <span className="dashboard-v3-eyebrow">
-                Plan
-              </span>
-
-              <h2>
-                Today's tasks
-              </h2>
-
-            </div>
-
-            <span className="dashboard-v3-count">
-              {todayPlan.length}
-            </span>
-
-          </div>
-
-          <div className="dashboard-v3-task-list">
+          <div className="v2d-task-list">
 
             {loading ? (
 
-              <DashboardEmpty
+              <EmptyState
                 icon={
                   <Clock3
-                    size={22}
+                    size={20}
                   />
                 }
                 title="Loading tasks"
@@ -1525,10 +1529,10 @@ function Dashboard() {
             ) : todayPlan.length ===
               0 ? (
 
-              <DashboardEmpty
+              <EmptyState
                 icon={
                   <CheckCircle2
-                    size={23}
+                    size={20}
                   />
                 }
                 title="You're clear"
@@ -1538,7 +1542,9 @@ function Dashboard() {
             ) : (
 
               todayPlan.map(
-                (task) => {
+                (
+                  task
+                ) => {
                   const dueKey =
                     getDateKey(
                       task.dueDate
@@ -1551,11 +1557,16 @@ function Dashboard() {
                           todayKey
                     );
 
+                  const priority =
+                    normalizePriority(
+                      task.priority
+                    );
+
                   return (
                     <div
-                      className={`dashboard-v3-task ${
+                      className={`v2d-task ${
                         overdue
-                          ? "overdue"
+                          ? "is-overdue"
                           : ""
                       }`}
                       key={
@@ -1563,23 +1574,20 @@ function Dashboard() {
                       }
                     >
 
-                      <div
-                        className={`dashboard-v3-priority priority-${normalizePriority(
-                          task.priority
-                        )}`}
+                      <span
+                        className={`v2d-task-priority is-${priority}`}
                       />
 
-                      <div className="dashboard-v3-task-content">
+                      <div className="v2d-task-copy">
 
                         <strong>
                           {task.title}
                         </strong>
 
-                        <div className="dashboard-v3-task-meta">
+                        <div className="v2d-task-meta">
 
                           {task.subjectName && (
                             <span>
-
                               <BookOpen
                                 size={12}
                               />
@@ -1587,7 +1595,6 @@ function Dashboard() {
                               {
                                 task.subjectName
                               }
-
                             </span>
                           )}
 
@@ -1595,11 +1602,10 @@ function Dashboard() {
                             <span
                               className={
                                 overdue
-                                  ? "overdue"
+                                  ? "is-danger"
                                   : ""
                               }
                             >
-
                               <CalendarDays
                                 size={12}
                               />
@@ -1611,13 +1617,11 @@ function Dashboard() {
                               {formatShortDate(
                                 task.dueDate
                               )}
-
                             </span>
                           )}
 
                           {task.dueTime && (
                             <span>
-
                               <Clock3
                                 size={12}
                               />
@@ -1625,7 +1629,6 @@ function Dashboard() {
                               {formatTaskTime(
                                 task.dueTime
                               )}
-
                             </span>
                           )}
 
@@ -1634,13 +1637,9 @@ function Dashboard() {
                       </div>
 
                       <span
-                        className={`dashboard-v3-priority-label ${normalizePriority(
-                          task.priority
-                        )}`}
+                        className={`v2d-priority-label is-${priority}`}
                       >
-                        {normalizePriority(
-                          task.priority
-                        )}
+                        {priority}
                       </span>
 
                     </div>
@@ -1656,7 +1655,7 @@ function Dashboard() {
             0 ||
             overdueTasks.length >
               0) && (
-            <div className="dashboard-v3-task-summary">
+            <div className="v2d-task-summary">
 
               <span>
                 {dueTodayTasks.length} due today
@@ -1671,51 +1670,40 @@ function Dashboard() {
 
         </div>
 
+
         {/* UPCOMING */}
 
-        <div className="dashboard-card dashboard-v3-panel">
+        <div className="v2d-panel">
 
-          <div className="dashboard-v3-panel-header">
+          <PanelHeader
+            eyebrow="Schedule"
+            title="Upcoming"
+            count={
+              upcomingItems.length
+            }
+          />
 
-            <div>
-
-              <span className="dashboard-v3-eyebrow">
-                Schedule
-              </span>
-
-              <h2>
-                Upcoming
-              </h2>
-
-            </div>
-
-            <span className="dashboard-v3-count">
-              {
-                upcomingItems.length
-              }
-            </span>
-
-          </div>
-
-          <div className="dashboard-v3-upcoming-list">
+          <div className="v2d-upcoming-list">
 
             {upcomingItems.length ===
             0 ? (
 
-              <DashboardEmpty
+              <EmptyState
                 icon={
                   <CalendarDays
-                    size={23}
+                    size={20}
                   />
                 }
                 title="Nothing upcoming"
-                description="Tasks with deadlines and Calendar events appear here."
+                description="Tasks with deadlines and calendar events appear here."
               />
 
             ) : (
 
               upcomingItems.map(
-                (item) => {
+                (
+                  item
+                ) => {
                   const taskItem =
                     item.source ===
                       "task" ||
@@ -1724,17 +1712,13 @@ function Dashboard() {
 
                   return (
                     <div
-                      className={`dashboard-v3-upcoming-item ${
-                        taskItem
-                          ? "task"
-                          : ""
-                      }`}
+                      className="v2d-upcoming"
                       key={
                         item._id
                       }
                     >
 
-                      <div className="dashboard-v3-date-box">
+                      <div className="v2d-date">
 
                         <strong>
                           {item.parsedDate.getDate()}
@@ -1752,7 +1736,7 @@ function Dashboard() {
 
                       </div>
 
-                      <div className="dashboard-v3-upcoming-content">
+                      <div className="v2d-upcoming-copy">
 
                         <strong>
                           {item.title}
@@ -1808,17 +1792,18 @@ function Dashboard() {
 
       </section>
 
-      {/* SECONDARY GRID */}
 
-      <section className="dashboard-v3-secondary-grid">
+      {/* REVIEW */}
 
-        <div className="dashboard-card dashboard-v3-week-card">
+      <section className="v2d-review-grid">
 
-          <div className="dashboard-v3-panel-header">
+        <div className="v2d-panel">
+
+          <div className="v2d-panel-heading">
 
             <div>
 
-              <span className="dashboard-v3-eyebrow">
+              <span className="v2d-kicker">
                 Activity
               </span>
 
@@ -1832,10 +1817,10 @@ function Dashboard() {
 
             </div>
 
-            <div className="dashboard-v3-week-total">
+            <div className="v2d-week-total">
 
               <TrendingUp
-                size={16}
+                size={15}
               />
 
               <strong>
@@ -1848,16 +1833,18 @@ function Dashboard() {
 
           </div>
 
-          <div className="dashboard-v3-week-chart">
+          <div className="v2d-chart">
 
             {weeklyActivity.map(
-              (day) => {
-                const percentage =
+              (
+                day
+              ) => {
+                const height =
                   day.seconds ===
                   0
-                    ? 4
+                    ? 3
                     : Math.max(
-                        10,
+                        8,
                         (
                           day.seconds /
                           maxWeeklySeconds
@@ -1871,13 +1858,13 @@ function Dashboard() {
 
                 return (
                   <div
-                    className="dashboard-v3-week-column"
+                    className="v2d-chart-column"
                     key={
                       day.key
                     }
                   >
 
-                    <span className="dashboard-v3-week-value">
+                    <span className="v2d-chart-value">
                       {day.seconds >
                       0
                         ? formatStudyTime(
@@ -1886,32 +1873,30 @@ function Dashboard() {
                         : "0"}
                     </span>
 
-                    <div className="dashboard-v3-week-track">
+                    <div className="v2d-chart-track">
 
                       <div
-                        className={`dashboard-v3-week-bar ${
+                        className={`v2d-chart-bar ${
                           currentDay
-                            ? "today"
+                            ? "is-today"
                             : ""
                         }`}
                         style={{
                           height:
-                            `${percentage}%`,
+                            `${height}%`,
                         }}
                       />
 
                     </div>
 
                     <span
-                      className={`dashboard-v3-week-label ${
+                      className={`v2d-chart-label ${
                         currentDay
-                          ? "today"
+                          ? "is-today"
                           : ""
                       }`}
                     >
-                      {
-                        day.label
-                      }
+                      {day.label}
                     </span>
 
                   </div>
@@ -1923,32 +1908,22 @@ function Dashboard() {
 
         </div>
 
-        {/* STUDY OVERVIEW */}
 
-        <div className="dashboard-card dashboard-v3-insight-card">
+        {/* OVERVIEW */}
 
-          <div className="dashboard-v3-panel-header">
+        <div className="v2d-panel">
 
-            <div>
+          <PanelHeader
+            eyebrow="Review"
+            title="Study overview"
+          />
 
-              <span className="dashboard-v3-eyebrow">
-                Insight
-              </span>
+          <div className="v2d-insights">
 
-              <h2>
-                Study overview
-              </h2>
-
-            </div>
-
-          </div>
-
-          <div className="dashboard-v3-insight-list">
-
-            <InsightRow
+            <Insight
               icon={
                 <BookOpen
-                  size={17}
+                  size={16}
                 />
               }
               label="Top subject"
@@ -1957,26 +1932,19 @@ function Dashboard() {
                   ? topSubject.subjectName
                   : "No data"
               }
-              description={
+              detail={
                 topSubject
                   ? formatStudyTime(
                       topSubject.seconds
                     )
-                  : "Complete Focus sessions to build insights."
-              }
-              color={
-                topSubject
-                  ? getSubjectColor(
-                      topSubject.subjectName
-                    )
-                  : undefined
+                  : "Complete focus sessions to build insights."
               }
             />
 
-            <InsightRow
+            <Insight
               icon={
                 <Zap
-                  size={17}
+                  size={16}
                 />
               }
               label="XP this week"
@@ -1985,20 +1953,20 @@ function Dashboard() {
                   gamification.weeklyXp
                 )
               }
-              description={`${gamification.weeklyFocusXp} from Focus · ${gamification.weeklyTaskXp} from tasks`}
+              detail={`${gamification.weeklyFocusXp} focus · ${gamification.weeklyTaskXp} tasks`}
             />
 
-            <InsightRow
+            <Insight
               icon={
                 <CheckCircle2
-                  size={17}
+                  size={16}
                 />
               }
               label="Completed today"
               value={
                 completedToday
               }
-              description="Tasks finished today"
+              detail="Tasks finished today"
             />
 
           </div>
@@ -2007,76 +1975,54 @@ function Dashboard() {
 
       </section>
 
-      {/* RECENT FOCUS */}
 
-      <section className="dashboard-card dashboard-v3-recent-card">
+      {/* RECENT */}
 
-        <div className="dashboard-v3-panel-header">
+      <section className="v2d-panel v2d-recent">
 
-          <div>
-
-            <span className="dashboard-v3-eyebrow">
-              Focus
-            </span>
-
-            <h2>
-              Recent sessions
-            </h2>
-
-          </div>
-
-          <span className="dashboard-v3-count">
-            {
-              recentSessions.length
-            }
-          </span>
-
-        </div>
+        <PanelHeader
+          eyebrow="Focus"
+          title="Recent sessions"
+          count={
+            recentSessions.length
+          }
+        />
 
         {recentSessions.length ===
         0 ? (
 
-          <DashboardEmpty
+          <EmptyState
             icon={
               <Timer
-                size={23}
+                size={20}
               />
             }
-            title="No Focus sessions yet"
+            title="No focus sessions yet"
             description="Your latest study sessions will appear here."
           />
 
         ) : (
 
-          <div className="dashboard-v3-recent-grid">
+          <div className="v2d-session-grid">
 
             {recentSessions.map(
-              (session) => (
+              (
+                session
+              ) => (
                 <div
-                  className="dashboard-v3-session"
+                  className="v2d-session"
                   key={
                     session._id
                   }
                 >
 
-                  <div
-                    className="dashboard-v3-session-icon"
-                    style={{
-                      "--dashboard-subject-color":
-                        getSubjectColor(
-                          session.subjectName ||
-                            "General Study"
-                        ),
-                    }}
-                  >
-
+                  <span className="v2d-session-icon">
                     <BookOpen
-                      size={16}
+                      size={15}
                     />
+                  </span>
 
-                  </div>
-
-                  <div className="dashboard-v3-session-content">
+                  <div className="v2d-session-copy">
 
                     <strong>
                       {session.subjectName ||
@@ -2092,7 +2038,7 @@ function Dashboard() {
 
                   </div>
 
-                  <strong className="dashboard-v3-session-duration">
+                  <strong className="v2d-session-time">
                     {formatStudyTime(
                       session.durationSeconds
                     )}
@@ -2112,22 +2058,23 @@ function Dashboard() {
   );
 }
 
+
 // =========================================================
-// STAT
+// METRIC
 // =========================================================
 
-function DashboardStat({
+function MetricCard({
   icon,
   label,
   value,
-  description,
+  detail,
 }) {
   return (
-    <div className="dashboard-v3-stat">
+    <article className="v2d-metric">
 
-      <div className="dashboard-v3-stat-top">
+      <div className="v2d-metric-label">
 
-        <span className="dashboard-v3-stat-icon">
+        <span className="v2d-metric-icon">
           {icon}
         </span>
 
@@ -2137,43 +2084,69 @@ function DashboardStat({
 
       </div>
 
-      <strong>
+      <strong className="v2d-metric-value">
         {value}
       </strong>
 
-      <small>
-        {description}
-      </small>
+      <span className="v2d-metric-detail">
+        {detail}
+      </span>
+
+    </article>
+  );
+}
+
+
+// =========================================================
+// PANEL HEADER
+// =========================================================
+
+function PanelHeader({
+  eyebrow,
+  title,
+  count,
+}) {
+  return (
+    <div className="v2d-panel-heading">
+
+      <div>
+
+        <span className="v2d-kicker">
+          {eyebrow}
+        </span>
+
+        <h2>
+          {title}
+        </h2>
+
+      </div>
+
+      {count !==
+        undefined && (
+        <span className="v2d-count">
+          {count}
+        </span>
+      )}
 
     </div>
   );
 }
 
+
 // =========================================================
 // INSIGHT
 // =========================================================
 
-function InsightRow({
+function Insight({
   icon,
   label,
   value,
-  description,
-  color,
+  detail,
 }) {
   return (
-    <div className="dashboard-v3-insight-row">
+    <div className="v2d-insight">
 
-      <span
-        className="dashboard-v3-insight-icon"
-        style={
-          color
-            ? {
-                "--dashboard-subject-color":
-                  color,
-              }
-            : undefined
-        }
-      >
+      <span className="v2d-insight-icon">
         {icon}
       </span>
 
@@ -2188,7 +2161,7 @@ function InsightRow({
         </strong>
 
         <small>
-          {description}
+          {detail}
         </small>
 
       </div>
@@ -2197,17 +2170,18 @@ function InsightRow({
   );
 }
 
+
 // =========================================================
 // EMPTY
 // =========================================================
 
-function DashboardEmpty({
+function EmptyState({
   icon,
   title,
   description,
 }) {
   return (
-    <div className="dashboard-v3-empty">
+    <div className="v2d-empty">
 
       {icon}
 
@@ -2222,5 +2196,6 @@ function DashboardEmpty({
     </div>
   );
 }
+
 
 export default Dashboard;

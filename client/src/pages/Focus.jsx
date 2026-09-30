@@ -37,16 +37,19 @@ import {
   getStudySessions,
 } from "../services/studySessionData";
 
-import "./Focus.selects.css";
+import "../styles/focus-v2.css";
+
 
 const TIMER_STORAGE_KEY_BASE =
   "studyos_active_focus_timer";
+
 
 const PRESET_DURATIONS = [
   25,
   50,
   90,
 ];
+
 
 // =========================================================
 // DEFAULT FOCUS DURATION
@@ -62,30 +65,47 @@ const getDefaultFocusMinutes =
       );
 
     if (
-      Number.isFinite(saved) &&
+      Number.isFinite(
+        saved
+      ) &&
       saved >= 1 &&
       saved <= 720
     ) {
-      return Math.round(saved);
+      return Math.round(
+        saved
+      );
     }
 
     return 50;
   };
 
+
 const getCustomValueForDuration =
-  (minutes) => {
+  (
+    minutes
+  ) => {
     return PRESET_DURATIONS.includes(
-      Number(minutes)
+      Number(
+        minutes
+      )
     )
       ? ""
-      : String(minutes);
+      : String(
+          minutes
+        );
   };
+
+
+// =========================================================
+// FOCUS
+// =========================================================
 
 function Focus() {
   const {
     isGuest,
     firebaseUser,
   } = useAuth();
+
 
   const timerStorageKey =
     isGuest
@@ -95,42 +115,54 @@ function Focus() {
           "unknown"
         }`;
 
-  // =========================================================
-  // DEFAULT TIMER
-  // =========================================================
 
   const initialDefaultMinutes =
     getDefaultFocusMinutes();
 
-  // =========================================================
+
+  // =======================================================
   // DATA
-  // =========================================================
+  // =======================================================
 
-  const [subjects, setSubjects] =
-    useState([]);
+  const [
+    subjects,
+    setSubjects,
+  ] = useState([]);
 
-  const [sessions, setSessions] =
-    useState([]);
+  const [
+    sessions,
+    setSessions,
+  ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  const [refreshing, setRefreshing] =
-    useState(false);
+  const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
 
-  // =========================================================
-  // STATUS MESSAGES
-  // =========================================================
 
-  const [message, setMessage] =
-    useState("");
+  // =======================================================
+  // MESSAGES
+  // =======================================================
 
-  const [error, setError] =
-    useState("");
+  const [
+    message,
+    setMessage,
+  ] = useState("");
 
-  // =========================================================
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+
+  // =======================================================
   // TIMER CONFIG
-  // =========================================================
+  // =======================================================
 
   const [
     selectedSubjectId,
@@ -153,19 +185,17 @@ function Focus() {
     )
   );
 
-  // =========================================================
+
+  // =======================================================
   // TIMER STATE
-  // =========================================================
+  // =======================================================
 
-  const [status, setStatus] =
-    useState("idle");
-
-  /*
-    status:
-    idle
-    running
-    paused
-  */
+  const [
+    status,
+    setStatus,
+  ] = useState(
+    "idle"
+  );
 
   const [
     remainingSeconds,
@@ -185,15 +215,6 @@ function Focus() {
     startedAt,
     setStartedAt,
   ] = useState(null);
-
-  /*
-    Freeze subject information
-    once the session begins.
-
-    That way renaming/deleting a
-    subject doesn't mutate the
-    current timer.
-  */
 
   const [
     activeSubjectId,
@@ -217,9 +238,10 @@ function Focus() {
     setHydrated,
   ] = useState(false);
 
-  // =========================================================
+
+  // =======================================================
   // DELETE SESSION
-  // =========================================================
+  // =======================================================
 
   const [
     sessionToDelete,
@@ -231,9 +253,10 @@ function Focus() {
     setDeletingSession,
   ] = useState(false);
 
-  // =========================================================
+
+  // =======================================================
   // REFS
-  // =========================================================
+  // =======================================================
 
   const autoFinishLockRef =
     useRef(false);
@@ -241,56 +264,73 @@ function Focus() {
   const finishSessionRef =
     useRef(null);
 
-  // =========================================================
+
+  // =======================================================
   // MESSAGE HELPERS
-  // =========================================================
+  // =======================================================
 
-  const showSuccess = (
-    text
-  ) => {
-    setError("");
-    setMessage(text);
+  const showSuccess =
+    (
+      text
+    ) => {
+      setError("");
+      setMessage(
+        text
+      );
 
-    window.setTimeout(
-      () => {
-        setMessage("");
-      },
-      3000
-    );
-  };
+      window.setTimeout(
+        () => {
+          setMessage("");
+        },
+        3000
+      );
+    };
 
-  const showError = (
-    text
-  ) => {
-    setMessage("");
-    setError(text);
-  };
 
-  // =========================================================
-  // FETCH SUBJECTS
-  // =========================================================
+  const showError =
+    (
+      text
+    ) => {
+      setMessage("");
+      setError(
+        text
+      );
+    };
+
+
+  // =======================================================
+  // SUBJECTS
+  // =======================================================
 
   const fetchSubjects =
     async () => {
       let data;
 
-      if (isGuest) {
+      if (
+        isGuest
+      ) {
         data =
           await localDb.getAll(
             "subjects"
           );
 
-        data = [
-          ...data,
-        ].sort(
-          (a, b) =>
-            new Date(
-              b.createdAt || 0
-            ) -
-            new Date(
-              a.createdAt || 0
-            )
-        );
+        data =
+          [
+            ...data,
+          ].sort(
+            (
+              first,
+              second
+            ) =>
+              new Date(
+                second.createdAt ||
+                  0
+              ) -
+              new Date(
+                first.createdAt ||
+                  0
+              )
+          );
       } else {
         data =
           await apiRequest(
@@ -299,15 +339,18 @@ function Focus() {
       }
 
       setSubjects(
-        Array.isArray(data)
+        Array.isArray(
+          data
+        )
           ? data
           : []
       );
     };
 
-  // =========================================================
-  // FETCH SESSIONS
-  // =========================================================
+
+  // =======================================================
+  // SESSIONS
+  // =======================================================
 
   const fetchSessions =
     async () => {
@@ -317,20 +360,25 @@ function Focus() {
         );
 
       setSessions(
-        Array.isArray(data)
+        Array.isArray(
+          data
+        )
           ? data
           : []
       );
     };
 
-  // =========================================================
+
+  // =======================================================
   // REFRESH
-  // =========================================================
+  // =======================================================
 
   const refreshData =
     async () => {
       try {
-        setRefreshing(true);
+        setRefreshing(
+          true
+        );
 
         setError("");
 
@@ -339,15 +387,9 @@ function Focus() {
           fetchSessions(),
         ]);
 
-        /*
-          When timer is idle,
-          refresh also picks up
-          the newest Settings
-          default duration.
-        */
-
         if (
-          status === "idle"
+          status ===
+          "idle"
         ) {
           const defaultMinutes =
             getDefaultFocusMinutes();
@@ -379,17 +421,20 @@ function Focus() {
         );
 
         showError(
-          refreshError.message ||
+          refreshError?.message ||
             "Couldn't refresh Focus."
         );
       } finally {
-        setRefreshing(false);
+        setRefreshing(
+          false
+        );
       }
     };
 
-  // =========================================================
-  // COMPLETION NOTIFICATION
-  // =========================================================
+
+  // =======================================================
+  // NOTIFICATION
+  // =======================================================
 
   const sendCompletionNotification =
     (
@@ -416,7 +461,8 @@ function Focus() {
         new Notification(
           "Focus session complete 🎯",
           {
-            body: `${subjectName} session finished. Nice work.`,
+            body:
+              `${subjectName} session finished. Nice work.`,
           }
         );
       } catch (
@@ -429,9 +475,10 @@ function Focus() {
       }
     };
 
-  // =========================================================
+
+  // =======================================================
   // RESTORE TIMER
-  // =========================================================
+  // =======================================================
 
   const restoreTimer =
     async () => {
@@ -440,13 +487,17 @@ function Focus() {
           timerStorageKey
         );
 
-      if (!raw) {
+      if (
+        !raw
+      ) {
         return;
       }
 
       try {
         const saved =
-          JSON.parse(raw);
+          JSON.parse(
+            raw
+          );
 
         const savedPlanned =
           Number(
@@ -499,9 +550,6 @@ function Focus() {
             null
         );
 
-        // =====================================================
-        // RUNNING TIMER
-        // =====================================================
 
         if (
           saved.status ===
@@ -522,16 +570,13 @@ function Focus() {
               Math.max(
                 0,
                 Math.ceil(
-                  (target -
-                    Date.now()) /
+                  (
+                    target -
+                    Date.now()
+                  ) /
                     1000
                 )
               );
-
-            /*
-              Timer completed while
-              browser/page was away.
-            */
 
             if (
               remaining <= 0
@@ -580,10 +625,10 @@ function Focus() {
 
                 setSessions(
                   (
-                    currentSessions
+                    current
                   ) => [
                     restoredSession,
-                    ...currentSessions,
+                    ...current,
                   ]
                 );
 
@@ -601,14 +646,6 @@ function Focus() {
                   saved.activeSubjectName ||
                     "General Study"
                 );
-
-                /*
-                  After restoring a
-                  completed session,
-                  return timer to the
-                  current Settings
-                  default.
-                */
 
                 const defaultMinutes =
                   getDefaultFocusMinutes();
@@ -661,12 +698,6 @@ function Focus() {
                   restoreError
                 );
 
-                /*
-                  Don't lose study
-                  progress if backend
-                  couldn't save.
-                */
-
                 setStatus(
                   "paused"
                 );
@@ -703,9 +734,6 @@ function Focus() {
           }
         }
 
-        // =====================================================
-        // PAUSED TIMER
-        // =====================================================
 
         if (
           saved.status ===
@@ -738,10 +766,6 @@ function Focus() {
           return;
         }
 
-        /*
-          Unknown timer state.
-        */
-
         throw new Error(
           "Unknown saved timer status"
         );
@@ -759,9 +783,10 @@ function Focus() {
       }
     };
 
-  // =========================================================
+
+  // =======================================================
   // INITIAL LOAD
-  // =========================================================
+  // =======================================================
 
   useEffect(() => {
     let cancelled =
@@ -770,14 +795,18 @@ function Focus() {
     const initialize =
       async () => {
         try {
-          setLoading(true);
+          setLoading(
+            true
+          );
 
           await Promise.all([
             fetchSubjects(),
             fetchSessions(),
           ]);
 
-          if (cancelled) {
+          if (
+            cancelled
+          ) {
             return;
           }
 
@@ -794,7 +823,7 @@ function Focus() {
             !cancelled
           ) {
             showError(
-              initializeError.message ||
+              initializeError?.message ||
                 "Couldn't load Focus."
             );
           }
@@ -816,19 +845,23 @@ function Focus() {
     initialize();
 
     return () => {
-      cancelled = true;
+      cancelled =
+        true;
     };
   }, [
     isGuest,
     timerStorageKey,
   ]);
 
-  // =========================================================
+
+  // =======================================================
   // PERSIST TIMER
-  // =========================================================
+  // =======================================================
 
   useEffect(() => {
-    if (!hydrated) {
+    if (
+      !hydrated
+    ) {
       return;
     }
 
@@ -844,7 +877,8 @@ function Focus() {
     }
 
     const snapshot = {
-      version: 1,
+      version:
+        1,
 
       status,
 
@@ -876,11 +910,13 @@ function Focus() {
     startedAt,
     activeSubjectId,
     activeSubjectName,
+    timerStorageKey,
   ]);
 
-  // =========================================================
+
+  // =======================================================
   // TIMER LOOP
-  // =========================================================
+  // =======================================================
 
   useEffect(() => {
     if (
@@ -891,34 +927,37 @@ function Focus() {
       return;
     }
 
-    const tick = () => {
-      const remaining =
-        Math.max(
-          0,
-          Math.ceil(
-            (targetEndAt -
-              Date.now()) /
-              1000
-          )
+    const tick =
+      () => {
+        const remaining =
+          Math.max(
+            0,
+            Math.ceil(
+              (
+                targetEndAt -
+                Date.now()
+              ) /
+                1000
+            )
+          );
+
+        setRemainingSeconds(
+          remaining
         );
 
-      setRemainingSeconds(
-        remaining
-      );
+        if (
+          remaining <= 0 &&
+          !autoFinishLockRef.current
+        ) {
+          autoFinishLockRef.current =
+            true;
 
-      if (
-        remaining <= 0 &&
-        !autoFinishLockRef.current
-      ) {
-        autoFinishLockRef.current =
-          true;
-
-        finishSessionRef.current?.(
-          true,
-          0
-        );
-      }
-    };
+          finishSessionRef.current?.(
+            true,
+            0
+          );
+        }
+      };
 
     tick();
 
@@ -938,40 +977,42 @@ function Focus() {
     targetEndAt,
   ]);
 
-  // =========================================================
-  // CHOOSE PRESET
-  // =========================================================
 
-  const chooseDuration = (
-    minutes
-  ) => {
-    if (
-      status !== "idle"
-    ) {
-      return;
-    }
+  // =======================================================
+  // DURATION
+  // =======================================================
 
-    setPlannedMinutes(
+  const chooseDuration =
+    (
       minutes
-    );
+    ) => {
+      if (
+        status !==
+        "idle"
+      ) {
+        return;
+      }
 
-    setRemainingSeconds(
-      minutes * 60
-    );
+      setPlannedMinutes(
+        minutes
+      );
 
-    setCustomMinutes(
-      ""
-    );
-  };
+      setRemainingSeconds(
+        minutes *
+          60
+      );
 
-  // =========================================================
-  // CUSTOM DURATION
-  // =========================================================
+      setCustomMinutes("");
+    };
+
 
   const handleCustomMinutes =
-    (event) => {
+    (
+      event
+    ) => {
       if (
-        status !== "idle"
+        status !==
+        "idle"
       ) {
         return;
       }
@@ -984,10 +1025,14 @@ function Focus() {
       );
 
       const number =
-        Number(value);
+        Number(
+          value
+        );
 
       if (
-        Number.isFinite(number) &&
+        Number.isFinite(
+          number
+        ) &&
         number >= 1 &&
         number <= 720
       ) {
@@ -1007,9 +1052,10 @@ function Focus() {
       }
     };
 
-  // =========================================================
-  // START SESSION
-  // =========================================================
+
+  // =======================================================
+  // START
+  // =======================================================
 
   const startSession =
     () => {
@@ -1041,9 +1087,15 @@ function Focus() {
 
       const selectedSubject =
         subjects.find(
-          (subject) =>
-            subject._id ===
-            selectedSubjectId
+          (
+            subject
+          ) =>
+            String(
+              subject._id
+            ) ===
+            String(
+              selectedSubjectId
+            )
         );
 
       const now =
@@ -1090,9 +1142,10 @@ function Focus() {
       setMessage("");
     };
 
-  // =========================================================
-  // PAUSE SESSION
-  // =========================================================
+
+  // =======================================================
+  // PAUSE
+  // =======================================================
 
   const pauseSession =
     () => {
@@ -1108,8 +1161,10 @@ function Focus() {
         Math.max(
           0,
           Math.ceil(
-            (targetEndAt -
-              Date.now()) /
+            (
+              targetEndAt -
+              Date.now()
+            ) /
               1000
           )
         );
@@ -1127,9 +1182,10 @@ function Focus() {
       );
     };
 
-  // =========================================================
-  // RESUME SESSION
-  // =========================================================
+
+  // =======================================================
+  // RESUME
+  // =======================================================
 
   const resumeSession =
     () => {
@@ -1161,9 +1217,10 @@ function Focus() {
         false;
     };
 
-  // =========================================================
-  // FINISH + SAVE SESSION
-  // =========================================================
+
+  // =======================================================
+  // FINISH
+  // =======================================================
 
   const finishSession =
     async (
@@ -1172,7 +1229,8 @@ function Focus() {
     ) => {
       if (
         savingSession ||
-        status === "idle"
+        status ===
+          "idle"
       ) {
         return;
       }
@@ -1199,8 +1257,10 @@ function Focus() {
           Math.max(
             0,
             Math.ceil(
-              (targetEndAt -
-                Date.now()) /
+              (
+                targetEndAt -
+                Date.now()
+              ) /
                 1000
             )
           );
@@ -1285,19 +1345,12 @@ function Focus() {
 
         setSessions(
           (
-            currentSessions
+            current
           ) => [
             savedSession,
-            ...currentSessions,
+            ...current,
           ]
         );
-
-        /*
-          After completing a
-          session, use whatever
-          default is currently
-          configured in Settings.
-        */
 
         const defaultMinutes =
           getDefaultFocusMinutes();
@@ -1375,7 +1428,7 @@ function Focus() {
         );
 
         showError(
-          saveError.message ||
+          saveError?.message ||
             "Couldn't save your study session."
         );
 
@@ -1388,17 +1441,20 @@ function Focus() {
       }
     };
 
+
   finishSessionRef.current =
     finishSession;
 
-  // =========================================================
-  // RESET IDLE TIMER
-  // =========================================================
+
+  // =======================================================
+  // RESET
+  // =======================================================
 
   const resetIdleTimer =
     () => {
       if (
-        status !== "idle"
+        status !==
+        "idle"
       ) {
         return;
       }
@@ -1429,9 +1485,10 @@ function Focus() {
       setMessage("");
     };
 
-  // =========================================================
+
+  // =======================================================
   // DELETE SESSION
-  // =========================================================
+  // =======================================================
 
   const deleteSession =
     async () => {
@@ -1454,12 +1511,18 @@ function Focus() {
 
         setSessions(
           (
-            currentSessions
+            current
           ) =>
-            currentSessions.filter(
-              (session) =>
-                session._id !==
-                sessionToDelete._id
+            current.filter(
+              (
+                session
+              ) =>
+                String(
+                  session._id
+                ) !==
+                String(
+                  sessionToDelete._id
+                )
             )
         );
 
@@ -1484,7 +1547,7 @@ function Focus() {
         );
 
         showError(
-          deleteError.message ||
+          deleteError?.message ||
             "Couldn't delete the session."
         );
       } finally {
@@ -1494,12 +1557,15 @@ function Focus() {
       }
     };
 
-  // =========================================================
+
+  // =======================================================
   // DATE HELPERS
-  // =========================================================
+  // =======================================================
 
   const getDateKey =
-    (date) => {
+    (
+      date
+    ) => {
       return [
         date.getFullYear(),
 
@@ -1520,10 +1586,15 @@ function Focus() {
       ].join("-");
     };
 
+
   const isToday =
-    (value) => {
+    (
+      value
+    ) => {
       const date =
-        new Date(value);
+        new Date(
+          value
+        );
 
       if (
         Number.isNaN(
@@ -1543,20 +1614,16 @@ function Focus() {
       );
     };
 
-  // =========================================================
-  // SESSION STATS
-  // =========================================================
+
+  // =======================================================
+  // STATS
+  // =======================================================
 
   const stats =
     useMemo(() => {
-      let totalSeconds =
-        0;
-
-      let todaySeconds =
-        0;
-
-      let weekSeconds =
-        0;
+      let totalSeconds = 0;
+      let todaySeconds = 0;
+      let weekSeconds = 0;
 
       const sevenDaysAgo =
         new Date();
@@ -1574,7 +1641,9 @@ function Focus() {
       );
 
       sessions.forEach(
-        (session) => {
+        (
+          session
+        ) => {
           const duration =
             Number(
               session.durationSeconds
@@ -1612,22 +1681,25 @@ function Focus() {
 
       return {
         totalSeconds,
-
         todaySeconds,
-
         weekSeconds,
 
         sessionCount:
           sessions.length,
       };
-    }, [sessions]);
+    }, [
+      sessions,
+    ]);
 
-  // =========================================================
+
+  // =======================================================
   // FORMAT TIMER
-  // =========================================================
+  // =======================================================
 
   const formatTimer =
-    (seconds) => {
+    (
+      seconds
+    ) => {
       const safe =
         Math.max(
           0,
@@ -1643,12 +1715,16 @@ function Focus() {
 
       const minutes =
         Math.floor(
-          (safe % 3600) /
+          (
+            safe %
+            3600
+          ) /
             60
         );
 
       const secs =
-        safe % 60;
+        safe %
+        60;
 
       if (
         hours > 0
@@ -1679,18 +1755,22 @@ function Focus() {
       )}`;
     };
 
-  // =========================================================
+
+  // =======================================================
   // FORMAT STUDY TIME
-  // =========================================================
+  // =======================================================
 
   const formatStudyTime =
-    (seconds) => {
+    (
+      seconds
+    ) => {
       const safeSeconds =
         Math.max(
           0,
           Math.floor(
-            Number(seconds) ||
-              0
+            Number(
+              seconds
+            ) || 0
           )
         );
 
@@ -1731,14 +1811,19 @@ function Focus() {
       return "0m";
     };
 
-  // =========================================================
+
+  // =======================================================
   // SESSION DATE
-  // =========================================================
+  // =======================================================
 
   const formatSessionDate =
-    (value) => {
+    (
+      value
+    ) => {
       const date =
-        new Date(value);
+        new Date(
+          value
+        );
 
       if (
         Number.isNaN(
@@ -1749,7 +1834,9 @@ function Focus() {
       }
 
       if (
-        isToday(date)
+        isToday(
+          date
+        )
       ) {
         return `Today · ${date.toLocaleTimeString(
           "en-IN",
@@ -1784,9 +1871,10 @@ function Focus() {
       );
     };
 
-  // =========================================================
-  // TIMER PROGRESS
-  // =========================================================
+
+  // =======================================================
+  // PROGRESS
+  // =======================================================
 
   const totalTimerSeconds =
     Math.max(
@@ -1795,6 +1883,7 @@ function Focus() {
         60
     );
 
+
   const elapsedSeconds =
     Math.max(
       0,
@@ -1802,24 +1891,24 @@ function Focus() {
         remainingSeconds
     );
 
+
   const progressPercent =
     Math.min(
       100,
       Math.max(
         0,
-        (elapsedSeconds /
-          totalTimerSeconds) *
+        (
+          elapsedSeconds /
+          totalTimerSeconds
+        ) *
           100
       )
     );
 
-  const progressDegrees =
-    progressPercent *
-    3.6;
 
-  // =========================================================
-  // STATUS LABEL
-  // =========================================================
+  // =======================================================
+  // LABEL
+  // =======================================================
 
   const timerStatusLabel =
     () => {
@@ -1827,48 +1916,99 @@ function Focus() {
         status ===
         "running"
       ) {
-        return "FOCUSING";
+        return "Focusing";
       }
 
       if (
         status ===
         "paused"
       ) {
-        return "PAUSED";
+        return "Paused";
       }
 
-      return "READY";
+      return "Ready";
     };
 
-  // =========================================================
+
+  // =======================================================
+  // OPTIONS
+  // =======================================================
+
+  const subjectOptions =
+    useMemo(
+      () => [
+        {
+          value:
+            "",
+
+          label:
+            "General Study",
+
+          description:
+            "Focus without linking a subject",
+        },
+
+        ...subjects.map(
+          (
+            subject
+          ) => ({
+            value:
+              String(
+                subject._id
+              ),
+
+            label:
+              subject.name,
+
+            description:
+              subject.code ||
+              "Subject",
+
+            color:
+              subject.color ||
+              "#64748b",
+          })
+        ),
+      ],
+      [
+        subjects,
+      ]
+    );
+
+
+  // =======================================================
   // UI
-  // =========================================================
+  // =======================================================
 
   return (
-    <div className="dashboard focus-v1-page">
+    <div className="v2f-page">
 
       {/* HEADER */}
 
-      <header className="dashboard-header focus-v1-header">
+      <header className="v2f-header">
 
         <div>
 
+          <span className="v2f-eyebrow">
+            Deep work
+          </span>
+
           <h1>
-            Focus ⏱️
+            Focus
           </h1>
 
           <p>
-            Run focused study
-            sessions and build a
-            real record of your
-            study time.
+            Run distraction-free study sessions
+            and build an accurate record of your
+            focused work.
           </p>
 
         </div>
 
+
         <button
           type="button"
-          className="focus-v1-refresh"
+          className="v2f-refresh"
           disabled={
             refreshing
           }
@@ -1881,23 +2021,24 @@ function Focus() {
             size={16}
             className={
               refreshing
-                ? "focus-v1-spin"
+                ? "v2f-spin"
                 : ""
             }
           />
 
           {refreshing
-            ? "Refreshing..."
+            ? "Refreshing"
             : "Refresh"}
 
         </button>
 
       </header>
 
-      {/* SUCCESS MESSAGE */}
+
+      {/* SUCCESS */}
 
       {message && (
-        <div className="focus-v1-message success">
+        <div className="v2f-message is-success">
 
           <CheckCircle2
             size={17}
@@ -1910,10 +2051,11 @@ function Focus() {
         </div>
       )}
 
+
       {/* ERROR */}
 
       {error && (
-        <div className="focus-v1-message error">
+        <div className="v2f-message is-error">
 
           <div>
 
@@ -1939,238 +2081,209 @@ function Focus() {
         </div>
       )}
 
+
       {loading ? (
 
-        <div className="dashboard-card">
-          Loading Focus...
-        </div>
+        <section className="v2f-loading">
+
+          <RefreshCw
+            size={22}
+            className="v2f-spin"
+          />
+
+          <strong>
+            Loading Focus
+          </strong>
+
+          <span>
+            Preparing your timer and study history.
+          </span>
+
+        </section>
 
       ) : (
-
         <>
-          {/* =================================================
-              STATS
-          ================================================= */}
 
-          <section className="focus-v1-stats">
+          {/* STATS */}
 
-            <div className="focus-v1-stat">
+          <section className="v2f-stats">
 
-              <Clock3
-                size={19}
-              />
+            <FocusStat
+              icon={
+                <Clock3
+                  size={19}
+                />
+              }
+              label="Today"
+              value={
+                formatStudyTime(
+                  stats.todaySeconds
+                )
+              }
+              description="Focused today"
+            />
 
-              <div>
+            <FocusStat
+              icon={
+                <Flame
+                  size={19}
+                />
+              }
+              label="Last 7 days"
+              value={
+                formatStudyTime(
+                  stats.weekSeconds
+                )
+              }
+              description="Recent focus"
+            />
 
-                <span>
-                  Today
-                </span>
+            <FocusStat
+              icon={
+                <History
+                  size={19}
+                />
+              }
+              label="Sessions"
+              value={
+                stats.sessionCount
+              }
+              description="Completed sessions"
+            />
 
-                <strong>
-                  {formatStudyTime(
-                    stats.todaySeconds
-                  )}
-                </strong>
-
-              </div>
-
-            </div>
-
-            <div className="focus-v1-stat">
-
-              <Flame
-                size={19}
-              />
-
-              <div>
-
-                <span>
-                  Last 7 Days
-                </span>
-
-                <strong>
-                  {formatStudyTime(
-                    stats.weekSeconds
-                  )}
-                </strong>
-
-              </div>
-
-            </div>
-
-            <div className="focus-v1-stat">
-
-              <History
-                size={19}
-              />
-
-              <div>
-
-                <span>
-                  Sessions
-                </span>
-
-                <strong>
-                  {
-                    stats.sessionCount
-                  }
-                </strong>
-
-              </div>
-
-            </div>
-
-            <div className="focus-v1-stat">
-
-              <Timer
-                size={19}
-              />
-
-              <div>
-
-                <span>
-                  Total Focus
-                </span>
-
-                <strong>
-                  {formatStudyTime(
-                    stats.totalSeconds
-                  )}
-                </strong>
-
-              </div>
-
-            </div>
+            <FocusStat
+              icon={
+                <Timer
+                  size={19}
+                />
+              }
+              label="Total focus"
+              value={
+                formatStudyTime(
+                  stats.totalSeconds
+                )
+              }
+              description="All-time study"
+            />
 
           </section>
 
-          {/* =================================================
-              MAIN TIMER
-          ================================================= */}
 
-          <section className="focus-v1-main-grid">
+          {/* TIMER WORKSPACE */}
 
-            <div className="dashboard-card focus-v1-timer-card">
+          <section className="v2f-workspace">
+
+            {/* TIMER */}
+
+            <main className="v2f-timer-card">
 
               {/* CONFIG */}
 
-              <div className="focus-v1-config">
+              <div className="v2f-config">
 
-                <div className="focus-v1-config-block">
+                <div className="v2f-config-block">
 
-                  <label>
+                  <span className="v2f-config-label">
                     Subject
-                  </label>
+                  </span>
 
-                  <div className="focus-v1-select-wrap focus-v2-select-wrap">
-
-                    <BookOpen
-                      size={16}
-                    />
-
-                    <StudySelect
-                      value={
-                        selectedSubjectId
-                      }
-                      onChange={
-                        setSelectedSubjectId
-                      }
-                      options={[
-                        {
-                          value: "",
-                          label: "General Study",
-                          description: "Focus without linking a subject",
-                        },
-                        ...subjects.map(
-                          (subject) => ({
-                            value: subject._id,
-                            label: subject.name,
-                            description: subject.code || "Subject",
-                            color: subject.color || "#6366f1",
-                          })
-                        ),
-                      ]}
-                      placeholder="General Study"
-                      className="focus-v2-subject-select"
-                      disabled={
-                        status !==
-                        "idle"
-                      }
-                      ariaLabel="Choose Focus subject"
-                    />
-
-                  </div>
+                  <StudySelect
+                    value={
+                      selectedSubjectId
+                    }
+                    onChange={(
+                      value
+                    ) =>
+                      setSelectedSubjectId(
+                        String(
+                          value
+                        )
+                      )
+                    }
+                    options={
+                      subjectOptions
+                    }
+                    placeholder="General Study"
+                    className="v2f-subject-select"
+                    disabled={
+                      status !==
+                      "idle"
+                    }
+                    ariaLabel="Choose Focus subject"
+                  />
 
                 </div>
 
-                {/* DURATION */}
 
-                <div className="focus-v1-config-block">
+                <div className="v2f-config-block">
 
-                  <label>
+                  <span className="v2f-config-label">
                     Duration
-                  </label>
+                  </span>
 
-                  <div className="focus-v1-presets">
+                  <div className="v2f-duration-row">
 
-                    {PRESET_DURATIONS.map(
-                      (
-                        minutes
-                      ) => (
+                    <div className="v2f-presets">
 
-                        <button
-                          key={
-                            minutes
-                          }
-                          type="button"
-                          disabled={
-                            status !==
-                            "idle"
-                          }
-                          className={
-                            plannedMinutes ===
-                              minutes &&
-                            customMinutes ===
-                              ""
-                              ? "active"
-                              : ""
-                          }
-                          onClick={() =>
-                            chooseDuration(
+                      {PRESET_DURATIONS.map(
+                        (
+                          minutes
+                        ) => (
+                          <button
+                            key={
                               minutes
-                            )
-                          }
-                        >
-                          {minutes}m
-                        </button>
+                            }
+                            type="button"
+                            disabled={
+                              status !==
+                              "idle"
+                            }
+                            className={
+                              plannedMinutes ===
+                                minutes &&
+                              customMinutes ===
+                                ""
+                                ? "is-active"
+                                : ""
+                            }
+                            onClick={() =>
+                              chooseDuration(
+                                minutes
+                              )
+                            }
+                          >
+                            {minutes} min
+                          </button>
+                        )
+                      )}
 
-                      )
-                    )}
+                    </div>
 
-                  </div>
 
-                  <div className="focus-v1-custom">
+                    <label className="v2f-custom">
 
-                    <input
-                      type="number"
-                      min="1"
-                      max="720"
-                      placeholder="Custom"
-                      value={
-                        customMinutes
-                      }
-                      disabled={
-                        status !==
-                        "idle"
-                      }
-                      onChange={
-                        handleCustomMinutes
-                      }
-                    />
+                      <input
+                        type="number"
+                        min="1"
+                        max="720"
+                        placeholder="Custom"
+                        value={
+                          customMinutes
+                        }
+                        disabled={
+                          status !==
+                          "idle"
+                        }
+                        onChange={
+                          handleCustomMinutes
+                        }
+                      />
 
-                    <span>
-                      min
-                    </span>
+                      <span>
+                        min
+                      </span>
+
+                    </label>
 
                   </div>
 
@@ -2178,40 +2291,66 @@ function Focus() {
 
               </div>
 
-              {/* =================================================
-                  TIMER RING
-              ================================================= */}
 
-              <div className="focus-v1-timer-area">
+              {/* TIMER */}
 
-                <div
-                  className="focus-v1-ring"
-                  style={{
-                    "--focus-progress":
-                      `${progressDegrees}deg`,
-                  }}
-                >
+              <div className="v2f-timer-area">
 
-                  <div className="focus-v1-ring-inner">
+                <div className="v2f-ring">
+
+                  <svg
+                    className="v2f-ring-svg"
+                    viewBox="0 0 120 120"
+                    aria-hidden="true"
+                  >
+
+                    <circle
+                      className="v2f-ring-track"
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      pathLength="100"
+                    />
+
+                    <circle
+                      className="v2f-ring-progress"
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      pathLength="100"
+                      strokeDasharray="100"
+                      strokeDashoffset={
+                        100 -
+                        progressPercent
+                      }
+                    />
+
+                  </svg>
+
+
+                  <div className="v2f-ring-content">
 
                     <span
-                      className={`focus-v1-status ${status}`}
+                      className={`v2f-status is-${status}`}
                     >
+                      <span />
                       {timerStatusLabel()}
                     </span>
 
-                    <strong>
+
+                    <strong className="v2f-time">
                       {formatTimer(
                         remainingSeconds
                       )}
                     </strong>
 
-                    <small>
+
+                    <span className="v2f-timer-subject">
                       {status ===
                       "idle"
                         ? `${plannedMinutes} minute session`
                         : activeSubjectName}
-                    </small>
+                    </span>
 
                   </div>
 
@@ -2219,11 +2358,10 @@ function Focus() {
 
               </div>
 
-              {/* =================================================
-                  CONTROLS
-              ================================================= */}
 
-              <div className="focus-v1-controls">
+              {/* CONTROLS */}
+
+              <div className="v2f-controls">
 
                 {status ===
                   "idle" && (
@@ -2231,30 +2369,31 @@ function Focus() {
 
                     <button
                       type="button"
-                      className="focus-v1-primary"
+                      className="v2f-primary-action"
                       onClick={
                         startSession
                       }
                     >
 
                       <Play
-                        size={18}
+                        size={19}
                       />
 
-                      Start Focus
+                      Start focus
 
                     </button>
 
+
                     <button
                       type="button"
-                      className="focus-v1-secondary"
+                      className="v2f-secondary-action"
                       onClick={
                         resetIdleTimer
                       }
                     >
 
                       <RotateCcw
-                        size={17}
+                        size={18}
                       />
 
                       Reset
@@ -2264,29 +2403,31 @@ function Focus() {
                   </>
                 )}
 
+
                 {status ===
                   "running" && (
                   <>
 
                     <button
                       type="button"
-                      className="focus-v1-primary"
+                      className="v2f-primary-action"
                       onClick={
                         pauseSession
                       }
                     >
 
                       <Pause
-                        size={18}
+                        size={19}
                       />
 
                       Pause
 
                     </button>
 
+
                     <button
                       type="button"
-                      className="focus-v1-finish"
+                      className="v2f-secondary-action"
                       disabled={
                         savingSession
                       }
@@ -2310,34 +2451,34 @@ function Focus() {
                   </>
                 )}
 
+
                 {status ===
                   "paused" && (
                   <>
 
                     {remainingSeconds >
                       0 && (
-
                       <button
                         type="button"
-                        className="focus-v1-primary"
+                        className="v2f-primary-action"
                         onClick={
                           resumeSession
                         }
                       >
 
                         <Play
-                          size={18}
+                          size={19}
                         />
 
                         Resume
 
                       </button>
-
                     )}
+
 
                     <button
                       type="button"
-                      className="focus-v1-finish"
+                      className="v2f-secondary-action"
                       disabled={
                         savingSession
                       }
@@ -2363,24 +2504,23 @@ function Focus() {
 
               </div>
 
-              <p className="focus-v1-persistence-note">
-                You can refresh StudyOS
-                or move to another page.
-                Your timer will continue
-                correctly.
+
+              <p className="v2f-persistence-note">
+                Your timer keeps running if you refresh
+                StudyOS or move to another page.
               </p>
 
-            </div>
+            </main>
 
-            {/* =================================================
-                CURRENT SESSION
-            ================================================= */}
 
-            <aside className="dashboard-card focus-v1-side-card">
+            {/* CURRENT SESSION */}
 
-              <span className="focus-v1-eyebrow">
-                CURRENT SESSION
+            <aside className="v2f-session-card">
+
+              <span className="v2f-eyebrow">
+                Current session
               </span>
+
 
               <h2>
                 {status ===
@@ -2389,17 +2529,19 @@ function Focus() {
                   : activeSubjectName}
               </h2>
 
+
               <p>
                 {status ===
                 "idle"
                   ? "Choose a subject and duration, then start a focused block."
                   : status ===
                     "running"
-                  ? "Timer is running. Stay with the task in front of you."
-                  : "Session is paused. Resume when you're ready."}
+                  ? "Timer is running. Keep your attention on the work in front of you."
+                  : "Session is paused. Resume whenever you're ready."}
               </p>
 
-              <div className="focus-v1-session-details">
+
+              <div className="v2f-session-metrics">
 
                 <div>
 
@@ -2408,13 +2550,11 @@ function Focus() {
                   </span>
 
                   <strong>
-                    {
-                      plannedMinutes
-                    }{" "}
-                    min
+                    {plannedMinutes} min
                   </strong>
 
                 </div>
+
 
                 <div>
 
@@ -2430,6 +2570,7 @@ function Focus() {
 
                 </div>
 
+
                 <div>
 
                   <span>
@@ -2439,15 +2580,15 @@ function Focus() {
                   <strong>
                     {Math.round(
                       progressPercent
-                    )}
-                    %
+                    )}%
                   </strong>
 
                 </div>
 
               </div>
 
-              <div className="focus-v1-mini-progress">
+
+              <div className="v2f-progress">
 
                 <div
                   style={{
@@ -2458,36 +2599,54 @@ function Focus() {
 
               </div>
 
+
+              <div className="v2f-session-note">
+
+                <Clock3
+                  size={16}
+                />
+
+                <span>
+                  {status ===
+                  "idle"
+                    ? "Start whenever you're ready."
+                    : status ===
+                      "running"
+                    ? "Session is being tracked."
+                    : "Progress is safely paused."}
+                </span>
+
+              </div>
+
             </aside>
 
           </section>
 
-          {/* =================================================
-              HISTORY
-          ================================================= */}
 
-          <section className="dashboard-card focus-v1-history">
+          {/* HISTORY */}
 
-            <div className="focus-v1-section-header">
+          <section className="v2f-history">
+
+            <div className="v2f-history-header">
 
               <div>
 
-                <span className="focus-v1-eyebrow">
-                  HISTORY
+                <span className="v2f-eyebrow">
+                  History
                 </span>
 
                 <h2>
-                  Study Sessions
+                  Study sessions
                 </h2>
 
                 <p>
-                  Your most recent
-                  focused study blocks.
+                  Your most recent completed focus blocks.
                 </p>
 
               </div>
 
-              <span className="focus-v1-history-count">
+
+              <span className="v2f-history-count">
                 {sessions.length}{" "}
                 {sessions.length ===
                 1
@@ -2497,10 +2656,11 @@ function Focus() {
 
             </div>
 
+
             {sessions.length ===
             0 ? (
 
-              <div className="focus-v1-empty">
+              <div className="v2f-empty">
 
                 <Timer
                   size={28}
@@ -2510,17 +2670,16 @@ function Focus() {
                   No study sessions yet
                 </strong>
 
-                <p>
-                  Finish your first
-                  Focus session and
-                  it'll appear here.
-                </p>
+                <span>
+                  Finish your first Focus session and
+                  it will appear here.
+                </span>
 
               </div>
 
             ) : (
 
-              <div className="focus-v1-history-list">
+              <div className="v2f-history-list">
 
                 {sessions
                   .slice(
@@ -2531,23 +2690,23 @@ function Focus() {
                     (
                       session
                     ) => (
-
-                      <div
-                        className="focus-v1-history-item"
+                      <article
+                        className="v2f-history-item"
                         key={
                           session._id
                         }
                       >
 
-                        <div className="focus-v1-history-icon">
+                        <span className="v2f-history-icon">
 
                           <BookOpen
-                            size={17}
+                            size={18}
                           />
 
-                        </div>
+                        </span>
 
-                        <div className="focus-v1-history-content">
+
+                        <div className="v2f-history-copy">
 
                           <strong>
                             {session.subjectName ||
@@ -2556,13 +2715,15 @@ function Focus() {
 
                           <span>
                             {formatSessionDate(
-                              session.endedAt
+                              session.endedAt ||
+                                session.startedAt
                             )}
                           </span>
 
                         </div>
 
-                        <div className="focus-v1-history-duration">
+
+                        <div className="v2f-history-duration">
 
                           <strong>
                             {formatStudyTime(
@@ -2571,18 +2732,17 @@ function Focus() {
                           </strong>
 
                           <span>
-                            target{" "}
-                            {
-                              session.plannedMinutes
-                            }
-                            m
+                            {session.plannedMinutes
+                              ? `Target ${session.plannedMinutes} min`
+                              : "Focus session"}
                           </span>
 
                         </div>
 
+
                         <button
                           type="button"
-                          className="focus-v1-delete"
+                          className="v2f-delete"
                           aria-label={`Delete ${
                             session.subjectName ||
                             "study"
@@ -2595,13 +2755,12 @@ function Focus() {
                         >
 
                           <Trash2
-                            size={16}
+                            size={17}
                           />
 
                         </button>
 
-                      </div>
-
+                      </article>
                     )
                   )}
 
@@ -2614,16 +2773,18 @@ function Focus() {
         </>
       )}
 
-      {/* =====================================================
-          DELETE MODAL
-      ===================================================== */}
+
+      {/* DELETE MODAL */}
 
       {sessionToDelete && (
-
         <div
-          className="delete-modal-overlay"
-          onClick={() => {
+          className="v2f-delete-overlay"
+          onMouseDown={(
+            event
+          ) => {
             if (
+              event.target ===
+                event.currentTarget &&
               !deletingSession
             ) {
               setSessionToDelete(
@@ -2634,39 +2795,47 @@ function Focus() {
         >
 
           <div
-            className="delete-modal"
-            onClick={(
-              event
-            ) =>
-              event.stopPropagation()
-            }
+            className="v2f-delete-modal"
+            role="dialog"
+            aria-modal="true"
           >
 
-            <div className="delete-modal-icon">
-              🗑️
+            <span className="v2f-delete-icon">
+
+              <Trash2
+                size={22}
+              />
+
+            </span>
+
+
+            <div className="v2f-delete-copy">
+
+              <h2>
+                Delete session?
+              </h2>
+
+              <p>
+                Remove the{" "}
+                <strong>
+                  {sessionToDelete.subjectName ||
+                    "General Study"}
+                </strong>{" "}
+                session from your study history?
+              </p>
+
+              <span>
+                This action cannot be undone.
+              </span>
+
             </div>
 
-            <h2>
-              Delete this session?
-            </h2>
 
-            <p>
-              This removes the{" "}
-
-              <strong>
-                {sessionToDelete.subjectName ||
-                  "General Study"}
-              </strong>{" "}
-
-              session from your
-              progress history.
-            </p>
-
-            <div className="delete-modal-actions">
+            <div className="v2f-delete-actions">
 
               <button
                 type="button"
-                className="cancel-delete-button"
+                className="v2f-secondary-button"
                 disabled={
                   deletingSession
                 }
@@ -2679,9 +2848,10 @@ function Focus() {
                 Cancel
               </button>
 
+
               <button
                 type="button"
-                className="confirm-delete-button"
+                className="v2f-danger-button"
                 disabled={
                   deletingSession
                 }
@@ -2690,9 +2860,13 @@ function Focus() {
                 }
               >
 
+                <Trash2
+                  size={16}
+                />
+
                 {deletingSession
                   ? "Deleting..."
-                  : "Delete Session"}
+                  : "Delete session"}
 
               </button>
 
@@ -2701,11 +2875,50 @@ function Focus() {
           </div>
 
         </div>
-
       )}
 
     </div>
   );
 }
+
+
+// =========================================================
+// STAT
+// =========================================================
+
+function FocusStat({
+  icon,
+  label,
+  value,
+  description,
+}) {
+  return (
+    <article className="v2f-stat">
+
+      <span className="v2f-stat-icon">
+        {icon}
+      </span>
+
+
+      <div>
+
+        <span className="v2f-stat-label">
+          {label}
+        </span>
+
+        <strong>
+          {value}
+        </strong>
+
+        <small>
+          {description}
+        </small>
+
+      </div>
+
+    </article>
+  );
+}
+
 
 export default Focus;

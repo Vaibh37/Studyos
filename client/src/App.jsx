@@ -10,6 +10,9 @@ import {
 
 import "./App.css";
 
+import "./styles/v2.css";
+import "./styles/typography-v2.css";
+
 import Sidebar from "./components/Sidebar";
 
 import Dashboard from "./pages/Dashboard";

@@ -13,10 +13,10 @@ import {
   ListChecks,
   Pencil,
   Plus,
+  RefreshCw,
   Search,
   Timer,
   Trash2,
-  TrendingUp,
   X,
 } from "lucide-react";
 
@@ -37,46 +37,44 @@ import {
 
 import StudySelect from "../components/StudySelect";
 
+import "../styles/subjects-v2.css";
+
+
 // =========================================================
 // COLORS
 // =========================================================
 
 const SUBJECT_COLORS = [
-  "#6366f1",
-  "#8b5cf6",
-  "#a855f7",
-  "#ec4899",
-  "#ef4444",
-  "#f97316",
-  "#eab308",
-  "#22c55e",
-  "#14b8a6",
-  "#06b6d4",
-  "#3b82f6",
-  "#64748b",
+  "#2563eb",
+  "#0f766e",
+  "#15803d",
+  "#a16207",
+  "#c2410c",
+  "#b91c1c",
+  "#7c3aed",
+  "#475569",
 ];
+
 
 const SUBJECT_SORT_OPTIONS = [
   {
     value: "activity",
     label: "Recent activity",
   },
-
   {
     value: "name",
     label: "Name",
   },
-
   {
     value: "focus",
     label: "Most studied",
   },
-
   {
     value: "tasks",
     label: "Most pending tasks",
   },
 ];
+
 
 // =========================================================
 // HELPERS
@@ -92,16 +90,13 @@ const safeDate = (
   const date =
     new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return null;
-  }
-
-  return date;
+  return Number.isNaN(
+    date.getTime()
+  )
+    ? null
+    : date;
 };
+
 
 const formatStudyTime = (
   seconds
@@ -141,6 +136,7 @@ const formatStudyTime = (
 
   return "0m";
 };
+
 
 const formatRelativeDate = (
   value
@@ -183,11 +179,15 @@ const formatRelativeDate = (
         )
     );
 
-  if (difference === 0) {
+  if (
+    difference === 0
+  ) {
     return "Today";
   }
 
-  if (difference === 1) {
+  if (
+    difference === 1
+  ) {
     return "Yesterday";
   }
 
@@ -206,6 +206,7 @@ const formatRelativeDate = (
     }
   );
 };
+
 
 const getSubjectId = (
   value
@@ -227,6 +228,7 @@ const getSubjectId = (
 
   return String(value);
 };
+
 
 const sessionBelongsToSubject = (
   session,
@@ -263,6 +265,7 @@ const sessionBelongsToSubject = (
   return false;
 };
 
+
 const taskBelongsToSubject = (
   task,
   subject
@@ -274,6 +277,7 @@ const taskBelongsToSubject = (
     String(subject._id)
   );
 };
+
 
 const noteBelongsToSubject = (
   note,
@@ -310,6 +314,7 @@ const noteBelongsToSubject = (
   return false;
 };
 
+
 // =========================================================
 // SUBJECTS
 // =========================================================
@@ -318,10 +323,6 @@ function Subjects() {
   const {
     isGuest,
   } = useAuth();
-
-  // =======================================================
-  // DATA
-  // =======================================================
 
   const [
     subjects,
@@ -358,10 +359,6 @@ function Subjects() {
     setError,
   ] = useState("");
 
-  // =======================================================
-  // SEARCH / SORT
-  // =======================================================
-
   const [
     search,
     setSearch,
@@ -373,10 +370,6 @@ function Subjects() {
   ] = useState(
     "activity"
   );
-
-  // =======================================================
-  // FORM
-  // =======================================================
 
   const [
     showForm,
@@ -407,7 +400,7 @@ function Subjects() {
     color,
     setColor,
   ] = useState(
-    "#6366f1"
+    "#2563eb"
   );
 
   const [
@@ -420,10 +413,6 @@ function Subjects() {
     setFormError,
   ] = useState("");
 
-  // =======================================================
-  // DELETE
-  // =======================================================
-
   const [
     deleteTarget,
     setDeleteTarget,
@@ -433,6 +422,7 @@ function Subjects() {
     deleting,
     setDeleting,
   ] = useState(false);
+
 
   // =======================================================
   // LOAD
@@ -444,13 +434,9 @@ function Subjects() {
     ) => {
       try {
         if (manual) {
-          setRefreshing(
-            true
-          );
+          setRefreshing(true);
         } else {
-          setLoading(
-            true
-          );
+          setLoading(true);
         }
 
         setError("");
@@ -497,54 +483,42 @@ function Subjects() {
             notesPromise,
           ]);
 
-        const safeSubjects =
+        setSubjects(
           Array.isArray(
             subjectData
           )
             ? subjectData
-            : [];
+            : []
+        );
 
-        const safeTasks =
+        setTasks(
           Array.isArray(
             taskData
           )
             ? taskData
-            : [];
+            : []
+        );
 
-        const safeSessions =
+        setSessions(
           Array.isArray(
             sessionData
           )
             ? sessionData
-            : [];
+            : []
+        );
 
-        const safeNotes =
+        setNotes(
           Array.isArray(
             noteData
           )
             ? noteData
-            : [];
-
-        setSubjects(
-          safeSubjects
-        );
-
-        setTasks(
-          safeTasks
-        );
-
-        setSessions(
-          safeSessions
-        );
-
-        setNotes(
-          safeNotes
+            : []
         );
       } catch (
         loadError
       ) {
         console.error(
-          "Failed to load Subjects V2:",
+          "Failed to load subjects:",
           loadError
         );
 
@@ -553,39 +527,23 @@ function Subjects() {
             "Could not load subject data."
         );
       } finally {
-        setLoading(
-          false
-        );
-
-        setRefreshing(
-          false
-        );
+        setLoading(false);
+        setRefreshing(false);
       }
     };
 
-  // =======================================================
-  // INITIAL LOAD
-  // =======================================================
 
   useEffect(() => {
-    loadSubjectsHub(
-      false
-    );
+    loadSubjectsHub();
   }, [
     isGuest,
   ]);
 
-  // =======================================================
-  // LIVE UPDATES
-  // =======================================================
 
   useEffect(() => {
     const refresh =
-      () => {
-        loadSubjectsHub(
-          false
-        );
-      };
+      () =>
+        loadSubjectsHub();
 
     const events = [
       "studyos-tasks-updated",
@@ -596,32 +554,31 @@ function Subjects() {
     events.forEach(
       (
         eventName
-      ) => {
+      ) =>
         window.addEventListener(
           eventName,
           refresh
-        );
-      }
+        )
     );
 
     return () => {
       events.forEach(
         (
           eventName
-        ) => {
+        ) =>
           window.removeEventListener(
             eventName,
             refresh
-          );
-        }
+          )
       );
     };
   }, [
     isGuest,
   ]);
 
+
   // =======================================================
-  // RESET FORM
+  // FORM
   // =======================================================
 
   const resetForm =
@@ -634,47 +591,30 @@ function Subjects() {
       setCode("");
       setDescription("");
       setColor(
-        "#6366f1"
+        "#2563eb"
       );
 
-      setEditingSubject(
-        null
-      );
-
+      setEditingSubject(null);
       setFormError("");
-
-      setShowForm(
-        false
-      );
+      setShowForm(false);
     };
 
-  // =======================================================
-  // ADD
-  // =======================================================
 
   const openAddForm =
     () => {
-      setEditingSubject(
-        null
-      );
+      setEditingSubject(null);
 
       setName("");
       setCode("");
       setDescription("");
       setColor(
-        "#6366f1"
+        "#2563eb"
       );
 
       setFormError("");
-
-      setShowForm(
-        true
-      );
+      setShowForm(true);
     };
 
-  // =======================================================
-  // EDIT
-  // =======================================================
 
   const openEditForm =
     (
@@ -701,14 +641,11 @@ function Subjects() {
 
       setColor(
         subject.color ||
-          "#6366f1"
+          "#2563eb"
       );
 
       setFormError("");
-
-      setShowForm(
-        true
-      );
+      setShowForm(true);
 
       window.scrollTo({
         top: 0,
@@ -716,9 +653,6 @@ function Subjects() {
       });
     };
 
-  // =======================================================
-  // SAVE
-  // =======================================================
 
   const saveSubject =
     async (
@@ -757,13 +691,8 @@ function Subjects() {
       }
 
       try {
-        setSaving(
-          true
-        );
-
+        setSaving(true);
         setFormError("");
-
-        let savedSubject;
 
         const subjectData = {
           name:
@@ -778,42 +707,43 @@ function Subjects() {
           color,
         };
 
-        if (isGuest) {
+        let savedSubject;
+
+        if (
+          isGuest
+        ) {
           const now =
             new Date()
               .toISOString();
 
-          if (
+          savedSubject =
             editingSubject
-          ) {
-            savedSubject = {
-              ...editingSubject,
-              ...subjectData,
+              ? {
+                  ...editingSubject,
+                  ...subjectData,
 
-              _id:
-                editingSubject._id,
+                  _id:
+                    editingSubject._id,
 
-              createdAt:
-                editingSubject.createdAt ||
-                now,
+                  createdAt:
+                    editingSubject.createdAt ||
+                    now,
 
-              updatedAt:
-                now,
-            };
-          } else {
-            savedSubject = {
-              _id:
-                createLocalId(),
+                  updatedAt:
+                    now,
+                }
+              : {
+                  _id:
+                    createLocalId(),
 
-              ...subjectData,
+                  ...subjectData,
 
-              createdAt:
-                now,
+                  createdAt:
+                    now,
 
-              updatedAt:
-                now,
-            };
-          }
+                  updatedAt:
+                    now,
+                };
 
           await localDb.put(
             "subjects",
@@ -891,37 +821,22 @@ function Subjects() {
             "Could not save subject."
         );
       } finally {
-        setSaving(
-          false
-        );
+        setSaving(false);
       }
     };
+
 
   // =======================================================
   // DELETE
   // =======================================================
 
-  const openDeleteConfirmation =
-    (
-      subject
-    ) => {
-      setDeleteTarget(
-        subject
-      );
-    };
-
   const closeDeleteConfirmation =
     () => {
-      if (
-        deleting
-      ) {
-        return;
+      if (!deleting) {
+        setDeleteTarget(null);
       }
-
-      setDeleteTarget(
-        null
-      );
     };
+
 
   const confirmDeleteSubject =
     async () => {
@@ -932,13 +847,12 @@ function Subjects() {
       }
 
       try {
-        setDeleting(
-          true
-        );
-
+        setDeleting(true);
         setError("");
 
-        if (isGuest) {
+        if (
+          isGuest
+        ) {
           await localDb.remove(
             "subjects",
             deleteTarget._id
@@ -976,9 +890,7 @@ function Subjects() {
           )
         );
 
-        setDeleteTarget(
-          null
-        );
+        setDeleteTarget(null);
       } catch (
         deleteError
       ) {
@@ -992,14 +904,13 @@ function Subjects() {
             "Could not delete subject."
         );
       } finally {
-        setDeleting(
-          false
-        );
+        setDeleting(false);
       }
     };
 
+
   // =======================================================
-  // SUBJECT METRICS
+  // METRICS
   // =======================================================
 
   const subjectMetrics =
@@ -1014,8 +925,7 @@ function Subjects() {
         new Date(
           now.getFullYear(),
           now.getMonth(),
-          now.getDate() -
-            6
+          now.getDate() - 6
         );
 
       weekStart.setHours(
@@ -1099,8 +1009,7 @@ function Subjects() {
                   0,
                   Number(
                     session.durationSeconds
-                  ) ||
-                    0
+                  ) || 0
                 ),
               0
             );
@@ -1132,8 +1041,7 @@ function Subjects() {
                     0,
                     Number(
                       session.durationSeconds
-                    ) ||
-                      0
+                    ) || 0
                   )
                 );
               },
@@ -1174,11 +1082,6 @@ function Subjects() {
               )[0] ||
             null;
 
-          const lastStudiedAt =
-            lastSession
-              ? lastSession._studyDate
-              : null;
-
           map.set(
             String(
               subject._id
@@ -1203,7 +1106,10 @@ function Subjects() {
 
               weekFocusSeconds,
 
-              lastStudiedAt,
+              lastStudiedAt:
+                lastSession
+                  ? lastSession._studyDate
+                  : null,
             }
           );
         }
@@ -1217,23 +1123,13 @@ function Subjects() {
       notes,
     ]);
 
-  // =======================================================
-  // OVERALL STATS
-  // =======================================================
 
   const overallStats =
     useMemo(() => {
-      let pendingTasks =
-        0;
-
-      let completedTasks =
-        0;
-
-      let totalFocusSeconds =
-        0;
-
-      let weekFocusSeconds =
-        0;
+      let pendingTasks = 0;
+      let completedTasks = 0;
+      let totalFocusSeconds = 0;
+      let weekFocusSeconds = 0;
 
       subjectMetrics.forEach(
         (
@@ -1263,6 +1159,7 @@ function Subjects() {
       subjectMetrics,
     ]);
 
+
   // =======================================================
   // FILTER / SORT
   // =======================================================
@@ -1279,9 +1176,7 @@ function Subjects() {
           (
             subject
           ) => {
-            if (
-              !query
-            ) {
+            if (!query) {
               return true;
             }
 
@@ -1290,16 +1185,12 @@ function Subjects() {
               subject.code,
               subject.description,
             ]
-              .filter(
-                Boolean
-              )
+              .filter(Boolean)
               .some(
                 (
                   value
                 ) =>
-                  String(
-                    value
-                  )
+                  String(value)
                     .toLowerCase()
                     .includes(
                       query
@@ -1330,8 +1221,7 @@ function Subjects() {
             );
 
           if (
-            sortBy ===
-            "name"
+            sortBy === "name"
           ) {
             return first.name.localeCompare(
               second.name
@@ -1339,36 +1229,30 @@ function Subjects() {
           }
 
           if (
-            sortBy ===
-            "focus"
+            sortBy === "focus"
           ) {
             return (
               (
-                secondMetrics
-                  ?.totalFocusSeconds ||
+                secondMetrics?.totalFocusSeconds ||
                 0
               ) -
               (
-                firstMetrics
-                  ?.totalFocusSeconds ||
+                firstMetrics?.totalFocusSeconds ||
                 0
               )
             );
           }
 
           if (
-            sortBy ===
-            "tasks"
+            sortBy === "tasks"
           ) {
             return (
               (
-                secondMetrics
-                  ?.pendingTasks ||
+                secondMetrics?.pendingTasks ||
                 0
               ) -
               (
-                firstMetrics
-                  ?.pendingTasks ||
+                firstMetrics?.pendingTasks ||
                 0
               )
             );
@@ -1405,19 +1289,20 @@ function Subjects() {
       sortBy,
     ]);
 
+
   // =======================================================
   // UI
   // =======================================================
 
   return (
-    <div className="dashboard subjects-v2-page">
+    <div className="v2s-page">
 
-      <header className="dashboard-header subjects-v2-header">
+      <header className="v2s-header">
 
-        <div>
+        <div className="v2s-header-copy">
 
-          <span className="subjects-v2-eyebrow">
-            STUDY LIBRARY
+          <span className="v2s-eyebrow">
+            Study library
           </span>
 
           <h1>
@@ -1425,37 +1310,32 @@ function Subjects() {
           </h1>
 
           <p>
-            Organize your coursework
-            and see real Focus and
-            task activity for every
-            subject.
+            Keep coursework organized and see
+            focus, tasks, notes and recent activity
+            for every subject.
           </p>
 
         </div>
 
         <button
           type="button"
-          className="subjects-v2-add-button"
+          className="v2s-primary-button"
           onClick={
             openAddForm
           }
         >
-
-          <Plus
-            size={16}
-          />
-
+          <Plus size={17} />
           Add subject
-
         </button>
 
       </header>
 
+
       {error && (
-        <div className="subjects-v2-error">
+        <div className="v2s-error">
 
           <AlertTriangle
-            size={16}
+            size={17}
           />
 
           <span>
@@ -1469,21 +1349,18 @@ function Subjects() {
             }
             aria-label="Dismiss error"
           >
-            <X
-              size={15}
-            />
+            <X size={16} />
           </button>
 
         </div>
       )}
 
-      <section className="subjects-v2-stats">
+
+      <section className="v2s-stats">
 
         <SubjectStat
           icon={
-            <BookOpen
-              size={18}
-            />
+            <BookOpen size={19} />
           }
           label="Subjects"
           value={
@@ -1494,9 +1371,7 @@ function Subjects() {
 
         <SubjectStat
           icon={
-            <Timer
-              size={18}
-            />
+            <Timer size={19} />
           }
           label="Focus this week"
           value={
@@ -1504,14 +1379,12 @@ function Subjects() {
               overallStats.weekFocusSeconds
             )
           }
-          description="Across your subjects"
+          description="Across all subjects"
         />
 
         <SubjectStat
           icon={
-            <ListChecks
-              size={18}
-            />
+            <ListChecks size={19} />
           }
           label="Pending tasks"
           value={
@@ -1522,49 +1395,47 @@ function Subjects() {
 
         <SubjectStat
           icon={
-            <CheckCircle2
-              size={18}
-            />
+            <CheckCircle2 size={19} />
           }
           label="Completed"
           value={
             overallStats.completedTasks
           }
-          description="Linked subject tasks"
+          description="Finished subject tasks"
         />
 
       </section>
 
-      {showForm && (
-        <section className="dashboard-card subjects-v2-form-card">
 
-          <div className="subjects-v2-form-header">
+      {showForm && (
+        <section className="v2s-form-card">
+
+          <div className="v2s-form-header">
 
             <div>
 
-              <span className="subjects-v2-eyebrow">
+              <span className="v2s-eyebrow">
                 {editingSubject
-                  ? "EDIT SUBJECT"
-                  : "NEW SUBJECT"}
+                  ? "Edit subject"
+                  : "New subject"}
               </span>
 
               <h2>
                 {editingSubject
                   ? "Update subject"
-                  : "Create subject"}
+                  : "Create a subject"}
               </h2>
 
               <p>
-                Add a clear name,
-                optional code and a
-                visual color.
+                Give it a clear name and optional
+                code, description and color.
               </p>
 
             </div>
 
             <button
               type="button"
-              className="subjects-v2-icon-button"
+              className="v2s-icon-button"
               onClick={
                 resetForm
               }
@@ -1573,34 +1444,31 @@ function Subjects() {
               }
               aria-label="Close subject form"
             >
-
-              <X
-                size={17}
-              />
-
+              <X size={18} />
             </button>
 
           </div>
 
+
           <form
-            className="subjects-v2-form"
+            className="v2s-form"
             onSubmit={
               saveSubject
             }
           >
 
-            <div className="subjects-v2-form-grid">
+            <div className="v2s-form-grid">
 
-              <label className="subjects-v2-field">
+              <label className="v2s-field">
 
                 <span>
                   Subject name
                 </span>
 
-                <div className="subjects-v2-input-wrap">
+                <div className="v2s-input">
 
                   <BookOpen
-                    size={15}
+                    size={16}
                   />
 
                   <input
@@ -1614,13 +1482,10 @@ function Subjects() {
                       event
                     ) => {
                       setName(
-                        event.target
-                          .value
+                        event.target.value
                       );
 
-                      setFormError(
-                        ""
-                      );
+                      setFormError("");
                     }}
                     disabled={
                       saving
@@ -1632,16 +1497,17 @@ function Subjects() {
 
               </label>
 
-              <label className="subjects-v2-field">
+
+              <label className="v2s-field">
 
                 <span>
                   Subject code
                 </span>
 
-                <div className="subjects-v2-input-wrap">
+                <div className="v2s-input">
 
                   <Hash
-                    size={15}
+                    size={16}
                   />
 
                   <input
@@ -1655,8 +1521,7 @@ function Subjects() {
                       event
                     ) =>
                       setCode(
-                        event.target
-                          .value
+                        event.target.value
                       )
                     }
                     disabled={
@@ -1670,7 +1535,8 @@ function Subjects() {
 
             </div>
 
-            <label className="subjects-v2-field">
+
+            <label className="v2s-field">
 
               <span>
                 Description
@@ -1686,8 +1552,7 @@ function Subjects() {
                   event
                 ) =>
                   setDescription(
-                    event.target
-                      .value
+                    event.target.value
                   )
                 }
                 disabled={
@@ -1701,13 +1566,14 @@ function Subjects() {
 
             </label>
 
-            <div className="subjects-v2-color-field">
+
+            <div className="v2s-color-field">
 
               <span>
                 Subject color
               </span>
 
-              <div className="subjects-v2-color-options">
+              <div className="v2s-colors">
 
                 {SUBJECT_COLORS.map(
                   (
@@ -1718,14 +1584,14 @@ function Subjects() {
                         option
                       }
                       type="button"
-                      className={`subjects-v2-color-option ${
+                      className={
                         color ===
                         option
-                          ? "active"
+                          ? "is-active"
                           : ""
-                      }`}
+                      }
                       style={{
-                        "--subject-picker-color":
+                        "--v2s-color":
                           option,
                       }}
                       onClick={() =>
@@ -1745,7 +1611,7 @@ function Subjects() {
                       {color ===
                         option && (
                         <CheckCircle2
-                          size={13}
+                          size={15}
                         />
                       )}
                     </button>
@@ -1756,11 +1622,12 @@ function Subjects() {
 
             </div>
 
+
             {formError && (
-              <div className="subjects-v2-form-error">
+              <div className="v2s-form-error">
 
                 <AlertTriangle
-                  size={14}
+                  size={15}
                 />
 
                 {formError}
@@ -1768,11 +1635,12 @@ function Subjects() {
               </div>
             )}
 
-            <div className="subjects-v2-form-actions">
+
+            <div className="v2s-form-actions">
 
               <button
                 type="button"
-                className="subjects-v2-secondary-button"
+                className="v2s-secondary-button"
                 onClick={
                   resetForm
                 }
@@ -1785,22 +1653,24 @@ function Subjects() {
 
               <button
                 type="submit"
-                className="subjects-v2-primary-button"
+                className="v2s-primary-button"
                 disabled={
                   saving ||
                   !name.trim()
                 }
               >
 
-                {editingSubject ? (
-                  <Pencil
-                    size={15}
-                  />
-                ) : (
-                  <Plus
-                    size={15}
-                  />
-                )}
+                {editingSubject
+                  ? (
+                    <Pencil
+                      size={16}
+                    />
+                  )
+                  : (
+                    <Plus
+                      size={16}
+                    />
+                  )}
 
                 {saving
                   ? "Saving..."
@@ -1817,12 +1687,13 @@ function Subjects() {
         </section>
       )}
 
-      <section className="subjects-v2-toolbar">
 
-        <div className="subjects-v2-search">
+      <section className="v2s-toolbar">
+
+        <label className="v2s-search">
 
           <Search
-            size={15}
+            size={17}
           />
 
           <input
@@ -1848,13 +1719,12 @@ function Subjects() {
               }
               aria-label="Clear search"
             >
-              <X
-                size={14}
-              />
+              <X size={15} />
             </button>
           )}
 
-        </div>
+        </label>
+
 
         <StudySelect
           value={
@@ -1867,13 +1737,14 @@ function Subjects() {
             SUBJECT_SORT_OPTIONS
           }
           placeholder="Recent activity"
-          className="subjects-v2-sort-select"
+          className="v2s-sort-select"
           ariaLabel="Sort subjects"
         />
 
+
         <button
           type="button"
-          className="subjects-v2-refresh"
+          className="v2s-refresh"
           onClick={() =>
             loadSubjectsHub(
               true
@@ -1883,93 +1754,65 @@ function Subjects() {
             refreshing
           }
         >
-          <TrendingUp
-            size={15}
+
+          <RefreshCw
+            size={16}
+            className={
+              refreshing
+                ? "v2s-spin"
+                : ""
+            }
           />
 
           {refreshing
-            ? "Refreshing..."
+            ? "Refreshing"
             : "Refresh"}
+
         </button>
 
       </section>
 
+
       {loading ? (
-
-        <section className="dashboard-card subjects-v2-empty">
-
-          <BookOpen
-            size={25}
-          />
-
-          <strong>
-            Loading subjects
-          </strong>
-
-          <span>
-            Building your subject
-            overview.
-          </span>
-
-        </section>
-
+        <EmptyState
+          icon={
+            <BookOpen size={28} />
+          }
+          title="Loading subjects"
+          description="Building your study overview."
+        />
       ) : subjects.length ===
         0 ? (
-
-        <section className="dashboard-card subjects-v2-empty">
-
-          <BookOpen
-            size={27}
-          />
-
-          <strong>
-            No subjects yet
-          </strong>
-
-          <span>
-            Create a subject to start
-            linking tasks and Focus
-            sessions.
-          </span>
-
-          <button
-            type="button"
-            className="subjects-v2-primary-button"
-            onClick={
-              openAddForm
-            }
-          >
-            <Plus
-              size={15}
-            />
-
-            Create first subject
-          </button>
-
-        </section>
-
+        <EmptyState
+          icon={
+            <BookOpen size={30} />
+          }
+          title="No subjects yet"
+          description="Create a subject to start linking tasks, notes and focus sessions."
+          action={
+            <button
+              type="button"
+              className="v2s-primary-button"
+              onClick={
+                openAddForm
+              }
+            >
+              <Plus size={16} />
+              Create first subject
+            </button>
+          }
+        />
       ) : visibleSubjects.length ===
         0 ? (
-
-        <section className="dashboard-card subjects-v2-empty">
-
-          <Search
-            size={25}
-          />
-
-          <strong>
-            No matching subjects
-          </strong>
-
-          <span>
-            Try a different search.
-          </span>
-
-        </section>
-
+        <EmptyState
+          icon={
+            <Search size={28} />
+          }
+          title="No matching subjects"
+          description="Try another search term."
+        />
       ) : (
-
-        <section className="subjects-v2-grid">
+        <section className="v2s-grid">
 
           {visibleSubjects.map(
             (
@@ -1997,45 +1840,41 @@ function Subjects() {
                   key={
                     subject._id
                   }
-                  className="subjects-v2-card"
+                  className="v2s-card"
                   style={{
                     "--subject-color":
                       subject.color ||
-                      "#6366f1",
+                      "#475569",
                   }}
                 >
 
-                  <div className="subjects-v2-card-accent" />
+                  <div className="v2s-card-accent" />
 
-                  <div className="subjects-v2-card-header">
 
-                    <div className="subjects-v2-card-icon">
+                  <div className="v2s-card-header">
 
+                    <div className="v2s-card-icon">
                       <BookOpen
-                        size={19}
+                        size={20}
                       />
+                    </div>
+
+                    <div className="v2s-card-title">
+
+                      <h2>
+                        {subject.name}
+                      </h2>
+
+                      {subject.code && (
+                        <span>
+                          {subject.code}
+                        </span>
+                      )}
 
                     </div>
 
-                    <div className="subjects-v2-card-heading">
 
-                      <div>
-
-                        <h2>
-                          {subject.name}
-                        </h2>
-
-                        {subject.code && (
-                          <span className="subjects-v2-code">
-                            {subject.code}
-                          </span>
-                        )}
-
-                      </div>
-
-                    </div>
-
-                    <div className="subjects-v2-card-actions">
+                    <div className="v2s-card-actions">
 
                       <button
                         type="button"
@@ -2044,54 +1883,43 @@ function Subjects() {
                             subject
                           )
                         }
-                        aria-label={`Edit ${subject.name}`}
                         title="Edit subject"
+                        aria-label={`Edit ${subject.name}`}
                       >
-
-                        <Pencil
-                          size={15}
-                        />
-
+                        <Pencil size={16} />
                       </button>
 
                       <button
                         type="button"
-                        className="danger"
+                        className="is-danger"
                         onClick={() =>
-                          openDeleteConfirmation(
+                          setDeleteTarget(
                             subject
                           )
                         }
-                        aria-label={`Delete ${subject.name}`}
                         title="Delete subject"
+                        aria-label={`Delete ${subject.name}`}
                       >
-
-                        <Trash2
-                          size={15}
-                        />
-
+                        <Trash2 size={16} />
                       </button>
 
                     </div>
 
                   </div>
 
-                  <p className="subjects-v2-description">
 
+                  <p className="v2s-description">
                     {subject.description ||
                       "No description added yet."}
-
                   </p>
 
-                  <div className="subjects-v2-focus-block">
+
+                  <div className="v2s-focus">
 
                     <div>
 
                       <span>
-                        <Timer
-                          size={13}
-                        />
-
+                        <Timer size={15} />
                         Total focus
                       </span>
 
@@ -2106,10 +1934,7 @@ function Subjects() {
                     <div>
 
                       <span>
-                        <Clock3
-                          size={13}
-                        />
-
+                        <Clock3 size={15} />
                         This week
                       </span>
 
@@ -2123,9 +1948,10 @@ function Subjects() {
 
                   </div>
 
-                  <div className="subjects-v2-progress">
 
-                    <div className="subjects-v2-progress-heading">
+                  <div className="v2s-progress">
+
+                    <div className="v2s-progress-heading">
 
                       <span>
                         Task completion
@@ -2137,10 +1963,10 @@ function Subjects() {
 
                     </div>
 
-                    <div className="subjects-v2-progress-track">
+                    <div className="v2s-progress-track">
 
                       <div
-                        className="subjects-v2-progress-bar"
+                        className="v2s-progress-fill"
                         style={{
                           width:
                             `${metrics.completionRate}%`,
@@ -2151,14 +1977,10 @@ function Subjects() {
 
                   </div>
 
-                  <div className="subjects-v2-mini-stats">
+
+                  <div className="v2s-mini-stats">
 
                     <div>
-
-                      <ListChecks
-                        size={14}
-                      />
-
                       <span>
                         Pending
                       </span>
@@ -2166,31 +1988,19 @@ function Subjects() {
                       <strong>
                         {metrics.pendingTasks}
                       </strong>
-
                     </div>
 
                     <div>
-
-                      <CheckCircle2
-                        size={14}
-                      />
-
                       <span>
-                        Done
+                        Completed
                       </span>
 
                       <strong>
                         {metrics.completedTasks}
                       </strong>
-
                     </div>
 
                     <div>
-
-                      <Timer
-                        size={14}
-                      />
-
                       <span>
                         Sessions
                       </span>
@@ -2198,30 +2008,29 @@ function Subjects() {
                       <strong>
                         {metrics.sessionCount}
                       </strong>
-
                     </div>
 
                   </div>
 
-                  <div className="subjects-v2-card-footer">
+
+                  <footer className="v2s-card-footer">
 
                     <span>
-                      {metrics.noteCount}
-                      {" "}
+                      {metrics.noteCount}{" "}
                       {metrics.noteCount ===
                       1
                         ? "note"
                         : "notes"}
                     </span>
 
-                    <strong>
+                    <span>
                       Last studied{" "}
                       {formatRelativeDate(
                         metrics.lastStudiedAt
                       )}
-                    </strong>
+                    </span>
 
-                  </div>
+                  </footer>
 
                 </article>
               );
@@ -2229,12 +2038,12 @@ function Subjects() {
           )}
 
         </section>
-
       )}
+
 
       {deleteTarget && (
         <div
-          className="delete-modal-overlay"
+          className="v2s-delete-overlay"
           onMouseDown={(
             event
           ) => {
@@ -2248,17 +2057,17 @@ function Subjects() {
           }}
         >
 
-          <div className="delete-modal subjects-v2-delete-modal">
+          <div
+            className="v2s-delete-modal"
+            role="dialog"
+            aria-modal="true"
+          >
 
-            <div className="delete-modal-icon">
-
-              <Trash2
-                size={21}
-              />
-
+            <div className="v2s-delete-icon">
+              <Trash2 size={21} />
             </div>
 
-            <div className="delete-modal-content">
+            <div className="v2s-delete-copy">
 
               <h2>
                 Delete subject?
@@ -2273,17 +2082,16 @@ function Subjects() {
               </p>
 
               <span>
-                This action cannot be
-                undone.
+                This action cannot be undone.
               </span>
 
             </div>
 
-            <div className="delete-modal-actions">
+            <div className="v2s-delete-actions">
 
               <button
                 type="button"
-                className="delete-cancel-button"
+                className="v2s-secondary-button"
                 onClick={
                   closeDeleteConfirmation
                 }
@@ -2296,7 +2104,7 @@ function Subjects() {
 
               <button
                 type="button"
-                className="delete-confirm-button"
+                className="v2s-danger-button"
                 onClick={
                   confirmDeleteSubject
                 }
@@ -2305,9 +2113,7 @@ function Subjects() {
                 }
               >
 
-                <Trash2
-                  size={15}
-                />
+                <Trash2 size={16} />
 
                 {deleting
                   ? "Deleting..."
@@ -2326,8 +2132,9 @@ function Subjects() {
   );
 }
 
+
 // =========================================================
-// STAT CARD
+// STAT
 // =========================================================
 
 function SubjectStat({
@@ -2337,11 +2144,11 @@ function SubjectStat({
   description,
 }) {
   return (
-    <div className="subjects-v2-stat">
+    <article className="v2s-stat">
 
-      <div className="subjects-v2-stat-top">
+      <div className="v2s-stat-heading">
 
-        <span className="subjects-v2-stat-icon">
+        <span className="v2s-stat-icon">
           {icon}
         </span>
 
@@ -2359,8 +2166,45 @@ function SubjectStat({
         {description}
       </small>
 
-    </div>
+    </article>
   );
 }
+
+
+// =========================================================
+// EMPTY
+// =========================================================
+
+function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+}) {
+  return (
+    <section className="v2s-empty">
+
+      <span className="v2s-empty-icon">
+        {icon}
+      </span>
+
+      <h2>
+        {title}
+      </h2>
+
+      <p>
+        {description}
+      </p>
+
+      {action && (
+        <div className="v2s-empty-action">
+          {action}
+        </div>
+      )}
+
+    </section>
+  );
+}
+
 
 export default Subjects;
