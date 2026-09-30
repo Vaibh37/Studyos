@@ -9,7 +9,7 @@ and compete with other students — without jumping between five different apps.
 
 <br />
 
-[![Live App](https://img.shields.io/badge/Live_App-Open_StudyOS-6366f1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos-one-omega.vercel.app/)
+[![Live App](https://img.shields.io/badge/Live_App-Open_StudyOS-111111?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos37.vercel.app/)
 [![GitHub](https://img.shields.io/badge/GitHub-Vaibh37-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Vaibh37/Studyos)
 
 <br />
@@ -22,7 +22,7 @@ and compete with other students — without jumping between five different apps.
 
 <br />
 
-**Live:** [studyos-one-omega.vercel.app](https://studyos-one-omega.vercel.app/)
+**Live:** [studyos37.vercel.app](https://studyos37.vercel.app/)
 
 </div>
 
@@ -46,74 +46,34 @@ StudyOS is designed to work both as a **personal study workspace** and as a more
 
 ---
 
-# Preview
+# Product Preview
+
+These are real screenshots from the current StudyOS V2 interface.
 
 <div align="center">
 
-## Dashboard
+## Dashboard — Light theme
 
 <img
-  src="./docs/screenshots/dashboard.png"
-  alt="StudyOS Dashboard"
+  src="./docs/screenshots/v2-dashboard.webp"
+  alt="StudyOS V2 Dashboard in light theme"
   width="100%"
 />
 
 <br />
 <br />
 
-## Tasks
+## Progress — Dark theme
 
 <img
-  src="./docs/screenshots/tasks.png"
-  alt="StudyOS Tasks"
+  src="./docs/screenshots/v2-progress.webp"
+  alt="StudyOS V2 Progress analytics in dark theme"
   width="100%"
-/>
-
-<br />
-<br />
-
-## Focus
-
-<img
-  src="./docs/screenshots/focus.png"
-  alt="StudyOS Focus"
-  width="100%"
-/>
-
-<br />
-<br />
-
-## Progress
-
-<img
-  src="./docs/screenshots/progress.png"
-  alt="StudyOS Progress"
-  width="100%"
-/>
-
-<br />
-<br />
-
-## Study Leaderboard
-
-<img
-  src="./docs/screenshots/leaderboard.png"
-  alt="StudyOS Leaderboard"
-  width="100%"
-/>
-
-<br />
-<br />
-
-## Mobile
-
-<img
-  src="./docs/screenshots/mobile-dashboard.jpg"
-  alt="StudyOS Mobile Dashboard"
-  width="340"
 />
 
 </div>
+
+> StudyOS supports both light and dark themes. The interface is responsive and uses the same Plan → Focus → Review workflow across desktop and mobile.
 
 ---
 
@@ -329,7 +289,7 @@ Participation is completely optional.
 
 ### Study. Earn XP. Climb the leaderboard.
 
-[Open StudyOS →](https://studyos-one-omega.vercel.app/)
+[Open StudyOS →](https://studyos37.vercel.app/)
 
 </div>
 
@@ -876,7 +836,7 @@ You can:
 
 ### Try StudyOS
 
-[![Launch StudyOS](https://img.shields.io/badge/Launch-StudyOS-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos-one-omega.vercel.app/)
+[![Launch StudyOS](https://img.shields.io/badge/Launch-StudyOS-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos37.vercel.app/)
 
 </div>
 
@@ -907,6 +867,6 @@ It helps more people discover the project.
 
 <br />
 
-[Launch StudyOS →](https://studyos-one-omega.vercel.app/)
+[Launch StudyOS →](https://studyos37.vercel.app/)
 
 </div>
