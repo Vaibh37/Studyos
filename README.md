@@ -50,122 +50,51 @@ StudyOS is designed to work both as a **personal study workspace** and as a more
 
 Real screenshots from the current **StudyOS V2** interface.
 
-<div align="center">
-
 ## Dashboard
 
-<img
-  src="./docs/screenshots/dashboard.webp"
-  alt="StudyOS V2 Dashboard"
-  width="100%"
-/>
-
-</div>
-
-<br />
-
-<table>
-<tr>
-<td width="50%" valign="top">
+![StudyOS V2 Dashboard](./docs/screenshots/dashboard.webp)
 
 ### Tasks
 
-<img
-  src="./docs/screenshots/tasks.webp"
-  alt="StudyOS Tasks"
-  width="100%"
-/>
+![StudyOS Tasks](./docs/screenshots/tasks.webp)
 
 Plan work, set priorities, connect tasks to subjects, and keep deadlines visible.
 
-</td>
-<td width="50%" valign="top">
-
 ### Subjects
 
-<img
-  src="./docs/screenshots/subjects.webp"
-  alt="StudyOS Subjects"
-  width="100%"
-/>
+![StudyOS Subjects](./docs/screenshots/subjects.webp)
 
 Organize coursework and see focus, task, note, and activity data by subject.
 
-</td>
-</tr>
-
-<tr>
-<td width="50%" valign="top">
-
 ### Notes
 
-<img
-  src="./docs/screenshots/notes.webp"
-  alt="StudyOS Notes"
-  width="100%"
-/>
+![StudyOS Notes](./docs/screenshots/notes.webp)
 
 Write, search, pin, and connect notes directly to your study structure.
 
-</td>
-<td width="50%" valign="top">
-
 ### Calendar
 
-<img
-  src="./docs/screenshots/calendar.webp"
-  alt="StudyOS Calendar"
-  width="100%"
-/>
+![StudyOS Calendar](./docs/screenshots/calendar.webp)
 
 See deadlines, study events, and actual Focus history together in one monthly view.
 
-</td>
-</tr>
-
-<tr>
-<td width="50%" valign="top">
-
 ### Focus
 
-<img
-  src="./docs/screenshots/focus.webp"
-  alt="StudyOS Focus timer"
-  width="100%"
-/>
+![StudyOS Focus timer](./docs/screenshots/focus.webp)
 
 Run subject-linked Focus sessions with presets, custom durations, pause/resume, and history.
 
-</td>
-<td width="50%" valign="top">
-
 ### Progress
 
-<img
-  src="./docs/screenshots/progress.webp"
-  alt="StudyOS Progress analytics"
-  width="100%"
-/>
+![StudyOS Progress analytics](./docs/screenshots/progress.webp)
 
 Review focus time, consistency, streaks, task completion, and weekly study patterns.
 
-</td>
-</tr>
-</table>
-
-<div align="center">
-
 ## Leaderboard
 
-<img
-  src="./docs/screenshots/leaderboard.webp"
-  alt="StudyOS Leaderboard"
-  width="100%"
-/>
+![StudyOS Leaderboard](./docs/screenshots/leaderboard.webp)
 
 Opt into a weekly ranking built from eligible Focus activity and completed tasks.
-
-</div>
 
 > StudyOS supports both light and dark themes, with responsive layouts across desktop and mobile.
 
