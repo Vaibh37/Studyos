@@ -763,7 +763,7 @@ This allows StudyOS to keep historical data while avoiding broken subject refere
 
 # Roadmap
 
-StudyOS is actively evolving.
+StudyOS V2 has completed its main interface redesign and the legacy page-level CSS has been split into dedicated stylesheets.
 
 ## Current
 
@@ -784,19 +784,29 @@ StudyOS is actively evolving.
 - [x] Study streaks
 - [x] Study leaderboard
 - [x] Responsive mobile interface
-- [x] Custom StudyOS controls
+- [x] StudyOS V2 monochrome design system
+- [x] Page-level CSS modularization
+- [x] Legacy App.css cleanup
 - [x] Subject relationship integrity
 
-## Next
+## Remaining engineering work
 
-- [ ] More backup/restore edge-case testing
-- [ ] More guest migration testing
-- [ ] Production hardening
-- [ ] Performance optimization
-- [ ] Bundle code splitting
-- [ ] CSS cleanup and modularization
+These are intentionally deferred so the current V2 can settle before another large refactor.
+
+- [ ] Finish URL-based navigation with React Router
+- [ ] Introduce a repository/data-access layer so pages stop branching directly between guest storage and API calls
+- [ ] Centralize shared client data and reduce repeated page-level fetching
+- [ ] Make guest → account migration fully idempotent and safe after partial failures
+- [ ] Make backup/restore imports idempotent and add more malformed/duplicate backup tests
+- [ ] Harden leaderboard scoring and validate leaderboard-eligible activity on the server
+- [ ] Validate Focus subject ownership on the backend and store canonical subject data
+- [ ] Move important preferences to cloud-backed account settings
+- [ ] Improve analytics queries so large accounts do not require loading full collections
+- [ ] Add automated tests for core client flows and server invariants
+- [ ] Add bundle/code splitting where it meaningfully improves startup performance
+- [ ] Complete a dark/light/mobile visual QA pass after V2 receives real usage
 - [ ] PWA / installable StudyOS
-- [ ] Mobile app exploration
+- [ ] Explore a dedicated mobile app only if the web product proves the need
 
 ---
 
