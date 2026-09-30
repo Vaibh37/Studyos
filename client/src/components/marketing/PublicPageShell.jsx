@@ -1,9 +1,33 @@
+import { useLocation } from "react-router";
+
+import Seo from "../Seo";
 import MarketingFooter from "./MarketingFooter";
 import MarketingNav from "./MarketingNav";
 
-function PublicPageShell({ eyebrow, title, intro, children }) {
+function PublicPageShell({
+  eyebrow,
+  title,
+  intro,
+  children,
+}) {
+  const location =
+    useLocation();
+
+  const pageTitle =
+    `${title} — StudyOS`;
+
+  const description =
+    intro ||
+    "StudyOS is a student productivity workspace for planning, focus and progress tracking.";
+
   return (
     <div className="marketing-page marketing-document-page">
+      <Seo
+        title={pageTitle}
+        description={description}
+        path={location.pathname}
+      />
+
       <MarketingNav solid />
 
       <main className="marketing-document-main">
@@ -24,4 +48,3 @@ function PublicPageShell({ eyebrow, title, intro, children }) {
 }
 
 export default PublicPageShell;
-
