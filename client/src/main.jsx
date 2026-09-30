@@ -1,8 +1,4 @@
 import {
-  StrictMode,
-} from "react";
-
-import {
   createRoot,
 } from "react-dom/client";
 
@@ -18,22 +14,31 @@ import {
   AuthProvider,
 } from "./context/AuthContext.jsx";
 
+// =========================================================
+// ROOT
+//
+// StrictMode was intentionally removed here.
+//
+// In development, React StrictMode re-runs effects to catch
+// unsafe side effects. StudyOS has many data-loading effects,
+// so localhost could issue duplicate requests and feel much
+// slower than the production build.
+//
+// This does not change production app behavior.
+// =========================================================
+
 createRoot(
   document.getElementById(
     "root"
   )
 ).render(
-  <StrictMode>
+  <BrowserRouter>
 
-    <BrowserRouter>
+    <AuthProvider>
 
-      <AuthProvider>
+      <App />
 
-        <App />
+    </AuthProvider>
 
-      </AuthProvider>
-
-    </BrowserRouter>
-
-  </StrictMode>
+  </BrowserRouter>
 );

@@ -1,45 +1,142 @@
 import {
+  lazy,
+  Suspense,
   useEffect,
-  useState,
 } from "react";
 
 import {
-  Cloud,
-  Menu,
-} from "lucide-react";
-
-import "./App.css";
-
-import "./styles/v2.css";
-import "./styles/typography-v2.css";
-
-import Sidebar from "./components/Sidebar";
-
-import Dashboard from "./pages/Dashboard";
-import Tasks from "./pages/Tasks";
-import Subjects from "./pages/Subjects";
-import Notes from "./pages/Notes";
-import Calendar from "./pages/Calendar";
-import Focus from "./pages/Focus";
-import Progress from "./pages/Progress";
-import Leaderboard from "./pages/Leaderboard";
-import Settings from "./pages/Settings";
-import Welcome from "./pages/Welcome";
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router";
 
 import {
   useAuth,
 } from "./context/AuthContext";
 
-import {
-  getGuestDataSnapshot,
-  migrateGuestDataToAccount,
-} from "./services/guestMigration";
-
 // =========================================================
-// PAGES
+// PUBLIC PAGES
 // =========================================================
 
-const VALID_PAGES = [
+const Landing = lazy(
+  () =>
+    import(
+      "./pages/Landing"
+    )
+);
+
+const GetStarted = lazy(
+  () =>
+    import(
+      "./pages/GetStarted"
+    )
+);
+
+const Privacy = lazy(
+  () =>
+    import(
+      "./pages/Privacy"
+    )
+);
+
+const Terms = lazy(
+  () =>
+    import(
+      "./pages/Terms"
+    )
+);
+
+const Contact = lazy(
+  () =>
+    import(
+      "./pages/Contact"
+    )
+);
+
+// =========================================================
+// APPLICATION SHELL
+// =========================================================
+
+const StudyApp = lazy(
+  () =>
+    import(
+      "./pages/StudyApp"
+    )
+);
+
+// =========================================================
+// APPLICATION PAGES
+// =========================================================
+
+const Dashboard = lazy(
+  () =>
+    import(
+      "./pages/Dashboard"
+    )
+);
+
+const Tasks = lazy(
+  () =>
+    import(
+      "./pages/Tasks"
+    )
+);
+
+const Subjects = lazy(
+  () =>
+    import(
+      "./pages/Subjects"
+    )
+);
+
+const Notes = lazy(
+  () =>
+    import(
+      "./pages/Notes"
+    )
+);
+
+const Calendar = lazy(
+  () =>
+    import(
+      "./pages/Calendar"
+    )
+);
+
+const Focus = lazy(
+  () =>
+    import(
+      "./pages/Focus"
+    )
+);
+
+const Progress = lazy(
+  () =>
+    import(
+      "./pages/Progress"
+    )
+);
+
+const Leaderboard = lazy(
+  () =>
+    import(
+      "./pages/Leaderboard"
+    )
+);
+
+const Settings = lazy(
+  () =>
+    import(
+      "./pages/Settings"
+    )
+);
+
+// =========================================================
+// APPLICATION ROUTES
+// =========================================================
+
+const VALID_APP_PAGES = [
   "dashboard",
   "tasks",
   "subjects",
@@ -51,886 +148,406 @@ const VALID_PAGES = [
   "settings",
 ];
 
-const PAGE_LABELS = {
-  dashboard: "Dashboard",
-  tasks: "Tasks",
-  subjects: "Subjects",
-  notes: "Notes",
-  calendar: "Calendar",
-  focus: "Focus",
-  progress: "Progress",
-  leaderboard: "Leaderboard",
-  settings: "Settings",
-};
+const getStartupPage =
+  () => {
+    const saved =
+      localStorage.getItem(
+        "studyos_startup_page"
+      );
 
-// =========================================================
-// STARTUP PAGE
-// =========================================================
-
-const getStartupPage = () => {
-  const saved =
-    localStorage.getItem(
-      "studyos_startup_page"
-    );
-
-  return VALID_PAGES.includes(
-    saved
-  )
-    ? saved
-    : "dashboard";
-};
-
-// =========================================================
-// COUNT GUEST DATA
-// =========================================================
-
-const getSnapshotCount = (
-  snapshot
-) => {
-  return (
-    snapshot.tasks.length +
-    snapshot.subjects.length +
-    snapshot.notes.length +
-    snapshot.events.length +
-    snapshot.studySessions.length
-  );
-};
-
-// =========================================================
-// GUEST SNAPSHOT SIGNATURE
-// =========================================================
-
-const buildGuestSignature = (
-  snapshot
-) => {
-  const normalize = (
-    items
-  ) => {
-    return items
-      .map((item) => {
-        return [
-          item?._id || "",
-          item?.updatedAt || "",
-          item?.createdAt || "",
-        ].join(":");
-      })
-      .sort();
+    return VALID_APP_PAGES.includes(
+      saved
+    )
+      ? saved
+      : "dashboard";
   };
 
-  return JSON.stringify({
-    tasks:
-      normalize(
-        snapshot.tasks
-      ),
+// =========================================================
+// LOADING
+// =========================================================
 
-    subjects:
-      normalize(
-        snapshot.subjects
-      ),
+function RouteLoader() {
+  return (
+    <div
+      className="route-loading"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="route-loading-mark">
+        S
+      </span>
 
-    notes:
-      normalize(
-        snapshot.notes
-      ),
-
-    events:
-      normalize(
-        snapshot.events
-      ),
-
-    studySessions:
-      normalize(
-        snapshot.studySessions
-      ),
-  });
-};
+      <span>
+        Loading StudyOS…
+      </span>
+    </div>
+  );
+}
 
 // =========================================================
-// APP
+// HOME
+//
+// New / signed-out visitor:
+// / -> marketing site
+//
+// Returning authenticated user:
+// / -> /app -> saved startup page
+//
+// Returning guest:
+// / -> /app -> saved startup page
+// =========================================================
+
+function HomeRoute() {
+  const {
+    loading,
+    mode,
+  } = useAuth();
+
+  if (loading) {
+    return (
+      <RouteLoader />
+    );
+  }
+
+  if (
+    mode === "authenticated" ||
+    mode === "guest"
+  ) {
+    return (
+      <Navigate
+        to="/app"
+        replace
+      />
+    );
+  }
+
+  return (
+    <Landing />
+  );
+}
+
+// =========================================================
+// GET STARTED
+// =========================================================
+
+function GetStartedRoute() {
+  const {
+    loading,
+    mode,
+  } = useAuth();
+
+  if (loading) {
+    return (
+      <RouteLoader />
+    );
+  }
+
+  if (
+    mode === "authenticated" ||
+    mode === "guest"
+  ) {
+    return (
+      <Navigate
+        to="/app"
+        replace
+      />
+    );
+  }
+
+  return (
+    <GetStarted />
+  );
+}
+
+// =========================================================
+// PROTECTED APPLICATION SHELL
+// =========================================================
+
+function ProtectedStudyApp() {
+  const {
+    loading,
+    mode,
+  } = useAuth();
+
+  if (loading) {
+    return (
+      <RouteLoader />
+    );
+  }
+
+  if (mode === "none") {
+    return (
+      <Navigate
+        to="/get-started"
+        replace
+      />
+    );
+  }
+
+  return (
+    <StudyApp />
+  );
+}
+
+// =========================================================
+// /app INDEX
+// =========================================================
+
+function AppIndexRedirect() {
+  const startupPage =
+    getStartupPage();
+
+  return (
+    <Navigate
+      to={`/app/${startupPage}`}
+      replace
+    />
+  );
+}
+
+// =========================================================
+// ROUTE SCROLL MANAGER
+// =========================================================
+
+function RouteScrollManager() {
+  const location =
+    useLocation();
+
+  useEffect(() => {
+    let frame = 0;
+    let attempts = 0;
+
+    const finishNavigation =
+      () => {
+        if (
+          location.hash
+        ) {
+          const target =
+            document.getElementById(
+              decodeURIComponent(
+                location.hash.slice(
+                  1
+                )
+              )
+            );
+
+          if (target) {
+            target.scrollIntoView({
+              block:
+                "start",
+            });
+
+            return;
+          }
+
+          attempts += 1;
+
+          if (
+            attempts < 24
+          ) {
+            frame =
+              window.requestAnimationFrame(
+                finishNavigation
+              );
+
+            return;
+          }
+        }
+
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior:
+            "auto",
+        });
+      };
+
+    frame =
+      window.requestAnimationFrame(
+        finishNavigation
+      );
+
+    return () => {
+      window.cancelAnimationFrame(
+        frame
+      );
+    };
+  }, [
+    location.pathname,
+    location.hash,
+  ]);
+
+  return null;
+}
+
+// =========================================================
+// ROUTER
 // =========================================================
 
 function App() {
-  const {
-    mode,
-
-    loading:
-      authLoading,
-
-    firebaseUser,
-
-    isAuthenticated,
-  } = useAuth();
-
-  // =======================================================
-  // ACTIVE PAGE
-  // =======================================================
-
-  const [
-    activePage,
-    setActivePage,
-  ] = useState(
-    getStartupPage
-  );
-
-  // =======================================================
-  // MOBILE NAVIGATION
-  // =======================================================
-
-  const [
-    sidebarOpen,
-    setSidebarOpen,
-  ] = useState(false);
-
-  // =======================================================
-  // GUEST MIGRATION
-  // =======================================================
-
-  const [
-    showGuestMigration,
-    setShowGuestMigration,
-  ] = useState(false);
-
-  const [
-    guestDataCount,
-    setGuestDataCount,
-  ] = useState(0);
-
-  const [
-    guestDataSignature,
-    setGuestDataSignature,
-  ] = useState("");
-
-  const [
-    migratingGuestData,
-    setMigratingGuestData,
-  ] = useState(false);
-
-  const [
-    migrationError,
-    setMigrationError,
-  ] = useState("");
-
-  // =======================================================
-  // THEME
-  // =======================================================
-
-  useEffect(() => {
-    const applyTheme = () => {
-      const theme =
-        localStorage.getItem(
-          "studyos_theme"
-        ) || "dark";
-
-      if (
-        theme === "light"
-      ) {
-        document.body.classList.add(
-          "light-theme"
-        );
-      } else {
-        document.body.classList.remove(
-          "light-theme"
-        );
-      }
-    };
-
-    applyTheme();
-
-    window.addEventListener(
-      "studyos-theme-updated",
-      applyTheme
-    );
-
-    return () => {
-      window.removeEventListener(
-        "studyos-theme-updated",
-        applyTheme
-      );
-    };
-  }, []);
-
-  // =======================================================
-  // MOBILE DRAWER BEHAVIOR
-  // =======================================================
-
-  useEffect(() => {
-    const media =
-      window.matchMedia(
-        "(max-width: 900px)"
-      );
-
-    const closeOnDesktop =
-      () => {
-        if (!media.matches) {
-          setSidebarOpen(
-            false
-          );
-        }
-      };
-
-    closeOnDesktop();
-
-    media.addEventListener(
-      "change",
-      closeOnDesktop
-    );
-
-    return () => {
-      media.removeEventListener(
-        "change",
-        closeOnDesktop
-      );
-    };
-  }, []);
-
-  // =======================================================
-  // LOCK PAGE WHILE MOBILE DRAWER IS OPEN
-  // =======================================================
-
-  useEffect(() => {
-    const media =
-      window.matchMedia(
-        "(max-width: 900px)"
-      );
-
-    if (
-      sidebarOpen &&
-      media.matches
-    ) {
-      document.body.style.overflow =
-        "hidden";
-    } else {
-      document.body.style.overflow =
-        "";
-    }
-
-    return () => {
-      document.body.style.overflow =
-        "";
-    };
-  }, [
-    sidebarOpen,
-  ]);
-
-  // =======================================================
-  // ESC CLOSE
-  // =======================================================
-
-  useEffect(() => {
-    if (
-      !sidebarOpen
-    ) {
-      return undefined;
-    }
-
-    const handleKeyDown =
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          setSidebarOpen(
-            false
-          );
-        }
-      };
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-    };
-  }, [
-    sidebarOpen,
-  ]);
-
-  // =======================================================
-  // CHECK GUEST DATA AFTER LOGIN
-  // =======================================================
-
-  useEffect(() => {
-    let cancelled =
-      false;
-
-    const checkGuestData =
-      async () => {
-        if (
-          !isAuthenticated ||
-          !firebaseUser?.uid
-        ) {
-          if (
-            !cancelled
-          ) {
-            setShowGuestMigration(
-              false
-            );
-
-            setGuestDataCount(
-              0
-            );
-
-            setGuestDataSignature(
-              ""
-            );
-
-            setMigrationError(
-              ""
-            );
-          }
-
-          return;
-        }
-
-        try {
-          const snapshot =
-            await getGuestDataSnapshot();
-
-          if (
-            cancelled
-          ) {
-            return;
-          }
-
-          const count =
-            getSnapshotCount(
-              snapshot
-            );
-
-          if (
-            count === 0
-          ) {
-            setShowGuestMigration(
-              false
-            );
-
-            setGuestDataCount(
-              0
-            );
-
-            setGuestDataSignature(
-              ""
-            );
-
-            return;
-          }
-
-          const signature =
-            buildGuestSignature(
-              snapshot
-            );
-
-          const skipKey =
-            `studyos_guest_migration_skip:${firebaseUser.uid}`;
-
-          const skippedSignature =
-            localStorage.getItem(
-              skipKey
-            );
-
-          setGuestDataCount(
-            count
-          );
-
-          setGuestDataSignature(
-            signature
-          );
-
-          setMigrationError(
-            ""
-          );
-
-          setShowGuestMigration(
-            skippedSignature !==
-              signature
-          );
-        } catch (
-          guestDataError
-        ) {
-          console.error(
-            "Guest migration check failed:",
-            guestDataError
-          );
-
-          if (
-            !cancelled
-          ) {
-            setShowGuestMigration(
-              false
-            );
-          }
-        }
-      };
-
-    checkGuestData();
-
-    return () => {
-      cancelled =
-        true;
-    };
-  }, [
-    isAuthenticated,
-    firebaseUser?.uid,
-  ]);
-
-  // =======================================================
-  // MOVE GUEST DATA
-  // =======================================================
-
-  const moveGuestData =
-    async () => {
-      if (
-        migratingGuestData
-      ) {
-        return;
-      }
-
-      try {
-        setMigratingGuestData(
-          true
-        );
-
-        setMigrationError(
-          ""
-        );
-
-        await migrateGuestDataToAccount({
-          clearAfterSuccess:
-            true,
-        });
-
-        if (
-          firebaseUser?.uid
-        ) {
-          localStorage.removeItem(
-            `studyos_guest_migration_skip:${firebaseUser.uid}`
-          );
-        }
-
-        setGuestDataCount(
-          0
-        );
-
-        setGuestDataSignature(
-          ""
-        );
-
-        setShowGuestMigration(
-          false
-        );
-
-        setActivePage(
-          "dashboard"
-        );
-
-        setSidebarOpen(
-          false
-        );
-      } catch (
-        migrationFailure
-      ) {
-        console.error(
-          "Guest migration failed:",
-          migrationFailure
-        );
-
-        setMigrationError(
-          migrationFailure.message ||
-            "StudyOS couldn't move all guest data. Your guest data has not been cleared, so you can retry."
-        );
-      } finally {
-        setMigratingGuestData(
-          false
-        );
-      }
-    };
-
-  // =======================================================
-  // START FRESH
-  // =======================================================
-
-  const startFresh =
-    () => {
-      if (
-        migratingGuestData
-      ) {
-        return;
-      }
-
-      if (
-        firebaseUser?.uid &&
-        guestDataSignature
-      ) {
-        localStorage.setItem(
-          `studyos_guest_migration_skip:${firebaseUser.uid}`,
-          guestDataSignature
-        );
-      }
-
-      setMigrationError(
-        ""
-      );
-
-      setShowGuestMigration(
-        false
-      );
-    };
-
-  // =======================================================
-  // NAVIGATE
-  // =======================================================
-
-  const handleNavigate =
-    (page) => {
-      if (
-        !VALID_PAGES.includes(
-          page
-        )
-      ) {
-        return;
-      }
-
-      setActivePage(
-        page
-      );
-
-      setSidebarOpen(
-        false
-      );
-
-      window.scrollTo({
-        top: 0,
-        behavior:
-          "instant",
-      });
-    };
-
-  // =======================================================
-  // RENDER PAGE
-  // =======================================================
-
-  const renderPage = () => {
-    switch (
-      activePage
-    ) {
-      case "dashboard":
-        return (
-          <Dashboard />
-        );
-
-      case "tasks":
-        return (
-          <Tasks />
-        );
-
-      case "subjects":
-        return (
-          <Subjects />
-        );
-
-      case "notes":
-        return (
-          <Notes />
-        );
-
-      case "calendar":
-        return (
-          <Calendar />
-        );
-
-      case "focus":
-        return (
-          <Focus />
-        );
-
-      case "progress":
-        return (
-          <Progress />
-        );
-
-      case "leaderboard":
-        return (
-          <Leaderboard />
-        );
-
-      case "settings":
-        return (
-          <Settings />
-        );
-
-      default:
-        return (
-          <Dashboard />
-        );
-    }
-  };
-
-  // =======================================================
-  // AUTH LOADING
-  // =======================================================
-
-  if (
-    authLoading
-  ) {
-    return (
-      <div className="auth-v1-loading">
-        StudyOS
-      </div>
-    );
-  }
-
-  // =======================================================
-  // WELCOME
-  // =======================================================
-
-  if (
-    mode === "none"
-  ) {
-    return (
-      <Welcome />
-    );
-  }
-
-  // =======================================================
-  // MAIN APP
-  // =======================================================
-
   return (
     <>
-      <div className="app app-shell-v2">
+      <RouteScrollManager />
 
-        {/* =================================================
-            MOBILE BACKDROP
-        ================================================= */}
-
-        <button
-          type="button"
-          className={`app-shell-v2-backdrop ${
-            sidebarOpen
-              ? "is-visible"
-              : ""
-          }`}
-          onClick={() =>
-            setSidebarOpen(
-              false
-            )
-          }
-          aria-label="Close navigation"
-          tabIndex={
-            sidebarOpen
-              ? 0
-              : -1
-          }
-        />
-
-        {/* =================================================
-            SIDEBAR
-        ================================================= */}
-
-        <Sidebar
-          activePage={
-            activePage
-          }
-          onNavigate={
-            handleNavigate
-          }
-          isOpen={
-            sidebarOpen
-          }
-          onClose={() =>
-            setSidebarOpen(
-              false
-            )
-          }
-        />
-
-        {/* =================================================
-            MAIN SHELL
-        ================================================= */}
-
-        <div className="app-shell-v2-content">
+      <Suspense
+        fallback={
+          <RouteLoader />
+        }
+      >
+        <Routes>
 
           {/* ===============================================
-              MOBILE TOP BAR
+              PUBLIC ENTRY
           ================================================ */}
 
-          <header className="app-shell-v2-mobile-bar">
+          <Route
+            path="/"
+            element={
+              <HomeRoute />
+            }
+          />
 
-            <button
-              type="button"
-              className="app-shell-v2-menu-button"
-              onClick={() =>
-                setSidebarOpen(
-                  true
-                )
-              }
-              aria-label="Open navigation"
-              aria-expanded={
-                sidebarOpen
-              }
-            >
-              <Menu
-                size={20}
-              />
-            </button>
-
-            <div className="app-shell-v2-mobile-brand">
-
-              <div className="app-shell-v2-mobile-logo">
-                S
-              </div>
-
-              <strong>
-                StudyOS
-              </strong>
-
-            </div>
-
-            <span className="app-shell-v2-mobile-page">
-              {PAGE_LABELS[
-                activePage
-              ]}
-            </span>
-
-          </header>
+          <Route
+            path="/get-started"
+            element={
+              <GetStartedRoute />
+            }
+          />
 
           {/* ===============================================
-              PAGE
+              STUDYOS APPLICATION
           ================================================ */}
 
-          <main className="main-content app-shell-v2-main">
-
-            {renderPage()}
-
-          </main>
-
-        </div>
-
-      </div>
-
-      {/* ===================================================
-          GUEST → ACCOUNT MIGRATION
-      =================================================== */}
-
-      {showGuestMigration && (
-        <div className="delete-modal-overlay">
-
-          <div
-            className="settings-v2-modal"
-            onClick={(
-              event
-            ) =>
-              event.stopPropagation()
+          <Route
+            path="/app"
+            element={
+              <ProtectedStudyApp />
             }
           >
 
-            <div className="settings-v2-modal-icon settings-v2-modal-icon-neutral">
+            <Route
+              index
+              element={
+                <AppIndexRedirect />
+              }
+            />
 
-              <Cloud
-                size={22}
+            <Route
+              path="dashboard"
+              element={
+                <Dashboard />
+              }
+            />
+
+            <Route
+              path="tasks"
+              element={
+                <Tasks />
+              }
+            />
+
+            <Route
+              path="subjects"
+              element={
+                <Subjects />
+              }
+            />
+
+            <Route
+              path="notes"
+              element={
+                <Notes />
+              }
+            />
+
+            <Route
+              path="calendar"
+              element={
+                <Calendar />
+              }
+            />
+
+            <Route
+              path="focus"
+              element={
+                <Focus />
+              }
+            />
+
+            <Route
+              path="progress"
+              element={
+                <Progress />
+              }
+            />
+
+            <Route
+              path="leaderboard"
+              element={
+                <Leaderboard />
+              }
+            />
+
+            <Route
+              path="settings"
+              element={
+                <Settings />
+              }
+            />
+
+            <Route
+              path="*"
+              element={
+                <Navigate
+                  to="/app/dashboard"
+                  replace
+                />
+              }
+            />
+
+          </Route>
+
+          {/* ===============================================
+              PUBLIC INFORMATION
+          ================================================ */}
+
+          <Route
+            path="/privacy"
+            element={
+              <Privacy />
+            }
+          />
+
+          <Route
+            path="/terms"
+            element={
+              <Terms />
+            }
+          />
+
+          <Route
+            path="/contact"
+            element={
+              <Contact />
+            }
+          />
+
+          {/* ===============================================
+              FALLBACK
+          ================================================ */}
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to="/"
+                replace
               />
+            }
+          />
 
-            </div>
-
-            <h2>
-              Move your guest data?
-            </h2>
-
-            <p>
-              StudyOS found{" "}
-
-              <strong>
-                {guestDataCount}
-              </strong>{" "}
-
-              {guestDataCount ===
-              1
-                ? "guest item"
-                : "guest items"}{" "}
-
-              saved in this browser.
-            </p>
-
-            <p>
-              You can move them into
-              your signed-in account
-              or start with your
-              account data as it is.
-            </p>
-
-            <p>
-              Moving data adds the
-              guest records to your
-              account. Existing cloud
-              data will not be
-              deleted.
-            </p>
-
-            {migrationError && (
-              <div className="settings-v2-notice settings-v2-notice-error">
-
-                <div>
-
-                  <strong>
-                    Migration failed
-                  </strong>
-
-                  <span>
-                    {migrationError}
-                  </span>
-
-                </div>
-
-              </div>
-            )}
-
-            <div className="settings-v2-modal-actions">
-
-              <button
-                type="button"
-                className="settings-v2-secondary-button"
-                disabled={
-                  migratingGuestData
-                }
-                onClick={
-                  startFresh
-                }
-              >
-                Start fresh
-              </button>
-
-              <button
-                type="button"
-                className="settings-v2-primary-button"
-                disabled={
-                  migratingGuestData
-                }
-                onClick={
-                  moveGuestData
-                }
-              >
-                {migratingGuestData
-                  ? "Moving data..."
-                  : "Move my data"}
-              </button>
-
-            </div>
-
-            <p className="app-shell-v2-migration-note">
-              “Start fresh” does not
-              delete your guest data.
-              It stays in this browser.
-            </p>
-
-          </div>
-
-        </div>
-      )}
+        </Routes>
+      </Suspense>
     </>
   );
 }

@@ -18,6 +18,53 @@
       content="StudyOS — your personal study workspace for tasks, subjects, notes, focus sessions, calendar and progress."
     />
 
+    <!-- ===================================================
+         AUTH NETWORK WARM-UP
+
+         These only establish DNS/TLS connections early.
+         They do not send credentials or sign the user in.
+    ==================================================== -->
+
+    <link
+      rel="preconnect"
+      href="https://accounts.google.com"
+      crossorigin
+    />
+
+    <link
+      rel="preconnect"
+      href="https://identitytoolkit.googleapis.com"
+      crossorigin
+    />
+
+    <link
+      rel="preconnect"
+      href="https://securetoken.googleapis.com"
+      crossorigin
+    />
+
+    <link
+      rel="dns-prefetch"
+      href="//accounts.google.com"
+    />
+
+    <link
+      rel="dns-prefetch"
+      href="//identitytoolkit.googleapis.com"
+    />
+
+    <link
+      rel="dns-prefetch"
+      href="//securetoken.googleapis.com"
+    />
+
+    <link
+      rel="preload"
+      href="https://accounts.google.com/gsi/client"
+      as="script"
+      crossorigin
+    />
+
     <link
       rel="icon"
       type="image/svg+xml"

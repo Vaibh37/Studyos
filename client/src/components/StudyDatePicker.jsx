@@ -17,6 +17,8 @@ import {
   createPortal,
 } from "react-dom";
 
+import "./StudyDatePicker.css";
+
 // =========================================================
 // HELPERS
 // =========================================================
@@ -96,9 +98,14 @@ const formatDisplayDate = (
   return date.toLocaleDateString(
     "en-IN",
     {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+      day:
+        "numeric",
+
+      month:
+        "short",
+
+      year:
+        "numeric",
     }
   );
 };
@@ -155,15 +162,20 @@ function StudyDatePicker({
   // SYNC SELECTED DATE
   // =======================================================
 
-  useEffect(() => {
-    if (
-      selectedDate
-    ) {
-      setViewDate(
+  useEffect(
+    () => {
+      if (
         selectedDate
-      );
-    }
-  }, [value]);
+      ) {
+        setViewDate(
+          selectedDate
+        );
+      }
+    },
+    [
+      value,
+    ]
+  );
 
   // =======================================================
   // POSITION POPOVER
@@ -179,24 +191,27 @@ function StudyDatePicker({
       }
 
       const triggerRect =
-        triggerRef.current.getBoundingClientRect();
-
-      const popoverWidth =
-        Math.min(
-          292,
-          window.innerWidth -
-            24
-        );
-
-      const popoverHeight =
-        popoverRef.current.offsetHeight ||
-        330;
+        triggerRef.current
+          .getBoundingClientRect();
 
       const viewportPadding =
         12;
 
       const gap =
         8;
+
+      const popoverWidth =
+        Math.min(
+          292,
+          window.innerWidth -
+            viewportPadding *
+              2
+        );
+
+      const popoverHeight =
+        popoverRef.current
+          .offsetHeight ||
+        330;
 
       const spaceBelow =
         window.innerHeight -
@@ -206,9 +221,6 @@ function StudyDatePicker({
         triggerRect.top;
 
       let top;
-
-      // Open upward if bottom space is too small
-      // and there is more room above.
 
       if (
         spaceBelow <
@@ -228,8 +240,6 @@ function StudyDatePicker({
           gap;
       }
 
-      // Keep inside viewport vertically.
-
       top =
         Math.max(
           viewportPadding,
@@ -243,8 +253,6 @@ function StudyDatePicker({
 
       let left =
         triggerRect.left;
-
-      // Keep inside viewport horizontally.
 
       left =
         Math.max(
@@ -273,258 +281,280 @@ function StudyDatePicker({
   // POSITION WHEN OPENED
   // =======================================================
 
-  useLayoutEffect(() => {
-    if (!open) {
-      setPositioned(
-        false
-      );
+  useLayoutEffect(
+    () => {
+      if (!open) {
+        setPositioned(
+          false
+        );
 
-      return;
-    }
+        return undefined;
+      }
 
-    const frame =
-      requestAnimationFrame(
-        () => {
-          updatePopoverPosition();
-        }
-      );
+      const frame =
+        requestAnimationFrame(
+          () => {
+            updatePopoverPosition();
+          }
+        );
 
-    return () => {
-      cancelAnimationFrame(
-        frame
-      );
-    };
-  }, [
-    open,
-    viewDate,
-  ]);
+      return () => {
+        cancelAnimationFrame(
+          frame
+        );
+      };
+    },
+    [
+      open,
+      viewDate,
+    ]
+  );
 
   // =======================================================
   // REPOSITION ON SCROLL / RESIZE
   // =======================================================
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!open) {
+        return undefined;
+      }
 
-    const reposition =
-      () => {
-        updatePopoverPosition();
-      };
+      const reposition =
+        () => {
+          updatePopoverPosition();
+        };
 
-    window.addEventListener(
-      "resize",
-      reposition
-    );
-
-    window.addEventListener(
-      "scroll",
-      reposition,
-      true
-    );
-
-    return () => {
-      window.removeEventListener(
+      window.addEventListener(
         "resize",
         reposition
       );
 
-      window.removeEventListener(
+      window.addEventListener(
         "scroll",
         reposition,
         true
       );
-    };
-  }, [
-    open,
-  ]);
+
+      return () => {
+        window.removeEventListener(
+          "resize",
+          reposition
+        );
+
+        window.removeEventListener(
+          "scroll",
+          reposition,
+          true
+        );
+      };
+    },
+    [
+      open,
+    ]
+  );
 
   // =======================================================
   // CLOSE OUTSIDE
   // =======================================================
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!open) {
+        return undefined;
+      }
 
-    const handleOutside =
-      (event) => {
-        const clickedTrigger =
-          triggerRef.current?.contains(
-            event.target
-          );
+      const handleOutside =
+        (
+          event
+        ) => {
+          const clickedTrigger =
+            triggerRef.current?.contains(
+              event.target
+            );
 
-        const clickedPopover =
-          popoverRef.current?.contains(
-            event.target
-          );
+          const clickedPopover =
+            popoverRef.current?.contains(
+              event.target
+            );
 
-        if (
-          !clickedTrigger &&
-          !clickedPopover
-        ) {
-          setOpen(
-            false
-          );
-        }
-      };
+          if (
+            !clickedTrigger &&
+            !clickedPopover
+          ) {
+            setOpen(
+              false
+            );
+          }
+        };
 
-    document.addEventListener(
-      "mousedown",
-      handleOutside
-    );
-
-    return () => {
-      document.removeEventListener(
+      document.addEventListener(
         "mousedown",
         handleOutside
       );
-    };
-  }, [
-    open,
-  ]);
+
+      return () => {
+        document.removeEventListener(
+          "mousedown",
+          handleOutside
+        );
+      };
+    },
+    [
+      open,
+    ]
+  );
 
   // =======================================================
   // ESCAPE
   // =======================================================
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!open) {
+        return undefined;
+      }
 
-    const handleKeyDown =
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          setOpen(
-            false
-          );
-        }
-      };
+      const handleKeyDown =
+        (
+          event
+        ) => {
+          if (
+            event.key ===
+            "Escape"
+          ) {
+            setOpen(
+              false
+            );
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+            triggerRef.current?.focus();
+          }
+        };
 
-    return () => {
-      window.removeEventListener(
+      window.addEventListener(
         "keydown",
         handleKeyDown
       );
-    };
-  }, [
-    open,
-  ]);
+
+      return () => {
+        window.removeEventListener(
+          "keydown",
+          handleKeyDown
+        );
+      };
+    },
+    [
+      open,
+    ]
+  );
 
   // =======================================================
   // CALENDAR CELLS
   // =======================================================
 
   const calendarDays =
-    useMemo(() => {
-      const year =
-        viewDate.getFullYear();
+    useMemo(
+      () => {
+        const year =
+          viewDate.getFullYear();
 
-      const month =
-        viewDate.getMonth();
+        const month =
+          viewDate.getMonth();
 
-      const firstDay =
-        new Date(
-          year,
-          month,
-          1
-        );
+        const firstDay =
+          new Date(
+            year,
+            month,
+            1
+          );
 
-      const firstWeekday =
-        firstDay.getDay();
+        const firstWeekday =
+          firstDay.getDay();
 
-      const daysInMonth =
-        new Date(
-          year,
-          month + 1,
-          0
-        ).getDate();
+        const daysInMonth =
+          new Date(
+            year,
+            month + 1,
+            0
+          ).getDate();
 
-      const previousMonthDays =
-        new Date(
-          year,
-          month,
-          0
-        ).getDate();
+        const previousMonthDays =
+          new Date(
+            year,
+            month,
+            0
+          ).getDate();
 
-      const days = [];
+        const days = [];
 
-      for (
-        let index =
-          firstWeekday - 1;
-        index >= 0;
-        index--
-      ) {
-        days.push({
-          date:
-            new Date(
-              year,
-              month - 1,
-              previousMonthDays -
-                index
-            ),
+        for (
+          let index =
+            firstWeekday -
+            1;
+          index >= 0;
+          index--
+        ) {
+          days.push({
+            date:
+              new Date(
+                year,
+                month - 1,
+                previousMonthDays -
+                  index
+              ),
 
-          currentMonth:
-            false,
-        });
-      }
+            currentMonth:
+              false,
+          });
+        }
 
-      for (
-        let day = 1;
-        day <=
-        daysInMonth;
-        day++
-      ) {
-        days.push({
-          date:
-            new Date(
-              year,
-              month,
-              day
-            ),
+        for (
+          let day = 1;
+          day <=
+          daysInMonth;
+          day++
+        ) {
+          days.push({
+            date:
+              new Date(
+                year,
+                month,
+                day
+              ),
 
-          currentMonth:
-            true,
-        });
-      }
+            currentMonth:
+              true,
+          });
+        }
 
-      let nextDay =
-        1;
+        let nextDay =
+          1;
 
-      while (
-        days.length <
-        42
-      ) {
-        days.push({
-          date:
-            new Date(
-              year,
-              month + 1,
-              nextDay
-            ),
+        while (
+          days.length <
+          42
+        ) {
+          days.push({
+            date:
+              new Date(
+                year,
+                month + 1,
+                nextDay
+              ),
 
-          currentMonth:
-            false,
-        });
+            currentMonth:
+              false,
+          });
 
-        nextDay++;
-      }
+          nextDay++;
+        }
 
-      return days;
-    }, [
-      viewDate,
-    ]);
+        return days;
+      },
+      [
+        viewDate,
+      ]
+    );
 
   // =======================================================
   // MONTH NAVIGATION
@@ -559,8 +589,10 @@ function StudyDatePicker({
   // =======================================================
 
   const selectDate =
-    (date) => {
-      onChange(
+    (
+      date
+    ) => {
+      onChange?.(
         getDateKey(
           date
         )
@@ -573,6 +605,8 @@ function StudyDatePicker({
       setOpen(
         false
       );
+
+      triggerRef.current?.focus();
     };
 
   // =======================================================
@@ -584,7 +618,7 @@ function StudyDatePicker({
       const today =
         new Date();
 
-      onChange(
+      onChange?.(
         getDateKey(
           today
         )
@@ -597,6 +631,8 @@ function StudyDatePicker({
       setOpen(
         false
       );
+
+      triggerRef.current?.focus();
     };
 
   // =======================================================
@@ -604,14 +640,18 @@ function StudyDatePicker({
   // =======================================================
 
   const clearDate =
-    (event) => {
+    (
+      event
+    ) => {
       event.stopPropagation();
 
-      onChange("");
+      onChange?.("");
 
       setOpen(
         false
       );
+
+      triggerRef.current?.focus();
     };
 
   // =======================================================
@@ -619,7 +659,9 @@ function StudyDatePicker({
   // =======================================================
 
   const popover =
-    open
+    open &&
+    typeof document !==
+      "undefined"
       ? createPortal(
           <div
             ref={
@@ -642,8 +684,6 @@ function StudyDatePicker({
                   : "hidden",
             }}
           >
-
-            {/* HEADER */}
 
             <div className="study-date-header">
 
@@ -686,8 +726,6 @@ function StudyDatePicker({
 
             </div>
 
-            {/* WEEKDAYS */}
-
             <div className="study-date-weekdays">
 
               <span>Su</span>
@@ -699,8 +737,6 @@ function StudyDatePicker({
               <span>Sa</span>
 
             </div>
-
-            {/* DAYS */}
 
             <div className="study-date-grid">
 
@@ -748,7 +784,9 @@ function StudyDatePicker({
                         .filter(
                           Boolean
                         )
-                        .join(" ")}
+                        .join(
+                          " "
+                        )}
                       onClick={() =>
                         selectDate(
                           date
@@ -763,18 +801,18 @@ function StudyDatePicker({
 
             </div>
 
-            {/* FOOTER */}
-
             <div className="study-date-footer">
 
               <button
                 type="button"
                 onClick={() => {
-                  onChange("");
+                  onChange?.("");
 
                   setOpen(
                     false
                   );
+
+                  triggerRef.current?.focus();
                 }}
               >
                 Clear
@@ -826,14 +864,21 @@ function StudyDatePicker({
             }
 
             setOpen(
-              (current) =>
+              (
+                current
+              ) =>
                 !current
             );
           }}
+          aria-haspopup="dialog"
+          aria-expanded={
+            open
+          }
         >
 
           <CalendarDays
             size={15}
+            aria-hidden="true"
           />
 
           <span

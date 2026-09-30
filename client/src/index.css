@@ -1,2 +1,27 @@
 @import "./styles/tokens.css";
 @import "./styles/base.css";
+
+.route-loading {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--color-bg, #0a0a0a);
+  color: var(--color-text-muted, #a3a3a3);
+  font-size: 13px;
+}
+
+.route-loading-mark {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: var(--color-solid, #f5f5f5);
+  color: var(--color-solid-text, #0a0a0a);
+  font-size: 12px;
+  font-weight: 700;
+}

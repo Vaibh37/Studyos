@@ -5,17 +5,6 @@ import {
 // =========================================================
 // API BASE URL
 // =========================================================
-//
-// LOCAL:
-// Falls back to http://localhost:5000
-//
-// PRODUCTION:
-// Set:
-//
-// VITE_API_URL=https://your-backend-domain.com
-//
-// in the frontend environment variables.
-// =========================================================
 
 export const API_URL =
   (
@@ -28,6 +17,47 @@ export const API_URL =
   );
 
 // =========================================================
+// TOKEN COALESCING
+//
+// Several pages can start multiple requests at the same
+// time. Firebase already caches ID tokens, but every caller
+// still asks Firebase separately.
+//
+// Share one in-flight token read across parallel requests.
+// =========================================================
+
+let tokenPromise =
+  null;
+
+const getRequestToken =
+  async () => {
+    const user =
+      auth.currentUser;
+
+    if (!user) {
+      return null;
+    }
+
+    if (
+      tokenPromise
+    ) {
+      return tokenPromise;
+    }
+
+    tokenPromise =
+      user
+        .getIdToken()
+        .finally(
+          () => {
+            tokenPromise =
+              null;
+          }
+        );
+
+    return tokenPromise;
+  };
+
+// =========================================================
 // API REQUEST
 // =========================================================
 
@@ -36,9 +66,6 @@ export const apiRequest =
     path,
     options = {}
   ) => {
-    const user =
-      auth.currentUser;
-
     const headers = {
       ...options.headers,
     };
@@ -63,10 +90,12 @@ export const apiRequest =
     // FIREBASE AUTH TOKEN
     // =====================================================
 
-    if (user) {
-      const token =
-        await user.getIdToken();
+    const token =
+      await getRequestToken();
 
+    if (
+      token
+    ) {
       headers.Authorization =
         `Bearer ${token}`;
     }
@@ -88,20 +117,24 @@ export const apiRequest =
     // RESPONSE BODY
     // =====================================================
 
-    let data = null;
+    let data =
+      null;
 
     try {
       data =
         await response.json();
     } catch {
-      data = null;
+      data =
+        null;
     }
 
     // =====================================================
     // ERROR
     // =====================================================
 
-    if (!response.ok) {
+    if (
+      !response.ok
+    ) {
       throw new Error(
         data?.message ||
           `Request failed (${response.status})`

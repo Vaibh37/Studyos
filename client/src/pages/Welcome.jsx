@@ -1,13 +1,23 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
+  ArrowLeft,
   ArrowRight,
   Eye,
   EyeOff,
   GraduationCap,
   Mail,
+  Moon,
+  Sun,
   UserRound,
 } from "lucide-react";
+
+import {
+  Link,
+} from "react-router";
 
 import {
   useAuth,
@@ -26,15 +36,15 @@ function Welcome() {
     setEmailMode,
   ] = useState(null);
 
-  // null = main screen
-  // login = email login
-  // register = email register
+  const [
+    name,
+    setName,
+  ] = useState("");
 
-  const [name, setName] =
-    useState("");
-
-  const [email, setEmail] =
-    useState("");
+  const [
+    email,
+    setEmail,
+  ] = useState("");
 
   const [
     password,
@@ -51,12 +61,44 @@ function Welcome() {
     setWorking,
   ] = useState(false);
 
-  const [error, setError] =
-    useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  // =========================================
-  // FRIENDLY ERRORS
-  // =========================================
+  const [
+    theme,
+    setTheme,
+  ] = useState(() => {
+    return localStorage.getItem(
+      "studyos_theme"
+    ) === "light"
+      ? "light"
+      : "dark";
+  });
+
+  useEffect(() => {
+    const isLight =
+      theme === "light";
+
+    document.body.classList.toggle(
+      "light-theme",
+      isLight
+    );
+
+    localStorage.setItem(
+      "studyos_theme",
+      theme
+    );
+
+    window.dispatchEvent(
+      new Event(
+        "studyos-theme-updated"
+      )
+    );
+  }, [
+    theme,
+  ]);
 
   const getFriendlyError = (
     firebaseError
@@ -110,10 +152,6 @@ function Welcome() {
     );
   };
 
-  // =========================================
-  // GOOGLE
-  // =========================================
-
   const handleGoogle =
     async () => {
       try {
@@ -136,10 +174,6 @@ function Welcome() {
         setWorking(false);
       }
     };
-
-  // =========================================
-  // EMAIL LOGIN / REGISTER
-  // =========================================
 
   const handleEmail =
     async (event) => {
@@ -198,10 +232,6 @@ function Welcome() {
       }
     };
 
-  // =========================================
-  // GUEST
-  // =========================================
-
   const handleGuest =
     async () => {
       try {
@@ -223,273 +253,398 @@ function Welcome() {
       }
     };
 
-  // =========================================
-  // UI
-  // =========================================
-
   return (
-    <main className="auth-v1-page">
+    <main className="auth-v2-page">
 
-      <div className="auth-v1-bg auth-v1-bg-one" />
-      <div className="auth-v1-bg auth-v1-bg-two" />
+      <div
+        className="auth-v2-grid"
+        aria-hidden="true"
+      />
 
-      <section className="auth-v1-shell">
+      <header className="auth-v2-topbar">
 
-        {/* LOGO */}
+        <Link
+          to="/"
+          className="auth-v2-home-link"
+        >
+          <ArrowLeft
+            size={15}
+          />
 
-        <div className="auth-v1-brand">
+          Back to StudyOS
+        </Link>
 
-          <div className="auth-v1-logo">
-            <GraduationCap
-              size={23}
+        <button
+          type="button"
+          className="auth-v2-theme-toggle"
+          aria-label={
+            theme === "dark"
+              ? "Switch to light theme"
+              : "Switch to dark theme"
+          }
+          onClick={() =>
+            setTheme(
+              (current) =>
+                current === "dark"
+                  ? "light"
+                  : "dark"
+            )
+          }
+        >
+          {theme === "dark" ? (
+            <Sun
+              size={17}
             />
+          ) : (
+            <Moon
+              size={17}
+            />
+          )}
+        </button>
+
+      </header>
+
+      <section className="auth-v2-layout">
+
+        <div className="auth-v2-intro">
+
+          <div className="auth-v2-brand">
+
+            <span className="auth-v2-brand-mark">
+              <GraduationCap
+                size={21}
+              />
+            </span>
+
+            <span>
+              StudyOS
+            </span>
+
           </div>
 
-          <span>
-            StudyOS
-          </span>
+          <div className="auth-v2-intro-copy">
+
+            <span className="auth-v2-eyebrow">
+              YOUR STUDY SYSTEM
+            </span>
+
+            <h1>
+              Turn plans into
+              <span>
+                actual progress.
+              </span>
+            </h1>
+
+            <p>
+              Organize the work,
+              focus on what matters,
+              and keep a clear view
+              of where your study time
+              actually goes.
+            </p>
+
+          </div>
+
+          <div className="auth-v2-flow">
+            <span>
+              Plan
+            </span>
+
+            <span
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+            <span>
+              Focus
+            </span>
+
+            <span
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+            <span>
+              Review
+            </span>
+          </div>
+
+          <div className="auth-v2-intro-note">
+
+            <span className="auth-v2-status-dot" />
+
+            Guest mode is available.
+            No account required to start.
+
+          </div>
 
         </div>
 
-        {/* HERO */}
+        <div className="auth-v2-panel-wrap">
 
-        <div className="auth-v1-copy">
+          <div className="auth-v2-panel">
 
-          <span className="auth-v1-eyebrow">
-            YOUR STUDY SYSTEM
-          </span>
+            {!emailMode ? (
+              <>
 
-          <h1>
-            Study without
-            the chaos.
-          </h1>
+                <div className="auth-v2-panel-heading">
 
-          <p>
-            Tasks, notes, Focus,
-            calendar and progress
-            in one place.
-          </p>
+                  <span className="auth-v2-panel-kicker">
+                    ENTER STUDYOS
+                  </span>
 
-        </div>
+                  <h2>
+                    Choose how you want
+                    to continue.
+                  </h2>
 
-        {/* CARD */}
+                  <p>
+                    Sign in for cloud
+                    persistence, or start
+                    locally as a guest.
+                  </p>
 
-        <div className="auth-v1-card">
-
-          {!emailMode ? (
-            <>
-
-              <h2>
-                Welcome to StudyOS
-              </h2>
-
-              <p className="auth-v1-card-copy">
-                Choose how you want
-                to continue.
-              </p>
-
-              {error && (
-                <div className="auth-v1-error">
-                  {error}
                 </div>
-              )}
 
-              {/* GOOGLE */}
+                {error && (
+                  <div className="auth-v1-error">
+                    {error}
+                  </div>
+                )}
 
-              <button
-                type="button"
-                className="auth-v1-provider"
-                disabled={
-                  working
-                }
-                onClick={
-                  handleGoogle
-                }
-              >
+                <div className="auth-v2-provider-stack">
 
-                <span className="auth-v1-provider-icon auth-v1-google">
-                  G
-                </span>
+                  <button
+                    type="button"
+                    className="auth-v1-provider"
+                    disabled={
+                      working
+                    }
+                    onClick={
+                      handleGoogle
+                    }
+                  >
 
-                <span>
-                  Continue with Google
-                </span>
+                    <span className="auth-v1-provider-icon auth-v1-google">
+                      G
+                    </span>
 
-                <ArrowRight
-                  size={16}
-                />
+                    <span>
+                      Continue with Google
+                    </span>
 
-              </button>
+                    <ArrowRight
+                      size={16}
+                    />
 
-              {/* X */}
+                  </button>
 
-              <button
-                type="button"
-                className="auth-v1-provider auth-v1-provider-disabled"
-                disabled
-              >
+                  <button
+                    type="button"
+                    className="auth-v1-provider auth-v1-provider-disabled"
+                    disabled
+                  >
 
-                <span className="auth-v1-provider-icon auth-v1-x">
-                  𝕏
-                </span>
+                    <span className="auth-v1-provider-icon auth-v1-x">
+                      𝕏
+                    </span>
 
-                <span>
-                  Continue with X
-                </span>
+                    <span>
+                      Continue with X
+                    </span>
 
-                <small>
-                  Soon
-                </small>
+                    <small>
+                      Soon
+                    </small>
 
-              </button>
+                  </button>
 
-              {/* EMAIL */}
+                  <button
+                    type="button"
+                    className="auth-v1-provider"
+                    disabled={
+                      working
+                    }
+                    onClick={() => {
+                      setError("");
 
-              <button
-                type="button"
-                className="auth-v1-provider"
-                disabled={
-                  working
-                }
-                onClick={() => {
-                  setError("");
+                      setEmailMode(
+                        "login"
+                      );
+                    }}
+                  >
 
-                  setEmailMode(
-                    "login"
-                  );
-                }}
-              >
+                    <span className="auth-v1-provider-icon">
+                      <Mail
+                        size={16}
+                      />
+                    </span>
 
-                <span className="auth-v1-provider-icon">
-                  <Mail
+                    <span>
+                      Continue with Email
+                    </span>
+
+                    <ArrowRight
+                      size={16}
+                    />
+
+                  </button>
+
+                </div>
+
+                <div className="auth-v1-divider">
+
+                  <span />
+
+                  <small>
+                    or continue locally
+                  </small>
+
+                  <span />
+
+                </div>
+
+                <button
+                  type="button"
+                  className="auth-v1-guest"
+                  disabled={
+                    working
+                  }
+                  onClick={
+                    handleGuest
+                  }
+                >
+
+                  <UserRound
+                    size={17}
+                  />
+
+                  Continue as Guest
+
+                  <ArrowRight
                     size={16}
                   />
-                </span>
 
-                <span>
-                  Continue with Email
-                </span>
+                </button>
 
-                <ArrowRight
-                  size={16}
-                />
+                <p className="auth-v1-guest-note">
+                  Guest data stays on
+                  this device. You can
+                  sign in later and move
+                  your local StudyOS data
+                  into your account.
+                </p>
 
-              </button>
+              </>
+            ) : (
+              <>
 
-              {/* DIVIDER */}
+                <button
+                  type="button"
+                  className="auth-v1-back"
+                  disabled={
+                    working
+                  }
+                  onClick={() => {
+                    setError("");
 
-              <div className="auth-v1-divider">
+                    setEmailMode(
+                      null
+                    );
+                  }}
+                >
+                  <ArrowLeft
+                    size={14}
+                  />
 
-                <span />
+                  All sign-in options
+                </button>
 
-                <small>
-                  or
-                </small>
+                <div className="auth-v2-panel-heading auth-v2-panel-heading-email">
 
-                <span />
+                  <span className="auth-v2-panel-kicker">
+                    EMAIL
+                  </span>
 
-              </div>
+                  <h2>
+                    {emailMode ===
+                    "register"
+                      ? "Create your account."
+                      : "Welcome back."}
+                  </h2>
 
-              {/* GUEST */}
+                  <p>
+                    {emailMode ===
+                    "register"
+                      ? "Create a StudyOS account and keep your study history in the cloud."
+                      : "Sign in to continue to your StudyOS workspace."}
+                  </p>
 
-              <button
-                type="button"
-                className="auth-v1-guest"
-                disabled={
-                  working
-                }
-                onClick={
-                  handleGuest
-                }
-              >
-
-                <UserRound
-                  size={17}
-                />
-
-                Continue as Guest
-
-              </button>
-
-              <p className="auth-v1-guest-note">
-                Guest data stays on
-                this device. Sign in
-                later to sync across
-                devices.
-              </p>
-
-            </>
-          ) : (
-            <>
-
-              {/* EMAIL SCREEN */}
-
-              <button
-                type="button"
-                className="auth-v1-back"
-                disabled={
-                  working
-                }
-                onClick={() => {
-                  setError("");
-
-                  setEmailMode(
-                    null
-                  );
-                }}
-              >
-                ← Back
-              </button>
-
-              <h2>
-                {emailMode ===
-                "register"
-                  ? "Create account"
-                  : "Welcome back"}
-              </h2>
-
-              <p className="auth-v1-card-copy">
-
-                {emailMode ===
-                "register"
-                  ? "Create your StudyOS account."
-                  : "Sign in to your StudyOS account."}
-
-              </p>
-
-              {error && (
-                <div className="auth-v1-error">
-                  {error}
                 </div>
-              )}
 
-              <form
-                className="auth-v1-form"
-                onSubmit={
-                  handleEmail
-                }
-              >
+                {error && (
+                  <div className="auth-v1-error">
+                    {error}
+                  </div>
+                )}
 
-                {emailMode ===
-                  "register" && (
+                <form
+                  className="auth-v1-form"
+                  onSubmit={
+                    handleEmail
+                  }
+                >
+
+                  {emailMode ===
+                    "register" && (
+                    <label>
+
+                      Name
+
+                      <input
+                        type="text"
+                        value={
+                          name
+                        }
+                        disabled={
+                          working
+                        }
+                        placeholder="Your name"
+                        autoComplete="name"
+                        onChange={(
+                          event
+                        ) =>
+                          setName(
+                            event.target
+                              .value
+                          )
+                        }
+                      />
+
+                    </label>
+                  )}
+
                   <label>
 
-                    Name
+                    Email
 
                     <input
-                      type="text"
+                      type="email"
                       value={
-                        name
+                        email
                       }
                       disabled={
                         working
                       }
-                      placeholder="Your name"
-                      autoComplete="name"
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      required
                       onChange={(
                         event
                       ) =>
-                        setName(
+                        setEmail(
                           event.target
                             .value
                         )
@@ -497,175 +652,173 @@ function Welcome() {
                     />
 
                   </label>
-                )}
 
-                <label>
+                  <label>
 
-                  Email
+                    Password
 
-                  <input
-                    type="email"
-                    value={
-                      email
-                    }
+                    <div className="auth-v1-password">
+
+                      <input
+                        type={
+                          showPassword
+                            ? "text"
+                            : "password"
+                        }
+                        value={
+                          password
+                        }
+                        disabled={
+                          working
+                        }
+                        placeholder="••••••••"
+                        required
+                        autoComplete={
+                          emailMode ===
+                          "register"
+                            ? "new-password"
+                            : "current-password"
+                        }
+                        onChange={(
+                          event
+                        ) =>
+                          setPassword(
+                            event.target
+                              .value
+                          )
+                        }
+                      />
+
+                      <button
+                        type="button"
+                        disabled={
+                          working
+                        }
+                        aria-label={
+                          showPassword
+                            ? "Hide password"
+                            : "Show password"
+                        }
+                        onClick={() =>
+                          setShowPassword(
+                            (
+                              current
+                            ) =>
+                              !current
+                          )
+                        }
+                      >
+
+                        {showPassword ? (
+                          <EyeOff
+                            size={16}
+                          />
+                        ) : (
+                          <Eye
+                            size={16}
+                          />
+                        )}
+
+                      </button>
+
+                    </div>
+
+                  </label>
+
+                  <button
+                    type="submit"
+                    className="auth-v1-submit"
                     disabled={
                       working
                     }
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    required
-                    onChange={(
-                      event
-                    ) =>
-                      setEmail(
-                        event.target
-                          .value
-                      )
-                    }
-                  />
+                  >
 
-                </label>
-
-                <label>
-
-                  Password
-
-                  <div className="auth-v1-password">
-
-                    <input
-                      type={
-                        showPassword
-                          ? "text"
-                          : "password"
-                      }
-                      value={
-                        password
-                      }
-                      disabled={
-                        working
-                      }
-                      placeholder="••••••••"
-                      required
-                      autoComplete={
-                        emailMode ===
+                    {working
+                      ? "Please wait..."
+                      : emailMode ===
                         "register"
-                          ? "new-password"
-                          : "current-password"
-                      }
-                      onChange={(
-                        event
-                      ) =>
-                        setPassword(
-                          event.target
-                            .value
-                        )
-                      }
-                    />
+                      ? "Create Account"
+                      : "Sign In"}
 
-                    <button
-                      type="button"
-                      disabled={
-                        working
-                      }
-                      onClick={() =>
-                        setShowPassword(
-                          (
-                            current
-                          ) =>
-                            !current
-                        )
-                      }
-                    >
+                    {!working && (
+                      <ArrowRight
+                        size={16}
+                      />
+                    )}
 
-                      {showPassword ? (
-                        <EyeOff
-                          size={16}
-                        />
-                      ) : (
-                        <Eye
-                          size={16}
-                        />
-                      )}
+                  </button>
 
-                    </button>
+                </form>
 
-                  </div>
+                <div className="auth-v1-switch">
 
-                </label>
+                  {emailMode ===
+                  "login" ? (
+                    <>
 
-                <button
-                  type="submit"
-                  className="auth-v1-submit"
-                  disabled={
-                    working
-                  }
-                >
+                      <span>
+                        New to StudyOS?
+                      </span>
 
-                  {working
-                    ? "Please wait..."
-                    : emailMode ===
-                      "register"
-                    ? "Create Account"
-                    : "Sign In"}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError("");
 
-                </button>
+                          setEmailMode(
+                            "register"
+                          );
+                        }}
+                      >
+                        Create account
+                      </button>
 
-              </form>
+                    </>
+                  ) : (
+                    <>
 
-              {/* SWITCH LOGIN/REGISTER */}
+                      <span>
+                        Already have an
+                        account?
+                      </span>
 
-              <div className="auth-v1-switch">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError("");
 
-                {emailMode ===
-                "login" ? (
-                  <>
+                          setEmailMode(
+                            "login"
+                          );
+                        }}
+                      >
+                        Sign in
+                      </button>
 
-                    <span>
-                      New to StudyOS?
-                    </span>
+                    </>
+                  )}
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setError("");
+                </div>
 
-                        setEmailMode(
-                          "register"
-                        );
-                      }}
-                    >
-                      Create account
-                    </button>
+              </>
+            )}
 
-                  </>
-                ) : (
-                  <>
+          </div>
 
-                    <span>
-                      Already have an
-                      account?
-                    </span>
+          <p className="auth-v2-legal">
+            By continuing, you agree
+            to the{" "}
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setError("");
+            <Link to="/terms">
+              Terms
+            </Link>
 
-                        setEmailMode(
-                          "login"
-                        );
-                      }}
-                    >
-                      Sign in
-                    </button>
+            {" "}and acknowledge the{" "}
 
-                  </>
-                )}
-
-              </div>
-
-            </>
-          )}
+            <Link to="/privacy">
+              Privacy Policy
+            </Link>.
+          </p>
 
         </div>
 

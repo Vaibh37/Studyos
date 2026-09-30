@@ -30,6 +30,11 @@ const connectDB =
 // ROUTES
 // =========================================
 
+const systemRoutes =
+  require(
+    "./routes/systemRoutes"
+  );
+
 const taskRoutes =
   require(
     "./routes/taskRoutes"
@@ -109,28 +114,29 @@ app.get(
     res.json({
       message:
         "StudyOS API is running",
+
+      api:
+        "/api",
+
+      health:
+        "/api/health",
+
+      status:
+        "/api/status",
+
+      uptime:
+        "/api/uptime",
     });
   }
 );
 
 // =========================================
-// HEALTH
+// SYSTEM / OBSERVABILITY
 // =========================================
 
-app.get(
-  "/api/health",
-  (
-    req,
-    res
-  ) => {
-    res.json({
-      status:
-        "ok",
-
-      message:
-        "StudyOS backend is healthy",
-    });
-  }
+app.use(
+  "/api",
+  systemRoutes
 );
 
 // =========================================
@@ -178,6 +184,27 @@ app.use(
 app.use(
   "/api/leaderboard",
   leaderboardRoutes
+);
+
+// =========================================
+// API 404
+// =========================================
+
+app.use(
+  "/api",
+  (
+    req,
+    res
+  ) => {
+    res
+      .status(
+        404
+      )
+      .json({
+        message:
+          "StudyOS API route not found",
+      });
+  }
 );
 
 // =========================================

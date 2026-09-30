@@ -1,0 +1,607 @@
+/* =========================================================
+   STUDYOS — SHARED DATE PICKER
+
+   Structural styles live with the component so date popovers
+   do not depend on whichever route CSS happened to load.
+   ========================================================= */
+
+
+/* =========================================================
+   TRIGGER
+   ========================================================= */
+
+.study-date-picker {
+  position:
+    relative;
+
+  width:
+    100%;
+
+  min-width:
+    0;
+}
+
+
+.study-date-trigger {
+  display:
+    grid;
+
+  width:
+    100%;
+
+  min-width:
+    0;
+
+  min-height:
+    42px;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  padding:
+    0
+    11px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius:
+    8px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text);
+
+  text-align:
+    left;
+
+  box-shadow:
+    none;
+
+  transition:
+    border-color
+    var(--transition-fast),
+    background
+    var(--transition-fast);
+}
+
+
+.study-date-trigger:hover:not(
+  :disabled
+) {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface-hover);
+}
+
+
+.study-date-trigger.active {
+  border-color:
+    var(--color-border-strong);
+}
+
+
+.study-date-trigger:disabled {
+  opacity:
+    0.55;
+}
+
+
+.study-date-trigger
+> svg {
+  flex:
+    0
+    0
+    auto;
+
+  color:
+    var(--color-text-muted);
+}
+
+
+.study-date-trigger
+> span:not(
+  .study-date-clear
+) {
+  overflow:
+    hidden;
+
+  min-width:
+    0;
+
+  white-space:
+    nowrap;
+
+  text-overflow:
+    ellipsis;
+}
+
+
+.study-date-trigger
+.placeholder {
+  color:
+    var(--color-text-muted);
+}
+
+
+.study-date-clear {
+  display:
+    inline-flex;
+
+  width:
+    24px;
+
+  height:
+    24px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    6px;
+
+  color:
+    var(--color-text-muted);
+}
+
+
+.study-date-clear:hover {
+  background:
+    var(--color-surface-hover);
+
+  color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   PORTAL
+   ========================================================= */
+
+.study-date-popover {
+  position:
+    fixed;
+
+  z-index:
+    12000;
+
+  padding:
+    14px;
+
+  border:
+    1px solid
+    var(--color-border-strong);
+
+  border-radius:
+    11px;
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text);
+
+  box-shadow:
+    0
+    20px
+    54px
+    rgba(
+      0,
+      0,
+      0,
+      0.32
+    );
+
+  animation:
+    study-date-popover-in
+    120ms
+    ease-out;
+}
+
+
+body.light-theme
+.study-date-popover {
+  box-shadow:
+    0
+    18px
+    48px
+    rgba(
+      0,
+      0,
+      0,
+      0.11
+    );
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.study-date-header {
+  display:
+    grid;
+
+  grid-template-columns:
+    34px
+    minmax(
+      0,
+      1fr
+    )
+    34px;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  margin-bottom:
+    13px;
+}
+
+
+.study-date-header
+strong {
+  color:
+    var(--color-text);
+
+  font-size:
+    14px;
+
+  font-weight:
+    600;
+
+  text-align:
+    center;
+
+  letter-spacing:
+    -0.02em;
+}
+
+
+.study-date-header
+button {
+  display:
+    inline-flex;
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    0;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    7px;
+
+  background:
+    transparent;
+
+  color:
+    var(--color-text-muted);
+}
+
+
+.study-date-header
+button:hover {
+  border-color:
+    var(--color-border);
+
+  background:
+    var(--color-surface-hover);
+
+  color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   WEEKDAYS
+   ========================================================= */
+
+.study-date-weekdays {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      7,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    2px;
+
+  margin-bottom:
+    5px;
+}
+
+
+.study-date-weekdays
+span {
+  display:
+    flex;
+
+  min-height:
+    26px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  color:
+    var(--color-text-faint);
+
+  font-size:
+    10px;
+
+  font-weight:
+    600;
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+.study-date-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      7,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    3px;
+}
+
+
+.study-date-day {
+  display:
+    inline-flex;
+
+  min-width:
+    0;
+
+  height:
+    32px;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    0;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    7px;
+
+  background:
+    transparent;
+
+  color:
+    var(--color-text-secondary);
+
+  font-size:
+    12px;
+
+  font-weight:
+    500;
+}
+
+
+.study-date-day:hover {
+  background:
+    var(--color-surface-hover);
+
+  color:
+    var(--color-text);
+}
+
+
+.study-date-day.other-month {
+  color:
+    var(--color-text-faint);
+
+  opacity:
+    0.58;
+}
+
+
+.study-date-day.today:not(
+  .selected
+) {
+  border-color:
+    var(--color-border-strong);
+
+  color:
+    var(--color-text);
+}
+
+
+.study-date-day.selected {
+  border-color:
+    var(--color-solid);
+
+  background:
+    var(--color-solid);
+
+  color:
+    var(--color-solid-text);
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.study-date-footer {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    8px;
+
+  margin-top:
+    12px;
+
+  padding-top:
+    11px;
+
+  border-top:
+    1px solid
+    var(--color-border);
+}
+
+
+.study-date-footer
+button {
+  min-height:
+    30px;
+
+  padding:
+    0
+    9px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    7px;
+
+  background:
+    transparent;
+
+  color:
+    var(--color-text-muted);
+
+  font-size:
+    11px;
+
+  font-weight:
+    550;
+}
+
+
+.study-date-footer
+button:hover {
+  border-color:
+    var(--color-border);
+
+  background:
+    var(--color-surface-hover);
+
+  color:
+    var(--color-text);
+}
+
+
+.study-date-footer
+.study-date-today {
+  color:
+    var(--color-text);
+}
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes study-date-popover-in {
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        -3px
+      )
+      scale(
+        0.985
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      )
+      scale(
+        1
+      );
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .study-date-popover {
+    animation:
+      none;
+  }
+}

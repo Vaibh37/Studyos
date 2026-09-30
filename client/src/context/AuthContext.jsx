@@ -7,27 +7,64 @@ import {
 
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
+  signInWithCredential,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
   updateProfile,
 } from "firebase/auth";
 
 import {
   auth,
-  googleProvider,
 } from "../firebase";
 
 import {
-  API_URL,
-} from "../services/api";
+  loadGoogleIdentity,
+  requestGoogleAccessToken,
+} from "../services/googleIdentity";
+
 
 const AuthContext =
-  createContext(null);
+  createContext(
+    null
+  );
 
 const GUEST_KEY =
   "studyos_guest_mode";
+
+// =========================================================
+// APP PRELOAD
+// =========================================================
+
+let appPreloadPromise =
+  null;
+
+const preloadStudyApp =
+  () => {
+    if (
+      appPreloadPromise
+    ) {
+      return appPreloadPromise;
+    }
+
+    appPreloadPromise =
+      Promise.allSettled([
+        import(
+          "../pages/StudyApp"
+        ),
+
+        import(
+          "../pages/Dashboard"
+        ),
+
+        import(
+          "../components/Sidebar"
+        ),
+      ]);
+
+    return appPreloadPromise;
+  };
 
 export function AuthProvider({
   children,
@@ -35,7 +72,9 @@ export function AuthProvider({
   const [
     firebaseUser,
     setFirebaseUser,
-  ] = useState(null);
+  ] = useState(
+    null
+  );
 
   const [
     guestMode,
@@ -44,162 +83,25 @@ export function AuthProvider({
     () =>
       localStorage.getItem(
         GUEST_KEY
-      ) === "true"
+      ) ===
+      "true"
   );
 
   const [
     loading,
     setLoading,
-  ] = useState(true);
+  ] = useState(
+    true
+  );
 
-  const [
-    backendUser,
-    setBackendUser,
-  ] = useState(null);
+  // =======================================================
+  // ACCEPT FIREBASE USER
+  // =======================================================
 
-  const [
-    backendAuthStatus,
-    setBackendAuthStatus,
-  ] = useState("idle");
-
-  // =========================================
-  // VERIFY USER WITH EXPRESS BACKEND
-  // =========================================
-
-  const verifyBackendUser =
-    async (
-      user = auth.currentUser
+  const acceptFirebaseUser =
+    (
+      user
     ) => {
-      if (!user) {
-        setBackendUser(
-          null
-        );
-
-        setBackendAuthStatus(
-          "idle"
-        );
-
-        return null;
-      }
-
-      try {
-        setBackendAuthStatus(
-          "checking"
-        );
-
-        const token =
-          await user.getIdToken();
-
-        const response =
-          await fetch(
-            `${API_URL}/api/auth/me`,
-            {
-              headers: {
-                Authorization:
-                  `Bearer ${token}`,
-              },
-            }
-          );
-
-        let data = null;
-
-        try {
-          data =
-            await response.json();
-        } catch {
-          data = null;
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message ||
-              "Backend authentication failed"
-          );
-        }
-
-        setBackendUser(
-          data.user
-        );
-
-        setBackendAuthStatus(
-          "verified"
-        );
-
-        return data.user;
-      } catch (error) {
-        console.error(
-          "Backend authentication failed:",
-          error
-        );
-
-        setBackendUser(
-          null
-        );
-
-        setBackendAuthStatus(
-          "error"
-        );
-
-        return null;
-      }
-    };
-
-  // =========================================
-  // FIREBASE AUTH STATE
-  // =========================================
-
-  useEffect(() => {
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        (user) => {
-          setFirebaseUser(
-            user
-          );
-
-          if (user) {
-            localStorage.removeItem(
-              GUEST_KEY
-            );
-
-            setGuestMode(
-              false
-            );
-
-            verifyBackendUser(
-              user
-            );
-          } else {
-            setBackendUser(
-              null
-            );
-
-            setBackendAuthStatus(
-              "idle"
-            );
-          }
-
-          setLoading(
-            false
-          );
-        }
-      );
-
-    return unsubscribe;
-  }, []);
-
-  // =========================================
-  // GOOGLE LOGIN
-  // =========================================
-
-  const loginWithGoogle =
-    async () => {
-      const result =
-        await signInWithPopup(
-          auth,
-          googleProvider
-        );
-
       localStorage.removeItem(
         GUEST_KEY
       );
@@ -208,12 +110,136 @@ export function AuthProvider({
         false
       );
 
+      setFirebaseUser(
+        user
+      );
+    };
+
+  // =======================================================
+  // SESSION RESTORE
+  // =======================================================
+
+  useEffect(
+    () => {
+      const unsubscribe =
+        onAuthStateChanged(
+          auth,
+          (
+            user
+          ) => {
+            if (
+              user
+            ) {
+              acceptFirebaseUser(
+                user
+              );
+
+              preloadStudyApp();
+            } else {
+              setFirebaseUser(
+                null
+              );
+            }
+
+            setLoading(
+              false
+            );
+          }
+        );
+
+      return unsubscribe;
+    },
+    []
+  );
+
+  // =======================================================
+  // PRELOAD GOOGLE GIS WHILE LOGIN PAGE IS IDLE
+  // =======================================================
+
+  useEffect(
+    () => {
+      const start =
+        () => {
+          loadGoogleIdentity()
+            .catch(
+              (
+                error
+              ) => {
+                console.warn(
+                  "Google Identity Services preload failed:",
+                  error
+                );
+              }
+            );
+        };
+
+      if (
+        "requestIdleCallback" in
+        window
+      ) {
+        const idleId =
+          window.requestIdleCallback(
+            start,
+            {
+              timeout:
+                1500,
+            }
+          );
+
+        return () =>
+          window.cancelIdleCallback(
+            idleId
+          );
+      }
+
+      const timer =
+        window.setTimeout(
+          start,
+          250
+        );
+
+      return () =>
+        window.clearTimeout(
+          timer
+        );
+    },
+    []
+  );
+
+  // =======================================================
+  // GOOGLE LOGIN — GIS -> FIREBASE CREDENTIAL
+  // =======================================================
+
+  const loginWithGoogle =
+    async () => {
+      preloadStudyApp();
+
+      const accessToken =
+        await requestGoogleAccessToken();
+
+      const firebaseCredential =
+        GoogleAuthProvider
+          .credential(
+            null,
+            accessToken
+          );
+
+      const result =
+        await signInWithCredential(
+          auth,
+          firebaseCredential
+        );
+
+      acceptFirebaseUser(
+        result.user
+      );
+
       return result.user;
     };
 
-  // =========================================
+  // =======================================================
   // EMAIL REGISTER
-  // =========================================
+  // =======================================================
 
   const registerWithEmail =
     async ({
@@ -221,6 +247,8 @@ export function AuthProvider({
       email,
       password,
     }) => {
+      preloadStudyApp();
+
       const result =
         await createUserWithEmailAndPassword(
           auth,
@@ -228,7 +256,9 @@ export function AuthProvider({
           password
         );
 
-      if (name.trim()) {
+      if (
+        name.trim()
+      ) {
         await updateProfile(
           result.user,
           {
@@ -238,26 +268,24 @@ export function AuthProvider({
         );
       }
 
-      localStorage.removeItem(
-        GUEST_KEY
-      );
-
-      setGuestMode(
-        false
+      acceptFirebaseUser(
+        result.user
       );
 
       return result.user;
     };
 
-  // =========================================
+  // =======================================================
   // EMAIL LOGIN
-  // =========================================
+  // =======================================================
 
   const loginWithEmail =
     async ({
       email,
       password,
     }) => {
+      preloadStudyApp();
+
       const result =
         await signInWithEmailAndPassword(
           auth,
@@ -265,23 +293,21 @@ export function AuthProvider({
           password
         );
 
-      localStorage.removeItem(
-        GUEST_KEY
-      );
-
-      setGuestMode(
-        false
+      acceptFirebaseUser(
+        result.user
       );
 
       return result.user;
     };
 
-  // =========================================
-  // GUEST MODE
-  // =========================================
+  // =======================================================
+  // GUEST
+  // =======================================================
 
   const continueAsGuest =
     async () => {
+      preloadStudyApp();
+
       if (
         auth.currentUser
       ) {
@@ -299,22 +325,14 @@ export function AuthProvider({
         null
       );
 
-      setBackendUser(
-        null
-      );
-
-      setBackendAuthStatus(
-        "idle"
-      );
-
       setGuestMode(
         true
       );
     };
 
-  // =========================================
+  // =======================================================
   // LOGOUT
-  // =========================================
+  // =======================================================
 
   const logout =
     async () => {
@@ -324,14 +342,6 @@ export function AuthProvider({
 
       setGuestMode(
         false
-      );
-
-      setBackendUser(
-        null
-      );
-
-      setBackendAuthStatus(
-        "idle"
       );
 
       if (
@@ -347,9 +357,9 @@ export function AuthProvider({
       );
     };
 
-  // =========================================
-  // GET FIREBASE TOKEN
-  // =========================================
+  // =======================================================
+  // TOKEN
+  // =======================================================
 
   const getIdToken =
     async () => {
@@ -363,9 +373,9 @@ export function AuthProvider({
         .getIdToken();
     };
 
-  // =========================================
-  // CURRENT MODE
-  // =========================================
+  // =======================================================
+  // MODE
+  // =======================================================
 
   const mode =
     firebaseUser
@@ -378,10 +388,6 @@ export function AuthProvider({
     <AuthContext.Provider
       value={{
         firebaseUser,
-
-        backendUser,
-
-        backendAuthStatus,
 
         guestMode,
 
@@ -409,7 +415,7 @@ export function AuthProvider({
 
         getIdToken,
 
-        verifyBackendUser,
+        preloadStudyApp,
       }}
     >
       {children}

@@ -1,26 +1,33 @@
 import {
-  LayoutDashboard,
-  CheckSquare,
-  BookOpen,
-  FileText,
-  CalendarDays,
-  Timer,
   BarChart3,
-  Trophy,
+  BookOpen,
+  CalendarDays,
+  CheckSquare,
+  FileText,
+  LayoutDashboard,
   Settings,
+  Timer,
+  Trophy,
   X,
 } from "lucide-react";
 
+import {
+  NavLink,
+} from "react-router";
+
 import "../styles/global-polish.css";
 
+// =========================================================
+// NAVIGATION
+// =========================================================
 
 const menuItems = [
   {
     label:
       "Dashboard",
 
-    page:
-      "dashboard",
+    to:
+      "/app/dashboard",
 
     icon:
       LayoutDashboard,
@@ -30,8 +37,8 @@ const menuItems = [
     label:
       "Tasks",
 
-    page:
-      "tasks",
+    to:
+      "/app/tasks",
 
     icon:
       CheckSquare,
@@ -41,8 +48,8 @@ const menuItems = [
     label:
       "Subjects",
 
-    page:
-      "subjects",
+    to:
+      "/app/subjects",
 
     icon:
       BookOpen,
@@ -52,8 +59,8 @@ const menuItems = [
     label:
       "Notes",
 
-    page:
-      "notes",
+    to:
+      "/app/notes",
 
     icon:
       FileText,
@@ -63,8 +70,8 @@ const menuItems = [
     label:
       "Calendar",
 
-    page:
-      "calendar",
+    to:
+      "/app/calendar",
 
     icon:
       CalendarDays,
@@ -74,8 +81,8 @@ const menuItems = [
     label:
       "Focus",
 
-    page:
-      "focus",
+    to:
+      "/app/focus",
 
     icon:
       Timer,
@@ -85,8 +92,8 @@ const menuItems = [
     label:
       "Progress",
 
-    page:
-      "progress",
+    to:
+      "/app/progress",
 
     icon:
       BarChart3,
@@ -96,30 +103,26 @@ const menuItems = [
     label:
       "Leaderboard",
 
-    page:
-      "leaderboard",
+    to:
+      "/app/leaderboard",
 
     icon:
       Trophy,
   },
 ];
 
+// =========================================================
+// SIDEBAR
+// =========================================================
 
 function Sidebar({
-  activePage,
-  onNavigate,
   isOpen = false,
   onClose,
 }) {
-  const navigate =
-    (
-      page
-    ) => {
-      onNavigate(
-        page
-      );
+  const closeNavigation =
+    () => {
+      onClose?.();
     };
-
 
   return (
     <aside
@@ -133,19 +136,21 @@ function Sidebar({
 
       {/* =================================================
           BRAND
-          ================================================= */}
+      ================================================= */}
 
       <div className="sidebar-logo app-shell-v2-sidebar-header">
 
-        <button
-          type="button"
+        <NavLink
+          to="/app/dashboard"
           className="app-shell-v2-brand"
-          onClick={() =>
-            navigate(
-              "dashboard"
-            )
-          }
           aria-label="Open Dashboard"
+          onClick={
+            closeNavigation
+          }
+          style={{
+            textDecoration:
+              "none",
+          }}
         >
 
           <span className="logo-mark">
@@ -156,8 +161,7 @@ function Sidebar({
             StudyOS
           </span>
 
-        </button>
-
+        </NavLink>
 
         <button
           type="button"
@@ -177,17 +181,15 @@ function Sidebar({
 
       </div>
 
-
       {/* =================================================
           WORKSPACE
-          ================================================= */}
+      ================================================= */}
 
       <div className="app-shell-v2-nav-section">
 
         <span className="app-shell-v2-nav-label">
           Workspace
         </span>
-
 
         <nav className="sidebar-nav app-shell-v2-nav">
 
@@ -198,31 +200,30 @@ function Sidebar({
               const Icon =
                 item.icon;
 
-              const active =
-                activePage ===
-                item.page;
-
-
               return (
-                <button
-                  type="button"
+                <NavLink
                   key={
-                    item.page
+                    item.to
                   }
-                  className={`nav-item ${
-                    active
-                      ? "active"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    navigate(
-                      item.page
-                    )
+                  to={
+                    item.to
                   }
-                  aria-current={
-                    active
-                      ? "page"
-                      : undefined
+                  end
+                  onClick={
+                    closeNavigation
+                  }
+                  style={{
+                    textDecoration:
+                      "none",
+                  }}
+                  className={({
+                    isActive,
+                  }) =>
+                    `nav-item ${
+                      isActive
+                        ? "active"
+                        : ""
+                    }`
                   }
                 >
 
@@ -235,7 +236,7 @@ function Sidebar({
                     {item.label}
                   </span>
 
-                </button>
+                </NavLink>
               );
             }
           )}
@@ -244,10 +245,9 @@ function Sidebar({
 
       </div>
 
-
       {/* =================================================
           SETTINGS
-          ================================================= */}
+      ================================================= */}
 
       <div className="sidebar-bottom">
 
@@ -255,25 +255,24 @@ function Sidebar({
           Preferences
         </span>
 
-
-        <button
-          type="button"
-          className={`nav-item ${
-            activePage ===
-            "settings"
-              ? "active"
-              : ""
-          }`}
-          onClick={() =>
-            navigate(
-              "settings"
-            )
+        <NavLink
+          to="/app/settings"
+          end
+          onClick={
+            closeNavigation
           }
-          aria-current={
-            activePage ===
-            "settings"
-              ? "page"
-              : undefined
+          style={{
+            textDecoration:
+              "none",
+          }}
+          className={({
+            isActive,
+          }) =>
+            `nav-item ${
+              isActive
+                ? "active"
+                : ""
+            }`
           }
         >
 
@@ -286,13 +285,12 @@ function Sidebar({
             Settings
           </span>
 
-        </button>
+        </NavLink>
 
       </div>
 
     </aside>
   );
 }
-
 
 export default Sidebar;
