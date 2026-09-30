@@ -54,13 +54,11 @@ Real screenshots from the current **StudyOS V2** interface.
 
 ## Dashboard
 
-<picture>
-  <img
-    src="./docs/screenshots/Dashboard.png"
-    alt="StudyOS V2 Dashboard"
-    width="100%"
-  />
-</picture>
+<img
+  src="./docs/screenshots/dashboard.webp"
+  alt="StudyOS V2 Dashboard"
+  width="100%"
+/>
 
 </div>
 
@@ -73,7 +71,7 @@ Real screenshots from the current **StudyOS V2** interface.
 ### Tasks
 
 <img
-  src="./docs/screenshots/Tasks.png"
+  src="./docs/screenshots/tasks.webp"
   alt="StudyOS Tasks"
   width="100%"
 />
@@ -86,7 +84,7 @@ Plan work, set priorities, connect tasks to subjects, and keep deadlines visible
 ### Subjects
 
 <img
-  src="./docs/screenshots/Subjects.png"
+  src="./docs/screenshots/subjects.webp"
   alt="StudyOS Subjects"
   width="100%"
 />
@@ -102,7 +100,7 @@ Organize coursework and see focus, task, note, and activity data by subject.
 ### Notes
 
 <img
-  src="./docs/screenshots/notes.png"
+  src="./docs/screenshots/notes.webp"
   alt="StudyOS Notes"
   width="100%"
 />
@@ -115,7 +113,7 @@ Write, search, pin, and connect notes directly to your study structure.
 ### Calendar
 
 <img
-  src="./docs/screenshots/calendar.png"
+  src="./docs/screenshots/calendar.webp"
   alt="StudyOS Calendar"
   width="100%"
 />
@@ -131,7 +129,7 @@ See deadlines, study events, and actual Focus history together in one monthly vi
 ### Focus
 
 <img
-  src="./docs/screenshots/focus.png"
+  src="./docs/screenshots/focus.webp"
   alt="StudyOS Focus timer"
   width="100%"
 />
@@ -144,7 +142,7 @@ Run subject-linked Focus sessions with presets, custom durations, pause/resume, 
 ### Progress
 
 <img
-  src="./docs/screenshots/progress.png"
+  src="./docs/screenshots/progress.webp"
   alt="StudyOS Progress analytics"
   width="100%"
 />
@@ -153,36 +151,21 @@ Review focus time, consistency, streaks, task completion, and weekly study patte
 
 </td>
 </tr>
+</table>
 
-<tr>
-<td width="50%" valign="top">
+<div align="center">
 
-### Leaderboard
+## Leaderboard
 
 <img
-  src="./docs/screenshots/leaderboard.png"
+  src="./docs/screenshots/leaderboard.webp"
   alt="StudyOS Leaderboard"
   width="100%"
 />
 
 Opt into a weekly ranking built from eligible Focus activity and completed tasks.
 
-</td>
-<td width="50%" valign="top">
-
-### Settings
-
-<img
-  src="./docs/screenshots/settings.png"
-  alt="StudyOS Settings"
-  width="100%"
-/>
-
-Manage account, appearance, goals, leaderboard privacy, notifications, backup, and diagnostics.
-
-</td>
-</tr>
-</table>
+</div>
 
 > StudyOS supports both light and dark themes, with responsive layouts across desktop and mobile.
 
@@ -639,15 +622,14 @@ Studyos/
 │
 ├── docs/
 │   └── screenshots/
-│       ├── Dashboard.png
-│       ├── Tasks.png
-│       ├── Subjects.png
-│       ├── notes.png
-│       ├── calendar.png
-│       ├── focus.png
-│       ├── progress.png
-│       ├── leaderboard.png
-│       └── settings.png
+│       ├── dashboard.webp
+│       ├── tasks.webp
+│       ├── subjects.webp
+│       ├── notes.webp
+│       ├── calendar.webp
+│       ├── focus.webp
+│       ├── progress.webp
+│       └── leaderboard.webp
 │
 └── README.md
 ```
