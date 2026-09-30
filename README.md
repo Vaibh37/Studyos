@@ -48,32 +48,143 @@ StudyOS is designed to work both as a **personal study workspace** and as a more
 
 # Product Preview
 
-These are real screenshots from the current StudyOS V2 interface.
+Real screenshots from the current **StudyOS V2** interface.
 
 <div align="center">
 
-## Dashboard — Light theme
+## Dashboard
 
-<img
-  src="./docs/screenshots/v2-dashboard.webp"
-  alt="StudyOS V2 Dashboard in light theme"
-  width="100%"
-/>
-
-<br />
-<br />
-
-## Progress — Dark theme
-
-<img
-  src="./docs/screenshots/v2-progress.webp"
-  alt="StudyOS V2 Progress analytics in dark theme"
-  width="100%"
-/>
+<picture>
+  <img
+    src="./docs/screenshots/Dashboard.png"
+    alt="StudyOS V2 Dashboard"
+    width="100%"
+  />
+</picture>
 
 </div>
 
-> StudyOS supports both light and dark themes. The interface is responsive and uses the same Plan → Focus → Review workflow across desktop and mobile.
+<br />
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### Tasks
+
+<img
+  src="./docs/screenshots/Tasks.png"
+  alt="StudyOS Tasks"
+  width="100%"
+/>
+
+Plan work, set priorities, connect tasks to subjects, and keep deadlines visible.
+
+</td>
+<td width="50%" valign="top">
+
+### Subjects
+
+<img
+  src="./docs/screenshots/Subjects.png"
+  alt="StudyOS Subjects"
+  width="100%"
+/>
+
+Organize coursework and see focus, task, note, and activity data by subject.
+
+</td>
+</tr>
+
+<tr>
+<td width="50%" valign="top">
+
+### Notes
+
+<img
+  src="./docs/screenshots/notes.png"
+  alt="StudyOS Notes"
+  width="100%"
+/>
+
+Write, search, pin, and connect notes directly to your study structure.
+
+</td>
+<td width="50%" valign="top">
+
+### Calendar
+
+<img
+  src="./docs/screenshots/calendar.png"
+  alt="StudyOS Calendar"
+  width="100%"
+/>
+
+See deadlines, study events, and actual Focus history together in one monthly view.
+
+</td>
+</tr>
+
+<tr>
+<td width="50%" valign="top">
+
+### Focus
+
+<img
+  src="./docs/screenshots/focus.png"
+  alt="StudyOS Focus timer"
+  width="100%"
+/>
+
+Run subject-linked Focus sessions with presets, custom durations, pause/resume, and history.
+
+</td>
+<td width="50%" valign="top">
+
+### Progress
+
+<img
+  src="./docs/screenshots/progress.png"
+  alt="StudyOS Progress analytics"
+  width="100%"
+/>
+
+Review focus time, consistency, streaks, task completion, and weekly study patterns.
+
+</td>
+</tr>
+
+<tr>
+<td width="50%" valign="top">
+
+### Leaderboard
+
+<img
+  src="./docs/screenshots/leaderboard.png"
+  alt="StudyOS Leaderboard"
+  width="100%"
+/>
+
+Opt into a weekly ranking built from eligible Focus activity and completed tasks.
+
+</td>
+<td width="50%" valign="top">
+
+### Settings
+
+<img
+  src="./docs/screenshots/settings.png"
+  alt="StudyOS Settings"
+  width="100%"
+/>
+
+Manage account, appearance, goals, leaderboard privacy, notifications, backup, and diagnostics.
+
+</td>
+</tr>
+</table>
+
+> StudyOS supports both light and dark themes, with responsive layouts across desktop and mobile.
 
 ---
 
@@ -528,12 +639,15 @@ Studyos/
 │
 ├── docs/
 │   └── screenshots/
-│       ├── dashboard.png
-│       ├── tasks.png
+│       ├── Dashboard.png
+│       ├── Tasks.png
+│       ├── Subjects.png
+│       ├── notes.png
+│       ├── calendar.png
 │       ├── focus.png
 │       ├── progress.png
 │       ├── leaderboard.png
-│       └── mobile-dashboard.jpg
+│       └── settings.png
 │
 └── README.md
 ```
@@ -836,7 +950,7 @@ You can:
 
 ### Try StudyOS
 
-[![Launch StudyOS](https://img.shields.io/badge/Launch-StudyOS-6366F1?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos37.vercel.app/)
+[![Launch StudyOS](https://img.shields.io/badge/Launch-StudyOS-111111?style=for-the-badge&logo=vercel&logoColor=white)](https://studyos37.vercel.app/)
 
 </div>
 
