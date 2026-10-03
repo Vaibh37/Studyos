@@ -1,3 +1,4 @@
+﻿import { useRef, useState } from "react";
 import {
   BarChart3,
   BookOpen,
@@ -6,222 +7,209 @@ import {
   Settings,
   X,
 } from "lucide-react";
-
-import {
-  NavLink,
-} from "react-router";
-
-
-// =========================================================
-// ITEMS
-// =========================================================
+import { NavLink } from "react-router";
 
 const moreItems = [
   {
+    to: "/app/subjects",
     label: "Subjects",
     description: "Manage your courses",
-    to: "/app/subjects",
     icon: BookOpen,
   },
-
   {
+    to: "/app/notes",
     label: "Notes",
     description: "Study notes",
-    to: "/app/notes",
     icon: FileText,
   },
-
   {
+    to: "/app/calendar",
     label: "Calendar",
     description: "Deadlines & events",
-    to: "/app/calendar",
     icon: CalendarDays,
   },
-
   {
+    to: "/app/progress",
     label: "Progress",
     description: "Stats & activity",
-    to: "/app/progress",
     icon: BarChart3,
   },
-
   {
+    to: "/app/settings",
     label: "Settings",
     description: "Account & preferences",
-    to: "/app/settings",
     icon: Settings,
   },
 ];
 
-
-// =========================================================
-// MOBILE MORE SHEET
-// =========================================================
-
-function MobileMoreSheet({
+export default function MobileMoreSheet({
   open,
   onClose,
 }) {
-  if (!open) {
-    return null;
-  }
+  const [dragY, setDragY] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  const startY = useRef(0);
+  const dragYRef = useRef(0);
+
+  if (!open) return null;
+
+  const closeSmoothly = () => {
+    if (closing) return;
+
+    setClosing(true);
+
+    window.setTimeout(() => {
+      setClosing(false);
+      setDragY(0);
+      onClose();
+    }, 240);
+  };
+
+  const handlePointerDown = (event) => {
+    if (closing) return;
+
+    setDragging(true);
+
+    startY.current = event.clientY;
+    dragYRef.current = 0;
+
+    event.currentTarget.setPointerCapture?.(
+      event.pointerId
+    );
+  };
+
+  const handlePointerMove = (event) => {
+    if (!dragging) return;
+
+    const distance =
+      event.clientY - startY.current;
+
+    const nextDrag =
+      Math.min(
+        Math.max(distance, 0),
+        320
+      );
+
+    dragYRef.current = nextDrag;
+
+    setDragY(nextDrag);
+  };
+
+  const finishDrag = () => {
+    if (!dragging) return;
+
+    const shouldClose =
+      dragYRef.current > 80;
+
+    setDragging(false);
+
+    if (shouldClose) {
+      closeSmoothly();
+      return;
+    }
+
+    dragYRef.current = 0;
+    setDragY(0);
+  };
 
   return (
     <div
-      className="mobile-more-overlay"
+      className={`mobile-more-overlay ${
+        closing ? "is-closing" : ""
+      }`}
+      role="presentation"
       onMouseDown={(event) => {
         if (
           event.target ===
           event.currentTarget
         ) {
-          onClose();
+          closeSmoothly();
         }
       }}
     >
-
       <section
-        className="mobile-more-sheet"
+        id="mobile-more-sheet"
+        className={[
+          "mobile-more-sheet",
+          dragging ? "is-dragging" : "",
+          closing ? "is-closing" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         role="dialog"
         aria-modal="true"
-        aria-label="More StudyOS navigation"
+        aria-label="More navigation"
+        style={{
+          "--mobile-more-drag-y":
+            `${dragY}px`,
+        }}
       >
-
-        {/* HANDLE */}
-
-        <div className="mobile-more-handle" />
-
-
-        {/* HEADER */}
+        <div
+          className="mobile-more-drag-zone"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={finishDrag}
+          onPointerCancel={finishDrag}
+        >
+          <div className="mobile-more-handle" />
+        </div>
 
         <div className="mobile-more-header">
-
           <div>
-
-            <span>
+            <p className="mobile-more-eyebrow">
               StudyOS
-            </span>
+            </p>
 
-            <h2>
-              More
-            </h2>
-
+            <h2>More</h2>
           </div>
-
 
           <button
             type="button"
             className="mobile-more-close"
-            onClick={
-              onClose
-            }
+            onClick={closeSmoothly}
             aria-label="Close more menu"
           >
-            <X
-              size={18}
-            />
+            <X size={18} />
           </button>
-
         </div>
-
-
-        {/* GRID */}
 
         <div className="mobile-more-grid">
-
           {moreItems.map(
-            (
-              item
-            ) => {
-              const Icon =
-                item.icon;
+            ({
+              to,
+              label,
+              description,
+              icon: Icon,
+            }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className="mobile-more-item"
+                onClick={onClose}
+              >
+                <span className="mobile-more-item-icon">
+                  <Icon
+                    size={19}
+                    strokeWidth={2}
+                  />
+                </span>
 
-              return (
-                <NavLink
-                  key={
-                    item.to
-                  }
-                  to={
-                    item.to
-                  }
-                  onClick={
-                    onClose
-                  }
-                  className={({
-                    isActive,
-                  }) =>
-                    [
-                      "mobile-more-item",
-
-                      isActive
-                        ? "is-active"
-                        : "",
-                    ]
-                      .filter(
-                        Boolean
-                      )
-                      .join(
-                        " "
-                      )
-                  }
-                >
-
-                  <span className="mobile-more-item-icon">
-
-                    <Icon
-                      size={20}
-                      strokeWidth={1.8}
-                    />
-
-                  </span>
-
-
-                  <div>
-
-                    <strong>
-                      {item.label}
-                    </strong>
-
-                    <span>
-                      {item.description}
-                    </span>
-
-                  </div>
-
-                </NavLink>
-              );
-            }
+                <span className="mobile-more-item-copy">
+                  <strong>{label}</strong>
+                  <small>{description}</small>
+                </span>
+              </NavLink>
+            )
           )}
-
         </div>
 
-
-        {/* FOOTER */}
-
-        <div className="mobile-more-footer">
-
-          <span className="mobile-more-logo">
-            S
-          </span>
-
-          <div>
-
-            <strong>
-              StudyOS
-            </strong>
-
-            <span>
-              Your study workspace
-            </span>
-
-          </div>
-
-        </div>
-
+        <p className="mobile-more-footer">
+          Everything else, without crowding
+          your main navigation.
+        </p>
       </section>
-
     </div>
   );
 }
-
-
-export default MobileMoreSheet;

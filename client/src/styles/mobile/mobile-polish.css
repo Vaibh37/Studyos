@@ -303,3 +303,91 @@
   }
 
 }
+
+/* =========================================================
+   MOBILE NAV — SMOOTH ACTIVE STATE
+   Keep the nav item fixed; animate its contents instead.
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .mobile-bottom-nav-item {
+    position: relative;
+
+    transform: none !important;
+
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease,
+      opacity 180ms ease !important;
+  }
+
+  .mobile-bottom-nav-item:not(.is-primary)
+  .mobile-bottom-nav-icon {
+    transform: translateY(0) scale(1);
+
+    transition:
+      transform 200ms cubic-bezier(.2, .8, .2, 1),
+      opacity 180ms ease,
+      color 180ms ease;
+  }
+
+  .mobile-bottom-nav-item:not(.is-primary)
+  .mobile-bottom-nav-label {
+    transform: translateY(0);
+
+    transition:
+      transform 200ms cubic-bezier(.2, .8, .2, 1),
+      opacity 180ms ease,
+      color 180ms ease;
+  }
+
+  .mobile-bottom-nav-item:not(.is-primary).is-active
+  .mobile-bottom-nav-icon {
+    transform:
+      translateY(-2px)
+      scale(1.06);
+  }
+
+  .mobile-bottom-nav-item:not(.is-primary).is-active
+  .mobile-bottom-nav-label {
+    transform:
+      translateY(-1px);
+  }
+
+  .mobile-bottom-nav-item:not(.is-primary)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 3px;
+
+    width: 18px;
+    height: 2px;
+
+    border-radius: 999px;
+
+    background: currentColor;
+
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      scaleX(.45);
+
+    transition:
+      opacity 180ms ease,
+      transform 220ms cubic-bezier(.2, .8, .2, 1);
+  }
+
+  .mobile-bottom-nav-item:not(.is-primary).is-active::after {
+    opacity: .55;
+
+    transform:
+      translateX(-50%)
+      scaleX(1);
+  }
+
+}
