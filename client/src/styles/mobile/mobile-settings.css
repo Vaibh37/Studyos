@@ -1,0 +1,1283 @@
+﻿/* =========================================================
+   STUDYOS — MOBILE SETTINGS
+   Compact native-style settings
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .settings-v2-page {
+    width: 100%;
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-header {
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center !important;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin:
+      0
+      0
+      15px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-eyebrow,
+  .settings-v2-page
+  .settings-v2-header
+  > div:first-child
+  > p:last-child {
+    display: none !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-header h1 {
+    margin: 0 !important;
+
+    font-size: 29px !important;
+    line-height: 1.05 !important;
+
+    letter-spacing:
+      -0.05em !important;
+  }
+
+
+  /* =======================================================
+     API STATUS
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-api-pill {
+    min-height:
+      30px !important;
+
+    padding:
+      0
+      9px !important;
+
+    gap:
+      5px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-status-dot {
+    width:
+      6px !important;
+
+    height:
+      6px !important;
+  }
+
+
+  /* =======================================================
+     NOTICES
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-notice {
+    gap:
+      7px !important;
+
+    margin-bottom:
+      10px !important;
+
+    padding:
+      9px
+      10px !important;
+
+    border-radius:
+      10px !important;
+
+    font-size:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     SHELL
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-shell {
+    display: block !important;
+
+    overflow:
+      visible !important;
+
+    border:
+      0 !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+
+  /* =======================================================
+     MOBILE SECTION PICKER
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-nav {
+    padding:
+      0 !important;
+
+    margin-bottom:
+      14px;
+
+    border:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-nav-heading,
+  .settings-v2-page
+  .settings-v2-nav-footer,
+  .settings-v2-page
+  .settings-v2-nav-list {
+    display: none !important;
+  }
+
+  .settings-v2-mobile-picker {
+    display:
+      block !important;
+
+    width:
+      100%;
+  }
+
+  .settings-v2-section-select {
+    width:
+      100% !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-section-select
+  .study-select-trigger {
+    min-height:
+      44px !important;
+
+    padding:
+      0
+      12px !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      var(--color-surface) !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     CONTENT
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-content {
+    padding:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+
+  /* =======================================================
+     SECTION HEADING
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-section-heading {
+    gap:
+      9px !important;
+
+    margin-bottom:
+      10px !important;
+
+    padding:
+      0
+      0
+      10px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-section-icon {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-section-icon svg {
+    width:
+      15px;
+
+    height:
+      15px;
+  }
+
+  .settings-v2-page
+  .settings-v2-section-heading h2 {
+    font-size:
+      16px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-section-heading p {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     SECTION STACK
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-section-stack {
+    gap:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     PANEL
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-panel {
+    border-radius:
+      14px !important;
+  }
+
+
+  /* =======================================================
+     PANEL HEADER
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-panel-header {
+    align-items:
+      center !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      12px
+      13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel-header h3 {
+    font-size:
+      12px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel-header p {
+    display:
+      none !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel-header
+  > svg {
+    width:
+      15px;
+
+    height:
+      15px;
+  }
+
+
+  /* =======================================================
+     ROWS
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-row {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    align-items:
+      center !important;
+
+    gap:
+      10px !important;
+
+    min-height:
+      58px !important;
+
+    padding:
+      10px
+      13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-row-copy strong {
+    font-size:
+      10px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-row-copy
+  > span:not(.settings-v2-status-badge) {
+    margin-top:
+      2px !important;
+
+    font-size:
+      8px !important;
+
+    line-height:
+      1.35 !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-row-actions {
+    width:
+      auto !important;
+
+    flex-wrap:
+      nowrap !important;
+
+    gap:
+      5px !important;
+  }
+
+
+  /* =======================================================
+     BUTTONS
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-primary-button,
+  .settings-v2-page
+  .settings-v2-secondary-button,
+  .settings-v2-page
+  .settings-v2-danger-outline,
+  .settings-v2-page
+  .settings-v2-danger-solid {
+    width:
+      auto !important;
+
+    min-height:
+      36px !important;
+
+    padding:
+      0
+      10px !important;
+
+    gap:
+      5px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-primary-button svg,
+  .settings-v2-page
+  .settings-v2-secondary-button svg,
+  .settings-v2-page
+  .settings-v2-danger-outline svg,
+  .settings-v2-page
+  .settings-v2-danger-solid svg {
+    width:
+      13px;
+
+    height:
+      13px;
+  }
+
+
+  /* =======================================================
+     FORM
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-form {
+    gap:
+      11px !important;
+
+    padding:
+      13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-field {
+    gap:
+      5px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-field > span {
+    font-size:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-field > small {
+    font-size:
+      7px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-field > input,
+  .settings-v2-page
+  .settings-v2-delete-field input {
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      10px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     UNIT INPUT
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v3-unit-field {
+    border-radius:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v3-unit-field input {
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      10px !important;
+
+    font-size:
+      10px !important;
+  }
+
+  .settings-v2-page
+  .settings-v3-unit-field > span {
+    padding:
+      0
+      10px !important;
+
+    font-size:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     FORM FOOTER
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-form-footer {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      flex-end;
+
+    gap:
+      8px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-form-hint {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     TOGGLES
+     ======================================================= */
+
+  .settings-v2-page
+  .toggle-button {
+    min-width:
+      48px !important;
+
+    min-height:
+      30px !important;
+
+    padding:
+      0
+      8px !important;
+
+    font-size:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     STARTUP SELECT
+     ======================================================= */
+
+  .settings-v2-startup-select {
+    width:
+      135px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-startup-select
+  .study-select-trigger {
+    min-height:
+      36px !important;
+
+    padding:
+      0
+      9px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     THEME GRID
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-theme-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    padding:
+      12px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-card {
+    padding:
+      8px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-preview {
+    height:
+      67px !important;
+
+    margin-bottom:
+      8px !important;
+
+    padding:
+      6px !important;
+
+    border-radius:
+      7px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-copy {
+    gap:
+      6px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-icon {
+    display:
+      none !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-copy strong {
+    font-size:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-copy small {
+    display:
+      none !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-theme-card > svg {
+    top:
+      8px !important;
+
+    right:
+      8px !important;
+
+    width:
+      13px;
+
+    height:
+      13px;
+  }
+
+
+  /* =======================================================
+     INFO / WARNING
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-info-panel,
+  .settings-v2-page
+  .settings-v2-warning-panel {
+    gap:
+      8px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel
+  > .settings-v2-info-panel {
+    margin:
+      10px
+      12px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-info-panel svg,
+  .settings-v2-page
+  .settings-v2-warning-panel svg {
+    width:
+      14px;
+
+    height:
+      14px;
+  }
+
+  .settings-v2-page
+  .settings-v2-info-panel strong,
+  .settings-v2-page
+  .settings-v2-warning-panel strong {
+    font-size:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-info-panel p,
+  .settings-v2-page
+  .settings-v2-warning-panel p {
+    margin-top:
+      2px !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     STATUS BADGE
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-status-badge {
+    min-height:
+      25px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     STATS / DATA
+
+     Horizontal dense rows instead of giant cards.
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-stat-grid,
+  .settings-v2-page
+  .settings-v2-data-list {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      0 !important;
+
+    padding:
+      10px
+      5px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-card {
+    padding:
+      6px
+      3px !important;
+
+    border:
+      0 !important;
+
+    border-right:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    text-align:
+      center;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-card:last-child {
+    border-right:
+      0 !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-card > span {
+    display:
+      block !important;
+
+    overflow:
+      hidden;
+
+    font-size:
+      6px !important;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-card
+  > span svg {
+    display:
+      none !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-card strong {
+    margin-top:
+      3px !important;
+
+    font-size:
+      11px !important;
+  }
+
+
+  /* DATA LIST */
+
+  .settings-v2-page
+  .settings-v2-data-item {
+    display: flex !important;
+
+    min-width: 0;
+
+    flex-direction:
+      column;
+
+    align-items:
+      center;
+
+    gap:
+      2px !important;
+
+    padding:
+      6px
+      2px !important;
+
+    border:
+      0 !important;
+
+    border-right:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    text-align:
+      center;
+  }
+
+  .settings-v2-page
+  .settings-v2-data-item:last-child {
+    border-right:
+      0 !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-data-item > svg {
+    display:
+      none !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-data-item span {
+    width:
+      100%;
+
+    font-size:
+      6px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-data-item strong {
+    font-size:
+      11px !important;
+  }
+
+
+  /* =======================================================
+     DANGER ZONE
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-danger-panel {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    align-items:
+      center !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      12px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-danger-copy {
+    gap:
+      8px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-danger-icon {
+    width:
+      32px !important;
+
+    height:
+      32px !important;
+
+    border-radius:
+      8px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-danger-icon svg {
+    width:
+      14px;
+
+    height:
+      14px;
+  }
+
+  .settings-v2-page
+  .settings-v2-danger-copy h3 {
+    font-size:
+      10px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-danger-copy p {
+    margin-top:
+      2px !important;
+
+    font-size:
+      7px !important;
+
+    line-height:
+      1.35 !important;
+  }
+
+
+  /* =======================================================
+     API / MONO
+     ======================================================= */
+
+  .settings-v2-page
+  .settings-v2-mono {
+    max-width:
+      180px;
+
+    font-size:
+      7px !important;
+
+    word-break:
+      break-all;
+  }
+
+
+  /* =======================================================
+     MODALS
+     ======================================================= */
+
+  .settings-v2-page
+  .delete-modal-overlay {
+    padding:
+      14px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal {
+    padding:
+      17px !important;
+
+    border-radius:
+      16px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal-icon {
+    width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    margin-bottom:
+      11px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal h2 {
+    font-size:
+      17px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal > p {
+    margin-top:
+      6px !important;
+
+    font-size:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-delete-field {
+    gap:
+      5px !important;
+
+    margin-top:
+      13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-delete-field > span {
+    font-size:
+      9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal-actions {
+    display: grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      7px !important;
+
+    margin-top:
+      14px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal-actions button {
+    width:
+      100% !important;
+  }
+
+
+  /* =======================================================
+     TOUCH
+     ======================================================= */
+
+  .settings-v2-page button {
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+  .settings-v2-page button:active:not(:disabled) {
+    transform:
+      scale(0.97);
+  }
+}
+
+/* =========================================================
+   MOBILE SETTINGS — READABLE TYPOGRAPHY FIX
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* section titles */
+  .settings-v2-page
+  .settings-v2-section-heading h2 {
+    font-size: 18px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-panel-header h3 {
+    font-size: 14px !important;
+  }
+
+
+  /* normal setting rows */
+  .settings-v2-page
+  .settings-v2-row-copy strong {
+    font-size: 13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-row-copy
+  > span:not(.settings-v2-status-badge) {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+
+
+  /* buttons */
+  .settings-v2-page
+  .settings-v2-primary-button,
+  .settings-v2-page
+  .settings-v2-secondary-button,
+  .settings-v2-page
+  .settings-v2-danger-outline,
+  .settings-v2-page
+  .settings-v2-danger-solid {
+    font-size: 11px !important;
+  }
+
+
+  /* form labels */
+  .settings-v2-page
+  .settings-v2-field > span {
+    font-size: 12px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-field > small {
+    font-size: 10px !important;
+  }
+
+
+  /* inputs */
+  .settings-v2-page
+  .settings-v2-field > input,
+  .settings-v2-page
+  .settings-v2-delete-field input,
+  .settings-v2-page
+  .settings-v3-unit-field input {
+    font-size: 13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v3-unit-field > span {
+    font-size: 11px !important;
+  }
+
+
+  /* dropdowns */
+  .settings-v2-page
+  .settings-v2-section-select
+  .study-select-trigger {
+    font-size: 12px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-startup-select
+  .study-select-trigger {
+    font-size: 11px !important;
+  }
+
+
+  /* toggles */
+  .settings-v2-page
+  .toggle-button {
+    font-size: 10px !important;
+  }
+
+
+  /* theme cards */
+  .settings-v2-page
+  .settings-v2-theme-copy strong {
+    font-size: 12px !important;
+  }
+
+
+  /* info / warning cards */
+  .settings-v2-page
+  .settings-v2-info-panel strong,
+  .settings-v2-page
+  .settings-v2-warning-panel strong {
+    font-size: 12px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-info-panel p,
+  .settings-v2-page
+  .settings-v2-warning-panel p {
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+  }
+
+
+  /* status badges */
+  .settings-v2-page
+  .settings-v2-status-badge,
+  .settings-v2-page
+  .settings-v2-api-pill {
+    font-size: 10px !important;
+  }
+
+
+  /* stats */
+  .settings-v2-page
+  .settings-v2-stat-card > span {
+    font-size: 9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-stat-card strong {
+    font-size: 15px !important;
+  }
+
+
+  /* data counts */
+  .settings-v2-page
+  .settings-v2-data-item span {
+    font-size: 9px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-data-item strong {
+    font-size: 15px !important;
+  }
+
+
+  /* danger zone */
+  .settings-v2-page
+  .settings-v2-danger-copy h3 {
+    font-size: 13px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-danger-copy p {
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+  }
+
+
+  /* API text */
+  .settings-v2-page
+  .settings-v2-mono {
+    font-size: 10px !important;
+  }
+
+
+  /* modal */
+  .settings-v2-page
+  .settings-v2-modal h2 {
+    font-size: 18px !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-modal > p {
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+  }
+
+  .settings-v2-page
+  .settings-v2-delete-field > span {
+    font-size: 11px !important;
+  }
+
+}
+

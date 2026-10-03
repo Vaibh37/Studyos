@@ -1,0 +1,1196 @@
+/* =========================================================
+   STUDYOS — MOBILE TASKS
+   Proper mobile planner presentation
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .v2t-page {
+    width: 100%;
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .v2t-header {
+    margin:
+      0
+      0
+      20px !important;
+  }
+
+  .v2t-eyebrow,
+  .v2t-header p {
+    display:
+      none !important;
+  }
+
+  .v2t-header h1 {
+    margin: 0 !important;
+
+    font-size:
+      30px !important;
+
+    line-height:
+      1.05 !important;
+
+    letter-spacing:
+      -0.05em !important;
+  }
+
+
+  /* =======================================================
+     REMOVE DESKTOP STATS
+     ======================================================= */
+
+  .v2t-stats {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     WORKSPACE
+     ======================================================= */
+
+  .v2t-workspace {
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2t-workspace-header {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      space-between;
+
+    gap:
+      12px;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .v2t-workspace-header h2 {
+    margin:
+      0 !important;
+
+    font-size:
+      16px !important;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.025em;
+  }
+
+  .v2t-result-count {
+    min-height:
+      26px !important;
+
+    padding:
+      0
+      9px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      999px !important;
+
+    background:
+      var(--color-surface) !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     QUICK ADD
+     ======================================================= */
+
+  .v2t-page
+  .add-task-form-v2 {
+    margin-bottom:
+      16px !important;
+
+    overflow:
+      visible !important;
+
+    border:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2t-page
+  .add-task-main-row {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      46px !important;
+
+    align-items:
+      center;
+
+    gap:
+      8px !important;
+
+    padding:
+      0 !important;
+  }
+
+  .v2t-page
+  .add-task-title-field {
+    min-height:
+      46px !important;
+
+    padding:
+      0
+      13px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      13px !important;
+
+    background:
+      var(--color-surface) !important;
+  }
+
+  .v2t-page
+  .add-task-title-field:focus-within {
+    border-color:
+      var(--color-border-strong) !important;
+
+    background:
+      var(--color-surface-subtle) !important;
+
+    box-shadow:
+      none !important;
+  }
+
+  .v2t-page
+  .add-task-title-icon {
+    width: 15px;
+    height: 15px;
+
+    color:
+      var(--color-text-faint);
+  }
+
+  .v2t-page
+  .add-task-title-field input {
+    min-height:
+      44px !important;
+
+    font-size:
+      12px !important;
+  }
+
+  .v2t-page
+  .add-task-submit {
+    display:
+      flex !important;
+
+    width:
+      46px !important;
+
+    min-width:
+      46px !important;
+
+    height:
+      46px !important;
+
+    min-height:
+      46px !important;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    padding:
+      0 !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .v2t-page
+  .add-task-submit span {
+    display:
+      none !important;
+  }
+
+  .v2t-page
+  .add-task-submit svg {
+    width:
+      18px;
+
+    height:
+      18px;
+  }
+
+
+  /* =======================================================
+     EXPANDED ADD FORM
+     ======================================================= */
+
+  .v2t-page
+  .add-task-form-v2.expanded {
+    padding:
+      10px;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      16px !important;
+
+    background:
+      var(--color-surface) !important;
+  }
+
+  .v2t-page
+  .add-task-form-v2.expanded
+  .add-task-main-row {
+    margin-bottom:
+      10px;
+  }
+
+  .v2t-page
+  .add-task-details {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      12px
+      0
+      0 !important;
+
+    border-top:
+      1px solid
+      var(--color-border) !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2t-page
+  .add-task-field {
+    min-width: 0;
+  }
+
+  .v2t-page
+  .add-task-field-label {
+    min-height:
+      16px !important;
+
+    font-size:
+      9px !important;
+  }
+
+  .v2t-page
+  .add-task-field-label svg {
+    width:
+      11px;
+
+    height:
+      11px;
+  }
+
+  .v2t-page
+  .add-task-study-select
+  .study-select-trigger,
+  .v2t-page
+  .add-task-field
+  .study-date-trigger,
+  .v2t-page
+  .add-task-field
+  .study-time-trigger {
+    min-height:
+      40px !important;
+
+    height:
+      40px !important;
+
+    border-radius:
+      10px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     ADD FORM FOOTER
+     ======================================================= */
+
+  .v2t-page
+  .add-task-footer {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      space-between;
+
+    gap:
+      8px !important;
+
+    min-height:
+      40px !important;
+
+    margin-top:
+      10px;
+
+    padding:
+      8px
+      0
+      0 !important;
+
+    border-top:
+      1px solid
+      var(--color-border) !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2t-page
+  .add-task-hint,
+  .v2t-page
+  .add-task-error {
+    font-size:
+      8px !important;
+  }
+
+  .v2t-page
+  .add-task-footer-actions {
+    width:
+      auto !important;
+
+    gap:
+      5px !important;
+  }
+
+  .v2t-page
+  .add-task-reset,
+  .v2t-page
+  .add-task-collapse {
+    min-height:
+      30px !important;
+
+    padding:
+      0
+      8px !important;
+
+    border-radius:
+      8px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     VIEW TABS
+
+     Proper segmented control
+     ======================================================= */
+
+  .v2t-tabs {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+
+    gap:
+      3px !important;
+
+    margin:
+      0
+      0
+      14px !important;
+
+    padding:
+      3px !important;
+
+    overflow:
+      visible !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      12px;
+
+    background:
+      var(--color-surface);
+  }
+
+  .v2t-tabs button {
+    display: flex !important;
+
+    min-width:
+      0;
+
+    min-height:
+      34px !important;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    gap:
+      4px !important;
+
+    padding:
+      0
+      5px !important;
+
+    overflow:
+      hidden;
+
+    border:
+      0 !important;
+
+    border-radius:
+      9px !important;
+
+    background:
+      transparent !important;
+
+    color:
+      var(--color-text-muted) !important;
+
+    font-size:
+      9px !important;
+
+    font-weight:
+      500 !important;
+
+    white-space:
+      nowrap;
+  }
+
+  .v2t-tabs button.is-active {
+    background:
+      var(--color-solid) !important;
+
+    color:
+      var(--color-solid-text) !important;
+  }
+
+  .v2t-tabs button span {
+    min-width:
+      15px !important;
+
+    height:
+      15px !important;
+
+    margin:
+      0 !important;
+
+    background:
+      color-mix(
+        in srgb,
+        currentColor 12%,
+        transparent
+      ) !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     SEARCH
+     ======================================================= */
+
+  .v2t-filters {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    margin-bottom:
+      15px !important;
+  }
+
+  .v2t-search {
+    grid-column:
+      1 / -1;
+
+    min-height:
+      43px !important;
+
+    padding:
+      0
+      12px !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      var(--color-surface) !important;
+  }
+
+  .v2t-search svg {
+    width:
+      14px;
+
+    height:
+      14px;
+  }
+
+  .v2t-search input {
+    font-size:
+      11px !important;
+  }
+
+
+  /* =======================================================
+     FILTER SELECTS
+     ======================================================= */
+
+  .v2t-select
+  .study-select-trigger {
+    min-height:
+      40px !important;
+
+    padding:
+      0
+      10px !important;
+
+    border-radius:
+      10px !important;
+
+    background:
+      var(--color-surface) !important;
+
+    font-size:
+      9px !important;
+  }
+
+  .v2t-clear {
+    grid-column:
+      1 / -1;
+
+    min-height:
+      34px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     LIST
+     ======================================================= */
+
+  .v2t-list {
+    display: flex;
+
+    flex-direction:
+      column;
+
+    gap:
+      9px;
+  }
+
+
+  /* =======================================================
+     TASK CARD
+
+     THIS is the important fix.
+     ======================================================= */
+
+  .v2t-page
+  .task-v2 {
+    position:
+      relative;
+
+    display: grid !important;
+
+    grid-template-columns:
+      24px
+      minmax(0, 1fr) !important;
+
+    grid-template-rows:
+      auto;
+
+    align-items:
+      start !important;
+
+    gap:
+      10px !important;
+
+    min-height:
+      84px !important;
+
+    padding:
+      14px !important;
+
+    overflow:
+      visible !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      15px !important;
+
+    background:
+      var(--color-surface) !important;
+  }
+
+  .v2t-page
+  .task-v2.overdue {
+    border-color:
+      color-mix(
+        in srgb,
+        var(--color-danger) 32%,
+        var(--color-border)
+      ) !important;
+  }
+
+
+  /* =======================================================
+     COMPLETE BUTTON
+     ======================================================= */
+
+  .v2t-page
+  .task-complete-button {
+    width:
+      22px !important;
+
+    height:
+      22px !important;
+
+    margin-top:
+      2px;
+
+    border-radius:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     CONTENT
+     ======================================================= */
+
+  .v2t-page
+  .task-v2-content {
+    min-width:
+      0;
+
+    padding-right:
+      62px;
+  }
+
+
+  /* =======================================================
+     TITLE ROW
+     ======================================================= */
+
+  .v2t-page
+  .task-v2-title-row {
+    display: flex !important;
+
+    min-width:
+      0;
+
+    align-items:
+      center;
+
+    gap:
+      7px;
+
+    margin-bottom:
+      7px;
+  }
+
+  .v2t-page
+  .task-v2
+  .task-title {
+    min-width:
+      0;
+
+    overflow:
+      hidden;
+
+    color:
+      var(--color-text) !important;
+
+    font-size:
+      13px !important;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.3 !important;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  /* =======================================================
+     PRIORITY
+     ======================================================= */
+
+  .v2t-page
+  .task-priority-badge {
+    display:
+      inline-flex;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      18px !important;
+
+    flex:
+      0 0 auto;
+
+    align-items:
+      center;
+
+    padding:
+      0
+      6px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      999px !important;
+
+    font-size:
+      7px !important;
+
+    font-weight:
+      600;
+
+    text-transform:
+      capitalize;
+  }
+
+  .v2t-page
+  .task-priority-badge.priority-high {
+    border-color:
+      color-mix(
+        in srgb,
+        var(--color-danger) 35%,
+        var(--color-border)
+      ) !important;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--color-danger-bg) 60%,
+        transparent
+      ) !important;
+
+    color:
+      var(--color-danger) !important;
+  }
+
+
+  /* =======================================================
+     META
+
+     Keep everything in compact readable rows.
+     ======================================================= */
+
+  .v2t-page
+  .task-meta-row {
+    display: flex !important;
+
+    min-width:
+      0;
+
+    flex-wrap:
+      wrap;
+
+    align-items:
+      center;
+
+    gap:
+      5px
+      9px;
+  }
+
+  .v2t-page
+  .task-meta-item {
+    display:
+      inline-flex !important;
+
+    min-width:
+      0;
+
+    align-items:
+      center;
+
+    gap:
+      4px;
+
+    color:
+      var(--color-text-muted) !important;
+
+    font-size:
+      9px !important;
+
+    line-height:
+      1.2;
+
+    white-space:
+      nowrap;
+  }
+
+  .v2t-page
+  .task-meta-item svg {
+    width:
+      10px;
+
+    height:
+      10px;
+
+    flex:
+      0 0 auto;
+  }
+
+
+  /* =======================================================
+     SUBJECT
+     ======================================================= */
+
+  .v2t-page
+  .task-subject-chip {
+    max-width:
+      130px;
+
+    overflow:
+      hidden;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  /* =======================================================
+     OVERDUE META
+     ======================================================= */
+
+  .v2t-page
+  .task-due-chip.overdue {
+    color:
+      var(--color-danger) !important;
+
+    font-weight:
+      500;
+  }
+
+
+  /* =======================================================
+     ACTIONS
+
+     Top right instead of stealing a full column.
+     ======================================================= */
+
+  .v2t-page
+  .task-v2-actions {
+    position:
+      absolute;
+
+    top:
+      10px;
+
+    right:
+      10px;
+
+    display:
+      flex !important;
+
+    flex-direction:
+      row !important;
+
+    gap:
+      3px !important;
+
+    grid-column:
+      auto !important;
+
+    grid-row:
+      auto !important;
+  }
+
+  .v2t-page
+  .task-icon-button {
+    width:
+      28px !important;
+
+    height:
+      28px !important;
+
+    border-radius:
+      8px !important;
+
+    color:
+      var(--color-text-faint) !important;
+  }
+
+  .v2t-page
+  .task-icon-button svg {
+    width:
+      13px;
+
+    height:
+      13px;
+  }
+
+  .v2t-page
+  .task-icon-button:hover {
+    background:
+      var(--color-surface-hover) !important;
+
+    color:
+      var(--color-text) !important;
+  }
+
+  .v2t-page
+  .task-delete-button:hover {
+    color:
+      var(--color-danger) !important;
+  }
+
+
+  /* =======================================================
+     COMPLETED TASK
+     ======================================================= */
+
+  .v2t-page
+  .task-v2.completed {
+    opacity:
+      0.65;
+  }
+
+  .v2t-page
+  .task-v2.completed
+  .task-title {
+    text-decoration:
+      line-through;
+  }
+
+
+  /* =======================================================
+     INLINE ERRORS
+     ======================================================= */
+
+  .v2t-page
+  .task-inline-error-bottom {
+    grid-column:
+      1 / -1;
+
+    margin-top:
+      8px;
+  }
+
+
+  /* =======================================================
+     EDIT MODE
+     ======================================================= */
+
+  .v2t-page
+  .task-editing-v2 {
+    display:
+      block !important;
+
+    padding:
+      14px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+  .v2t-page
+  .task-edit-fields {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      10px !important;
+  }
+
+  .v2t-page
+  .task-edit-title,
+  .v2t-page
+  .task-edit-field > span {
+    font-size:
+      9px !important;
+  }
+
+  .v2t-page
+  .task-edit-title input,
+  .v2t-page
+  .task-edit-field input {
+    min-height:
+      40px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      10px !important;
+  }
+
+  .v2t-page
+  .task-edit-actions {
+    display:
+      grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      7px;
+  }
+
+  .v2t-page
+  .task-action-button {
+    min-height:
+      39px !important;
+
+    border-radius:
+      10px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     EMPTY STATE
+     ======================================================= */
+
+  .v2t-empty {
+    min-height:
+      170px !important;
+
+    padding:
+      24px !important;
+
+    border:
+      1px dashed
+      var(--color-border) !important;
+
+    border-radius:
+      15px;
+
+    background:
+      transparent !important;
+  }
+
+  .v2t-empty h3 {
+    font-size:
+      13px !important;
+  }
+
+  .v2t-empty p {
+    max-width:
+      240px;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     TOUCH FEEDBACK
+     ======================================================= */
+
+  .v2t-page button {
+    -webkit-tap-highlight-color:
+      transparent;
+
+    transition:
+      transform 120ms ease,
+      background 120ms ease,
+      border-color 120ms ease,
+      color 120ms ease;
+  }
+
+  .v2t-page button:active:not(:disabled) {
+    transform:
+      scale(0.97);
+  }
+}

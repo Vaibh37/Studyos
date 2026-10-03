@@ -1,0 +1,305 @@
+﻿/* =========================================================
+   STUDYOS — MOBILE FINAL POLISH
+   Shared consistency layer
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* =======================================================
+     GLOBAL MOBILE SAFETY
+     ======================================================= */
+
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+
+  /* =======================================================
+     PAGE WIDTHS
+     ======================================================= */
+
+  .v2d-page,
+  .v2f-page,
+  .v2t-page,
+  .v2l-page,
+  .v2s-page,
+  .v2n-page,
+  .v2c-page,
+  .v2p-page,
+  .settings-v2-page {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-width: 0 !important;
+
+    overflow-x: hidden;
+  }
+
+
+  /* =======================================================
+     BOTTOM NAV CLEARANCE
+     ======================================================= */
+
+  .app-shell-v2-main,
+  .app-shell-v2-content {
+    min-width: 0 !important;
+
+    padding-bottom:
+      calc(
+        92px +
+        env(safe-area-inset-bottom)
+      ) !important;
+  }
+
+
+  /* =======================================================
+     MAIN PAGE HEADINGS
+     ======================================================= */
+
+  .v2d-page h1,
+  .v2f-page h1,
+  .v2t-page h1,
+  .v2l-page h1,
+  .v2s-page h1,
+  .v2n-page h1,
+  .v2c-page h1,
+  .v2p-page h1,
+  .settings-v2-page h1 {
+    font-size:
+      clamp(
+        27px,
+        7.6vw,
+        31px
+      ) !important;
+
+    line-height:
+      1.08 !important;
+
+    letter-spacing:
+      -0.045em !important;
+  }
+
+
+  /* =======================================================
+     SECTION TITLES
+     ======================================================= */
+
+  .v2d-page h2,
+  .v2f-page h2,
+  .v2t-page h2,
+  .v2l-page h2,
+  .v2s-page h2,
+  .v2n-page h2,
+  .v2c-page h2,
+  .v2p-page h2,
+  .settings-v2-page h2 {
+    line-height:
+      1.2;
+  }
+
+
+  /* =======================================================
+     BODY TEXT FLOOR
+
+     Prevent the cursed 6px era 💀
+     ======================================================= */
+
+  .v2d-page p,
+  .v2f-page p,
+  .v2t-page p,
+  .v2l-page p,
+  .v2s-page p,
+  .v2n-page p,
+  .v2c-page p,
+  .v2p-page p,
+  .settings-v2-page p {
+    line-height:
+      1.45;
+  }
+
+
+  /* =======================================================
+     INPUTS
+
+     16px prevents mobile browser zoom on focus.
+     ======================================================= */
+
+  .v2d-page input,
+  .v2d-page textarea,
+
+  .v2f-page input,
+  .v2f-page textarea,
+
+  .v2t-page input,
+  .v2t-page textarea,
+
+  .v2s-page input,
+  .v2s-page textarea,
+
+  .v2n-page input,
+  .v2n-page textarea,
+
+  .v2c-page input,
+  .v2c-page textarea,
+
+  .settings-v2-page input,
+  .settings-v2-page textarea {
+    font-size:
+      max(
+        16px,
+        1em
+      );
+  }
+
+
+  /* =======================================================
+     TAP BEHAVIOUR
+     ======================================================= */
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+  button,
+  a {
+    touch-action:
+      manipulation;
+  }
+
+
+  /* =======================================================
+     ICON BUTTON FLOOR
+     ======================================================= */
+
+  button {
+    flex-shrink: 0;
+  }
+
+
+  /* =======================================================
+     MOBILE CARDS — CONSISTENT SHAPE
+     ======================================================= */
+
+  .v2s-card,
+  .v2n-editor,
+  .v2c-calendar,
+  .v2c-selected,
+  .v2p-panel,
+  .v2p-goal,
+  .settings-v2-panel {
+    border-radius:
+      14px !important;
+  }
+
+
+  /* =======================================================
+     DROPDOWNS
+     ======================================================= */
+
+  .study-select-trigger {
+    min-width: 0 !important;
+
+    overflow: hidden;
+  }
+
+  .study-select-trigger > * {
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     LONG TEXT
+     ======================================================= */
+
+  .v2s-card-title,
+  .v2n-note-item,
+  .v2c-event-content,
+  .v2p-subject-name,
+  .settings-v2-row-copy {
+    min-width: 0 !important;
+  }
+
+
+  /* =======================================================
+     MOBILE NAV SAFE AREA
+     ======================================================= */
+
+  .mobile-bottom-nav {
+    padding-bottom:
+      env(safe-area-inset-bottom);
+  }
+
+
+  /* =======================================================
+     360PX PHONES
+     ======================================================= */
+
+  @media (max-width: 370px) {
+
+    .v2d-page,
+    .v2f-page,
+    .v2t-page,
+    .v2l-page,
+    .v2s-page,
+    .v2n-page,
+    .v2c-page,
+    .v2p-page,
+    .settings-v2-page {
+      font-size:
+        0.96rem;
+    }
+
+    .mobile-bottom-nav-label {
+      font-size:
+        9px !important;
+    }
+
+    .mobile-bottom-nav-icon {
+      transform:
+        scale(0.94);
+    }
+
+  }
+
+
+  /* =======================================================
+     LARGE PHONES
+     ======================================================= */
+
+  @media (
+    min-width: 420px
+  ) and (
+    max-width: 700px
+  ) {
+
+    .v2s-card,
+    .v2n-editor,
+    .v2c-calendar,
+    .v2c-selected,
+    .v2p-panel,
+    .settings-v2-panel {
+      border-radius:
+        16px !important;
+    }
+
+  }
+
+}

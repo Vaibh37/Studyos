@@ -1,0 +1,907 @@
+/* =========================================================
+   STUDYOS — MOBILE LEADERBOARD
+   Dense student-grid interface
+   ========================================================= */
+
+.mobile-rank {
+  display:
+    none;
+}
+
+
+@media (max-width: 700px) {
+
+  /* =======================================================
+     DESKTOP LEADERBOARD CONTENT
+     ======================================================= */
+
+  .v2l-desktop-content {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     PAGE HEADER
+     ======================================================= */
+
+  .v2l-header {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      space-between;
+
+    gap:
+      12px;
+
+    margin:
+      0
+      0
+      18px !important;
+  }
+
+  .v2l-header
+  .v2l-eyebrow,
+  .v2l-header p {
+    display:
+      none !important;
+  }
+
+  .v2l-header h1 {
+    margin:
+      0 !important;
+
+    font-size:
+      29px !important;
+
+    line-height:
+      1.05 !important;
+
+    letter-spacing:
+      -0.05em !important;
+  }
+
+  /*
+    Mobile grid already has its own refresh.
+  */
+
+  .v2l-header
+  .v2l-refresh {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     PRIVATE NOTICE
+     ======================================================= */
+
+  .v2l-private {
+    gap:
+      10px !important;
+
+    margin-bottom:
+      14px !important;
+
+    padding:
+      11px
+      12px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .v2l-private-icon {
+    width:
+      32px !important;
+
+    height:
+      32px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+  .v2l-private-icon svg {
+    width:
+      14px;
+
+    height:
+      14px;
+  }
+
+  .v2l-private strong {
+    font-size:
+      10px !important;
+  }
+
+  .v2l-private p {
+    margin-top:
+      2px !important;
+
+    font-size:
+      8px !important;
+
+    line-height:
+      1.4 !important;
+  }
+
+
+  /* =======================================================
+     MOBILE BOARD
+     ======================================================= */
+
+  .mobile-rank {
+    display:
+      block;
+  }
+
+
+  /* =======================================================
+     USER STATUS
+     ======================================================= */
+
+  .mobile-rank-status {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    margin-bottom:
+      20px;
+
+    padding:
+      13px
+      5px;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      15px;
+
+    background:
+      var(--color-surface);
+  }
+
+  .mobile-rank-status > div {
+    display: flex;
+
+    min-width: 0;
+
+    align-items: center;
+
+    flex-direction: column;
+
+    padding:
+      0
+      7px;
+
+    border-right:
+      1px solid
+      var(--color-border);
+
+    text-align:
+      center;
+  }
+
+  .mobile-rank-status > div:last-child {
+    border-right:
+      0;
+  }
+
+  .mobile-rank-status span {
+    width: 100%;
+
+    overflow:
+      hidden;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      8px;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+  .mobile-rank-status strong {
+    margin-top:
+      4px;
+
+    color:
+      var(--color-text);
+
+    font-size:
+      16px;
+
+    font-weight:
+      650;
+
+    letter-spacing:
+      -0.035em;
+  }
+
+
+  /* =======================================================
+     GRID HEADER
+     ======================================================= */
+
+  .mobile-rank-heading {
+    display: flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      space-between;
+
+    gap:
+      12px;
+
+    margin-bottom:
+      13px;
+  }
+
+  .mobile-rank-heading h2 {
+    margin: 0;
+
+    color:
+      var(--color-text);
+
+    font-size:
+      17px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.03em;
+  }
+
+  .mobile-rank-heading
+  > div:first-child
+  > span {
+    display:
+      block;
+
+    margin-top:
+      2px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      8px;
+  }
+
+  .mobile-rank-heading-actions {
+    display: flex;
+
+    align-items:
+      center;
+
+    gap:
+      6px;
+  }
+
+  .mobile-rank-count {
+    display:
+      inline-flex;
+
+    min-height:
+      30px;
+
+    align-items:
+      center;
+
+    gap:
+      4px;
+
+    padding:
+      0
+      9px;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      999px;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      9px;
+  }
+
+
+  /* =======================================================
+     REFRESH
+     ======================================================= */
+
+  .mobile-rank-refresh {
+    display:
+      inline-flex;
+
+    width:
+      30px;
+
+    height:
+      30px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    padding: 0;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      9px;
+
+    background:
+      var(--color-surface);
+
+    color:
+      var(--color-text-muted);
+  }
+
+  .mobile-rank-refresh:hover:not(:disabled) {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-hover);
+
+    color:
+      var(--color-text);
+  }
+
+
+  /* =======================================================
+     STUDENT GRID
+     ======================================================= */
+
+  .mobile-rank-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      8px
+      7px;
+  }
+
+
+  /* =======================================================
+     STUDENT
+     ======================================================= */
+
+  .mobile-rank-student {
+    position:
+      relative;
+
+    display: flex;
+
+    min-width: 0;
+    min-height:
+      128px;
+
+    align-items:
+      center;
+
+    flex-direction:
+      column;
+
+    padding:
+      8px
+      5px
+      9px;
+
+    overflow:
+      hidden;
+
+    border:
+      1px solid
+      transparent;
+
+    border-radius:
+      13px;
+
+    background:
+      transparent;
+
+    text-align:
+      center;
+
+    transition:
+      border-color
+      120ms ease,
+      background
+      120ms ease,
+      transform
+      120ms ease;
+  }
+
+  .mobile-rank-student:hover {
+    border-color:
+      var(--color-border);
+
+    background:
+      var(--color-surface-subtle);
+  }
+
+
+  /* =======================================================
+     CURRENT USER
+     ======================================================= */
+
+  .mobile-rank-student.is-current {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface);
+  }
+
+
+  /* =======================================================
+     TOP 3
+     ======================================================= */
+
+  .mobile-rank-student.rank-1,
+  .mobile-rank-student.rank-2,
+  .mobile-rank-student.rank-3 {
+    background:
+      var(--color-surface);
+  }
+
+  .mobile-rank-student.rank-1 {
+    border-color:
+      var(--color-border-strong);
+  }
+
+
+  /* =======================================================
+     RANK POSITION
+     ======================================================= */
+
+  .mobile-rank-position {
+    display: flex;
+
+    width: 100%;
+
+    min-height:
+      15px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    gap:
+      3px;
+
+    margin-bottom:
+      5px;
+  }
+
+  .mobile-rank-position
+  > span:first-child {
+    display:
+      inline-flex;
+
+    align-items:
+      center;
+
+    gap:
+      2px;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      8px;
+
+    font-weight:
+      600;
+  }
+
+  .rank-1
+  .mobile-rank-position
+  > span:first-child {
+    color:
+      var(--color-warning);
+  }
+
+  .mobile-rank-you {
+    position:
+      absolute;
+
+    top:
+      5px;
+
+    right:
+      4px;
+
+    padding:
+      2px
+      3px;
+
+    border-radius:
+      4px;
+
+    background:
+      var(--color-solid);
+
+    color:
+      var(--color-solid-text);
+
+    font-size:
+      5px;
+
+    font-weight:
+      700;
+
+    letter-spacing:
+      0.04em;
+  }
+
+
+  /* =======================================================
+     AVATAR
+     ======================================================= */
+
+  .mobile-rank-avatar {
+    display: flex;
+
+    width:
+      42px;
+
+    height:
+      42px;
+
+    flex:
+      0 0 auto;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      12px;
+
+    background:
+      var(--color-surface-subtle);
+
+    color:
+      var(--color-text);
+
+    font-size:
+      11px;
+
+    font-weight:
+      700;
+
+    letter-spacing:
+      -0.02em;
+  }
+
+  .mobile-rank-student.rank-1
+  .mobile-rank-avatar {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-solid);
+
+    color:
+      var(--color-solid-text);
+  }
+
+
+  /* =======================================================
+     NAME
+     ======================================================= */
+
+  .mobile-rank-name {
+    display:
+      block;
+
+    width: 100%;
+
+    margin-top:
+      7px;
+
+    overflow:
+      hidden;
+
+    color:
+      var(--color-text);
+
+    font-size:
+      9px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.2;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  /* =======================================================
+     FOCUS
+     ======================================================= */
+
+  .mobile-rank-focus {
+    display:
+      flex;
+
+    max-width: 100%;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    gap:
+      3px;
+
+    margin-top:
+      5px;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      8px;
+
+    white-space:
+      nowrap;
+  }
+
+
+  /* =======================================================
+     XP
+     ======================================================= */
+
+  .mobile-rank-xp {
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    gap:
+      2px;
+
+    margin-top:
+      3px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      7px;
+  }
+
+  .mobile-rank-xp strong {
+    color:
+      var(--color-text-secondary);
+
+    font-size:
+      8px;
+
+    font-weight:
+      600;
+  }
+
+
+  /* =======================================================
+     LOAD MORE
+     ======================================================= */
+
+  .mobile-rank-load-more {
+    display: flex;
+
+    width: 100%;
+
+    min-height:
+      44px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    flex-direction:
+      column;
+
+    gap:
+      2px;
+
+    margin-top:
+      14px;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      12px;
+
+    background:
+      var(--color-surface);
+
+    color:
+      var(--color-text);
+
+    font-size:
+      10px;
+
+    font-weight:
+      600;
+  }
+
+  .mobile-rank-load-more span {
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      7px;
+
+    font-weight:
+      400;
+  }
+
+  .mobile-rank-load-more:hover {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-hover);
+  }
+
+
+  /* =======================================================
+     LOADING / EMPTY
+     ======================================================= */
+
+  .mobile-rank-state {
+    display: flex;
+
+    min-height:
+      180px;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+    flex-direction:
+      column;
+
+    padding:
+      24px;
+
+    border:
+      1px dashed
+      var(--color-border);
+
+    border-radius:
+      15px;
+
+    color:
+      var(--color-text-muted);
+
+    text-align:
+      center;
+  }
+
+  .mobile-rank-state strong {
+    margin-top:
+      8px;
+
+    color:
+      var(--color-text);
+
+    font-size:
+      12px;
+  }
+
+  .mobile-rank-state span {
+    margin-top:
+      4px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      9px;
+  }
+
+
+  /* =======================================================
+     TOUCH
+     ======================================================= */
+
+  .mobile-rank button {
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+  .mobile-rank button:active:not(:disabled) {
+    transform:
+      scale(0.97);
+  }
+}
+
+
+/* =========================================================
+   TINY PHONES
+   ========================================================= */
+
+@media (max-width: 340px) {
+
+  .mobile-rank-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}

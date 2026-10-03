@@ -23,6 +23,8 @@ import {
   useAuth,
 } from "../context/AuthContext";
 
+import MobileLeaderboard from "../components/mobile/MobileLeaderboard";
+
 import apiRequest from "../services/api";
 
 import "../styles/leaderboard-v2.css";
@@ -451,9 +453,7 @@ function Leaderboard() {
   return (
     <div className="v2l-page">
 
-      {/* ===================================================
-          HEADER
-          =================================================== */}
+      {/* HEADER */}
 
       <header className="v2l-header">
 
@@ -506,9 +506,7 @@ function Leaderboard() {
       </header>
 
 
-      {/* ===================================================
-          ERROR
-          =================================================== */}
+      {/* ERROR */}
 
       {error && (
         <div className="v2l-error">
@@ -525,9 +523,7 @@ function Leaderboard() {
       )}
 
 
-      {/* ===================================================
-          PRIVATE NOTICE
-          =================================================== */}
+      {/* PRIVATE NOTICE */}
 
       {!loading &&
         !profile.isPublic && (
@@ -561,480 +557,509 @@ function Leaderboard() {
 
 
       {/* ===================================================
-          YOUR STATUS
+          MOBILE LEADERBOARD
           =================================================== */}
 
-      <section className="v2l-status">
-
-        <StatusCard
-          icon={
-            <Trophy
-              size={19}
-            />
-          }
-          label="Your rank"
-          value={
-            profile.isPublic
-              ? currentUserRank
-                ? `#${currentUserRank}`
-                : "Unranked"
-              : "Private"
-          }
-          detail="Current weekly position"
-        />
-
-
-        <StatusCard
-          icon={
-            <Zap
-              size={19}
-            />
-          }
-          label="Weekly score"
-          value={
-            currentUserEntry
-              ? `${currentUserEntry.score} XP`
-              : "—"
-          }
-          detail="Leaderboard score"
-        />
-
-
-        <StatusCard
-          icon={
-            <Clock3
-              size={19}
-            />
-          }
-          label="Focus"
-          value={
-            currentUserEntry
-              ? formatMinutes(
-                  currentUserEntry
-                    .focusMinutes
-                )
-              : "—"
-          }
-          detail="Last 7 days"
-        />
-
-      </section>
+      <MobileLeaderboard
+        leaderboard={
+          leaderboard
+        }
+        profile={
+          profile
+        }
+        currentUserRank={
+          currentUserRank
+        }
+        currentUserEntry={
+          currentUserEntry
+        }
+        loading={
+          loading
+        }
+        refreshing={
+          refreshing
+        }
+        onRefresh={() =>
+          loadLeaderboard(
+            true
+          )
+        }
+      />
 
 
       {/* ===================================================
-          BOARD
+          DESKTOP LEADERBOARD
           =================================================== */}
 
-      <section className="v2l-board">
+      <div className="v2l-desktop-content">
 
-        <div className="v2l-board-header">
+        {/* YOUR STATUS */}
+
+        <section className="v2l-status">
+
+          <StatusCard
+            icon={
+              <Trophy
+                size={19}
+              />
+            }
+            label="Your rank"
+            value={
+              profile.isPublic
+                ? currentUserRank
+                  ? `#${currentUserRank}`
+                  : "Unranked"
+                : "Private"
+            }
+            detail="Current weekly position"
+          />
+
+
+          <StatusCard
+            icon={
+              <Zap
+                size={19}
+              />
+            }
+            label="Weekly score"
+            value={
+              currentUserEntry
+                ? `${currentUserEntry.score} XP`
+                : "—"
+            }
+            detail="Leaderboard score"
+          />
+
+
+          <StatusCard
+            icon={
+              <Clock3
+                size={19}
+              />
+            }
+            label="Focus"
+            value={
+              currentUserEntry
+                ? formatMinutes(
+                    currentUserEntry
+                      .focusMinutes
+                  )
+                : "—"
+            }
+            detail="Last 7 days"
+          />
+
+        </section>
+
+
+        {/* BOARD */}
+
+        <section className="v2l-board">
+
+          <div className="v2l-board-header">
+
+            <div>
+
+              <span className="v2l-eyebrow">
+                Last 7 days
+              </span>
+
+              <h2>
+                Global ranking
+              </h2>
+
+              <p>
+                Weekly score combines eligible
+                StudyOS Focus and task activity.
+              </p>
+
+            </div>
+
+
+            <div className="v2l-player-count">
+
+              <UserRound
+                size={15}
+              />
+
+              <span>
+                {leaderboard.length}
+                {" "}
+                {leaderboard.length ===
+                1
+                  ? "student"
+                  : "students"}
+              </span>
+
+            </div>
+
+          </div>
+
+
+          {loading ? (
+
+            <div className="v2l-loading">
+
+              <RefreshCw
+                size={22}
+                className="v2l-spin"
+              />
+
+              <strong>
+                Calculating rankings
+              </strong>
+
+              <span>
+                Loading weekly StudyOS activity.
+              </span>
+
+            </div>
+
+          ) : leaderboard.length ===
+            0 ? (
+
+            <div className="v2l-empty">
+
+              <span className="v2l-empty-icon">
+
+                <Trophy
+                  size={28}
+                />
+
+              </span>
+
+              <strong>
+                No ranked students yet
+              </strong>
+
+              <p>
+                Public StudyOS users with recent
+                leaderboard activity will appear
+                here.
+              </p>
+
+            </div>
+
+          ) : (
+            <>
+
+              {/* TOP 3 */}
+
+              <section className="v2l-podium">
+
+                {podium.map(
+                  (
+                    entry
+                  ) => (
+                    <article
+                      key={`${entry.rank}-${entry.displayName}`}
+                      className={`v2l-podium-card rank-${entry.rank} ${
+                        entry.isCurrentUser
+                          ? "is-current"
+                          : ""
+                      }`}
+                    >
+
+                      <div className="v2l-podium-top">
+
+                        <span className="v2l-rank-badge">
+
+                          {getRankIcon(
+                            entry.rank
+                          )}
+
+                          #{entry.rank}
+
+                        </span>
+
+
+                        {entry.isCurrentUser && (
+                          <span className="v2l-you">
+                            You
+                          </span>
+                        )}
+
+                      </div>
+
+
+                      <div className="v2l-avatar">
+
+                        {getInitials(
+                          entry.displayName
+                        )}
+
+                      </div>
+
+
+                      <div className="v2l-podium-user">
+
+                        <strong>
+                          {entry.displayName}
+                        </strong>
+
+                        <span>
+                          Weekly rank #{entry.rank}
+                        </span>
+
+                      </div>
+
+
+                      <div className="v2l-podium-score">
+
+                        <span>
+
+                          <Zap
+                            size={15}
+                          />
+
+                          Weekly XP
+
+                        </span>
+
+                        <strong>
+                          {entry.score}
+                        </strong>
+
+                      </div>
+
+
+                      <div className="v2l-podium-meta">
+
+                        <div>
+
+                          <span>
+                            Focus
+                          </span>
+
+                          <strong>
+                            {formatMinutes(
+                              entry.focusMinutes
+                            )}
+                          </strong>
+
+                        </div>
+
+
+                        <div>
+
+                          <span>
+                            Tasks
+                          </span>
+
+                          <strong>
+                            {entry.completedTasks}
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                    </article>
+                  )
+                )}
+
+              </section>
+
+
+              {/* REST */}
+
+              {remaining.length >
+                0 && (
+
+                <section className="v2l-ranking">
+
+                  <div className="v2l-ranking-header">
+
+                    <div>
+
+                      <span className="v2l-eyebrow">
+                        Rankings
+                      </span>
+
+                      <h3>
+                        Rest of the board
+                      </h3>
+
+                    </div>
+
+
+                    <span>
+                      {remaining.length}
+                      {" "}
+                      more
+                    </span>
+
+                  </div>
+
+
+                  <div className="v2l-table">
+
+                    <div className="v2l-table-head">
+
+                      <span>
+                        Rank
+                      </span>
+
+                      <span>
+                        Student
+                      </span>
+
+                      <span>
+                        Focus
+                      </span>
+
+                      <span>
+                        Tasks
+                      </span>
+
+                      <span>
+                        Weekly XP
+                      </span>
+
+                    </div>
+
+
+                    {remaining.map(
+                      (
+                        entry
+                      ) => (
+
+                        <div
+                          key={`${entry.rank}-${entry.displayName}`}
+                          className={`v2l-row ${
+                            entry.isCurrentUser
+                              ? "is-current"
+                              : ""
+                          }`}
+                        >
+
+                          <div className="v2l-row-rank">
+
+                            <strong>
+                              #{entry.rank}
+                            </strong>
+
+                          </div>
+
+
+                          <div className="v2l-row-user">
+
+                            <div className="v2l-mini-avatar">
+
+                              {getInitials(
+                                entry.displayName
+                              )}
+
+                            </div>
+
+
+                            <div>
+
+                              <strong>
+                                {entry.displayName}
+                              </strong>
+
+                              {entry.isCurrentUser && (
+                                <span>
+                                  You
+                                </span>
+                              )}
+
+                            </div>
+
+                          </div>
+
+
+                          <div className="v2l-row-cell">
+
+                            <Clock3
+                              size={14}
+                            />
+
+                            <span>
+                              {formatMinutes(
+                                entry.focusMinutes
+                              )}
+                            </span>
+
+                          </div>
+
+
+                          <div className="v2l-row-cell">
+
+                            <Sparkles
+                              size={14}
+                            />
+
+                            <span>
+                              {entry.completedTasks}
+                            </span>
+
+                          </div>
+
+
+                          <div className="v2l-row-score">
+
+                            <Zap
+                              size={14}
+                            />
+
+                            <strong>
+                              {entry.score} XP
+                            </strong>
+
+                          </div>
+
+                        </div>
+                      )
+                    )}
+
+                  </div>
+
+                </section>
+              )}
+
+            </>
+          )}
+
+        </section>
+
+
+        {/* FAIR PLAY */}
+
+        <section className="v2l-fairplay">
+
+          <span className="v2l-fairplay-icon">
+
+            <ShieldCheck
+              size={19}
+            />
+
+          </span>
+
 
           <div>
 
             <span className="v2l-eyebrow">
-              Last 7 days
+              Ranking rules
             </span>
 
             <h2>
-              Global ranking
+              Fair-play scoring
             </h2>
 
             <p>
-              Weekly score combines eligible
-              StudyOS Focus and task activity.
+              StudyOS calculates leaderboard scores
+              on the server and applies limits to
+              Focus and task XP used in weekly
+              rankings.
             </p>
 
           </div>
 
+        </section>
 
-          <div className="v2l-player-count">
-
-            <UserRound
-              size={15}
-            />
-
-            <span>
-              {leaderboard.length}
-              {" "}
-              {leaderboard.length ===
-              1
-                ? "student"
-                : "students"}
-            </span>
-
-          </div>
-
-        </div>
-
-
-        {/* =================================================
-            LOADING
-            ================================================= */}
-
-        {loading ? (
-
-          <div className="v2l-loading">
-
-            <RefreshCw
-              size={22}
-              className="v2l-spin"
-            />
-
-            <strong>
-              Calculating rankings
-            </strong>
-
-            <span>
-              Loading weekly StudyOS activity.
-            </span>
-
-          </div>
-
-        ) : leaderboard.length ===
-          0 ? (
-
-          <div className="v2l-empty">
-
-            <span className="v2l-empty-icon">
-
-              <Trophy
-                size={28}
-              />
-
-            </span>
-
-            <strong>
-              No ranked students yet
-            </strong>
-
-            <p>
-              Public StudyOS users with recent
-              leaderboard activity will appear
-              here.
-            </p>
-
-          </div>
-
-        ) : (
-          <>
-
-            {/* =============================================
-                TOP 3
-                ============================================= */}
-
-            <section className="v2l-podium">
-
-              {podium.map(
-                (
-                  entry
-                ) => (
-                  <article
-                    key={`${entry.rank}-${entry.displayName}`}
-                    className={`v2l-podium-card rank-${entry.rank} ${
-                      entry.isCurrentUser
-                        ? "is-current"
-                        : ""
-                    }`}
-                  >
-
-                    <div className="v2l-podium-top">
-
-                      <span className="v2l-rank-badge">
-
-                        {getRankIcon(
-                          entry.rank
-                        )}
-
-                        #{entry.rank}
-
-                      </span>
-
-
-                      {entry.isCurrentUser && (
-                        <span className="v2l-you">
-                          You
-                        </span>
-                      )}
-
-                    </div>
-
-
-                    <div className="v2l-avatar">
-
-                      {getInitials(
-                        entry.displayName
-                      )}
-
-                    </div>
-
-
-                    <div className="v2l-podium-user">
-
-                      <strong>
-                        {entry.displayName}
-                      </strong>
-
-                      <span>
-                        Weekly rank #{entry.rank}
-                      </span>
-
-                    </div>
-
-
-                    <div className="v2l-podium-score">
-
-                      <span>
-                        <Zap
-                          size={15}
-                        />
-
-                        Weekly XP
-                      </span>
-
-                      <strong>
-                        {entry.score}
-                      </strong>
-
-                    </div>
-
-
-                    <div className="v2l-podium-meta">
-
-                      <div>
-
-                        <span>
-                          Focus
-                        </span>
-
-                        <strong>
-                          {formatMinutes(
-                            entry.focusMinutes
-                          )}
-                        </strong>
-
-                      </div>
-
-
-                      <div>
-
-                        <span>
-                          Tasks
-                        </span>
-
-                        <strong>
-                          {entry.completedTasks}
-                        </strong>
-
-                      </div>
-
-                    </div>
-
-                  </article>
-                )
-              )}
-
-            </section>
-
-
-            {/* =============================================
-                RANK 4+
-                ============================================= */}
-
-            {remaining.length >
-              0 && (
-              <section className="v2l-ranking">
-
-                <div className="v2l-ranking-header">
-
-                  <div>
-
-                    <span className="v2l-eyebrow">
-                      Rankings
-                    </span>
-
-                    <h3>
-                      Rest of the board
-                    </h3>
-
-                  </div>
-
-
-                  <span>
-                    {remaining.length}
-                    {" "}
-                    more
-                  </span>
-
-                </div>
-
-
-                <div className="v2l-table">
-
-                  <div className="v2l-table-head">
-
-                    <span>
-                      Rank
-                    </span>
-
-                    <span>
-                      Student
-                    </span>
-
-                    <span>
-                      Focus
-                    </span>
-
-                    <span>
-                      Tasks
-                    </span>
-
-                    <span>
-                      Weekly XP
-                    </span>
-
-                  </div>
-
-
-                  {remaining.map(
-                    (
-                      entry
-                    ) => (
-                      <div
-                        key={`${entry.rank}-${entry.displayName}`}
-                        className={`v2l-row ${
-                          entry.isCurrentUser
-                            ? "is-current"
-                            : ""
-                        }`}
-                      >
-
-                        <div className="v2l-row-rank">
-
-                          <strong>
-                            #{entry.rank}
-                          </strong>
-
-                        </div>
-
-
-                        <div className="v2l-row-user">
-
-                          <div className="v2l-mini-avatar">
-
-                            {getInitials(
-                              entry.displayName
-                            )}
-
-                          </div>
-
-
-                          <div>
-
-                            <strong>
-                              {entry.displayName}
-                            </strong>
-
-                            {entry.isCurrentUser && (
-                              <span>
-                                You
-                              </span>
-                            )}
-
-                          </div>
-
-                        </div>
-
-
-                        <div className="v2l-row-cell">
-
-                          <Clock3
-                            size={14}
-                          />
-
-                          <span>
-                            {formatMinutes(
-                              entry.focusMinutes
-                            )}
-                          </span>
-
-                        </div>
-
-
-                        <div className="v2l-row-cell">
-
-                          <Sparkles
-                            size={14}
-                          />
-
-                          <span>
-                            {entry.completedTasks}
-                          </span>
-
-                        </div>
-
-
-                        <div className="v2l-row-score">
-
-                          <Zap
-                            size={14}
-                          />
-
-                          <strong>
-                            {entry.score} XP
-                          </strong>
-
-                        </div>
-
-                      </div>
-                    )
-                  )}
-
-                </div>
-
-              </section>
-            )}
-
-          </>
-        )}
-
-      </section>
-
-
-      {/* ===================================================
-          FAIR PLAY
-          =================================================== */}
-
-      <section className="v2l-fairplay">
-
-        <span className="v2l-fairplay-icon">
-
-          <ShieldCheck
-            size={19}
-          />
-
-        </span>
-
-
-        <div>
-
-          <span className="v2l-eyebrow">
-            Ranking rules
-          </span>
-
-          <h2>
-            Fair-play scoring
-          </h2>
-
-          <p>
-            StudyOS calculates leaderboard scores
-            on the server and applies limits to
-            Focus and task XP used in weekly
-            rankings.
-          </p>
-
-        </div>
-
-      </section>
+      </div>
 
     </div>
   );

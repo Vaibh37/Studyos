@@ -1,0 +1,697 @@
+/* =========================================================
+   STUDYOS MOBILE DASHBOARD
+   Focused, compact, app-like.
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .v2d-page {
+    display: flex;
+
+    width: 100%;
+
+    flex-direction: column;
+
+    gap: 0;
+  }
+
+  .app-shell-v2-main {
+    padding:
+      22px
+      18px
+      calc(
+        92px +
+        env(safe-area-inset-bottom)
+      ) !important;
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .v2d-header {
+    order: 0;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      38px;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin:
+      0
+      0
+      24px !important;
+  }
+
+  .v2d-header-copy {
+    min-width: 0;
+  }
+
+  .v2d-eyebrow,
+  .v2d-description {
+    display: none !important;
+  }
+
+  .v2d-title {
+    margin: 0 !important;
+
+    font-size:
+      27px !important;
+
+    font-weight:
+      600 !important;
+
+    line-height:
+      1.12 !important;
+
+    letter-spacing:
+      -0.045em !important;
+  }
+
+  .v2d-refresh {
+    display: flex !important;
+
+    width:
+      38px !important;
+
+    min-width:
+      38px !important;
+
+    height:
+      38px !important;
+
+    padding:
+      0 !important;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2d-refresh span {
+    display: none;
+  }
+
+
+  /* =======================================================
+     ERROR
+     ======================================================= */
+
+  .v2d-error {
+    order: 1;
+
+    margin-bottom:
+      16px;
+  }
+
+
+  /* =======================================================
+     DAILY FOCUS HERO
+     ======================================================= */
+
+  .v2d-goal {
+    order: 2;
+
+    margin:
+      0
+      0
+      16px !important;
+
+    padding:
+      20px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      18px !important;
+
+    background:
+      var(--color-surface) !important;
+  }
+
+  .v2d-goal-copy {
+    display: flex !important;
+
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+
+    gap:
+      12px;
+  }
+
+  .v2d-goal-copy .v2d-kicker {
+    display: block;
+
+    margin-bottom:
+      5px;
+
+    font-size:
+      9px !important;
+
+    color:
+      var(--color-text-faint);
+
+    letter-spacing:
+      0.12em;
+  }
+
+  .v2d-goal-copy .v2d-kicker::after {
+    content: "";
+  }
+
+  .v2d-goal-copy h2 {
+    margin: 0 !important;
+
+    font-size:
+      16px !important;
+
+    font-weight:
+      600;
+  }
+
+  .v2d-goal-copy > strong {
+    font-size:
+      26px !important;
+
+    line-height:
+      1;
+  }
+
+  .v2d-goal-track {
+    height:
+      6px !important;
+
+    margin-top:
+      18px;
+
+    border-radius:
+      999px;
+  }
+
+  .v2d-goal-fill {
+    border-radius:
+      999px;
+  }
+
+  .v2d-goal-meta {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items: center !important;
+    justify-content: space-between;
+
+    gap:
+      12px !important;
+
+    margin-top:
+      10px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     QUICK STATS
+     ======================================================= */
+
+  .v2d-stats {
+    order: 3;
+
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(
+          0,
+          1fr
+        )
+      ) !important;
+
+    gap:
+      8px !important;
+
+    margin:
+      0
+      0
+      16px !important;
+
+    padding:
+      0 !important;
+
+    overflow:
+      visible !important;
+  }
+
+  /* Daily goal is already the hero. */
+  .v2d-stats
+  .v2d-metric:nth-child(2) {
+    display: none !important;
+  }
+
+  .v2d-metric {
+    width:
+      auto !important;
+
+    min-width:
+      0 !important;
+
+    min-height:
+      94px !important;
+
+    padding:
+      13px
+      12px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      15px !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2d-metric-label {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+      7px;
+
+    margin-bottom:
+      10px !important;
+  }
+
+  .v2d-metric-label > span:last-child {
+    overflow: hidden;
+
+    font-size:
+      9px !important;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .v2d-metric-icon {
+    width:
+      25px !important;
+
+    height:
+      25px !important;
+
+    flex:
+      0 0
+      25px;
+
+    border-radius:
+      8px !important;
+  }
+
+  .v2d-metric-icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .v2d-metric-value {
+    margin:
+      0
+      0
+      2px !important;
+
+    font-size:
+      21px !important;
+  }
+
+  .v2d-metric-detail {
+    overflow: hidden;
+
+    font-size:
+      8px !important;
+
+    line-height:
+      1.3 !important;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+
+  /* =======================================================
+     LEVEL
+
+     Compact secondary information.
+     ======================================================= */
+
+  .v2d-level {
+    order: 4;
+
+    display: block !important;
+
+    margin:
+      0
+      0
+      22px !important;
+
+    padding:
+      15px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      16px !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2d-level-main {
+    display: grid !important;
+
+    grid-template-columns:
+      36px
+      minmax(
+        0,
+        1fr
+      ) !important;
+
+    gap:
+      11px !important;
+
+    align-items:
+      center;
+  }
+
+  .v2d-level-mark {
+    width:
+      36px !important;
+
+    height:
+      36px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .v2d-level-mark svg {
+    display: none;
+  }
+
+  .v2d-level-mark span {
+    font-size:
+      12px !important;
+  }
+
+  .v2d-level-heading {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap:
+      10px !important;
+  }
+
+  .v2d-level-heading .v2d-kicker {
+    display:
+      none !important;
+  }
+
+  .v2d-level-heading h2 {
+    margin:
+      0 !important;
+
+    font-size:
+      14px !important;
+  }
+
+  .v2d-level-heading > strong {
+    font-size:
+      11px !important;
+  }
+
+  .v2d-progress-track {
+    margin-top:
+      8px !important;
+  }
+
+  .v2d-level-footer {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    margin-top:
+      6px !important;
+
+    font-size:
+      9px !important;
+  }
+
+  .v2d-level-footer span:last-child {
+    display: none;
+  }
+
+  /*
+    We already show streak in the quick stats.
+    These extra three metrics are unnecessary on mobile.
+  */
+
+  .v2d-level-metrics {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     TODAY'S TASKS
+
+     Keep only useful dashboard content.
+     ======================================================= */
+
+  .v2d-main-grid {
+    order: 5;
+
+    display: block !important;
+
+    margin:
+      0 !important;
+  }
+
+  /*
+    Upcoming has its own Calendar screen.
+    Do not duplicate it on Dashboard mobile.
+  */
+
+  .v2d-main-grid
+  > .v2d-panel:nth-child(2) {
+    display:
+      none !important;
+  }
+
+  .v2d-main-grid
+  > .v2d-panel:first-child {
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2d-panel-heading {
+    margin-bottom:
+      12px !important;
+  }
+
+  .v2d-panel-heading
+  .v2d-kicker {
+    margin-bottom:
+      4px;
+
+    font-size:
+      8px !important;
+
+    color:
+      var(--color-text-faint);
+  }
+
+  .v2d-panel-heading h2 {
+    font-size:
+      18px !important;
+
+    letter-spacing:
+      -0.025em;
+  }
+
+  .v2d-count {
+    min-width:
+      25px !important;
+
+    height:
+      25px !important;
+
+    font-size:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     TASK LIST
+     ======================================================= */
+
+  .v2d-task-list {
+    gap:
+      8px !important;
+  }
+
+  /*
+    Dashboard is a preview.
+    Maximum 3.
+  */
+
+  .v2d-task-list
+  .v2d-task:nth-child(n + 4) {
+    display:
+      none !important;
+  }
+
+  .v2d-task {
+    min-height:
+      60px !important;
+
+    padding:
+      11px
+      12px !important;
+
+    gap:
+      10px !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      13px !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2d-task-copy > strong {
+    font-size:
+      13px !important;
+  }
+
+  .v2d-task-meta {
+    margin-top:
+      5px !important;
+
+    gap:
+      5px
+      9px !important;
+  }
+
+  .v2d-task-meta span {
+    font-size:
+      9px !important;
+  }
+
+  .v2d-task-meta svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .v2d-priority-label {
+    display:
+      none !important;
+  }
+
+  .v2d-task-summary {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top:
+      9px !important;
+
+    padding-top:
+      9px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     EMPTY TASK STATE
+     ======================================================= */
+
+  .v2d-main-grid
+  .v2d-empty {
+    min-height:
+      120px !important;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      14px;
+  }
+
+
+  /* =======================================================
+     NOT DASHBOARD CONTENT ON MOBILE
+     ======================================================= */
+
+  /*
+    Weekly charts, overview, and recent sessions already
+    belong to Progress / Focus.
+
+    Removing them is what makes the Dashboard actually useful.
+  */
+
+  .v2d-review-grid,
+  .v2d-recent {
+    display:
+      none !important;
+  }
+}

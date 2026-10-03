@@ -1,0 +1,1682 @@
+﻿/* =========================================================
+   STUDYOS — MOBILE PROGRESS
+   Compact analytics experience
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .v2p-page {
+    width: 100%;
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .v2p-header {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      40px;
+
+    align-items: center !important;
+
+    gap: 12px;
+
+    margin:
+      0
+      0
+      17px !important;
+  }
+
+  .v2p-header > div {
+    min-width: 0;
+  }
+
+  .v2p-header .v2p-eyebrow,
+  .v2p-header p {
+    display: none !important;
+  }
+
+  .v2p-header h1 {
+    margin: 0 !important;
+
+    font-size: 29px !important;
+    line-height: 1.05 !important;
+
+    letter-spacing:
+      -0.05em !important;
+  }
+
+
+  /* REFRESH */
+
+  .v2p-refresh {
+    display: flex !important;
+
+    width: 40px !important;
+    min-width: 40px !important;
+
+    height: 40px !important;
+    min-height: 40px !important;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 0 !important;
+
+    padding: 0 !important;
+
+    overflow: hidden;
+
+    border-radius:
+      11px !important;
+
+    font-size:
+      0 !important;
+  }
+
+  .v2p-refresh svg {
+    width: 15px;
+    height: 15px;
+  }
+
+
+  /* =======================================================
+     ERROR / LOADING
+     ======================================================= */
+
+  .v2p-error {
+    margin-bottom:
+      12px !important;
+
+    padding:
+      11px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+  .v2p-error strong {
+    font-size:
+      10px !important;
+  }
+
+  .v2p-error span,
+  .v2p-error button {
+    font-size:
+      8px !important;
+  }
+
+  .v2p-loading {
+    min-height:
+      220px !important;
+  }
+
+
+  /* =======================================================
+     TOP STATS
+
+     4 big desktop cards -> compact 2x2 block
+     ======================================================= */
+
+  .v2p-stats {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .v2p-stat {
+    min-width: 0;
+    min-height:
+      88px !important;
+
+    padding:
+      12px !important;
+
+    border-radius:
+      13px !important;
+  }
+
+  .v2p-stat-heading {
+    gap:
+      6px !important;
+
+    margin-bottom:
+      8px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .v2p-stat-icon {
+    width:
+      25px !important;
+
+    height:
+      25px !important;
+
+    border-radius:
+      7px !important;
+  }
+
+  .v2p-stat-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .v2p-stat strong {
+    margin:
+      0
+      0
+      3px !important;
+
+    font-size:
+      18px !important;
+
+    line-height:
+      1.1;
+  }
+
+  .v2p-stat small {
+    display:
+      block;
+
+    overflow: hidden;
+
+    font-size:
+      7px !important;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+
+  /* =======================================================
+     DAILY GOAL
+     ======================================================= */
+
+  .v2p-goal {
+    margin-bottom:
+      12px !important;
+
+    padding:
+      14px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+  .v2p-goal-top {
+    display: flex !important;
+
+    flex-direction:
+      row !important;
+
+    align-items:
+      center !important;
+
+    justify-content:
+      space-between;
+
+    gap:
+      12px !important;
+  }
+
+  .v2p-goal-top
+  .v2p-eyebrow {
+    display: none !important;
+  }
+
+  .v2p-goal-top h2 {
+    margin:
+      0 !important;
+
+    font-size:
+      14px !important;
+  }
+
+  .v2p-goal-top p {
+    margin-top:
+      3px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .v2p-goal-value {
+    flex:
+      0 0 auto;
+
+    gap:
+      5px !important;
+  }
+
+  .v2p-goal-value svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .v2p-goal-value strong {
+    font-size:
+      19px !important;
+  }
+
+  .v2p-goal-track {
+    height:
+      6px !important;
+
+    margin-top:
+      12px !important;
+  }
+
+  .v2p-goal-footer {
+    margin-top:
+      6px !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     MAIN GRID
+     ======================================================= */
+
+  .v2p-main-grid {
+    display: block !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .v2p-main-grid
+  > .v2p-panel {
+    margin-bottom:
+      12px;
+  }
+
+
+  /* =======================================================
+     GENERIC PANEL
+     ======================================================= */
+
+  .v2p-panel {
+    padding:
+      14px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+  .v2p-panel-header {
+    align-items:
+      center !important;
+
+    margin-bottom:
+      12px !important;
+  }
+
+  .v2p-panel-header
+  .v2p-eyebrow,
+  .v2p-panel-header p {
+    display: none !important;
+  }
+
+  .v2p-panel-header h2 {
+    margin:
+      0 !important;
+
+    font-size:
+      14px !important;
+  }
+
+  .v2p-panel-header > svg {
+    width: 15px;
+    height: 15px;
+  }
+
+
+  /* =======================================================
+     WEEK CHART
+     ======================================================= */
+
+  .v2p-chart {
+    gap:
+      4px !important;
+
+    height:
+      155px !important;
+  }
+
+  .v2p-chart-column {
+    min-width: 0;
+  }
+
+  .v2p-chart-value {
+    min-height:
+      18px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-chart-track {
+    height:
+      95px !important;
+
+    border-radius:
+      5px !important;
+  }
+
+  .v2p-chart-column > strong {
+    margin-top:
+      5px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .v2p-chart-column > small {
+    display: none !important;
+  }
+
+  .v2p-trend {
+    min-height:
+      25px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .v2p-trend svg {
+    width: 11px;
+    height: 11px;
+  }
+
+
+  /* =======================================================
+     STUDY OVERVIEW
+
+     Compact row instead of tall second panel
+     ======================================================= */
+
+  .v2p-overview {
+    padding:
+      12px !important;
+  }
+
+  .v2p-overview
+  .v2p-panel-header {
+    display: none !important;
+  }
+
+  .v2p-total-focus {
+    padding:
+      0
+      0
+      10px !important;
+
+    text-align:
+      center;
+  }
+
+  .v2p-total-focus strong {
+    font-size:
+      25px !important;
+  }
+
+  .v2p-total-focus span {
+    margin-top:
+      3px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .v2p-overview-list {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      );
+
+    margin-top:
+      0 !important;
+  }
+
+  .v2p-overview-list > div {
+    min-height:
+      42px !important;
+
+    flex-direction:
+      column;
+
+    justify-content:
+      center;
+
+    gap:
+      3px;
+
+    border-bottom:
+      0 !important;
+
+    border-right:
+      1px solid
+      var(--color-border);
+  }
+
+  .v2p-overview-list > div:last-child {
+    border-right:
+      0;
+  }
+
+  .v2p-overview-list span {
+    font-size:
+      7px !important;
+  }
+
+  .v2p-overview-list strong {
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     INSIGHTS
+
+     Horizontal swipe instead of 4 stacked cards
+     ======================================================= */
+
+  .v2p-insights {
+    display: flex !important;
+
+    gap:
+      8px !important;
+
+    margin:
+      0
+      -18px
+      12px !important;
+
+    padding:
+      0
+      18px
+      3px;
+
+    overflow-x:
+      auto;
+
+    scrollbar-width:
+      none;
+  }
+
+  .v2p-insights::-webkit-scrollbar {
+    display: none;
+  }
+
+  .v2p-insight {
+    width:
+      160px !important;
+
+    min-width:
+      160px !important;
+
+    min-height:
+      72px;
+
+    gap:
+      8px !important;
+
+    padding:
+      10px !important;
+
+    border-radius:
+      12px !important;
+  }
+
+  .v2p-insight-icon {
+    width:
+      29px !important;
+
+    height:
+      29px !important;
+  }
+
+  .v2p-insight-icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .v2p-insight > div > span {
+    font-size:
+      7px !important;
+  }
+
+  .v2p-insight strong {
+    margin-top:
+      2px !important;
+
+    font-size:
+      11px !important;
+  }
+
+  .v2p-insight small {
+    margin-top:
+      2px !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     30 DAY CONSISTENCY
+     ======================================================= */
+
+  .v2p-consistency {
+    margin-bottom:
+      12px !important;
+  }
+
+  .v2p-count-badge {
+    min-height:
+      24px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-heatmap {
+    grid-template-columns:
+      repeat(
+        10,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      4px !important;
+  }
+
+  .v2p-heatmap-day {
+    border-radius:
+      5px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-heatmap-legend {
+    margin-top:
+      8px !important;
+
+    gap:
+      4px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-heatmap-legend i {
+    width:
+      10px !important;
+
+    height:
+      10px !important;
+  }
+
+
+  /* =======================================================
+     LOWER GRID
+     ======================================================= */
+
+  .v2p-lower-grid {
+    display: block !important;
+  }
+
+  .v2p-lower-column {
+    gap:
+      12px !important;
+  }
+
+  .v2p-lower-column + .v2p-lower-column {
+    margin-top:
+      12px;
+  }
+
+
+  /* =======================================================
+     SUBJECT DISTRIBUTION
+     ======================================================= */
+
+  .v2p-top-subject {
+    max-width:
+      110px;
+
+    min-height:
+      24px !important;
+
+    padding:
+      0
+      7px !important;
+
+    overflow:
+      hidden;
+
+    font-size:
+      7px !important;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+  .v2p-subject-list {
+    gap:
+      7px !important;
+  }
+
+  .v2p-subject {
+    padding:
+      10px !important;
+
+    border-radius:
+      11px !important;
+  }
+
+  .v2p-subject-top {
+    align-items:
+      center !important;
+  }
+
+  .v2p-subject-name {
+    gap:
+      7px !important;
+  }
+
+  .v2p-subject-dot {
+    width:
+      7px !important;
+
+    height:
+      7px !important;
+  }
+
+  .v2p-subject-name strong {
+    font-size:
+      10px !important;
+  }
+
+  .v2p-subject-name span {
+    margin-top:
+      2px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-subject-focus strong {
+    font-size:
+      10px !important;
+  }
+
+  .v2p-subject-focus span {
+    margin-top:
+      1px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-subject-track {
+    height:
+      5px !important;
+
+    margin-top:
+      8px !important;
+  }
+
+  .v2p-subject-meta {
+    flex-direction:
+      row !important;
+
+    align-items:
+      center !important;
+
+    margin-top:
+      6px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-subject-meta svg {
+    width: 9px;
+    height: 9px;
+  }
+
+
+  /* =======================================================
+     RECENT ACTIVITY
+
+     Only latest 3 on mobile
+     ======================================================= */
+
+  .v2p-recent-list
+  .v2p-recent-item:nth-child(n + 4) {
+    display:
+      none !important;
+  }
+
+  .v2p-recent-list {
+    gap:
+      6px !important;
+  }
+
+  .v2p-recent-item {
+    grid-template-columns:
+      30px
+      minmax(0, 1fr)
+      auto !important;
+
+    min-height:
+      50px;
+
+    gap:
+      8px !important;
+
+    padding:
+      8px !important;
+
+    border-radius:
+      10px !important;
+  }
+
+  .v2p-recent-icon {
+    width:
+      30px !important;
+
+    height:
+      30px !important;
+  }
+
+  .v2p-recent-icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .v2p-recent-copy strong {
+    font-size:
+      9px !important;
+  }
+
+  .v2p-recent-copy span {
+    margin-top:
+      2px !important;
+
+    font-size:
+      7px !important;
+  }
+
+  .v2p-recent-meta {
+    grid-column:
+      auto !important;
+
+    font-size:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     TASK COMPLETION
+     ======================================================= */
+
+  .v2p-rate {
+    min-height:
+      24px !important;
+
+    padding:
+      0
+      7px !important;
+
+    font-size:
+      8px !important;
+  }
+
+  .v2p-task-track {
+    height:
+      6px !important;
+  }
+
+  .v2p-small-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      0 !important;
+
+    margin-top:
+      10px !important;
+  }
+
+  .v2p-small-grid > div {
+    padding:
+      7px
+      4px !important;
+
+    border:
+      0 !important;
+
+    border-right:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    text-align:
+      center;
+  }
+
+  .v2p-small-grid > div:last-child {
+    border-right:
+      0;
+  }
+
+  .v2p-small-grid span {
+    font-size:
+      7px !important;
+  }
+
+  .v2p-small-grid strong {
+    margin-top:
+      2px !important;
+
+    font-size:
+      11px !important;
+  }
+
+
+  /* =======================================================
+     NOTES
+
+     Keep tiny summary only
+     ======================================================= */
+
+  .v2p-note-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      0 !important;
+  }
+
+  .v2p-note-grid > div {
+    display: flex !important;
+
+    min-width: 0;
+
+    flex-direction:
+      column;
+
+    align-items:
+      center;
+
+    gap:
+      2px !important;
+
+    padding:
+      7px
+      3px !important;
+
+    border:
+      0 !important;
+
+    border-right:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    text-align:
+      center;
+  }
+
+  .v2p-note-grid > div:last-child {
+    border-right:
+      0;
+  }
+
+  .v2p-note-grid svg {
+    display:
+      none !important;
+  }
+
+  .v2p-note-grid span {
+    font-size:
+      7px !important;
+  }
+
+  .v2p-note-grid strong {
+    font-size:
+      11px !important;
+  }
+
+
+  /* =======================================================
+     STUDYOS INSIGHT
+
+     Compact recommendation strip
+     ======================================================= */
+
+  .v2p-study-insight {
+    padding:
+      13px !important;
+
+    border-radius:
+      14px !important;
+  }
+
+  .v2p-study-insight-icon {
+    width:
+      32px !important;
+
+    height:
+      32px !important;
+
+    margin-bottom:
+      9px !important;
+  }
+
+  .v2p-study-insight-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .v2p-study-insight
+  .v2p-eyebrow {
+    font-size:
+      7px !important;
+  }
+
+  .v2p-study-insight-copy h2 {
+    margin-top:
+      4px !important;
+
+    font-size:
+      14px !important;
+  }
+
+  .v2p-study-insight-copy p {
+    margin-top:
+      5px !important;
+
+    font-size:
+      8px !important;
+
+    line-height:
+      1.5 !important;
+  }
+
+  .v2p-study-insight-footer {
+    margin-top:
+      10px !important;
+
+    gap:
+      5px !important;
+  }
+
+  .v2p-study-insight-footer > span {
+    padding:
+      5px
+      7px !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     EMPTY STATES
+     ======================================================= */
+
+  .v2p-empty {
+    min-height:
+      110px !important;
+
+    padding:
+      15px !important;
+  }
+
+  .v2p-empty > strong {
+    font-size:
+      10px !important;
+  }
+
+  .v2p-empty > p {
+    font-size:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     TOUCH
+     ======================================================= */
+
+  .v2p-page button {
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+  .v2p-page button:active:not(:disabled) {
+    transform:
+      scale(0.97);
+  }
+}
+
+/* =========================================================
+   STUDYOS — MOBILE PROGRESS V2
+   Ultra compact: only essential analytics
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* =======================================================
+     TOP STATS — ONE ROW
+     ======================================================= */
+
+  .v2p-stats {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap: 0 !important;
+
+    margin-bottom:
+      12px !important;
+
+    padding:
+      12px
+      3px;
+
+    border:
+      1px solid
+      var(--color-border);
+
+    border-radius:
+      14px;
+
+    background:
+      var(--color-surface);
+  }
+
+  .v2p-stat {
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    padding:
+      0
+      5px !important;
+
+    border:
+      0 !important;
+
+    border-right:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      0 !important;
+
+    background:
+      transparent !important;
+
+    text-align:
+      center;
+  }
+
+  .v2p-stat:last-child {
+    border-right:
+      0 !important;
+  }
+
+  .v2p-stat-heading {
+    display: block !important;
+
+    width: 100%;
+
+    margin-bottom:
+      4px !important;
+
+    overflow:
+      hidden;
+
+    font-size:
+      7px !important;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+  .v2p-stat-icon {
+    display:
+      none !important;
+  }
+
+  .v2p-stat strong {
+    margin:
+      0 !important;
+
+    font-size:
+      13px !important;
+
+    white-space:
+      nowrap;
+  }
+
+  .v2p-stat small {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     DAILY GOAL
+
+     Already represented by Today stat.
+     ======================================================= */
+
+  .v2p-goal {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     MAIN
+
+     Keep weekly chart only.
+     Hide redundant Study Overview.
+     ======================================================= */
+
+  .v2p-main-grid {
+    margin-bottom:
+      10px !important;
+  }
+
+  .v2p-main-grid
+  > .v2p-overview {
+    display:
+      none !important;
+  }
+
+  .v2p-main-grid
+  > .v2p-panel:first-child {
+    margin:
+      0 !important;
+
+    padding:
+      12px !important;
+  }
+
+
+  /* =======================================================
+     WEEK CHART — SHORTER
+     ======================================================= */
+
+  .v2p-main-grid
+  .v2p-panel-header {
+    margin-bottom:
+      8px !important;
+  }
+
+  .v2p-chart {
+    height:
+      123px !important;
+
+    gap:
+      4px !important;
+  }
+
+  .v2p-chart-value {
+    min-height:
+      15px !important;
+
+    font-size:
+      6px !important;
+  }
+
+  .v2p-chart-track {
+    height:
+      74px !important;
+  }
+
+  .v2p-chart-column > strong {
+    margin-top:
+      4px !important;
+
+    font-size:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     REMOVE INSIGHT CAROUSEL
+
+     Nice-to-have, not important enough for phone dashboard.
+     ======================================================= */
+
+  .v2p-insights {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     CONSISTENCY
+     ======================================================= */
+
+  .v2p-consistency {
+    margin-bottom:
+      10px !important;
+
+    padding:
+      12px !important;
+  }
+
+  .v2p-consistency
+  .v2p-panel-header {
+    margin-bottom:
+      8px !important;
+  }
+
+  .v2p-consistency
+  .v2p-panel-header h2 {
+    font-size:
+      13px !important;
+  }
+
+  .v2p-heatmap {
+    grid-template-columns:
+      repeat(
+        15,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      3px !important;
+  }
+
+  .v2p-heatmap-day {
+    aspect-ratio:
+      1;
+
+    border-radius:
+      3px !important;
+
+    font-size:
+      0 !important;
+  }
+
+  .v2p-heatmap-day span {
+    display:
+      none !important;
+  }
+
+  .v2p-heatmap-legend {
+    margin-top:
+      6px !important;
+
+    font-size:
+      6px !important;
+  }
+
+  .v2p-heatmap-legend i {
+    width:
+      8px !important;
+
+    height:
+      8px !important;
+  }
+
+
+  /* =======================================================
+     LOWER AREA
+
+     Keep ONLY subject distribution.
+     ======================================================= */
+
+  .v2p-lower-grid {
+    display:
+      block !important;
+  }
+
+  .v2p-lower-column:first-child
+  > .v2p-panel:nth-child(2) {
+    display:
+      none !important;
+  }
+
+  .v2p-lower-column:nth-child(2) {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     SUBJECT DISTRIBUTION
+
+     Horizontal cards instead of a vertical list.
+     ======================================================= */
+
+  .v2p-lower-column:first-child
+  > .v2p-panel:first-child {
+    padding:
+      12px !important;
+  }
+
+  .v2p-lower-column:first-child
+  > .v2p-panel:first-child
+  .v2p-panel-header {
+    margin-bottom:
+      9px !important;
+  }
+
+  .v2p-subject-list {
+    display:
+      flex !important;
+
+    flex-direction:
+      row !important;
+
+    gap:
+      7px !important;
+
+    overflow-x:
+      auto;
+
+    overflow-y:
+      hidden;
+
+    padding-bottom:
+      3px;
+
+    scrollbar-width:
+      none;
+  }
+
+  .v2p-subject-list::-webkit-scrollbar {
+    display:
+      none;
+  }
+
+  .v2p-subject {
+    width:
+      155px !important;
+
+    min-width:
+      155px !important;
+
+    padding:
+      9px !important;
+  }
+
+  .v2p-subject-top {
+    display:
+      block !important;
+  }
+
+  .v2p-subject-name strong {
+    font-size:
+      9px !important;
+  }
+
+  .v2p-subject-name span {
+    display:
+      none !important;
+  }
+
+  .v2p-subject-focus {
+    align-items:
+      flex-start !important;
+
+    margin-top:
+      7px;
+  }
+
+  .v2p-subject-focus strong {
+    font-size:
+      12px !important;
+  }
+
+  .v2p-subject-focus span {
+    font-size:
+      7px !important;
+  }
+
+  .v2p-subject-track {
+    margin-top:
+      7px !important;
+  }
+
+  .v2p-subject-meta {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     REMOVE EXTRA EMPTY HEIGHT
+     ======================================================= */
+
+  .v2p-panel {
+    min-height:
+      0 !important;
+  }
+
+  .v2p-lower-column {
+    gap:
+      0 !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE PROGRESS — READABLE TYPOGRAPHY FIX
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* HEADER */
+
+  .v2p-header h1 {
+    font-size: 30px !important;
+  }
+
+
+  /* TOP STATS */
+
+  .v2p-stat-heading {
+    font-size: 10px !important;
+  }
+
+  .v2p-stat strong {
+    font-size: 16px !important;
+  }
+
+  .v2p-stat small {
+    font-size: 9px !important;
+  }
+
+
+  /* PANEL TITLES */
+
+  .v2p-panel-header h2 {
+    font-size: 16px !important;
+  }
+
+  .v2p-count-badge,
+  .v2p-top-subject,
+  .v2p-rate {
+    font-size: 10px !important;
+  }
+
+
+  /* WEEK CHART */
+
+  .v2p-chart-value {
+    font-size: 9px !important;
+  }
+
+  .v2p-chart-column > strong {
+    font-size: 10px !important;
+  }
+
+  .v2p-trend {
+    font-size: 10px !important;
+  }
+
+
+  /* HEATMAP */
+
+  .v2p-heatmap-legend {
+    font-size: 9px !important;
+  }
+
+
+  /* SUBJECTS */
+
+  .v2p-subject-name strong {
+    font-size: 12px !important;
+  }
+
+  .v2p-subject-name span {
+    font-size: 10px !important;
+  }
+
+  .v2p-subject-focus strong {
+    font-size: 13px !important;
+  }
+
+  .v2p-subject-focus span {
+    font-size: 10px !important;
+  }
+
+  .v2p-subject-meta {
+    font-size: 9px !important;
+  }
+
+
+  /* RECENT ACTIVITY */
+
+  .v2p-recent-copy strong {
+    font-size: 11px !important;
+  }
+
+  .v2p-recent-copy span {
+    font-size: 9px !important;
+  }
+
+  .v2p-recent-meta {
+    font-size: 10px !important;
+  }
+
+
+  /* SMALL ANALYTICS */
+
+  .v2p-small-grid span,
+  .v2p-note-grid span {
+    font-size: 9px !important;
+  }
+
+  .v2p-small-grid strong,
+  .v2p-note-grid strong {
+    font-size: 14px !important;
+  }
+
+
+  /* STUDYOS INSIGHT */
+
+  .v2p-study-insight
+  .v2p-eyebrow {
+    font-size: 9px !important;
+  }
+
+  .v2p-study-insight-copy h2 {
+    font-size: 15px !important;
+  }
+
+  .v2p-study-insight-copy p {
+    font-size: 10px !important;
+  }
+
+  .v2p-study-insight-footer > span {
+    font-size: 9px !important;
+  }
+
+
+  /* EMPTY */
+
+  .v2p-empty > strong {
+    font-size: 12px !important;
+  }
+
+  .v2p-empty > p {
+    font-size: 10px !important;
+  }
+
+}
+

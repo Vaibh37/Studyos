@@ -16,8 +16,10 @@ import {
 
 import "../styles/v2.css";
 import "../styles/typography-v2.css";
+import "../styles/mobile/mobile-shell.css";
 
 import Sidebar from "../components/Sidebar";
+import MobileBottomNav from "../components/mobile/MobileBottomNav";
 
 import {
   useAuth,
@@ -735,6 +737,14 @@ function StudyApp() {
           </main>
 
         </div>
+
+        <MobileBottomNav
+          onMore={() =>
+            setSidebarOpen(
+              true
+            )
+          }
+        />
 
       </div>
 

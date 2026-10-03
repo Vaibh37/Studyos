@@ -1,0 +1,792 @@
+﻿/* =========================================================
+   STUDYOS — MOBILE SUBJECTS
+   Compact subject-library layout
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  /* PAGE */
+
+  .v2s-page {
+    width: 100%;
+    min-width: 0;
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .v2s-header {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    align-items: center !important;
+
+    gap: 12px;
+
+    margin:
+      0
+      0
+      18px !important;
+  }
+
+  .v2s-header-copy {
+    min-width: 0;
+  }
+
+  .v2s-header .v2s-eyebrow,
+  .v2s-header p {
+    display: none !important;
+  }
+
+  .v2s-header h1 {
+    margin: 0 !important;
+
+    font-size: 29px !important;
+    line-height: 1.05 !important;
+
+    letter-spacing:
+      -0.05em !important;
+  }
+
+
+  /* ADD SUBJECT */
+
+  .v2s-header
+  .v2s-primary-button {
+    width: auto !important;
+
+    min-height: 42px !important;
+
+    padding:
+      0
+      13px !important;
+
+    border-radius:
+      12px !important;
+
+    font-size:
+      10px !important;
+
+    font-weight:
+      600 !important;
+  }
+
+  .v2s-header
+  .v2s-primary-button svg {
+    width: 15px;
+    height: 15px;
+  }
+
+
+  /* =======================================================
+     REMOVE MOBILE DASHBOARD STATS
+     ======================================================= */
+
+  .v2s-stats {
+    display: none !important;
+  }
+
+
+  /* =======================================================
+     TOOLBAR
+     ======================================================= */
+
+  .v2s-toolbar {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      40px !important;
+
+    gap: 8px !important;
+
+    margin-bottom:
+      16px !important;
+  }
+
+
+  /* SEARCH */
+
+  .v2s-search {
+    grid-column:
+      1 / -1;
+
+    min-height:
+      43px !important;
+
+    padding:
+      0
+      12px !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      var(--color-surface) !important;
+  }
+
+  .v2s-search input {
+    font-size:
+      11px !important;
+  }
+
+  .v2s-search svg {
+    width: 14px;
+    height: 14px;
+  }
+
+
+  /* SORT */
+
+  .v2s-sort-select
+  .study-select-trigger {
+    min-height:
+      40px !important;
+
+    border-radius:
+      10px !important;
+
+    background:
+      var(--color-surface) !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* REFRESH */
+
+  .v2s-refresh {
+    display: flex !important;
+
+    width:
+      40px !important;
+
+    min-width:
+      40px !important;
+
+    height:
+      40px !important;
+
+    min-height:
+      40px !important;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 0 !important;
+
+    padding:
+      0 !important;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      10px !important;
+
+    background:
+      var(--color-surface) !important;
+
+    color:
+      var(--color-text-muted) !important;
+
+    font-size:
+      0 !important;
+  }
+
+  .v2s-refresh svg {
+    width: 15px;
+    height: 15px;
+  }
+
+
+  /* =======================================================
+     SUBJECT LIST
+     ======================================================= */
+
+  .v2s-grid {
+    display: flex !important;
+
+    flex-direction: column;
+
+    gap:
+      7px !important;
+  }
+
+
+  /* =======================================================
+     SUBJECT ROW
+     ======================================================= */
+
+  .v2s-card {
+    position: relative;
+
+    display: grid !important;
+
+    grid-template-columns:
+      42px
+      minmax(0, 1fr)
+      auto;
+
+    grid-template-rows:
+      auto
+      auto;
+
+    align-items: center;
+
+    gap:
+      2px
+      11px;
+
+    min-height:
+      74px !important;
+
+    padding:
+      11px
+      10px !important;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      14px !important;
+
+    background:
+      transparent !important;
+  }
+
+
+  /* COLOR ACCENT */
+
+  .v2s-card-accent {
+    position: absolute !important;
+
+    top: 11px !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: 11px;
+
+    width:
+      3px !important;
+
+    height:
+      auto !important;
+
+    border-radius:
+      0
+      999px
+      999px
+      0;
+  }
+
+
+  /* =======================================================
+     CARD HEADER BECOMES THE WHOLE ROW
+     ======================================================= */
+
+  .v2s-card-header {
+    display: contents !important;
+  }
+
+
+  /* ICON */
+
+  .v2s-card-icon {
+    grid-column: 1;
+    grid-row:
+      1 / span 2;
+
+    display: flex !important;
+
+    width:
+      42px !important;
+
+    height:
+      42px !important;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 !important;
+
+    border:
+      1px solid
+      var(--color-border) !important;
+
+    border-radius:
+      12px !important;
+
+    background:
+      var(--color-surface-subtle) !important;
+  }
+
+  .v2s-card-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+
+  /* =======================================================
+     TITLE
+     ======================================================= */
+
+  .v2s-card-title {
+    grid-column: 2;
+    grid-row: 1;
+
+    min-width: 0;
+
+    align-self:
+      end;
+  }
+
+  .v2s-card-title h2 {
+    margin: 0 !important;
+
+    overflow: hidden;
+
+    color:
+      var(--color-text);
+
+    font-size:
+      13px !important;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.2 !important;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+  .v2s-card-title span {
+    display: block !important;
+
+    margin-top:
+      3px !important;
+
+    overflow: hidden;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      8px !important;
+
+    white-space:
+      nowrap;
+
+    text-overflow:
+      ellipsis;
+  }
+
+
+  /* =======================================================
+     ACTIONS
+     ======================================================= */
+
+  .v2s-card-actions {
+    grid-column: 3;
+    grid-row:
+      1 / span 2;
+
+    display: flex !important;
+
+    align-items: center;
+
+    gap:
+      2px !important;
+  }
+
+  .v2s-card-actions button {
+    display: flex !important;
+
+    width:
+      29px !important;
+
+    height:
+      29px !important;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 !important;
+
+    border:
+      1px solid
+      transparent !important;
+
+    border-radius:
+      8px !important;
+
+    color:
+      var(--color-text-faint) !important;
+  }
+
+  .v2s-card-actions button svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .v2s-card-actions button:hover {
+    border-color:
+      var(--color-border) !important;
+
+    background:
+      var(--color-surface-hover) !important;
+
+    color:
+      var(--color-text) !important;
+  }
+
+  .v2s-card-actions
+  button.is-danger:hover {
+    color:
+      var(--color-danger) !important;
+  }
+
+
+  /* =======================================================
+     HIDE DESKTOP DETAIL SECTIONS
+     ======================================================= */
+
+  .v2s-description,
+  .v2s-progress,
+  .v2s-mini-stats,
+  .v2s-card-footer {
+    display:
+      none !important;
+  }
+
+
+  /* =======================================================
+     FOCUS INFORMATION
+
+     Turn huge focus panel into small text under the name.
+     ======================================================= */
+
+  .v2s-focus {
+    grid-column: 2;
+    grid-row: 2;
+
+    display: flex !important;
+
+    align-items: center;
+
+    gap:
+      10px;
+
+    margin:
+      3px
+      0
+      0 !important;
+
+    border:
+      0 !important;
+
+    background:
+      transparent !important;
+  }
+
+  .v2s-focus > div {
+    display: flex;
+
+    align-items: center;
+
+    gap:
+      4px;
+
+    padding:
+      0 !important;
+
+    border:
+      0 !important;
+  }
+
+  .v2s-focus > div + div {
+    border:
+      0 !important;
+  }
+
+  .v2s-focus span {
+    display: none !important;
+  }
+
+  .v2s-focus strong {
+    color:
+      var(--color-text-muted) !important;
+
+    font-size:
+      9px !important;
+
+    font-weight:
+      500 !important;
+
+    letter-spacing:
+      0 !important;
+  }
+
+  .v2s-focus > div:first-child
+  strong::before {
+    content:
+      "Total ";
+  }
+
+  .v2s-focus > div:nth-child(2)
+  strong::before {
+    content:
+      "Week ";
+  }
+
+  .v2s-focus > div:first-child
+  strong::before,
+  .v2s-focus > div:nth-child(2)
+  strong::before {
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      8px;
+
+    font-weight:
+      400;
+  }
+
+
+  /* =======================================================
+     CREATE / EDIT SUBJECT FORM
+     ======================================================= */
+
+  .v2s-form-card {
+    margin-bottom:
+      16px !important;
+
+    padding:
+      14px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+  .v2s-form-header {
+    align-items:
+      center !important;
+
+    margin-bottom:
+      13px !important;
+
+    padding-bottom:
+      11px !important;
+  }
+
+  .v2s-form-header
+  .v2s-eyebrow,
+  .v2s-form-header p {
+    display:
+      none !important;
+  }
+
+  .v2s-form-header h2 {
+    margin: 0 !important;
+
+    font-size:
+      16px !important;
+  }
+
+  .v2s-icon-button {
+    width:
+      34px !important;
+
+    height:
+      34px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+
+  /* FORM GRID */
+
+  .v2s-form {
+    gap:
+      12px !important;
+  }
+
+  .v2s-form-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      8px !important;
+  }
+
+  .v2s-field {
+    gap:
+      5px !important;
+  }
+
+  .v2s-field > span,
+  .v2s-color-field > span {
+    font-size:
+      9px !important;
+  }
+
+  .v2s-input {
+    min-height:
+      39px !important;
+
+    padding:
+      0
+      9px !important;
+
+    border-radius:
+      9px !important;
+  }
+
+  .v2s-input input {
+    font-size:
+      10px !important;
+  }
+
+  .v2s-input svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .v2s-field textarea {
+    min-height:
+      68px !important;
+
+    padding:
+      9px !important;
+
+    border-radius:
+      9px !important;
+
+    font-size:
+      10px !important;
+  }
+
+  .v2s-field small {
+    font-size:
+      8px !important;
+  }
+
+
+  /* COLORS */
+
+  .v2s-colors {
+    gap:
+      7px !important;
+  }
+
+  .v2s-colors button {
+    width:
+      27px !important;
+
+    height:
+      27px !important;
+  }
+
+
+  /* FORM BUTTONS */
+
+  .v2s-form-actions {
+    display: grid !important;
+
+    grid-template-columns:
+      0.8fr
+      1.2fr;
+
+    gap:
+      7px !important;
+  }
+
+  .v2s-form-actions button {
+    width: 100%;
+
+    min-height:
+      40px !important;
+
+    border-radius:
+      10px !important;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* =======================================================
+     EMPTY
+     ======================================================= */
+
+  .v2s-empty {
+    min-height:
+      170px !important;
+
+    padding:
+      22px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+  .v2s-empty-icon {
+    width:
+      42px !important;
+
+    height:
+      42px !important;
+
+    margin-bottom:
+      9px !important;
+  }
+
+  .v2s-empty h2 {
+    font-size:
+      13px !important;
+  }
+
+  .v2s-empty p {
+    max-width:
+      230px;
+
+    font-size:
+      9px !important;
+  }
+
+
+  /* TOUCH */
+
+  .v2s-page button {
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+  .v2s-page button:active:not(:disabled) {
+    transform:
+      scale(0.96);
+  }
+}
