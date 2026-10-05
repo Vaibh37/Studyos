@@ -1,13 +1,22 @@
-﻿import { useRef, useState } from "react";
+import {
+  useRef,
+  useState,
+} from "react";
+
 import {
   BarChart3,
   BookOpen,
   CalendarDays,
   FileText,
+  MessageCircle,
   Settings,
+  UsersRound,
   X,
 } from "lucide-react";
-import { NavLink } from "react-router";
+
+import {
+  NavLink,
+} from "react-router";
 
 const moreItems = [
   {
@@ -35,6 +44,18 @@ const moreItems = [
     icon: BarChart3,
   },
   {
+    to: "/app/groups",
+    label: "Study Groups",
+    description: "Study together live",
+    icon: UsersRound,
+  },
+  {
+    to: "/app/chats",
+    label: "Chats",
+    description: "Group conversations",
+    icon: MessageCircle,
+  },
+  {
     to: "/app/settings",
     label: "Settings",
     description: "Account & preferences",
@@ -46,81 +67,131 @@ export default function MobileMoreSheet({
   open,
   onClose,
 }) {
-  const [dragY, setDragY] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const [closing, setClosing] = useState(false);
+  const [
+    dragY,
+    setDragY,
+  ] = useState(0);
 
-  const startY = useRef(0);
-  const dragYRef = useRef(0);
+  const [
+    dragging,
+    setDragging,
+  ] = useState(false);
 
-  if (!open) return null;
+  const [
+    closing,
+    setClosing,
+  ] = useState(false);
 
-  const closeSmoothly = () => {
-    if (closing) return;
+  const startY =
+    useRef(0);
 
-    setClosing(true);
+  const dragYRef =
+    useRef(0);
 
-    window.setTimeout(() => {
-      setClosing(false);
-      setDragY(0);
-      onClose();
-    }, 240);
-  };
+  if (!open) {
+    return null;
+  }
 
-  const handlePointerDown = (event) => {
-    if (closing) return;
+  const closeSmoothly =
+    () => {
+      if (closing) {
+        return;
+      }
 
-    setDragging(true);
+      setClosing(true);
 
-    startY.current = event.clientY;
-    dragYRef.current = 0;
-
-    event.currentTarget.setPointerCapture?.(
-      event.pointerId
-    );
-  };
-
-  const handlePointerMove = (event) => {
-    if (!dragging) return;
-
-    const distance =
-      event.clientY - startY.current;
-
-    const nextDrag =
-      Math.min(
-        Math.max(distance, 0),
-        320
+      window.setTimeout(
+        () => {
+          setClosing(false);
+          setDragY(0);
+          onClose();
+        },
+        240
       );
+    };
 
-    dragYRef.current = nextDrag;
+  const handlePointerDown =
+    (
+      event
+    ) => {
+      if (closing) {
+        return;
+      }
 
-    setDragY(nextDrag);
-  };
+      setDragging(true);
 
-  const finishDrag = () => {
-    if (!dragging) return;
+      startY.current =
+        event.clientY;
 
-    const shouldClose =
-      dragYRef.current > 80;
+      dragYRef.current = 0;
 
-    setDragging(false);
+      event.currentTarget
+        .setPointerCapture?.(
+          event.pointerId
+        );
+    };
 
-    if (shouldClose) {
-      closeSmoothly();
-      return;
-    }
+  const handlePointerMove =
+    (
+      event
+    ) => {
+      if (!dragging) {
+        return;
+      }
 
-    dragYRef.current = 0;
-    setDragY(0);
-  };
+      const distance =
+        event.clientY -
+        startY.current;
+
+      const nextDrag =
+        Math.min(
+          Math.max(
+            distance,
+            0
+          ),
+          320
+        );
+
+      dragYRef.current =
+        nextDrag;
+
+      setDragY(
+        nextDrag
+      );
+    };
+
+  const finishDrag =
+    () => {
+      if (!dragging) {
+        return;
+      }
+
+      const shouldClose =
+        dragYRef.current >
+        80;
+
+      setDragging(false);
+
+      if (shouldClose) {
+        closeSmoothly();
+        return;
+      }
+
+      dragYRef.current = 0;
+      setDragY(0);
+    };
 
   return (
     <div
       className={`mobile-more-overlay ${
-        closing ? "is-closing" : ""
+        closing
+          ? "is-closing"
+          : ""
       }`}
       role="presentation"
-      onMouseDown={(event) => {
+      onMouseDown={(
+        event
+      ) => {
         if (
           event.target ===
           event.currentTarget
@@ -133,8 +204,12 @@ export default function MobileMoreSheet({
         id="mobile-more-sheet"
         className={[
           "mobile-more-sheet",
-          dragging ? "is-dragging" : "",
-          closing ? "is-closing" : "",
+          dragging
+            ? "is-dragging"
+            : "",
+          closing
+            ? "is-closing"
+            : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -148,10 +223,18 @@ export default function MobileMoreSheet({
       >
         <div
           className="mobile-more-drag-zone"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={finishDrag}
-          onPointerCancel={finishDrag}
+          onPointerDown={
+            handlePointerDown
+          }
+          onPointerMove={
+            handlePointerMove
+          }
+          onPointerUp={
+            finishDrag
+          }
+          onPointerCancel={
+            finishDrag
+          }
         >
           <div className="mobile-more-handle" />
         </div>
@@ -162,13 +245,17 @@ export default function MobileMoreSheet({
               StudyOS
             </p>
 
-            <h2>More</h2>
+            <h2>
+              More
+            </h2>
           </div>
 
           <button
             type="button"
             className="mobile-more-close"
-            onClick={closeSmoothly}
+            onClick={
+              closeSmoothly
+            }
             aria-label="Close more menu"
           >
             <X size={18} />
@@ -187,7 +274,9 @@ export default function MobileMoreSheet({
                 key={to}
                 to={to}
                 className="mobile-more-item"
-                onClick={onClose}
+                onClick={
+                  onClose
+                }
               >
                 <span className="mobile-more-item-icon">
                   <Icon
@@ -197,8 +286,13 @@ export default function MobileMoreSheet({
                 </span>
 
                 <span className="mobile-more-item-copy">
-                  <strong>{label}</strong>
-                  <small>{description}</small>
+                  <strong>
+                    {label}
+                  </strong>
+
+                  <small>
+                    {description}
+                  </small>
                 </span>
               </NavLink>
             )
@@ -206,8 +300,7 @@ export default function MobileMoreSheet({
         </div>
 
         <p className="mobile-more-footer">
-          Everything else, without crowding
-          your main navigation.
+          Everything else, without crowding your main navigation.
         </p>
       </section>
     </div>

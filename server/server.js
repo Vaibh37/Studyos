@@ -1,8 +1,16 @@
 const express =
   require("express");
 
+const http =
+  require("http");
+
 const cors =
   require("cors");
+
+const {
+  Server,
+} =
+  require("socket.io");
 
 // =========================================
 // LOAD ENV FIRST
@@ -24,6 +32,44 @@ const corsOptions =
 const connectDB =
   require(
     "./config/db"
+  );
+
+const {
+  globalApiLimiter,
+} =
+  require(
+    "./middleware/rateLimiters"
+  );
+
+const {
+  connectSocialDB,
+} =
+  require(
+    "./config/socialDb"
+  );
+
+// =========================================
+// SOCKET
+// =========================================
+
+const socketAuth =
+  require(
+    "./socket/socketAuth"
+  );
+
+const registerLiveStudySocket =
+  require(
+    "./socket/liveStudySocket"
+  );
+
+const registerGroupTypingSocket =
+  require(
+    "./socket/groupTypingSocket"
+  );
+
+const registerGroupReactionSocket =
+  require(
+    "./socket/groupReactionSocket"
   );
 
 // =========================================
@@ -70,22 +116,73 @@ const leaderboardRoutes =
     "./routes/leaderboardRoutes"
   );
 
+const groupRoutes =
+  require(
+    "./routes/groupRoutes"
+  );
+
 // =========================================
 // APP
 // =========================================
 
+
+const groupAttachmentRoutes =
+  require("./routes/groupAttachmentRoutes");
+
 const app =
   express();
+
+// =========================================
+// TRUST RENDER REVERSE PROXY
+// =========================================
+
+app.set(
+  "trust proxy",
+  1
+);
 
 const PORT =
   process.env.PORT ||
   5000;
 
 // =========================================
-// DATABASE
+// HTTP SERVER
 // =========================================
 
-connectDB();
+const server =
+  http.createServer(
+    app
+  );
+
+// =========================================
+// SOCKET.IO
+// =========================================
+
+const io =
+  new Server(
+    server,
+    {
+      cors:
+        corsOptions,
+    }
+  );
+
+// =========================================
+// SOCKET AUTH
+// =========================================
+
+io.use(
+  socketAuth
+);
+
+// =========================================
+// MAKE IO AVAILABLE TO EXPRESS
+// =========================================
+
+app.set(
+  "io",
+  io
+);
 
 // =========================================
 // MIDDLEWARE
@@ -95,6 +192,15 @@ app.use(
   cors(
     corsOptions
   )
+);
+
+// =========================================
+// GLOBAL API RATE LIMIT
+// =========================================
+
+app.use(
+  "/api",
+  globalApiLimiter
 );
 
 app.use(
@@ -178,12 +284,92 @@ app.use(
 );
 
 // =========================================
+// SOCIAL / STUDY GROUPS
+// =========================================
+
+app.use(
+  "/api/groups",
+  groupRoutes
+);
+
+// =========================================
 // LEADERBOARD
 // =========================================
 
 app.use(
   "/api/leaderboard",
   leaderboardRoutes
+);
+
+// =========================================
+// SOCKET CONNECTION
+// =========================================
+
+io.on(
+  "connection",
+  (
+    socket
+  ) => {
+    console.log(
+      "Authenticated socket connected:",
+      socket.id,
+      socket.user.uid
+    );
+
+    // =====================================
+    // LIVE STUDY / CHAT EVENTS
+    // =====================================
+
+    registerLiveStudySocket(
+      io,
+      socket
+    );
+
+    // =====================================
+    // GROUP TYPING EVENTS
+    // =====================================
+
+    registerGroupTypingSocket(
+      io,
+      socket
+    );
+
+    // =====================================
+    // GROUP REACTION EVENTS
+    // =====================================
+
+    registerGroupReactionSocket(
+      io,
+      socket
+    );
+
+    // =====================================
+    // DISCONNECT
+    // =====================================
+
+    socket.on(
+      "disconnect",
+      (
+        reason
+      ) => {
+        console.log(
+          "Socket disconnected:",
+          socket.id,
+          socket.user.uid,
+          reason
+        );
+      }
+    );
+  }
+);
+
+// =========================================
+// GROUP ATTACHMENTS
+// =========================================
+
+app.use(
+  "/api/groups",
+  groupAttachmentRoutes
 );
 
 // =========================================
@@ -207,15 +393,47 @@ app.use(
   }
 );
 
+
+// =========================================
+// GROUP ATTACHMENTS
+// =========================================
+
+
+
 // =========================================
 // START SERVER
 // =========================================
 
-app.listen(
-  PORT,
-  () => {
-    console.log(
-      `StudyOS server running on port ${PORT}`
-    );
-  }
-);
+const startServer =
+  async () => {
+    try {
+      await Promise.all([
+        connectDB(),
+        connectSocialDB(),
+      ]);
+
+      server.listen(
+        PORT,
+        () => {
+          console.log(
+            `StudyOS server running on port ${PORT}`
+          );
+
+          console.log(
+            "Socket.IO ready âœ…"
+          );
+        }
+      );
+    } catch (error) {
+      console.error(
+        "SERVER STARTUP ERROR:",
+        error.message
+      );
+
+      process.exit(1);
+    }
+  };
+
+startServer();
+
+

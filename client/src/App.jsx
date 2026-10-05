@@ -125,6 +125,20 @@ const Leaderboard = lazy(
     )
 );
 
+const Groups = lazy(
+  () =>
+    import(
+      "./pages/Groups"
+    )
+);
+
+const Chats = lazy(
+  () =>
+    import(
+      "./pages/Chats"
+    )
+);
+
 const Settings = lazy(
   () =>
     import(
@@ -145,6 +159,8 @@ const VALID_APP_PAGES = [
   "focus",
   "progress",
   "leaderboard",
+  "groups",
+  "chats",
   "settings",
 ];
 
@@ -485,6 +501,20 @@ function App() {
               path="leaderboard"
               element={
                 <Leaderboard />
+              }
+            />
+
+            <Route
+              path="groups"
+              element={
+                <Groups />
+              }
+            />
+
+            <Route
+              path="chats"
+              element={
+                <Chats />
               }
             />
 

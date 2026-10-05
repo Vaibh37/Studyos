@@ -43,3 +43,20 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# StudyOS local development backups
+backup-groups-ui/
+upload/
+client/server/
+client/chats-mobile-missing.txt
+client/src/pages/*.before-*
+client/src/pages/*.backup.*
+client/src/pages/*.visibility-backup
+client/src/styles/*before*
+client/src/styles/*.backup.*
+client/src/styles/*.desktop-v3-backup
+client/src/components/chat/*.before-*
+server/debug-attachment.js
+server/server.before-*
+server/routes/*.before-*
+server/socket/*.before-*

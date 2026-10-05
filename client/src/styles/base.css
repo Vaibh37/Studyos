@@ -1,5 +1,5 @@
 @import url(
-  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&display=swap"
 );
 
 
@@ -70,6 +70,9 @@ body {
 
   line-height:
     var(--line-height-base);
+
+  letter-spacing:
+    var(--tracking-normal);
 }
 
 
@@ -103,10 +106,13 @@ h6 {
     var(--color-text);
 
   font-family:
-    var(--font-sans);
+    var(--font-display);
+
+  font-weight:
+    var(--font-weight-semibold);
 
   line-height:
-    var(--line-height-tight);
+    var(--line-height-heading);
 
   text-wrap:
     balance;
@@ -117,20 +123,14 @@ h1 {
   font-size:
     var(--font-size-3xl);
 
-  font-weight:
-    var(--font-weight-semibold);
-
   letter-spacing:
-    -0.045em;
+    var(--tracking-display);
 }
 
 
 h2 {
   font-size:
     var(--font-size-xl);
-
-  font-weight:
-    var(--font-weight-semibold);
 
   letter-spacing:
     var(--tracking-tight);
@@ -141,9 +141,6 @@ h3 {
   font-size:
     var(--font-size-lg);
 
-  font-weight:
-    var(--font-weight-semibold);
-
   letter-spacing:
     var(--tracking-heading);
 }
@@ -153,14 +150,35 @@ h4 {
   font-size:
     var(--font-size-md);
 
-  font-weight:
-    var(--font-weight-semibold);
+  letter-spacing:
+    var(--tracking-heading);
+}
+
+
+h5 {
+  font-size:
+    var(--font-size-base);
+
+  letter-spacing:
+    var(--tracking-heading);
+}
+
+
+h6 {
+  font-size:
+    var(--font-size-sm);
+
+  letter-spacing:
+    var(--tracking-heading);
 }
 
 
 p {
   color:
     var(--color-text-secondary);
+
+  font-family:
+    var(--font-sans);
 
   font-size:
     var(--font-size-base);
@@ -171,6 +189,12 @@ p {
 
 
 small {
+  color:
+    var(--color-text-muted);
+
+  font-family:
+    var(--font-sans);
+
   font-size:
     var(--font-size-xs);
 
@@ -182,6 +206,15 @@ small {
 strong {
   font-weight:
     var(--font-weight-semibold);
+}
+
+
+code,
+pre,
+kbd,
+samp {
+  font-family:
+    var(--font-mono);
 }
 
 
@@ -216,7 +249,7 @@ button {
     inherit;
 
   font-family:
-    inherit;
+    var(--font-sans);
 
   font-size:
     var(--font-size-sm);
@@ -226,6 +259,9 @@ button {
 
   line-height:
     1.2;
+
+  letter-spacing:
+    -0.01em;
 
   cursor:
     pointer;
@@ -251,7 +287,7 @@ select {
   margin: 0;
 
   font-family:
-    inherit;
+    var(--font-sans);
 
   font-size:
     var(--font-size-sm);
@@ -261,6 +297,9 @@ select {
 
   line-height:
     1.4;
+
+  letter-spacing:
+    -0.005em;
 
   color:
     inherit;
@@ -406,10 +445,12 @@ table {
       32px;
   }
 
+
   h2 {
     font-size:
       20px;
   }
+
 
   body {
     font-size:

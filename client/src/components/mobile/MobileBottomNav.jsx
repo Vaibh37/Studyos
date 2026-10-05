@@ -167,6 +167,7 @@ function MobileBottomNav() {
       "/app/notes",
       "/app/calendar",
       "/app/progress",
+      "/app/groups",
       "/app/settings",
     ].some(
       (

@@ -1,0 +1,6474 @@
+/* =========================================================
+   STUDYOS V2 â€” STUDY GROUPS
+   ========================================================= */
+
+.v2g-page {
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  color: var(--color-text);
+}
+
+.v2g-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.v2g-eyebrow {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.v2g-header h1 {
+  margin: 6px 0 10px;
+  color: var(--color-text);
+  font-size: clamp(34px, 4vw, 42px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.v2g-header p {
+  max-width: 720px;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.v2g-refresh,
+.v2g-primary-button,
+.v2g-secondary-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.v2g-refresh,
+.v2g-secondary-button {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.v2g-refresh:hover:not(:disabled),
+.v2g-secondary-button:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.v2g-primary-button {
+  border: 1px solid var(--color-solid);
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+}
+
+.v2g-primary-button:hover:not(:disabled) {
+  background: var(--color-solid-hover);
+}
+
+.v2g-primary-button:disabled,
+.v2g-secondary-button:disabled,
+.v2g-refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.v2g-secondary-button.full {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.v2g-message {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.v2g-message.is-success {
+  border: 1px solid color-mix(
+    in srgb,
+    var(--color-success) 30%,
+    var(--color-border)
+  );
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.v2g-message.is-error {
+  border: 1px solid color-mix(
+    in srgb,
+    var(--color-danger) 30%,
+    var(--color-border)
+  );
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+
+/* =========================================================
+   CREATE / JOIN
+   ========================================================= */
+
+.v2g-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.v2g-action-card,
+.v2g-groups-section,
+.v2g-room,
+.v2g-empty-card {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.v2g-action-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+}
+
+.v2g-action-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.v2g-action-icon {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+
+.v2g-action-heading h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.v2g-action-heading p,
+.v2g-panel-copy {
+  margin-top: 5px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.v2g-action-card input,
+.v2g-action-card textarea,
+.v2g-action-card select {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.v2g-action-card input,
+.v2g-action-card select {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.v2g-action-card textarea {
+  min-height: 82px;
+  padding: 11px 12px;
+  resize: vertical;
+}
+
+.v2g-action-card input:focus,
+.v2g-action-card textarea:focus,
+.v2g-action-card select:focus {
+  border-color: var(--color-border-strong);
+}
+
+.v2g-action-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 10px;
+}
+
+.v2g-join-spacer {
+  min-height: 36px;
+}
+
+
+/* =========================================================
+   MY GROUPS
+   ========================================================= */
+
+.v2g-groups-section {
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.v2g-section-heading,
+.v2g-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.v2g-section-heading {
+  margin-bottom: 16px;
+}
+
+.v2g-section-heading h2,
+.v2g-room-header h2 {
+  margin: 5px 0 0;
+  color: var(--color-text);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.v2g-count-pill,
+.v2g-role-pill,
+.v2g-room-tags span,
+.v2g-live-count {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.v2g-group-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    3,
+    minmax(0, 1fr)
+  );
+  gap: 10px;
+}
+
+.v2g-group-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-subtle);
+  color: inherit;
+  text-align: left;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.v2g-group-card:hover,
+.v2g-group-card.is-active {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+}
+
+.v2g-group-card.is-active {
+  box-shadow:
+    inset 3px 0 0 var(--color-solid);
+}
+
+.v2g-group-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.v2g-group-avatar,
+.v2g-member-avatar {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.v2g-group-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.v2g-group-avatar.large {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.v2g-group-card > strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2g-group-card > p {
+  min-height: 40px;
+  margin-top: 6px;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.v2g-group-meta {
+  margin-top: 13px;
+  color: var(--color-text-faint);
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   ROOM
+   ========================================================= */
+
+.v2g-room {
+  padding: 24px;
+}
+
+.v2g-room-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.v2g-room-title {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.v2g-room-title p {
+  max-width: 700px;
+  margin-top: 7px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.v2g-room-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.v2g-room-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.4fr)
+    minmax(270px, 0.75fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.v2g-panel {
+  min-width: 0;
+  padding: 19px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-subtle);
+}
+
+.v2g-live-panel {
+  grid-row: span 2;
+}
+
+.v2g-members-panel {
+  min-height: 260px;
+}
+
+.v2g-panel-heading {
+  margin-bottom: 14px;
+}
+
+.v2g-panel-heading h3 {
+  margin: 4px 0 0;
+  color: var(--color-text);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.v2g-live-count {
+  color: var(--color-success);
+}
+
+.v2g-live-list,
+.v2g-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2g-live-user,
+.v2g-member-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface);
+}
+
+.v2g-member-picture,
+.v2g-member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.v2g-member-picture {
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+}
+
+.v2g-live-copy,
+.v2g-member-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.v2g-live-copy > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.v2g-live-copy strong,
+.v2g-member-copy strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2g-live-copy > span,
+.v2g-member-copy span {
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2g-live-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--color-success);
+}
+
+.v2g-live-time {
+  flex: 0 0 auto;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2g-role-icon {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--color-text-muted);
+}
+
+.v2g-invite-box {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.v2g-invite-box code {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  padding: 0 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2g-invite-box button {
+  display: inline-flex;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.v2g-invite-box button:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.v2g-panel-copy {
+  margin: 10px 0 0;
+}
+
+.v2g-panel-empty,
+.v2g-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.v2g-panel-empty {
+  min-height: 230px;
+  padding: 24px;
+}
+
+.v2g-panel-empty.small {
+  min-height: 160px;
+}
+
+.v2g-panel-empty strong,
+.v2g-empty-card h2,
+.v2g-empty-card h3 {
+  margin-top: 10px;
+  color: var(--color-text);
+}
+
+.v2g-panel-empty span,
+.v2g-empty-card p {
+  max-width: 420px;
+  margin-top: 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.v2g-empty-card {
+  min-height: 320px;
+  padding: 32px;
+}
+
+.v2g-empty-card.compact {
+  min-height: 180px;
+}
+
+
+/* =========================================================
+   GROUP CHAT
+   ========================================================= */
+
+.v2g-chat-panel {
+  margin-top: 14px;
+}
+
+.v2g-chat-title-icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.v2g-chat-shell {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.v2g-chat-messages {
+  min-height: 320px;
+  max-height: 460px;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.v2g-chat-empty {
+  display: flex;
+  min-height: 288px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.v2g-chat-empty strong {
+  margin-top: 10px;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.v2g-chat-empty span {
+  max-width: 420px;
+  margin-top: 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.v2g-chat-message {
+  display: flex;
+  min-width: 0;
+  align-items: flex-end;
+  gap: 9px;
+  margin-bottom: 13px;
+}
+
+.v2g-chat-message.is-you {
+  flex-direction: row-reverse;
+}
+
+.v2g-chat-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.v2g-chat-avatar.fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.v2g-chat-bubble {
+  max-width: min(72%, 720px);
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px 12px 12px 4px;
+  background: var(--color-surface-subtle);
+}
+
+.v2g-chat-message.is-you .v2g-chat-bubble {
+  border-color: var(--color-border-strong);
+  border-radius: 12px 12px 4px 12px;
+  background: var(--color-surface-hover);
+}
+
+.v2g-chat-meta {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.v2g-chat-message.is-you .v2g-chat-meta {
+  justify-content: flex-end;
+}
+
+.v2g-chat-meta strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2g-chat-meta span {
+  flex: 0 0 auto;
+  color: var(--color-text-faint);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2g-chat-bubble p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.v2g-chat-end {
+  width: 100%;
+  height: 1px;
+}
+
+.v2g-chat-composer {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 9px;
+  padding: 11px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-subtle);
+}
+
+.v2g-chat-input-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.v2g-chat-input-wrap textarea {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  max-height: 140px;
+  padding: 11px 74px 11px 12px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  outline: 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.v2g-chat-input-wrap textarea:focus {
+  border-color: var(--color-border-strong);
+}
+
+.v2g-chat-input-wrap textarea::placeholder {
+  color: var(--color-text-faint);
+}
+
+.v2g-chat-character-count {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  color: var(--color-text-faint);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.v2g-chat-send {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  align-self: end;
+  border: 1px solid var(--color-solid);
+  border-radius: 9px;
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+}
+
+.v2g-chat-send:hover:not(:disabled) {
+  background: var(--color-solid-hover);
+}
+
+.v2g-chat-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   LEADERBOARD
+   ========================================================= */
+
+.v2g-leaderboard-panel {
+  margin-top: 14px;
+}
+
+.v2g-leaderboard-title-icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+
+.v2g-leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2g-leaderboard-row {
+  display: grid;
+  grid-template-columns:
+    42px
+    36px
+    minmax(0, 1fr)
+    auto;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface);
+}
+
+.v2g-leaderboard-row.is-you {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+}
+
+.v2g-rank {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2g-rank.is-top-1 {
+  color: var(--color-text);
+}
+
+.v2g-rank.is-top-2,
+.v2g-rank.is-top-3 {
+  color: var(--color-text-secondary);
+}
+
+.v2g-leaderboard-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.v2g-leaderboard-copy > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.v2g-leaderboard-copy strong {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v2g-leaderboard-copy > span {
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.v2g-you-pill {
+  display: inline-flex;
+  min-height: 20px;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.v2g-leaderboard-time {
+  flex: 0 0 auto;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .v2g-group-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .v2g-room-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .v2g-live-panel {
+    grid-row: auto;
+  }
+}
+
+
+@media (max-width: 760px) {
+  .v2g-page {
+    padding-bottom: 90px;
+  }
+
+  .v2g-header,
+  .v2g-room-header {
+    flex-direction: column;
+  }
+
+  .v2g-refresh {
+    width: 100%;
+  }
+
+  .v2g-actions-grid,
+  .v2g-group-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .v2g-action-card,
+  .v2g-groups-section,
+  .v2g-room {
+    padding: 17px;
+  }
+
+  .v2g-room-tags {
+    justify-content: flex-start;
+  }
+
+  .v2g-action-row {
+    grid-template-columns: 1fr;
+  }
+
+  .v2g-primary-button,
+  .v2g-secondary-button {
+    width: 100%;
+  }
+}
+
+
+@media (max-width: 520px) {
+  .v2g-header h1 {
+    font-size: 32px;
+  }
+
+  .v2g-room-title {
+    flex-direction: column;
+  }
+
+  .v2g-live-user,
+  .v2g-member-row {
+    align-items: flex-start;
+  }
+
+  .v2g-live-time {
+    margin-left: auto;
+  }
+
+  .v2g-chat-messages {
+    min-height: 280px;
+    max-height: 410px;
+    padding: 12px;
+  }
+
+  .v2g-chat-bubble {
+    max-width: 86%;
+  }
+
+  .v2g-chat-avatar {
+    width: 29px;
+    height: 29px;
+  }
+
+  .v2g-chat-composer {
+    padding: 9px;
+  }
+
+  .v2g-chat-input-wrap textarea {
+    padding-right: 12px;
+    padding-bottom: 26px;
+  }
+
+  .v2g-leaderboard-row {
+    grid-template-columns:
+      34px
+      32px
+      minmax(0, 1fr)
+      auto;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .v2g-rank {
+    width: 30px;
+    height: 30px;
+  }
+
+  .v2g-leaderboard-row .v2g-member-picture,
+  .v2g-leaderboard-row .v2g-member-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .v2g-leaderboard-time {
+    font-size: 13px;
+  }
+}
+/* =========================================================
+   STUDYOS V3 — DESKTOP GROUPS POLISH
+   ========================================================= */
+
+@media (min-width: 1061px) {
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .v2g-page {
+    width: 100%;
+    max-width: 1480px;
+
+    margin:
+      0
+      auto;
+
+    padding:
+      4px
+      4px
+      48px;
+
+    font-family:
+      var(--font-sans);
+  }
+
+
+  /* =======================================================
+     PAGE HEADER
+     ======================================================= */
+
+  .v2g-header {
+    align-items:
+      center;
+
+    gap:
+      40px;
+
+    margin-bottom:
+      28px;
+
+    padding:
+      12px
+      2px
+      4px;
+  }
+
+
+  .v2g-header > div {
+    min-width: 0;
+  }
+
+
+  .v2g-eyebrow {
+    color:
+      var(--color-text-faint);
+
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      10px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1;
+
+    letter-spacing:
+      0.12em;
+
+    text-transform:
+      uppercase;
+  }
+
+
+  .v2g-header h1 {
+    margin:
+      8px
+      0
+      8px;
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      clamp(
+        38px,
+        4vw,
+        52px
+      );
+
+    font-weight:
+      600;
+
+    line-height:
+      0.98;
+
+    letter-spacing:
+      -0.055em;
+  }
+
+
+  .v2g-header p {
+    max-width:
+      660px;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      13px;
+
+    line-height:
+      1.6;
+
+    letter-spacing:
+      -0.006em;
+  }
+
+
+  /* =======================================================
+     BUTTONS
+     ======================================================= */
+
+  .v2g-refresh,
+  .v2g-primary-button,
+  .v2g-secondary-button {
+    min-height:
+      38px;
+
+    gap:
+      7px;
+
+    padding:
+      0
+      13px;
+
+    border-radius:
+      7px;
+
+    font-size:
+      12px;
+
+    font-weight:
+      550;
+
+    letter-spacing:
+      -0.01em;
+
+    transition:
+      background
+        var(--transition-fast),
+      border-color
+        var(--transition-fast),
+      color
+        var(--transition-fast),
+      transform
+        100ms ease;
+  }
+
+
+  .v2g-refresh {
+    min-width:
+      96px;
+
+    background:
+      transparent;
+  }
+
+
+  .v2g-refresh:hover:not(:disabled),
+  .v2g-secondary-button:hover:not(:disabled) {
+    transform:
+      translateY(-1px);
+  }
+
+
+  .v2g-primary-button:active:not(:disabled),
+  .v2g-secondary-button:active:not(:disabled),
+  .v2g-refresh:active:not(:disabled) {
+    transform:
+      translateY(0);
+  }
+
+
+  /* =======================================================
+     STATUS
+     ======================================================= */
+
+  .v2g-message {
+    margin-bottom:
+      18px;
+
+    padding:
+      10px
+      12px;
+
+    border-radius:
+      7px;
+
+    font-size:
+      12px;
+
+    font-weight:
+      500;
+  }
+
+
+  /* =======================================================
+     CREATE / JOIN
+     ======================================================= */
+
+  .v2g-actions-grid {
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(340px, 0.65fr);
+
+    gap:
+      12px;
+
+    margin-bottom:
+      12px;
+  }
+
+
+  .v2g-action-card,
+  .v2g-groups-section,
+  .v2g-room,
+  .v2g-empty-card {
+    border-color:
+      color-mix(
+        in srgb,
+        var(--color-border) 88%,
+        transparent
+      );
+
+    border-radius:
+      10px;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--color-surface) 94%,
+        var(--color-bg)
+      );
+
+    box-shadow:
+      none;
+  }
+
+
+  .v2g-action-card {
+    gap:
+      10px;
+
+    padding:
+      18px;
+  }
+
+
+  .v2g-action-heading {
+    align-items:
+      center;
+
+    gap:
+      10px;
+
+    margin-bottom:
+      5px;
+  }
+
+
+  .v2g-action-icon {
+    width:
+      34px;
+
+    height:
+      34px;
+
+    border-radius:
+      8px;
+
+    background:
+      transparent;
+
+    color:
+      var(--color-text-secondary);
+  }
+
+
+  .v2g-action-heading h2 {
+    font-family:
+      var(--font-display);
+
+    font-size:
+      16px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.025em;
+  }
+
+
+  .v2g-action-heading p,
+  .v2g-panel-copy {
+    margin-top:
+      3px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      11px;
+
+    line-height:
+      1.5;
+  }
+
+
+  .v2g-action-card input,
+  .v2g-action-card textarea,
+  .v2g-action-card select {
+    border-color:
+      var(--color-border);
+
+    border-radius:
+      7px;
+
+    background:
+      var(--color-bg);
+
+    color:
+      var(--color-text);
+
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      12px;
+
+    transition:
+      border-color
+        var(--transition-fast),
+      background
+        var(--transition-fast);
+  }
+
+
+  .v2g-action-card input,
+  .v2g-action-card select {
+    min-height:
+      40px;
+
+    padding:
+      0
+      11px;
+  }
+
+
+  .v2g-action-card textarea {
+    min-height:
+      74px;
+
+    padding:
+      10px
+      11px;
+  }
+
+
+  .v2g-action-card input:hover,
+  .v2g-action-card textarea:hover,
+  .v2g-action-card select:hover {
+    border-color:
+      color-mix(
+        in srgb,
+        var(--color-border-strong) 75%,
+        var(--color-border)
+      );
+  }
+
+
+  .v2g-action-card input:focus,
+  .v2g-action-card textarea:focus,
+  .v2g-action-card select:focus {
+    border-color:
+      var(--color-text-faint);
+
+    background:
+      var(--color-surface-subtle);
+  }
+
+
+  .v2g-action-row {
+    gap:
+      8px;
+  }
+
+
+  .v2g-join-spacer {
+    min-height:
+      30px;
+  }
+
+
+  /* =======================================================
+     MY GROUPS
+     ======================================================= */
+
+  .v2g-groups-section {
+    margin-bottom:
+      12px;
+
+    padding:
+      18px;
+  }
+
+
+  .v2g-section-heading {
+    align-items:
+      center;
+
+    margin-bottom:
+      14px;
+  }
+
+
+  .v2g-section-heading h2,
+  .v2g-room-header h2 {
+    margin:
+      4px
+      0
+      0;
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      20px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.1;
+
+    letter-spacing:
+      -0.035em;
+  }
+
+
+  .v2g-count-pill,
+  .v2g-role-pill,
+  .v2g-room-tags span,
+  .v2g-live-count {
+    min-height:
+      25px;
+
+    gap:
+      5px;
+
+    padding:
+      0
+      8px;
+
+    border-radius:
+      6px;
+
+    background:
+      transparent;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      10px;
+
+    font-weight:
+      550;
+
+    letter-spacing:
+      0.01em;
+  }
+
+
+  .v2g-group-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+
+    gap:
+      8px;
+  }
+
+
+  .v2g-group-card {
+    position:
+      relative;
+
+    min-height:
+      142px;
+
+    padding:
+      14px;
+
+    overflow:
+      hidden;
+
+    border-radius:
+      8px;
+
+    background:
+      var(--color-bg);
+
+    transition:
+      border-color
+        var(--transition-fast),
+      background
+        var(--transition-fast),
+      transform
+        120ms ease;
+  }
+
+
+  .v2g-group-card::before {
+    position:
+      absolute;
+
+    top:
+      0;
+
+    bottom:
+      0;
+
+    left:
+      0;
+
+    width:
+      2px;
+
+    background:
+      transparent;
+
+    content:
+      "";
+  }
+
+
+  .v2g-group-card:hover {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-subtle);
+
+    transform:
+      translateY(-1px);
+  }
+
+
+  .v2g-group-card.is-active {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-subtle);
+
+    box-shadow:
+      none;
+  }
+
+
+  .v2g-group-card.is-active::before {
+    background:
+      var(--color-text);
+  }
+
+
+  .v2g-group-card-top {
+    margin-bottom:
+      11px;
+  }
+
+
+  .v2g-group-avatar {
+    width:
+      34px;
+
+    height:
+      34px;
+
+    border-radius:
+      8px;
+
+    background:
+      var(--color-surface);
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      13px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-group-avatar.large {
+    width:
+      44px;
+
+    height:
+      44px;
+
+    border-radius:
+      9px;
+
+    font-size:
+      17px;
+  }
+
+
+  .v2g-group-card > strong {
+    font-family:
+      var(--font-display);
+
+    font-size:
+      14px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.018em;
+  }
+
+
+  .v2g-group-card > p {
+    min-height:
+      34px;
+
+    margin-top:
+      5px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      11px;
+
+    line-height:
+      1.5;
+  }
+
+
+  .v2g-group-meta {
+    margin-top:
+      auto;
+
+    padding-top:
+      12px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      10px;
+
+    font-weight:
+      500;
+
+    letter-spacing:
+      0.01em;
+  }
+
+
+  /* =======================================================
+     SELECTED GROUP
+     ======================================================= */
+
+  .v2g-room {
+    padding:
+      20px;
+  }
+
+
+  .v2g-room-header {
+    align-items:
+      center;
+
+    gap:
+      24px;
+
+    padding-bottom:
+      18px;
+  }
+
+
+  .v2g-room-title {
+    align-items:
+      center;
+
+    gap:
+      12px;
+  }
+
+
+  .v2g-room-title p {
+    max-width:
+      680px;
+
+    margin-top:
+      5px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      11px;
+
+    line-height:
+      1.5;
+  }
+
+
+  .v2g-room-tags {
+    align-items:
+      center;
+
+    gap:
+      6px;
+  }
+
+
+  .v2g-room-tags .v2g-secondary-button {
+    min-height:
+      32px;
+
+    margin-left:
+      4px;
+
+    padding:
+      0
+      11px;
+  }
+
+
+  /* =======================================================
+     GROUP DETAIL GRID
+     ======================================================= */
+
+  .v2g-room-grid {
+    grid-template-columns:
+      minmax(0, 1.55fr)
+      minmax(280px, 0.72fr);
+
+    gap:
+      10px;
+
+    margin-top:
+      12px;
+  }
+
+
+  .v2g-panel {
+    padding:
+      15px;
+
+    border-radius:
+      8px;
+
+    background:
+      var(--color-bg);
+  }
+
+
+  .v2g-panel-heading {
+    align-items:
+      center;
+
+    margin-bottom:
+      12px;
+  }
+
+
+  .v2g-panel-heading h3 {
+    margin:
+      4px
+      0
+      0;
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      15px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.02em;
+  }
+
+
+  .v2g-live-panel {
+    grid-row:
+      span 2;
+  }
+
+
+  .v2g-members-panel {
+    min-height:
+      230px;
+  }
+
+
+  /* =======================================================
+     MEMBERS / LIVE USERS
+     ======================================================= */
+
+  .v2g-live-list,
+  .v2g-member-list {
+    gap:
+      6px;
+  }
+
+
+  .v2g-live-user,
+  .v2g-member-row {
+    gap:
+      9px;
+
+    padding:
+      9px
+      10px;
+
+    border-radius:
+      7px;
+
+    background:
+      var(--color-surface);
+
+    transition:
+      background
+        var(--transition-fast),
+      border-color
+        var(--transition-fast);
+  }
+
+
+  .v2g-live-user:hover,
+  .v2g-member-row:hover {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-subtle);
+  }
+
+
+  .v2g-member-picture,
+  .v2g-member-avatar {
+    width:
+      32px;
+
+    height:
+      32px;
+  }
+
+
+  .v2g-member-avatar {
+    font-size:
+      11px;
+  }
+
+
+  .v2g-live-copy strong,
+  .v2g-member-copy strong {
+    font-size:
+      12px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-live-copy > span,
+  .v2g-member-copy span {
+    margin-top:
+      1px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      10px;
+  }
+
+
+  .v2g-live-dot {
+    width:
+      6px;
+
+    height:
+      6px;
+  }
+
+
+  .v2g-live-time {
+    color:
+      var(--color-text-secondary);
+
+    font-size:
+      11px;
+
+    font-weight:
+      550;
+  }
+
+
+  .v2g-role-icon {
+    width:
+      26px;
+
+    height:
+      26px;
+  }
+
+
+  /* =======================================================
+     INVITE
+     ======================================================= */
+
+  .v2g-invite-box {
+    gap:
+      6px;
+  }
+
+
+  .v2g-invite-box code {
+    min-height:
+      40px;
+
+    padding:
+      0
+      11px;
+
+    border-radius:
+      7px;
+
+    background:
+      var(--color-surface);
+
+    font-size:
+      12px;
+
+    font-weight:
+      550;
+
+    letter-spacing:
+      0.07em;
+  }
+
+
+  .v2g-invite-box button {
+    width:
+      40px;
+
+    height:
+      40px;
+
+    border-radius:
+      7px;
+  }
+
+
+  /* =======================================================
+     EMPTY STATES
+     ======================================================= */
+
+  .v2g-panel-empty {
+    min-height:
+      200px;
+
+    padding:
+      22px;
+  }
+
+
+  .v2g-panel-empty.small {
+    min-height:
+      135px;
+  }
+
+
+  .v2g-panel-empty strong,
+  .v2g-empty-card h2,
+  .v2g-empty-card h3 {
+    margin-top:
+      9px;
+
+    font-family:
+      var(--font-display);
+
+    font-size:
+      14px;
+
+    letter-spacing:
+      -0.02em;
+  }
+
+
+  .v2g-panel-empty span,
+  .v2g-empty-card p {
+    margin-top:
+      5px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      11px;
+
+    line-height:
+      1.5;
+  }
+
+
+  /* =======================================================
+     LEADERBOARD
+     ======================================================= */
+
+  .v2g-leaderboard-panel {
+    margin-top:
+      10px;
+  }
+
+
+  .v2g-leaderboard-title-icon {
+    width:
+      30px;
+
+    height:
+      30px;
+
+    border-radius:
+      7px;
+
+    background:
+      transparent;
+  }
+
+
+  .v2g-leaderboard-list {
+    gap:
+      6px;
+  }
+
+
+  .v2g-leaderboard-row {
+    grid-template-columns:
+      36px
+      32px
+      minmax(0, 1fr)
+      auto;
+
+    gap:
+      9px;
+
+    padding:
+      9px
+      10px;
+
+    border-radius:
+      7px;
+
+    background:
+      var(--color-surface);
+  }
+
+
+  .v2g-leaderboard-row.is-you {
+    border-color:
+      var(--color-border-strong);
+
+    background:
+      var(--color-surface-subtle);
+  }
+
+
+  .v2g-rank {
+    width:
+      30px;
+
+    height:
+      30px;
+
+    border-radius:
+      7px;
+
+    background:
+      transparent;
+
+    font-size:
+      10px;
+  }
+
+
+  .v2g-leaderboard-copy strong {
+    font-size:
+      12px;
+  }
+
+
+  .v2g-leaderboard-copy > span {
+    margin-top:
+      1px;
+
+    color:
+      var(--color-text-faint);
+
+    font-size:
+      10px;
+  }
+
+
+  .v2g-you-pill {
+    min-height:
+      18px;
+
+    padding:
+      0
+      6px;
+
+    border-radius:
+      5px;
+
+    background:
+      transparent;
+
+    font-size:
+      8px;
+
+    letter-spacing:
+      0.05em;
+  }
+
+
+  .v2g-leaderboard-time {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      12px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.015em;
+  }
+
+}
+
+
+/* =========================================================
+   STUDYOS V3 — DESKTOP GROUPS REFINEMENT
+   ========================================================= */
+
+@media (min-width: 1061px) {
+
+  /* -------------------------------------------------------
+     PAGE WIDTH / RHYTHM
+     ------------------------------------------------------- */
+
+  .v2g-page {
+    max-width:
+      1380px;
+
+    padding-bottom:
+      40px;
+  }
+
+
+  /* -------------------------------------------------------
+     HEADER
+     ------------------------------------------------------- */
+
+  .v2g-header {
+    margin-bottom:
+      22px;
+
+    padding-top:
+      8px;
+  }
+
+
+  .v2g-header h1 {
+    margin:
+      7px
+      0
+      7px;
+
+    font-size:
+      clamp(
+        38px,
+        3.2vw,
+        46px
+      );
+
+    font-weight:
+      600;
+
+    line-height:
+      1;
+
+    letter-spacing:
+      -0.05em;
+  }
+
+
+  .v2g-header p {
+    max-width:
+      600px;
+
+    font-size:
+      12.5px;
+
+    color:
+      #878787;
+  }
+
+
+  .v2g-eyebrow {
+    font-size:
+      9px;
+
+    letter-spacing:
+      0.14em;
+  }
+
+
+  /* -------------------------------------------------------
+     CREATE / JOIN
+     ------------------------------------------------------- */
+
+  .v2g-actions-grid {
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(320px, 0.7fr);
+
+    gap:
+      10px;
+
+    margin-bottom:
+      10px;
+  }
+
+
+  .v2g-action-card {
+    padding:
+      16px;
+
+    border-radius:
+      9px;
+  }
+
+
+  .v2g-action-heading {
+    margin-bottom:
+      2px;
+  }
+
+
+  .v2g-action-heading h2 {
+    font-size:
+      15px;
+
+    letter-spacing:
+      -0.03em;
+  }
+
+
+  .v2g-action-heading p {
+    font-size:
+      10.5px;
+  }
+
+
+  .v2g-action-icon {
+    width:
+      32px;
+
+    height:
+      32px;
+  }
+
+
+  .v2g-action-card textarea {
+    min-height:
+      68px;
+  }
+
+
+  .v2g-join-spacer {
+    min-height:
+      8px;
+  }
+
+
+  /* -------------------------------------------------------
+     MY GROUPS
+     ------------------------------------------------------- */
+
+  .v2g-groups-section {
+    padding:
+      16px;
+
+    margin-bottom:
+      10px;
+  }
+
+
+  .v2g-section-heading {
+    margin-bottom:
+      12px;
+  }
+
+
+  .v2g-section-heading h2 {
+    font-size:
+      18px;
+  }
+
+
+  .v2g-group-grid {
+    gap:
+      7px;
+  }
+
+
+  .v2g-group-card {
+    min-height:
+      132px;
+
+    padding:
+      13px;
+  }
+
+
+  .v2g-group-card > strong {
+    font-size:
+      13px;
+  }
+
+
+  .v2g-group-card > p {
+    min-height:
+      29px;
+
+    font-size:
+      10.5px;
+  }
+
+
+  .v2g-group-meta {
+    padding-top:
+      9px;
+  }
+
+
+  /* -------------------------------------------------------
+     OPEN GROUP HEADER
+     ------------------------------------------------------- */
+
+  .v2g-room {
+    padding:
+      18px;
+
+    border-radius:
+      9px;
+  }
+
+
+  .v2g-room-header {
+    gap:
+      18px;
+
+    padding-bottom:
+      15px;
+  }
+
+
+  .v2g-room-header h2 {
+    font-size:
+      19px;
+  }
+
+
+  .v2g-group-avatar.large {
+    width:
+      40px;
+
+    height:
+      40px;
+
+    font-size:
+      15px;
+  }
+
+
+  /* -------------------------------------------------------
+     ROOM GRID
+     ------------------------------------------------------- */
+
+  .v2g-room-grid {
+    grid-template-columns:
+      minmax(0, 1.6fr)
+      minmax(300px, 0.74fr);
+
+    gap:
+      9px;
+
+    margin-top:
+      10px;
+  }
+
+
+  .v2g-panel {
+    padding:
+      14px;
+
+    border-radius:
+      8px;
+  }
+
+
+  .v2g-panel-heading {
+    margin-bottom:
+      10px;
+  }
+
+
+  .v2g-panel-heading h3 {
+    font-size:
+      14px;
+  }
+
+
+  /* -------------------------------------------------------
+     STUDYING NOW
+     ------------------------------------------------------- */
+
+  .v2g-live-panel {
+    min-height:
+      335px;
+  }
+
+
+  .v2g-panel-empty {
+    min-height:
+      165px;
+  }
+
+
+  .v2g-panel-empty.small {
+    min-height:
+      110px;
+  }
+
+
+  .v2g-panel-empty strong {
+    font-size:
+      13px;
+  }
+
+
+  .v2g-panel-empty span {
+    font-size:
+      10.5px;
+  }
+
+
+  /* -------------------------------------------------------
+     ACCESS / MEMBERS
+     ------------------------------------------------------- */
+
+  .v2g-members-panel {
+    min-height:
+      205px;
+  }
+
+
+  .v2g-member-row,
+  .v2g-live-user {
+    padding:
+      8px
+      9px;
+  }
+
+
+  .v2g-member-picture,
+  .v2g-member-avatar {
+    width:
+      30px;
+
+    height:
+      30px;
+  }
+
+
+  .v2g-member-copy strong,
+  .v2g-live-copy strong {
+    font-size:
+      11.5px;
+  }
+
+
+  /* -------------------------------------------------------
+     LEADERBOARD
+     ------------------------------------------------------- */
+
+  .v2g-leaderboard-panel {
+    margin-top:
+      9px;
+  }
+
+
+  .v2g-leaderboard-row {
+    padding:
+      8px
+      9px;
+  }
+
+
+  .v2g-leaderboard-time {
+    font-size:
+      11px;
+  }
+
+
+  /* -------------------------------------------------------
+     BORDER HIERARCHY
+     ------------------------------------------------------- */
+
+  .v2g-action-card,
+  .v2g-groups-section,
+  .v2g-room {
+    border-color:
+      #262626;
+  }
+
+
+  .v2g-panel {
+    border-color:
+      #242424;
+  }
+
+
+  .v2g-group-card,
+  .v2g-member-row,
+  .v2g-live-user,
+  .v2g-leaderboard-row {
+    border-color:
+      #292929;
+  }
+
+
+  /* -------------------------------------------------------
+     TEXT HIERARCHY
+     ------------------------------------------------------- */
+
+  .v2g-panel-copy,
+  .v2g-room-title p,
+  .v2g-member-copy span,
+  .v2g-live-copy > span,
+  .v2g-group-meta {
+    color:
+      #737373;
+  }
+
+}
+
+
+/* =========================================================
+   STUDYOS V3 — VISIBILITY DROPDOWN
+   ========================================================= */
+
+.v2g-visibility-field {
+  position: relative;
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+/* =========================================================
+   TRIGGER
+   ========================================================= */
+
+.v2g-visibility-trigger {
+  display: flex;
+
+  width: 100%;
+  min-height: 46px;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding:
+    6px
+    11px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius:
+    8px;
+
+  background:
+    var(--color-bg);
+
+  color:
+    var(--color-text);
+
+  text-align: left;
+
+  transition:
+    border-color
+      var(--transition-fast),
+    background
+      var(--transition-fast),
+    box-shadow
+      var(--transition-fast);
+}
+
+
+.v2g-visibility-trigger:hover {
+  border-color:
+    var(--color-border-strong);
+
+  background:
+    var(--color-surface-subtle);
+}
+
+
+.v2g-visibility-trigger.is-open {
+  border-color:
+    #525252;
+
+  background:
+    #111111;
+
+  box-shadow:
+    0 0 0 1px
+    rgba(255, 255, 255, 0.025);
+}
+
+
+.v2g-visibility-trigger-main {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+/* =========================================================
+   TRIGGER ICON
+   ========================================================= */
+
+.v2g-visibility-trigger-icon {
+  display: inline-flex;
+
+  width: 30px;
+  height: 30px;
+
+  flex:
+    0
+    0
+    30px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    #282828;
+
+  border-radius:
+    7px;
+
+  background:
+    #151515;
+
+  color:
+    #a8a8a8;
+}
+
+
+/* =========================================================
+   TRIGGER COPY
+   ========================================================= */
+
+.v2g-visibility-trigger-copy {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 1px;
+}
+
+
+.v2g-visibility-trigger-copy strong {
+  overflow: hidden;
+
+  color:
+    #eeeeee;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    12px;
+
+  font-weight:
+    600;
+
+  line-height:
+    1.25;
+
+  letter-spacing:
+    -0.018em;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.v2g-visibility-trigger-copy small {
+  overflow: hidden;
+
+  color:
+    #686868;
+
+  font-family:
+    var(--font-sans);
+
+  font-size:
+    9.5px;
+
+  font-weight:
+    450;
+
+  line-height:
+    1.35;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   CHEVRON
+   ========================================================= */
+
+.v2g-visibility-chevron {
+  flex:
+    0
+    0
+    auto;
+
+  color:
+    #707070;
+
+  transition:
+    transform
+      160ms ease,
+    color
+      var(--transition-fast);
+}
+
+
+.v2g-visibility-trigger:hover
+.v2g-visibility-chevron {
+  color:
+    #bdbdbd;
+}
+
+
+.v2g-visibility-chevron.is-open {
+  transform:
+    rotate(180deg);
+
+  color:
+    #d5d5d5;
+}
+
+
+/* =========================================================
+   FLOATING MENU
+   ========================================================= */
+
+.v2g-visibility-menu {
+  position: absolute;
+
+  z-index: 80;
+
+  top:
+    calc(100% + 7px);
+
+  right: 0;
+  left: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  padding:
+    5px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    #303030;
+
+  border-radius:
+    10px;
+
+  background:
+    #111111;
+
+  box-shadow:
+    0 18px 50px
+      rgba(0, 0, 0, 0.55),
+    0 2px 8px
+      rgba(0, 0, 0, 0.35);
+
+  animation:
+    v2g-visibility-menu-in
+    130ms
+    ease
+    both;
+}
+
+
+/* =========================================================
+   OPTION
+   ========================================================= */
+
+.v2g-visibility-option {
+  display: grid;
+
+  width: 100%;
+
+  grid-template-columns:
+    30px
+    minmax(0, 1fr)
+    20px;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding:
+    8px
+    9px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    7px;
+
+  background:
+    transparent;
+
+  color:
+    #b5b5b5;
+
+  text-align: left;
+
+  transition:
+    background
+      100ms ease,
+    border-color
+      100ms ease,
+    color
+      100ms ease;
+}
+
+
+.v2g-visibility-option:hover {
+  border-color:
+    #292929;
+
+  background:
+    #191919;
+
+  color:
+    #f0f0f0;
+}
+
+
+.v2g-visibility-option.is-selected {
+  border-color:
+    #303030;
+
+  background:
+    #1b1b1b;
+}
+
+
+/* =========================================================
+   OPTION ICON
+   ========================================================= */
+
+.v2g-visibility-option-icon {
+  display: inline-flex;
+
+  width: 30px;
+  height: 30px;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    #282828;
+
+  border-radius:
+    7px;
+
+  background:
+    #151515;
+
+  color:
+    #858585;
+}
+
+
+.v2g-visibility-option.is-selected
+.v2g-visibility-option-icon {
+  border-color:
+    #3a3a3a;
+
+  color:
+    #d8d8d8;
+}
+
+
+/* =========================================================
+   OPTION TEXT
+   ========================================================= */
+
+.v2g-visibility-option-copy {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.v2g-visibility-option-copy strong {
+  color:
+    #e7e7e7;
+
+  font-family:
+    var(--font-display);
+
+  font-size:
+    11.5px;
+
+  font-weight:
+    600;
+
+  line-height:
+    1.25;
+
+  letter-spacing:
+    -0.018em;
+}
+
+
+.v2g-visibility-option-copy small {
+  overflow: hidden;
+
+  color:
+    #6e6e6e;
+
+  font-family:
+    var(--font-sans);
+
+  font-size:
+    9.5px;
+
+  font-weight:
+    450;
+
+  line-height:
+    1.35;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   CHECK
+   ========================================================= */
+
+.v2g-visibility-check {
+  justify-self: end;
+
+  color:
+    #eeeeee;
+}
+
+
+/* =========================================================
+   KEEP DROPDOWN ABOVE CARD CONTENT
+   ========================================================= */
+
+.v2g-action-card {
+  overflow: visible;
+}
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes v2g-visibility-menu-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-4px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* =========================================================
+   DESKTOP TUNING
+   ========================================================= */
+
+@media (min-width: 1061px) {
+
+  .v2g-visibility-trigger {
+    min-height:
+      44px;
+  }
+
+
+  .v2g-visibility-menu {
+    min-width:
+      320px;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .v2g-visibility-menu {
+    animation: none;
+  }
+
+
+  .v2g-visibility-chevron {
+    transition: none;
+  }
+
+}
+
+
+/* =========================================================
+   STUDYOS V3 — DASHBOARD TYPOGRAPHY ALIGNMENT
+   Match Groups with the Dashboard Inter typography system.
+   ========================================================= */
+
+@media (min-width: 1061px) {
+
+  /* =======================================================
+     FONT FAMILY
+     ======================================================= */
+
+  .v2g-page,
+  .v2g-page h1,
+  .v2g-page h2,
+  .v2g-page h3,
+  .v2g-page h4,
+  .v2g-page h5,
+  .v2g-page h6,
+  .v2g-page strong,
+  .v2g-page button,
+  .v2g-page input,
+  .v2g-page textarea,
+  .v2g-page select {
+    font-family:
+      var(--font-sans);
+  }
+
+
+  /* =======================================================
+     PAGE HEADER — SAME SCALE AS DASHBOARD
+     ======================================================= */
+
+  .v2g-eyebrow {
+    font-size:
+      12px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.3;
+
+    letter-spacing:
+      0.09em;
+  }
+
+
+  .v2g-header h1 {
+    margin:
+      6px
+      0
+      8px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      clamp(
+        36px,
+        4vw,
+        42px
+      );
+
+    font-weight:
+      600;
+
+    line-height:
+      1.08;
+
+    letter-spacing:
+      -0.045em;
+  }
+
+
+  .v2g-header p {
+    max-width:
+      680px;
+
+    color:
+      var(--color-text-muted);
+
+    font-size:
+      15px;
+
+    line-height:
+      1.65;
+
+    letter-spacing:
+      0;
+  }
+
+
+  /* =======================================================
+     CREATE / JOIN CARDS
+     ======================================================= */
+
+  .v2g-action-heading h2 {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      17px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.3;
+
+    letter-spacing:
+      -0.025em;
+  }
+
+
+  .v2g-action-heading p {
+    margin-top:
+      3px;
+
+    font-size:
+      13px;
+
+    line-height:
+      1.5;
+  }
+
+
+  .v2g-action-icon {
+    width:
+      36px;
+
+    height:
+      36px;
+  }
+
+
+  .v2g-action-card {
+    padding:
+      18px;
+  }
+
+
+  .v2g-action-card input,
+  .v2g-action-card textarea,
+  .v2g-action-card select {
+    font-size:
+      14px;
+  }
+
+
+  .v2g-action-card input {
+    min-height:
+      44px;
+  }
+
+
+  .v2g-action-card textarea {
+    min-height:
+      82px;
+
+    line-height:
+      1.5;
+  }
+
+
+  .v2g-primary-button,
+  .v2g-secondary-button,
+  .v2g-refresh {
+    font-size:
+      13px;
+
+    font-weight:
+      600;
+  }
+
+
+  /* =======================================================
+     CUSTOM VISIBILITY DROPDOWN
+     ======================================================= */
+
+  .v2g-visibility-trigger {
+    min-height:
+      48px;
+
+    padding:
+      7px
+      12px;
+  }
+
+
+  .v2g-visibility-trigger-icon,
+  .v2g-visibility-option-icon {
+    width:
+      32px;
+
+    height:
+      32px;
+
+    flex-basis:
+      32px;
+  }
+
+
+  .v2g-visibility-trigger-copy strong {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      13px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      -0.01em;
+  }
+
+
+  .v2g-visibility-trigger-copy small {
+    margin-top:
+      1px;
+
+    font-size:
+      11px;
+
+    line-height:
+      1.4;
+  }
+
+
+  .v2g-visibility-option {
+    grid-template-columns:
+      32px
+      minmax(0, 1fr)
+      20px;
+
+    padding:
+      10px;
+
+    gap:
+      11px;
+  }
+
+
+  .v2g-visibility-option-copy strong {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      13px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-visibility-option-copy small {
+    font-size:
+      11px;
+
+    line-height:
+      1.45;
+  }
+
+
+  /* =======================================================
+     MY GROUPS
+     ======================================================= */
+
+  .v2g-section-heading h2 {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      20px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.25;
+
+    letter-spacing:
+      -0.03em;
+  }
+
+
+  .v2g-count-pill,
+  .v2g-role-pill,
+  .v2g-room-tags span,
+  .v2g-live-count {
+    font-size:
+      11px;
+
+    font-weight:
+      500;
+  }
+
+
+  .v2g-group-card {
+    min-height:
+      154px;
+
+    padding:
+      15px;
+  }
+
+
+  .v2g-group-card > strong {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      15px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.35;
+
+    letter-spacing:
+      -0.015em;
+  }
+
+
+  .v2g-group-card > p {
+    min-height:
+      36px;
+
+    margin-top:
+      6px;
+
+    font-size:
+      13px;
+
+    line-height:
+      1.55;
+  }
+
+
+  .v2g-group-meta {
+    font-size:
+      12px;
+
+    line-height:
+      1.45;
+  }
+
+
+  .v2g-group-avatar {
+    width:
+      38px;
+
+    height:
+      38px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      14px;
+
+    font-weight:
+      600;
+  }
+
+
+  /* =======================================================
+     OPEN GROUP
+     ======================================================= */
+
+  .v2g-room-header h2 {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      21px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.25;
+
+    letter-spacing:
+      -0.03em;
+  }
+
+
+  .v2g-room-title p {
+    margin-top:
+      5px;
+
+    font-size:
+      13px;
+
+    line-height:
+      1.5;
+  }
+
+
+  .v2g-group-avatar.large {
+    width:
+      44px;
+
+    height:
+      44px;
+
+    font-size:
+      16px;
+  }
+
+
+  /* =======================================================
+     PANEL HEADINGS
+     ======================================================= */
+
+  .v2g-panel-heading h3 {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      16px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.3;
+
+    letter-spacing:
+      -0.02em;
+  }
+
+
+  .v2g-panel-copy {
+    font-size:
+      12px;
+
+    line-height:
+      1.5;
+  }
+
+
+  /* =======================================================
+     MEMBERS / LIVE STUDY
+     ======================================================= */
+
+  .v2g-live-copy strong,
+  .v2g-member-copy strong {
+    font-size:
+      14px;
+
+    font-weight:
+      600;
+
+    line-height:
+      1.35;
+  }
+
+
+  .v2g-live-copy > span,
+  .v2g-member-copy span {
+    margin-top:
+      2px;
+
+    font-size:
+      12px;
+
+    line-height:
+      1.4;
+  }
+
+
+  .v2g-member-picture,
+  .v2g-member-avatar {
+    width:
+      34px;
+
+    height:
+      34px;
+  }
+
+
+  .v2g-live-time {
+    font-size:
+      12px;
+  }
+
+
+  /* =======================================================
+     EMPTY STATES
+     ======================================================= */
+
+  .v2g-panel-empty strong,
+  .v2g-empty-card h2,
+  .v2g-empty-card h3 {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      15px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-panel-empty span,
+  .v2g-empty-card p {
+    margin-top:
+      6px;
+
+    font-size:
+      13px;
+
+    line-height:
+      1.55;
+  }
+
+
+  /* =======================================================
+     INVITE
+     ======================================================= */
+
+  .v2g-invite-box code {
+    min-height:
+      44px;
+
+    font-size:
+      13px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      0.05em;
+  }
+
+
+  .v2g-invite-box button {
+    width:
+      44px;
+
+    height:
+      44px;
+  }
+
+
+  /* =======================================================
+     LEADERBOARD
+     ======================================================= */
+
+  .v2g-leaderboard-copy strong {
+    font-size:
+      14px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-leaderboard-copy > span {
+    margin-top:
+      2px;
+
+    font-size:
+      12px;
+
+    line-height:
+      1.4;
+  }
+
+
+  .v2g-leaderboard-time {
+    font-family:
+      var(--font-sans);
+
+    font-size:
+      13px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-rank {
+    font-size:
+      11px;
+
+    font-weight:
+      600;
+  }
+
+
+  .v2g-you-pill {
+    font-size:
+      9px;
+  }
+
+
+  /* =======================================================
+     EYEBROW / KICKER LABELS
+     ======================================================= */
+
+  .v2g-section-heading .v2g-eyebrow,
+  .v2g-panel-heading .v2g-eyebrow,
+  .v2g-room-header .v2g-eyebrow {
+    font-size:
+      11px;
+
+    font-weight:
+      600;
+
+    letter-spacing:
+      0.1em;
+  }
+
+}
+
+
+/* =========================================================
+   STUDYOS V3 — MOBILE GROUPS
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .v2g-page {
+    width: 100%;
+
+    padding:
+      16px
+      14px
+      110px;
+
+    font-family:
+      var(--font-sans);
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .v2g-header {
+    display: flex;
+
+    flex-direction: row;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    margin-bottom: 20px;
+
+    padding: 0;
+  }
+
+
+  .v2g-header > div {
+    min-width: 0;
+
+    flex: 1;
+  }
+
+
+  .v2g-eyebrow {
+    font-family:
+      var(--font-sans);
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    letter-spacing: 0.1em;
+
+    text-transform: uppercase;
+  }
+
+
+  .v2g-header h1 {
+    margin:
+      5px
+      0
+      6px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 32px;
+
+    font-weight: 600;
+
+    line-height: 1.05;
+
+    letter-spacing: -0.045em;
+  }
+
+
+  .v2g-header p {
+    max-width: 320px;
+
+    color:
+      var(--color-text-muted);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+  }
+
+
+  .v2g-refresh {
+    width: auto;
+
+    min-width: 42px;
+    min-height: 42px;
+
+    flex: 0 0 auto;
+
+    padding:
+      0
+      11px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
+  }
+
+
+  /* =======================================================
+     STATUS MESSAGES
+     ======================================================= */
+
+  .v2g-message {
+    margin-bottom: 12px;
+
+    padding:
+      10px
+      12px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+  }
+
+
+  /* =======================================================
+     CREATE / JOIN
+     ======================================================= */
+
+  .v2g-actions-grid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+  }
+
+
+  .v2g-action-card {
+    gap: 11px;
+
+    padding: 15px;
+
+    border-radius: 11px;
+  }
+
+
+  .v2g-action-heading {
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 2px;
+  }
+
+
+  .v2g-action-icon {
+    width: 34px;
+    height: 34px;
+
+    flex:
+      0
+      0
+      34px;
+
+    border-radius: 8px;
+  }
+
+
+  .v2g-action-heading h2 {
+    font-family:
+      var(--font-sans);
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    letter-spacing: -0.025em;
+  }
+
+
+  .v2g-action-heading p {
+    margin-top: 2px;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+  }
+
+
+  .v2g-action-card input,
+  .v2g-action-card textarea {
+    width: 100%;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+  }
+
+
+  .v2g-action-card input {
+    min-height: 46px;
+
+    padding:
+      0
+      12px;
+  }
+
+
+  .v2g-action-card textarea {
+    min-height: 86px;
+
+    padding:
+      11px
+      12px;
+
+    line-height: 1.5;
+  }
+
+
+  .v2g-action-row {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+  }
+
+
+  .v2g-join-spacer {
+    display: none;
+  }
+
+
+  .v2g-primary-button,
+  .v2g-secondary-button {
+    width: 100%;
+
+    min-height: 44px;
+
+    justify-content: center;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+  }
+
+
+  /* =======================================================
+     CUSTOM VISIBILITY DROPDOWN
+     ======================================================= */
+
+  .v2g-visibility-field {
+    width: 100%;
+  }
+
+
+  .v2g-visibility-trigger {
+    min-height: 48px;
+
+    border-radius: 9px;
+
+    padding:
+      7px
+      10px;
+  }
+
+
+  .v2g-visibility-trigger-icon,
+  .v2g-visibility-option-icon {
+    width: 32px;
+    height: 32px;
+
+    flex:
+      0
+      0
+      32px;
+  }
+
+
+  .v2g-visibility-trigger-copy strong,
+  .v2g-visibility-option-copy strong {
+    font-family:
+      var(--font-sans);
+
+    font-size: 13px;
+
+    font-weight: 600;
+  }
+
+
+  .v2g-visibility-trigger-copy small,
+  .v2g-visibility-option-copy small {
+    font-size: 11px;
+
+    line-height: 1.4;
+  }
+
+
+  .v2g-visibility-menu {
+    top:
+      calc(100% + 6px);
+
+    min-width: 0;
+
+    border-radius: 10px;
+
+    padding: 5px;
+  }
+
+
+  .v2g-visibility-option {
+    grid-template-columns:
+      32px
+      minmax(0, 1fr)
+      18px;
+
+    gap: 9px;
+
+    padding:
+      9px;
+  }
+
+
+  /* =======================================================
+     MY GROUPS
+     ======================================================= */
+
+  .v2g-groups-section {
+    padding: 15px;
+
+    margin-bottom: 10px;
+
+    border-radius: 11px;
+  }
+
+
+  .v2g-section-heading {
+    align-items: center;
+
+    margin-bottom: 12px;
+  }
+
+
+  .v2g-section-heading h2 {
+    margin-top: 3px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 20px;
+
+    font-weight: 600;
+
+    letter-spacing: -0.035em;
+  }
+
+
+  .v2g-count-pill {
+    min-height: 26px;
+
+    padding:
+      0
+      8px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+  }
+
+
+  .v2g-group-grid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+  }
+
+
+  .v2g-group-card {
+    min-height: 0;
+
+    padding: 13px;
+
+    border-radius: 9px;
+  }
+
+
+  .v2g-group-card-top {
+    margin-bottom: 10px;
+  }
+
+
+  .v2g-group-avatar {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 8px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 13px;
+  }
+
+
+  .v2g-group-card > strong {
+    font-family:
+      var(--font-sans);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    letter-spacing: -0.015em;
+  }
+
+
+  .v2g-group-card > p {
+    min-height: 0;
+
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+  }
+
+
+  .v2g-group-meta {
+    margin-top: 10px;
+
+    padding-top: 0;
+
+    font-size: 11px;
+  }
+
+
+  /* =======================================================
+     SELECTED GROUP
+     ======================================================= */
+
+  .v2g-room {
+    padding: 15px;
+
+    border-radius: 11px;
+  }
+
+
+  .v2g-room-header {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 14px;
+
+    padding-bottom: 14px;
+  }
+
+
+  .v2g-room-title {
+    display: flex;
+
+    flex-direction: row;
+
+    align-items: center;
+
+    gap: 11px;
+  }
+
+
+  .v2g-group-avatar.large {
+    width: 42px;
+    height: 42px;
+
+    flex:
+      0
+      0
+      42px;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+  }
+
+
+  .v2g-room-header h2 {
+    margin-top: 2px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 19px;
+
+    font-weight: 600;
+
+    line-height: 1.25;
+
+    letter-spacing: -0.03em;
+  }
+
+
+  .v2g-room-title p {
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    line-height: 1.45;
+  }
+
+
+  .v2g-room-tags {
+    display: grid;
+
+    grid-template-columns:
+      auto
+      auto
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 6px;
+  }
+
+
+  .v2g-room-tags span {
+    min-height: 30px;
+
+    padding:
+      0
+      9px;
+
+    justify-content: center;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+  }
+
+
+  .v2g-room-tags .v2g-secondary-button {
+    width: auto;
+
+    min-height: 36px;
+
+    margin: 0;
+
+    justify-self: stretch;
+  }
+
+
+  /* =======================================================
+     ROOM PANELS
+     ======================================================= */
+
+  .v2g-room-grid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+
+    margin-top: 8px;
+  }
+
+
+  .v2g-panel {
+    padding: 13px;
+
+    border-radius: 9px;
+  }
+
+
+  .v2g-panel-heading {
+    align-items: center;
+
+    margin-bottom: 10px;
+  }
+
+
+  .v2g-panel-heading h3 {
+    margin-top: 3px;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    letter-spacing: -0.02em;
+  }
+
+
+  .v2g-live-panel {
+    min-height: 240px;
+
+    grid-row: auto;
+  }
+
+
+  .v2g-members-panel {
+    min-height: 0;
+  }
+
+
+  .v2g-panel-empty {
+    min-height: 145px;
+
+    padding: 18px;
+  }
+
+
+  .v2g-panel-empty.small {
+    min-height: 110px;
+  }
+
+
+  .v2g-panel-empty strong {
+    font-size: 14px;
+  }
+
+
+  .v2g-panel-empty span {
+    font-size: 12px;
+
+    line-height: 1.5;
+  }
+
+
+  /* =======================================================
+     MEMBER / LIVE ROWS
+     ======================================================= */
+
+  .v2g-live-list,
+  .v2g-member-list {
+    gap: 6px;
+  }
+
+
+  .v2g-live-user,
+  .v2g-member-row {
+    align-items: center;
+
+    gap: 9px;
+
+    padding:
+      9px
+      10px;
+
+    border-radius: 8px;
+  }
+
+
+  .v2g-member-picture,
+  .v2g-member-avatar {
+    width: 34px;
+    height: 34px;
+
+    flex:
+      0
+      0
+      34px;
+  }
+
+
+  .v2g-live-copy strong,
+  .v2g-member-copy strong {
+    font-size: 13px;
+
+    font-weight: 600;
+  }
+
+
+  .v2g-live-copy > span,
+  .v2g-member-copy span {
+    margin-top: 1px;
+
+    font-size: 11px;
+  }
+
+
+  /* =======================================================
+     INVITE
+     ======================================================= */
+
+  .v2g-invite-box {
+    gap: 7px;
+  }
+
+
+  .v2g-invite-box code {
+    min-height: 44px;
+
+    padding:
+      0
+      11px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+  }
+
+
+  .v2g-invite-box button {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 8px;
+  }
+
+
+  /* =======================================================
+     LEADERBOARD
+     ======================================================= */
+
+  .v2g-leaderboard-panel {
+    margin-top: 8px;
+  }
+
+
+  .v2g-leaderboard-list {
+    gap: 6px;
+  }
+
+
+  .v2g-leaderboard-row {
+    grid-template-columns:
+      30px
+      34px
+      minmax(0, 1fr)
+      auto;
+
+    gap: 8px;
+
+    padding:
+      9px;
+
+    border-radius: 8px;
+  }
+
+
+  .v2g-rank {
+    width: 28px;
+    height: 28px;
+
+    font-size: 10px;
+  }
+
+
+  .v2g-leaderboard-copy strong {
+    font-size: 13px;
+  }
+
+
+  .v2g-leaderboard-copy > span {
+    font-size: 11px;
+  }
+
+
+  .v2g-leaderboard-time {
+    font-size: 12px;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .v2g-page {
+    padding-right: 11px;
+    padding-left: 11px;
+  }
+
+
+  .v2g-header h1 {
+    font-size: 29px;
+  }
+
+
+  .v2g-header p {
+    font-size: 12px;
+  }
+
+
+  .v2g-refresh {
+    min-width: 40px;
+
+    padding:
+      0
+      9px;
+  }
+
+
+  .v2g-action-card,
+  .v2g-groups-section,
+  .v2g-room {
+    padding: 13px;
+  }
+
+
+  .v2g-room-tags {
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+
+  .v2g-room-tags .v2g-secondary-button {
+    grid-column:
+      1
+      / -1;
+
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   STUDYOS V3 — MOBILE FULLSCREEN GROUP
+   ========================================================= */
+
+
+/* desktop never shows mobile back */
+
+.v2g-mobile-room-back {
+  display: none;
+}
+
+
+@media (max-width: 760px) {
+
+  /* =======================================================
+     OPEN GROUP — FULLSCREEN ABOVE BOTTOM NAV
+     ======================================================= */
+
+  .v2g-room.is-mobile-open {
+    position: fixed;
+
+    z-index: 30;
+
+    top: 0;
+    right: 0;
+
+    bottom:
+      calc(
+        68px +
+        env(safe-area-inset-bottom)
+      );
+
+    left: 0;
+
+    display: flex;
+
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    flex-direction: column;
+
+    margin: 0;
+
+    padding: 0;
+
+    overflow: hidden;
+
+    border: 0;
+    border-radius: 0;
+
+    background:
+      #0b0b0b;
+
+    box-shadow: none;
+  }
+
+
+  /* =======================================================
+     HIDE NORMAL GROUPS PAGE BEHIND OPEN GROUP
+     ======================================================= */
+
+  .v2g-page:has(.v2g-room.is-mobile-open)
+  .v2g-header,
+
+  .v2g-page:has(.v2g-room.is-mobile-open)
+  .v2g-actions-grid,
+
+  .v2g-page:has(.v2g-room.is-mobile-open)
+  .v2g-groups-section {
+    display: none !important;
+  }
+
+
+  .app-shell-v2-main:has(
+    .v2g-room.is-mobile-open
+  ) {
+    padding: 0 !important;
+
+    overflow: hidden;
+  }
+
+
+  /* =======================================================
+     GROUP HEADER
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-header {
+    position: relative;
+
+    z-index: 10;
+
+    display: grid;
+
+    grid-template-columns:
+      40px
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 9px;
+
+    flex:
+      0
+      0
+      auto;
+
+    padding:
+      calc(
+        9px +
+        env(safe-area-inset-top)
+      )
+      10px
+      10px;
+
+    border-bottom:
+      1px solid
+      #252525;
+
+    background:
+      rgba(
+        16,
+        16,
+        16,
+        0.98
+      );
+
+    backdrop-filter:
+      blur(16px);
+
+    -webkit-backdrop-filter:
+      blur(16px);
+  }
+
+
+  /* =======================================================
+     MOBILE BACK BUTTON
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-mobile-room-back {
+    display: inline-flex;
+
+    width: 38px;
+    height: 38px;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border:
+      1px solid
+      transparent;
+
+    border-radius: 9px;
+
+    background:
+      transparent;
+
+    color:
+      #dddddd;
+
+    cursor: pointer;
+
+    transition:
+      background
+        120ms ease,
+      transform
+        100ms ease;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-mobile-room-back:active {
+    transform:
+      scale(0.94);
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-mobile-room-back:hover {
+    background:
+      #1b1b1b;
+  }
+
+
+  /* =======================================================
+     GROUP TITLE AREA
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-title {
+    display: flex;
+
+    min-width: 0;
+
+    align-items: center;
+
+    gap: 9px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-group-avatar.large {
+    width: 38px;
+    height: 38px;
+
+    flex:
+      0
+      0
+      38px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-title > div {
+    min-width: 0;
+
+    flex: 1;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-title h2 {
+    overflow: hidden;
+
+    margin: 0;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    line-height: 1.25;
+
+    letter-spacing:
+      -0.025em;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-title p {
+    display: none;
+  }
+
+
+  /* =======================================================
+     ROOM TAGS BECOME SECOND HEADER ROW
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-tags {
+    grid-column:
+      1
+      / -1;
+
+    display: flex;
+
+    width: 100%;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 2px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-tags::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-tags span {
+    min-height: 28px;
+
+    flex:
+      0
+      0
+      auto;
+
+    padding:
+      0
+      8px;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-tags
+  .v2g-secondary-button {
+    width: auto;
+
+    min-height: 30px;
+
+    flex:
+      0
+      0
+      auto;
+
+    margin: 0;
+
+    padding:
+      0
+      9px;
+
+    font-size: 10px;
+  }
+
+
+  /* =======================================================
+     INTERNAL SCROLLER
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid {
+    display: grid;
+
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    flex: 1;
+
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+
+    margin: 0;
+
+    padding:
+      10px
+      10px
+      16px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    overscroll-behavior-y: contain;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  /* =======================================================
+     PANELS
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-panel {
+    width: 100%;
+
+    padding: 13px;
+
+    border:
+      1px solid
+      #272727;
+
+    border-radius: 10px;
+
+    background:
+      #111111;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-heading {
+    margin-bottom: 11px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-heading h3 {
+    font-family:
+      var(--font-sans);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    letter-spacing:
+      -0.02em;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-copy {
+    font-size: 11px;
+
+    line-height: 1.45;
+  }
+
+
+  /* =======================================================
+     STUDYING NOW
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-live-panel {
+    min-height: 220px;
+
+    grid-row: auto;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-empty {
+    min-height: 130px;
+
+    padding: 18px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-empty.small {
+    min-height: 105px;
+  }
+
+
+  /* =======================================================
+     MEMBER ROWS
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-member-row,
+
+  .v2g-room.is-mobile-open
+  .v2g-live-user {
+    gap: 9px;
+
+    padding:
+      9px
+      10px;
+
+    border:
+      1px solid
+      #282828;
+
+    border-radius: 8px;
+
+    background:
+      #151515;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-member-picture,
+
+  .v2g-room.is-mobile-open
+  .v2g-member-avatar {
+    width: 34px;
+    height: 34px;
+
+    flex:
+      0
+      0
+      34px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-member-copy strong,
+
+  .v2g-room.is-mobile-open
+  .v2g-live-copy strong {
+    font-size: 13px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-member-copy span,
+
+  .v2g-room.is-mobile-open
+  .v2g-live-copy > span {
+    font-size: 11px;
+  }
+
+
+  /* =======================================================
+     INVITE CODE
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-invite-box {
+    gap: 7px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-invite-box code {
+    min-height: 44px;
+
+    padding:
+      0
+      11px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-invite-box button {
+    width: 44px;
+    height: 44px;
+
+    border-radius: 8px;
+  }
+
+
+  /* =======================================================
+     LEADERBOARD
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-leaderboard-panel {
+    margin-top: 0;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-leaderboard-row {
+    grid-template-columns:
+      30px
+      34px
+      minmax(0, 1fr)
+      auto;
+
+    gap: 8px;
+
+    padding: 9px;
+
+    border:
+      1px solid
+      #282828;
+
+    border-radius: 8px;
+
+    background:
+      #151515;
+  }
+
+
+  /* =======================================================
+     PREVENT OUTER PAGE SCROLL
+     ======================================================= */
+
+  html:has(.v2g-room.is-mobile-open),
+  body:has(.v2g-room.is-mobile-open),
+  #root:has(.v2g-room.is-mobile-open) {
+    height: 100%;
+
+    overflow: hidden;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid {
+    padding:
+      8px
+      8px
+      14px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-panel {
+    padding: 12px;
+  }
+
+}
+
+/* =========================================================
+   STUDYOS V3 — MOBILE GROUP PANEL SWIPE
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  /* =======================================================
+     DETAIL AREA BECOMES HORIZONTAL PAGES
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid {
+    display: flex;
+
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    flex: 1;
+
+    gap: 8px;
+
+    margin: 0;
+
+    padding:
+      8px
+      8px
+      10px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-snap-type:
+      x mandatory;
+
+    scroll-behavior:
+      smooth;
+
+    overscroll-behavior-x:
+      contain;
+
+    scrollbar-width:
+      none;
+
+    -webkit-overflow-scrolling:
+      touch;
+
+    touch-action:
+      pan-x;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+
+  /* =======================================================
+     EACH PANEL = ONE MOBILE SCREEN
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid
+  > .v2g-panel {
+    width:
+      calc(
+        100vw -
+        16px
+      );
+
+    min-width:
+      calc(
+        100vw -
+        16px
+      );
+
+    height: 100%;
+
+    min-height: 0;
+
+    max-height: 100%;
+
+    flex:
+      0
+      0
+      calc(
+        100vw -
+        16px
+      );
+
+    margin: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scroll-snap-align:
+      center;
+
+    scroll-snap-stop:
+      always;
+
+    overscroll-behavior-y:
+      contain;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
+
+  /* =======================================================
+     REMOVE OLD LARGE PANEL HEIGHTS
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-live-panel,
+
+  .v2g-room.is-mobile-open
+  .v2g-members-panel,
+
+  .v2g-room.is-mobile-open
+  .v2g-leaderboard-panel {
+    min-height: 0;
+
+    margin-top: 0;
+  }
+
+
+  /* =======================================================
+     EMPTY STATES SHOULD NOT CREATE GIANT SPACE
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-empty,
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-empty.small {
+    min-height: 0;
+
+    height: auto;
+
+    margin-top: 12px;
+
+    padding:
+      26px
+      16px;
+  }
+
+
+  /* =======================================================
+     PANEL HEADERS STAY VISIBLE WHILE CONTENT SCROLLS
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-panel-heading {
+    position: sticky;
+
+    z-index: 3;
+
+    top: -13px;
+
+    margin:
+      -13px
+      -13px
+      10px;
+
+    padding:
+      13px
+      13px
+      10px;
+
+    border-bottom:
+      1px solid
+      #242424;
+
+    background:
+      #111111;
+  }
+
+
+  /* =======================================================
+     COMPACT MEMBER / LEADERBOARD LISTS
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-member-list,
+
+  .v2g-room.is-mobile-open
+  .v2g-live-list,
+
+  .v2g-room.is-mobile-open
+  .v2g-leaderboard-list {
+    gap: 6px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-member-row,
+
+  .v2g-room.is-mobile-open
+  .v2g-live-user,
+
+  .v2g-room.is-mobile-open
+  .v2g-leaderboard-row {
+    min-height: 0;
+  }
+
+
+  /* =======================================================
+     SUBTLE SWIPE CUE
+     ======================================================= */
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid::after {
+    content: "";
+
+    flex:
+      0
+      0
+      1px;
+  }
+
+}
+
+
+@media (max-width: 420px) {
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid {
+    gap: 7px;
+
+    padding:
+      7px
+      7px
+      9px;
+  }
+
+
+  .v2g-room.is-mobile-open
+  .v2g-room-grid
+  > .v2g-panel {
+    width:
+      calc(
+        100vw -
+        14px
+      );
+
+    min-width:
+      calc(
+        100vw -
+        14px
+      );
+
+    flex-basis:
+      calc(
+        100vw -
+        14px
+      );
+  }
+
+}
+
+/* =========================================================
+   STUDYOS V3 — MOBILE COMPACT GROUP ACTIONS
+   ========================================================= */
+
+
+/* desktop never shows mobile action toggles */
+
+.v2g-mobile-action-toggle {
+  display: none;
+}
+
+
+@media (max-width: 760px) {
+
+  /* =======================================================
+     CREATE / JOIN GRID
+     ======================================================= */
+
+  .v2g-actions-grid {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+  }
+
+
+  /* =======================================================
+     COLLAPSED ACTION CARDS
+     ======================================================= */
+
+  .v2g-action-card {
+    min-width: 0;
+
+    margin: 0;
+
+    padding: 0;
+
+    gap: 10px;
+
+    overflow: hidden;
+
+    border:
+      1px solid
+      #292929;
+
+    border-radius: 10px;
+
+    background:
+      #111111;
+  }
+
+
+  .v2g-action-card:not(.is-mobile-expanded)
+  > :not(.v2g-mobile-action-toggle) {
+    display: none !important;
+  }
+
+
+  /* =======================================================
+     MOBILE ACTION BUTTON
+     ======================================================= */
+
+  .v2g-mobile-action-toggle {
+    display: flex;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 62px;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding:
+      9px
+      10px;
+
+    border: 0;
+
+    background:
+      transparent;
+
+    color:
+      var(--color-text);
+
+    text-align: left;
+
+    cursor: pointer;
+  }
+
+
+  .v2g-mobile-action-toggle:active {
+    background:
+      #181818;
+  }
+
+
+  .v2g-mobile-action-toggle-icon {
+    display: inline-flex;
+
+    width: 34px;
+    height: 34px;
+
+    flex:
+      0
+      0
+      34px;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+      1px solid
+      #303030;
+
+    border-radius: 8px;
+
+    background:
+      #171717;
+
+    color:
+      #dcdcdc;
+  }
+
+
+  .v2g-mobile-action-toggle-copy {
+    display: flex;
+
+    min-width: 0;
+
+    flex: 1;
+
+    flex-direction: column;
+
+    gap: 1px;
+  }
+
+
+  .v2g-mobile-action-toggle-copy strong {
+    overflow: hidden;
+
+    font-family:
+      var(--font-sans);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+  }
+
+
+  .v2g-mobile-action-toggle-copy small {
+    overflow: hidden;
+
+    color:
+      #747474;
+
+    font-size: 10px;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+  }
+
+
+  .v2g-mobile-action-chevron {
+    flex:
+      0
+      0
+      auto;
+
+    color:
+      #686868;
+
+    transition:
+      transform
+        160ms ease;
+  }
+
+
+  /* =======================================================
+     EXPANDED ACTION
+     ======================================================= */
+
+  .v2g-action-card.is-mobile-expanded {
+    grid-column:
+      1
+      / -1;
+
+    padding:
+      0
+      12px
+      12px;
+  }
+
+
+  .v2g-action-card.is-mobile-expanded
+  .v2g-mobile-action-toggle {
+    margin:
+      0
+      -12px;
+
+    width:
+      calc(
+        100% + 24px
+      );
+
+    padding:
+      10px
+      12px;
+
+    border-bottom:
+      1px solid
+      #282828;
+  }
+
+
+  .v2g-action-card.is-mobile-expanded
+  .v2g-mobile-action-chevron {
+    transform:
+      rotate(180deg);
+  }
+
+
+  /* original desktop heading is redundant on mobile */
+
+  .v2g-action-card.is-mobile-expanded
+  > .v2g-action-heading {
+    display: none;
+  }
+
+
+  /* =======================================================
+     FORM CONTROLS
+     ======================================================= */
+
+  .v2g-action-card.is-mobile-expanded
+  input,
+
+  .v2g-action-card.is-mobile-expanded
+  textarea {
+    width: 100%;
+
+    margin-top: 10px;
+  }
+
+
+  .v2g-action-card.is-mobile-expanded
+  .v2g-visibility-field {
+    width: 100%;
+
+    margin-top: 10px;
+  }
+
+
+  .v2g-action-card.is-mobile-expanded
+  .v2g-primary-button,
+
+  .v2g-action-card.is-mobile-expanded
+  .v2g-secondary-button {
+    width: 100%;
+
+    margin-top: 10px;
+
+    min-height: 44px;
+  }
+
+
+  /* =======================================================
+     KEEP YOUR ROOMS CLOSE TO ACTIONS
+     ======================================================= */
+
+  .v2g-groups-section {
+    margin-top: 0;
+
+    margin-bottom: 10px;
+  }
+
+}
+
+
+@media (max-width: 420px) {
+
+  .v2g-actions-grid {
+    gap: 7px;
+  }
+
+
+  .v2g-mobile-action-toggle {
+    min-height: 58px;
+
+    padding:
+      8px;
+  }
+
+
+  .v2g-mobile-action-toggle-icon {
+    width: 32px;
+    height: 32px;
+
+    flex-basis: 32px;
+  }
+
+
+  .v2g-mobile-action-toggle-copy strong {
+    font-size: 12px;
+  }
+
+
+  .v2g-mobile-action-toggle-copy small {
+    font-size: 9px;
+  }
+
+}
+
+/* =========================================================
+   STUDYOS V3 — MEMBERS COLLAPSE ACTUAL FIX
+   applies on all mobile group views
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  /* collapsed by default */
+
+  .v2g-members-panel:not(.is-mobile-expanded) {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+
+
+  .v2g-members-panel:not(.is-mobile-expanded)
+  .v2g-member-list,
+
+  .v2g-members-panel:not(.is-mobile-expanded)
+  .v2g-panel-empty {
+    display: none !important;
+  }
+
+
+  /* clickable header */
+
+  .v2g-members-toggle {
+    position: relative !important;
+    top: auto !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      20px;
+
+    align-items: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    margin: 0 !important;
+
+    padding:
+      12px
+      13px !important;
+
+    border: 0;
+
+    background:
+      #111111;
+
+    cursor: pointer;
+  }
+
+
+  .v2g-members-toggle:active {
+    background:
+      #181818;
+  }
+
+
+  /* count */
+
+  .v2g-members-toggle
+  .v2g-count-pill {
+    margin: 0;
+  }
+
+
+  /* chevron */
+
+  .v2g-members-chevron {
+    color:
+      #777777;
+
+    transition:
+      transform
+        160ms ease;
+  }
+
+
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-members-chevron {
+    transform:
+      rotate(180deg);
+  }
+
+
+  /* expanded */
+
+  .v2g-members-panel.is-mobile-expanded {
+    height: auto !important;
+    min-height: 0 !important;
+
+    max-height: 340px !important;
+
+    padding:
+      0
+      13px
+      13px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-members-toggle {
+    position: sticky !important;
+
+    z-index: 5;
+
+    top: 0 !important;
+
+    width:
+      calc(
+        100% + 26px
+      );
+
+    margin:
+      0
+      -13px
+      10px !important;
+
+    border-bottom:
+      1px solid
+      #262626;
+  }
+
+
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-member-list {
+    display: flex !important;
+
+    flex-direction: column;
+
+    gap: 6px;
+  }
+
+}
+
+/* =========================================================
+   STUDYOS V3 — MEMBERS INTERACTION POLISH
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  /* -------------------------------------------------------
+     REMOVE MOBILE BLUE TAP FLASH
+     ------------------------------------------------------- */
+
+  .v2g-members-toggle {
+    -webkit-tap-highlight-color:
+      transparent;
+
+    -webkit-user-select:
+      none;
+
+    user-select:
+      none;
+
+    outline:
+      none;
+
+    transition:
+      background
+        160ms ease,
+      transform
+        120ms ease;
+  }
+
+
+  .v2g-members-toggle:active {
+    background:
+      #181818;
+
+    transform:
+      scale(0.995);
+  }
+
+
+  /* keep keyboard accessibility without blue outline */
+
+  .v2g-members-toggle:focus {
+    outline:
+      none;
+  }
+
+
+  .v2g-members-toggle:focus-visible {
+    outline:
+      none;
+
+    box-shadow:
+      inset 0 0 0 1px
+      #3b3b3b;
+  }
+
+
+  /* -------------------------------------------------------
+     CHEVRON
+     ------------------------------------------------------- */
+
+  .v2g-members-chevron {
+    transform:
+      rotate(0deg);
+
+    transition:
+      transform
+        220ms
+        cubic-bezier(
+          0.2,
+          0.8,
+          0.2,
+          1
+        ),
+      color
+        160ms ease;
+  }
+
+
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-members-chevron {
+    transform:
+      rotate(180deg);
+  }
+
+
+  /* -------------------------------------------------------
+     MEMBER LIST ANIMATION
+     ------------------------------------------------------- */
+
+  .v2g-members-panel
+  .v2g-member-list {
+    display:
+      flex !important;
+
+    flex-direction:
+      column;
+
+    gap:
+      6px;
+
+    overflow:
+      hidden;
+
+    transform-origin:
+      top;
+
+    transition:
+      max-height
+        280ms
+        cubic-bezier(
+          0.2,
+          0.8,
+          0.2,
+          1
+        ),
+      opacity
+        180ms ease,
+      transform
+        220ms ease,
+      margin
+        220ms ease;
+  }
+
+
+  /* collapsed */
+
+  .v2g-members-panel:not(.is-mobile-expanded)
+  .v2g-member-list {
+    max-height:
+      0 !important;
+
+    margin-top:
+      0 !important;
+
+    opacity:
+      0;
+
+    transform:
+      translateY(-6px);
+
+    pointer-events:
+      none;
+  }
+
+
+  /* expanded */
+
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-member-list {
+    max-height:
+      280px !important;
+
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+
+    pointer-events:
+      auto;
+  }
+
+
+  /* -------------------------------------------------------
+     MEMBER ROW ENTRANCE
+     ------------------------------------------------------- */
+
+  .v2g-member-row {
+    transition:
+      opacity
+        180ms ease,
+      transform
+        220ms ease,
+      background
+        160ms ease,
+      border-color
+        160ms ease;
+  }
+
+
+  .v2g-members-panel:not(.is-mobile-expanded)
+  .v2g-member-row {
+    opacity:
+      0;
+
+    transform:
+      translateY(-4px);
+  }
+
+
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-member-row {
+    opacity:
+      1;
+
+    transform:
+      translateY(0);
+  }
+
+
+  /* -------------------------------------------------------
+     PANEL POLISH
+     ------------------------------------------------------- */
+
+  .v2g-members-panel {
+    transition:
+      background
+        180ms ease,
+      border-color
+        180ms ease,
+      padding
+        220ms ease;
+  }
+
+}
+
+
+/* accessibility */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .v2g-members-toggle,
+  .v2g-members-chevron,
+  .v2g-member-list,
+  .v2g-member-row,
+  .v2g-members-panel {
+    transition:
+      none !important;
+  }
+
+}
+
+/* =========================================================
+   STUDYOS V3 — GROUPS MOBILE LIGHT THEME FINAL BLACK FIX
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  .light-theme .v2g-action-card,
+  .light-theme .v2g-action-card.is-mobile-expanded {
+    background: #ffffff !important;
+    border-color: #dcdcdc !important;
+    color: #111111 !important;
+    box-shadow: none !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle {
+    background: #ffffff !important;
+    border-color: #dddddd !important;
+    color: #111111 !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle:hover,
+  .light-theme .v2g-mobile-action-toggle:active {
+    background: #f3f3f3 !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle-copy strong,
+  .light-theme .v2g-mobile-action-toggle-copy small,
+  .light-theme .v2g-mobile-action-toggle svg {
+    color: #222222 !important;
+  }
+
+  .light-theme .v2g-members-panel,
+  .light-theme .v2g-members-panel:not(.is-mobile-expanded),
+  .light-theme .v2g-members-panel.is-mobile-expanded {
+    background: #ffffff !important;
+    border-color: #dddddd !important;
+    box-shadow: none !important;
+  }
+
+  .light-theme .v2g-members-toggle {
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-color: #dddddd !important;
+  }
+
+  .light-theme .v2g-members-toggle:hover,
+  .light-theme .v2g-members-toggle:active,
+  .light-theme .v2g-members-toggle:focus,
+  .light-theme .v2g-members-toggle:focus-visible {
+    background: #f3f3f3 !important;
+    color: #111111 !important;
+  }
+
+  .light-theme .v2g-members-toggle h3,
+  .light-theme .v2g-members-toggle .v2g-eyebrow {
+    color: #111111 !important;
+  }
+
+  .light-theme .v2g-members-chevron,
+  .light-theme .v2g-members-toggle svg {
+    color: #444444 !important;
+  }
+
+  .light-theme .v2g-count-pill {
+    background: #f3f3f3 !important;
+    border-color: #dddddd !important;
+    color: #222222 !important;
+  }
+}
+/* =========================================================
+   STUDYOS V3 — MOBILE LIGHT NO BLACK FINAL
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  /* -------------------------------------------------------
+     CREATE / JOIN
+     ------------------------------------------------------- */
+
+  .light-theme .v2g-action-card,
+  .light-theme .v2g-action-card.is-mobile-expanded,
+  .light-theme .v2g-mobile-action-toggle {
+    background: #ffffff !important;
+    border-color: #e1e4e8 !important;
+    color: #16181c !important;
+    box-shadow: none !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle:hover,
+  .light-theme .v2g-mobile-action-toggle:active {
+    background: #f5f6f8 !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle-icon {
+    background: #f4f5f7 !important;
+    border-color: #e0e3e7 !important;
+    color: #30343a !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle-copy strong {
+    color: #16181c !important;
+  }
+
+  .light-theme .v2g-mobile-action-toggle-copy small {
+    color: #747b85 !important;
+  }
+
+  .light-theme .v2g-mobile-action-chevron {
+    color: #747b85 !important;
+  }
+
+
+  /* -------------------------------------------------------
+     PEOPLE / MEMBERS
+     ------------------------------------------------------- */
+
+  .light-theme .v2g-members-panel,
+  .light-theme .v2g-members-panel:not(.is-mobile-expanded),
+  .light-theme .v2g-members-panel.is-mobile-expanded {
+    background: #ffffff !important;
+    border-color: #e1e4e8 !important;
+    color: #16181c !important;
+    box-shadow: none !important;
+  }
+
+  .light-theme .v2g-members-toggle,
+  .light-theme
+  .v2g-members-panel:not(.is-mobile-expanded)
+  .v2g-members-toggle,
+  .light-theme
+  .v2g-members-panel.is-mobile-expanded
+  .v2g-members-toggle {
+    background: #f7f8fa !important;
+    border-color: #e1e4e8 !important;
+    color: #16181c !important;
+    box-shadow: none !important;
+  }
+
+  .light-theme .v2g-members-toggle:hover,
+  .light-theme .v2g-members-toggle:active {
+    background: #f0f2f4 !important;
+  }
+
+  .light-theme .v2g-members-toggle .v2g-eyebrow {
+    color: #747b85 !important;
+  }
+
+  .light-theme .v2g-members-toggle h3 {
+    color: #16181c !important;
+  }
+
+  .light-theme .v2g-members-chevron,
+  .light-theme .v2g-members-toggle svg {
+    color: #6f7680 !important;
+  }
+
+  .light-theme .v2g-count-pill {
+    background: #ffffff !important;
+    border: 1px solid #dde1e5 !important;
+    color: #30343a !important;
+  }
+
+
+  /* -------------------------------------------------------
+     EXPANDED MEMBERS
+     ------------------------------------------------------- */
+
+  .light-theme .v2g-member-list {
+    background: transparent !important;
+  }
+
+  .light-theme .v2g-member-row {
+    background: #ffffff !important;
+    border-color: #e5e7eb !important;
+    color: #16181c !important;
+  }
+
+  .light-theme .v2g-member-row:hover {
+    background: #f7f8fa !important;
+  }
+
+
+  /* -------------------------------------------------------
+     MOBILE GROUP ROOM
+     ------------------------------------------------------- */
+
+  .light-theme .v2g-room.is-mobile-open {
+    background: #f7f8fa !important;
+  }
+
+  .light-theme
+  .v2g-room.is-mobile-open
+  .v2g-mobile-room-back {
+    background: #ffffff !important;
+    border-color: #e1e4e8 !important;
+    color: #30343a !important;
+  }
+
+}

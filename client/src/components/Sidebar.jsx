@@ -5,9 +5,11 @@ import {
   CheckSquare,
   FileText,
   LayoutDashboard,
+  MessageCircle,
   Settings,
   Timer,
   Trophy,
+  UsersRound,
   X,
 } from "lucide-react";
 
@@ -108,6 +110,28 @@ const menuItems = [
 
     icon:
       Trophy,
+  },
+
+  {
+    label:
+      "Study Groups",
+
+    to:
+      "/app/groups",
+
+    icon:
+      UsersRound,
+  },
+
+  {
+    label:
+      "Chats",
+
+    to:
+      "/app/chats",
+
+    icon:
+      MessageCircle,
   },
 ];
 

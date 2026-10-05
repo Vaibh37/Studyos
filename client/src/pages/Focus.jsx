@@ -28,6 +28,10 @@ import StudySelect from "../components/StudySelect";
 import apiRequest from "../services/api";
 
 import {
+  connectSocket,
+} from "../socket";
+
+import {
   localDb,
 } from "../services/localDb";
 
@@ -135,6 +139,11 @@ function Focus() {
   ] = useState([]);
 
   const [
+    groups,
+    setGroups,
+  ] = useState([]);
+
+  const [
     loading,
     setLoading,
   ] = useState(true);
@@ -185,6 +194,11 @@ function Focus() {
     )
   );
 
+  const [
+    selectedShareGroupId,
+    setSelectedShareGroupId,
+  ] = useState("");
+
 
   // =======================================================
   // TIMER STATE
@@ -227,6 +241,16 @@ function Focus() {
   ] = useState(
     "General Study"
   );
+
+  const [
+    activeGroupId,
+    setActiveGroupId,
+  ] = useState(null);
+
+  const [
+    activeGroupName,
+    setActiveGroupName,
+  ] = useState(null);
 
   const [
     savingSession,
@@ -370,6 +394,44 @@ function Focus() {
 
 
   // =======================================================
+  // GROUPS
+  // =======================================================
+
+  const fetchGroups =
+    async () => {
+      if (
+        isGuest
+      ) {
+        setGroups([]);
+
+        return [];
+      }
+
+      const data =
+        await apiRequest(
+          "/api/groups/mine"
+        );
+
+      const nextGroups =
+        Array.isArray(
+          data
+        )
+          ? data
+          : Array.isArray(
+              data?.groups
+            )
+          ? data.groups
+          : [];
+
+      setGroups(
+        nextGroups
+      );
+
+      return nextGroups;
+    };
+
+
+  // =======================================================
   // REFRESH
   // =======================================================
 
@@ -385,6 +447,7 @@ function Focus() {
         await Promise.all([
           fetchSubjects(),
           fetchSessions(),
+          fetchGroups(),
         ]);
 
         if (
@@ -477,6 +540,334 @@ function Focus() {
 
 
   // =======================================================
+  // REALTIME LIVE SHARING
+  // =======================================================
+
+  const waitForSocketConnection =
+    async () => {
+      const socket =
+        await connectSocket();
+
+      if (
+        socket.connected
+      ) {
+        return socket;
+      }
+
+      await new Promise(
+        (
+          resolve,
+          reject
+        ) => {
+          const timeout =
+            window.setTimeout(
+              () => {
+                cleanup();
+
+                reject(
+                  new Error(
+                    "Realtime connection timed out"
+                  )
+                );
+              },
+              8000
+            );
+
+          const cleanup =
+            () => {
+              window.clearTimeout(
+                timeout
+              );
+
+              socket.off(
+                "connect",
+                handleConnect
+              );
+
+              socket.off(
+                "connect_error",
+                handleError
+              );
+            };
+
+          const handleConnect =
+            () => {
+              cleanup();
+              resolve();
+            };
+
+          const handleError =
+            (
+              socketError
+            ) => {
+              cleanup();
+
+              reject(
+                socketError
+              );
+            };
+
+          socket.once(
+            "connect",
+            handleConnect
+          );
+
+          socket.once(
+            "connect_error",
+            handleError
+          );
+        }
+      );
+
+      return socket;
+    };
+
+
+  const emitSocketRequest =
+    (
+      socket,
+      eventName,
+      payload
+    ) => {
+      return new Promise(
+        (
+          resolve,
+          reject
+        ) => {
+          const timeout =
+            window.setTimeout(
+              () => {
+                reject(
+                  new Error(
+                    `${eventName} timed out`
+                  )
+                );
+              },
+              8000
+            );
+
+          const handleResponse =
+            (
+              response
+            ) => {
+              window.clearTimeout(
+                timeout
+              );
+
+              if (
+                response?.ok
+              ) {
+                resolve(
+                  response
+                );
+
+                return;
+              }
+
+              reject(
+                new Error(
+                  response?.message ||
+                    "Realtime request failed"
+                )
+              );
+            };
+
+          if (
+            typeof payload ===
+            "undefined"
+          ) {
+            socket.emit(
+              eventName,
+              handleResponse
+            );
+          } else {
+            socket.emit(
+              eventName,
+              payload,
+              handleResponse
+            );
+          }
+        }
+      );
+    };
+
+
+  const joinLiveGroup =
+    async (
+      groupId
+    ) => {
+      if (
+        isGuest ||
+        !groupId
+      ) {
+        return null;
+      }
+
+      const socket =
+        await waitForSocketConnection();
+
+      await emitSocketRequest(
+        socket,
+        "group:join",
+        {
+          groupId:
+            String(
+              groupId
+            ),
+        }
+      );
+
+      return socket;
+    };
+
+
+  const startLiveShare =
+    async ({
+      groupId,
+      subjectId,
+      subjectName,
+    }) => {
+      const socket =
+        await joinLiveGroup(
+          groupId
+        );
+
+      if (
+        !socket
+      ) {
+        return;
+      }
+
+      await emitSocketRequest(
+        socket,
+        "focus:start",
+        {
+          groupId:
+            String(
+              groupId
+            ),
+
+          subjectId:
+            subjectId
+              ? String(
+                  subjectId
+                )
+              : null,
+
+          subjectName:
+            subjectName ||
+            "General Study",
+        }
+      );
+    };
+
+
+  const stopLiveShare =
+    async (
+      durationSeconds = null
+    ) => {
+      if (
+        isGuest
+      ) {
+        return null;
+      }
+
+      const socket =
+        await waitForSocketConnection();
+
+      const numericDuration =
+        Number(
+          durationSeconds
+        );
+
+      const payload =
+        Number.isFinite(
+          numericDuration
+        ) &&
+        numericDuration >= 1
+          ? {
+              durationSeconds:
+                Math.floor(
+                  numericDuration
+                ),
+            }
+          : undefined;
+
+      try {
+        return await emitSocketRequest(
+          socket,
+          "focus:stop",
+          payload
+        );
+      } catch (
+        stopError
+      ) {
+        if (
+          stopError?.message ===
+          "No active live study session"
+        ) {
+          return null;
+        }
+
+        throw stopError;
+      }
+    };
+
+
+  const stopLiveShareSafely =
+    async (
+      durationSeconds = null
+    ) => {
+      try {
+        return await stopLiveShare(
+          durationSeconds
+        );
+      } catch (
+        stopError
+      ) {
+        console.warn(
+          "Couldn't stop live sharing:",
+          stopError?.message ||
+            stopError
+        );
+
+        return null;
+      }
+    };
+
+
+  const restoreLiveShare =
+    async (
+      groupId
+    ) => {
+      if (
+        !groupId ||
+        isGuest
+      ) {
+        return true;
+      }
+
+      try {
+        await joinLiveGroup(
+          groupId
+        );
+
+        return true;
+      } catch (
+        restoreShareError
+      ) {
+        console.warn(
+          "Couldn't restore live group room:",
+          restoreShareError?.message ||
+            restoreShareError
+        );
+
+        return false;
+      }
+    };
+
+
+  // =======================================================
   // RESTORE TIMER
   // =======================================================
 
@@ -549,6 +940,63 @@ function Focus() {
           saved.startedAt ||
             null
         );
+
+        const savedShareGroupId =
+          !isGuest &&
+          saved.shareGroupId
+            ? String(
+                saved.shareGroupId
+              )
+            : "";
+
+        const savedShareGroupName =
+          savedShareGroupId
+            ? saved.shareGroupName ||
+              null
+            : null;
+
+        setSelectedShareGroupId(
+          savedShareGroupId
+        );
+
+        setActiveGroupId(
+          savedShareGroupId ||
+            null
+        );
+
+        setActiveGroupName(
+          savedShareGroupName
+        );
+
+        if (
+          savedShareGroupId
+        ) {
+          restoreLiveShare(
+            savedShareGroupId
+          ).then(
+            (
+              restored
+            ) => {
+              if (
+                !restored
+              ) {
+                setSelectedShareGroupId(
+                  ""
+                );
+
+                setActiveGroupId(
+                  null
+                );
+
+                setActiveGroupName(
+                  null
+                );
+
+                stopLiveShareSafely();
+              }
+            }
+          );
+        }
 
 
         if (
@@ -689,6 +1137,26 @@ function Focus() {
                   null
                 );
 
+                setSelectedShareGroupId(
+                  ""
+                );
+
+                setActiveGroupId(
+                  null
+                );
+
+                setActiveGroupName(
+                  null
+                );
+
+                if (
+                  savedShareGroupId
+                ) {
+                  await stopLiveShareSafely(
+                    plannedSeconds
+                  );
+                }
+
                 return;
               } catch (
                 restoreError
@@ -737,7 +1205,7 @@ function Focus() {
 
         if (
           saved.status ===
-          "paused"
+            "paused"
         ) {
           const remaining =
             Math.max(
@@ -802,6 +1270,7 @@ function Focus() {
           await Promise.all([
             fetchSubjects(),
             fetchSessions(),
+            fetchGroups(),
           ]);
 
           if (
@@ -878,7 +1347,7 @@ function Focus() {
 
     const snapshot = {
       version:
-        1,
+        2,
 
       status,
 
@@ -893,6 +1362,12 @@ function Focus() {
       activeSubjectId,
 
       activeSubjectName,
+
+      shareGroupId:
+        activeGroupId,
+
+      shareGroupName:
+        activeGroupName,
     };
 
     localStorage.setItem(
@@ -910,7 +1385,135 @@ function Focus() {
     startedAt,
     activeSubjectId,
     activeSubjectName,
+    activeGroupId,
+    activeGroupName,
     timerStorageKey,
+  ]);
+
+
+  // =======================================================
+  // LIVE SHARE HEARTBEAT
+  // =======================================================
+
+  useEffect(() => {
+    if (
+      isGuest ||
+      status ===
+        "idle" ||
+      !activeGroupId
+    ) {
+      return;
+    }
+
+    let cancelled =
+      false;
+
+    let socket =
+      null;
+
+    let heartbeatInterval =
+      null;
+
+    const handleReconnect =
+      () => {
+        if (
+          cancelled ||
+          !socket
+        ) {
+          return;
+        }
+
+        socket.emit(
+          "group:join",
+          {
+            groupId:
+              String(
+                activeGroupId
+              ),
+          },
+          () => {}
+        );
+
+        socket.emit(
+          "focus:heartbeat"
+        );
+      };
+
+    const startHeartbeat =
+      async () => {
+        try {
+          socket =
+            await joinLiveGroup(
+              activeGroupId
+            );
+
+          if (
+            cancelled ||
+            !socket
+          ) {
+            return;
+          }
+
+          socket.emit(
+            "focus:heartbeat"
+          );
+
+          socket.on(
+            "connect",
+            handleReconnect
+          );
+
+          heartbeatInterval =
+            window.setInterval(
+              () => {
+                if (
+                  socket?.connected
+                ) {
+                  socket.emit(
+                    "focus:heartbeat"
+                  );
+                }
+              },
+              30000
+            );
+        } catch (
+          heartbeatError
+        ) {
+          console.warn(
+            "Live share heartbeat failed:",
+            heartbeatError?.message ||
+              heartbeatError
+          );
+        }
+      };
+
+    startHeartbeat();
+
+    return () => {
+      cancelled =
+        true;
+
+      if (
+        heartbeatInterval
+      ) {
+        window.clearInterval(
+          heartbeatInterval
+        );
+      }
+
+      if (
+        socket
+      ) {
+        socket.off(
+          "connect",
+          handleReconnect
+        );
+      }
+    };
+  }, [
+    isGuest,
+    status,
+    activeGroupId,
   ]);
 
 
@@ -1058,7 +1661,7 @@ function Focus() {
   // =======================================================
 
   const startSession =
-    () => {
+    async () => {
       if (
         status !==
         "idle"
@@ -1098,6 +1701,41 @@ function Focus() {
             )
         );
 
+      const selectedShareGroup =
+        groups.find(
+          (
+            group
+          ) =>
+            String(
+              group._id
+            ) ===
+            String(
+              selectedShareGroupId
+            )
+        );
+
+      const sessionSubjectId =
+        selectedSubject?._id ||
+        null;
+
+      const sessionSubjectName =
+        selectedSubject?.name ||
+        "General Study";
+
+      const shareGroupId =
+        !isGuest &&
+        selectedShareGroup
+          ? String(
+              selectedShareGroup._id
+            )
+          : null;
+
+      const shareGroupName =
+        shareGroupId
+          ? selectedShareGroup.name ||
+            "Study group"
+          : null;
+
       const now =
         Date.now();
 
@@ -1106,13 +1744,19 @@ function Focus() {
         60;
 
       setActiveSubjectId(
-        selectedSubject?._id ||
-          null
+        sessionSubjectId
       );
 
       setActiveSubjectName(
-        selectedSubject?.name ||
-          "General Study"
+        sessionSubjectName
+      );
+
+      setActiveGroupId(
+        shareGroupId
+      );
+
+      setActiveGroupName(
+        shareGroupName
       );
 
       setStartedAt(
@@ -1140,6 +1784,50 @@ function Focus() {
 
       setError("");
       setMessage("");
+
+      if (
+        shareGroupId
+      ) {
+        try {
+          await startLiveShare({
+            groupId:
+              shareGroupId,
+
+            subjectId:
+              sessionSubjectId,
+
+            subjectName:
+              sessionSubjectName,
+          });
+        } catch (
+          shareError
+        ) {
+          console.error(
+            "Failed to start live sharing:",
+            shareError
+          );
+
+          setSelectedShareGroupId(
+            ""
+          );
+
+          setActiveGroupId(
+            null
+          );
+
+          setActiveGroupName(
+            null
+          );
+
+          showError(
+            "Focus started, but live sharing couldn't connect. This session is private."
+          );
+        }
+      } else if (
+        !isGuest
+      ) {
+        stopLiveShareSafely();
+      }
     };
 
 
@@ -1352,6 +2040,14 @@ function Focus() {
           ]
         );
 
+        if (
+          activeGroupId
+        ) {
+          await stopLiveShareSafely(
+            durationSeconds
+          );
+        }
+
         const defaultMinutes =
           getDefaultFocusMinutes();
 
@@ -1392,6 +2088,18 @@ function Focus() {
 
         setActiveSubjectName(
           "General Study"
+        );
+
+        setSelectedShareGroupId(
+          ""
+        );
+
+        setActiveGroupId(
+          null
+        );
+
+        setActiveGroupName(
+          null
         );
 
         localStorage.removeItem(
@@ -1478,6 +2186,10 @@ function Focus() {
       );
 
       setSelectedSubjectId(
+        ""
+      );
+
+      setSelectedShareGroupId(
         ""
       );
 
@@ -1976,6 +2688,59 @@ function Focus() {
     );
 
 
+  const shareGroupOptions =
+    useMemo(
+      () => [
+        {
+          value:
+            "",
+
+          label:
+            "Private",
+
+          description:
+            isGuest
+              ? "Sign in to share live study status"
+              : "Only you can see this focus session",
+        },
+
+        ...groups.map(
+          (
+            group
+          ) => {
+            const memberCount =
+              Number(
+                group.memberCount
+              ) ||
+              1;
+
+            return {
+              value:
+                String(
+                  group._id
+                ),
+
+              label:
+                group.name,
+
+              description:
+                `${memberCount} ${
+                  memberCount ===
+                  1
+                    ? "member"
+                    : "members"
+                } · share live`,
+            };
+          }
+        ),
+      ],
+      [
+        groups,
+        isGuest,
+      ]
+    );
+
+
   // =======================================================
   // UI
   // =======================================================
@@ -2289,6 +3054,50 @@ function Focus() {
 
                 </div>
 
+
+                <div className="v2f-config-block">
+
+                  <span className="v2f-config-label">
+                    Share live
+                  </span>
+
+                  <StudySelect
+                    value={
+                      selectedShareGroupId
+                    }
+                    onChange={(
+                      value
+                    ) =>
+                      setSelectedShareGroupId(
+                        String(
+                          value
+                        )
+                      )
+                    }
+                    options={
+                      shareGroupOptions
+                    }
+                    placeholder="Private"
+                    className="v2f-share-select"
+                    disabled={
+                      status !==
+                        "idle" ||
+                      isGuest
+                    }
+                    ariaLabel="Choose where to share live focus status"
+                  />
+
+                  <span className="v2f-config-hint">
+                    {isGuest
+                      ? "Sign in to share live study status."
+                      : groups.length ===
+                        0
+                      ? "Private by default. Join a study group to share live."
+                      : "Optional — group members will see you studying in real time."}
+                  </span>
+
+                </div>
+
               </div>
 
 
@@ -2539,6 +3348,31 @@ function Focus() {
                   ? "Timer is running. Keep your attention on the work in front of you."
                   : "Session is paused. Resume whenever you're ready."}
               </p>
+
+
+              {status !==
+                "idle" && (
+                <div
+                  className={`v2f-share-state ${
+                    activeGroupId
+                      ? "is-live"
+                      : "is-private"
+                  }`}
+                >
+
+                  <span className="v2f-share-dot" />
+
+                  <span>
+                    {activeGroupId
+                      ? `Live in ${
+                          activeGroupName ||
+                          "study group"
+                        }`
+                      : "Private session"}
+                  </span>
+
+                </div>
+              )}
 
 
               <div className="v2f-session-metrics">

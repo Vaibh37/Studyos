@@ -487,12 +487,16 @@
 
   grid-template-columns:
     minmax(
-      220px,
+      180px,
       1fr
     )
     minmax(
-      300px,
+      280px,
       1.2fr
+    )
+    minmax(
+      220px,
+      1fr
     );
 
   gap: 16px;
@@ -527,11 +531,14 @@
    SUBJECT SELECT
    ========================================================= */
 
-.v2f-subject-select {
+.v2f-subject-select,
+.v2f-share-select {
   width: 100%;
 }
 
 .v2f-subject-select
+.study-select-trigger,
+.v2f-share-select
 .study-select-trigger {
   width: 100%;
   min-height: 44px;
@@ -564,6 +571,10 @@
 .v2f-subject-select
 .study-select-trigger:hover:not(:disabled),
 .v2f-subject-select
+.study-select-trigger.open,
+.v2f-share-select
+.study-select-trigger:hover:not(:disabled),
+.v2f-share-select
 .study-select-trigger.open {
   border-color:
     var(--color-border-strong) !important;
@@ -573,6 +584,15 @@
 
   box-shadow:
     none !important;
+}
+
+
+.v2f-config-hint {
+  color:
+    var(--color-text-faint);
+
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 
@@ -962,6 +982,56 @@
   font-size: 14px;
 
   line-height: 1.65;
+}
+
+
+.v2f-share-state {
+  display: inline-flex;
+
+  width: fit-content;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 16px;
+
+  padding:
+    8px
+    10px;
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: 999px;
+
+  background:
+    var(--color-surface-subtle);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.v2f-share-dot {
+  width: 7px;
+  height: 7px;
+
+  flex: 0 0 auto;
+
+  border-radius: 999px;
+
+  background:
+    var(--color-text-faint);
+}
+
+.v2f-share-state.is-live
+.v2f-share-dot {
+  background:
+    var(--color-success);
 }
 
 
