@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "predev": "node scripts/sync-marketing-screenshots.mjs",
-    "dev": "vite",
+    "dev": "node ./node_modules/vite/bin/vite.js",
     "prebuild": "node scripts/sync-marketing-screenshots.mjs",
-    "build": "vite build",
+    "build": "node ./node_modules/vite/bin/vite.js build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -26,5 +26,9 @@
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
     "vite": "^8.2.2"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "1.14.5",
+    "re2js": "2.8.7"
   }
 }

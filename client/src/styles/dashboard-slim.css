@@ -1,0 +1,853 @@
+
+/* =========================================================
+   StudyOS Dashboard
+   Standard Typography + Balanced Compact Layout
+
+   Desktop-first, responsive, theme-compatible
+   ========================================================= */
+
+.sd-page {
+  --sd-border: var(--color-border);
+  --sd-surface: var(--color-surface);
+  --sd-muted: var(--color-text-secondary);
+
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  display: grid;
+  align-content: start;
+  gap: 18px;
+
+  color: var(--color-text);
+
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.sd-page *,
+.sd-page *::before,
+.sd-page *::after {
+  box-sizing: border-box;
+}
+
+.sd-page h1,
+.sd-page h2,
+.sd-page p {
+  margin: 0;
+}
+
+.sd-page h1,
+.sd-page h2 {
+  font-family: inherit;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.sd-page a {
+  text-decoration: none;
+}
+
+.sd-page button {
+  font-family: inherit;
+}
+
+/* =========================================================
+   SHARED ROW LAYOUT
+   ========================================================= */
+
+.sd-header,
+.sd-card-top,
+.sd-focus-main,
+.sd-track-meta,
+.sd-level-header,
+.sd-level-xp,
+.sd-level-bottom,
+.sd-panel-header,
+.sd-panel-title,
+.sd-panel-footer,
+.sd-bottom-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.sd-header {
+  min-height: 66px;
+  gap: 20px;
+}
+
+.sd-heading {
+  min-width: 0;
+}
+
+.sd-overline {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sd-heading h1 {
+  margin-top: 5px;
+
+  color: var(--color-text);
+  font-size: clamp(27px, 2.5vw, 34px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+
+  overflow-wrap: anywhere;
+}
+
+/* REFRESH */
+
+.sd-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 40px;
+  padding: 0 15px;
+
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  border: 1px solid var(--sd-border);
+  border-radius: 9px;
+
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sd-refresh:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+
+.sd-refresh:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@keyframes sd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sd-spin {
+  animation: sd-spin 1s linear infinite;
+}
+
+/* ERROR */
+
+.sd-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 15px;
+
+  border: 1px solid var(--color-danger);
+  border-radius: 9px;
+
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   COMMON CARD DESIGN
+   ========================================================= */
+
+.sd-card {
+  min-width: 0;
+
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-border);
+  border-radius: 12px;
+}
+
+/* =========================================================
+   TOP OVERVIEW
+   ========================================================= */
+
+.sd-top {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.3fr)
+    minmax(0, 1fr);
+
+  gap: 16px;
+}
+
+.sd-focus,
+.sd-level {
+  min-height: 195px;
+  padding: 22px 24px;
+}
+
+/* =========================================================
+   FOCUS CARD
+   ========================================================= */
+
+.sd-focus-icon {
+  display: flex;
+  align-items: center;
+  color: var(--sd-muted);
+}
+
+.sd-focus-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.sd-focus-main {
+  gap: 20px;
+  margin: 19px 0 22px;
+}
+
+.sd-focus-numbers {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sd-focus-numbers strong {
+  color: var(--color-text);
+
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.sd-focus-numbers > span {
+  color: var(--sd-muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* FOCUS BUTTON */
+
+.sd-primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 40px;
+  padding: 0 18px;
+
+  background: var(--color-solid);
+  color: var(--color-solid-text) !important;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sd-primary-action:hover {
+  background: var(--color-solid-hover);
+}
+
+.sd-primary-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* PROGRESS BAR */
+
+.sd-track {
+  height: 8px;
+  overflow: hidden;
+
+  border-radius: 99px;
+  background: var(--color-surface-hover);
+}
+
+.sd-track > span {
+  display: block;
+  height: 100%;
+
+  border-radius: inherit;
+  background: var(--color-solid);
+
+  transition: width 0.2s ease;
+}
+
+.sd-track-meta {
+  gap: 12px;
+  margin-top: 11px;
+
+  color: var(--sd-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   LEVEL CARD
+   ========================================================= */
+
+.sd-level-header {
+  gap: 12px;
+}
+
+.sd-level h2 {
+  margin-top: 8px;
+
+  color: var(--color-text);
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.sd-level h2 span {
+  display: inline;
+  margin-left: 5px;
+
+  color: var(--sd-muted);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* PROGRESS LINK */
+
+.sd-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+
+  border: 1px solid var(--sd-border);
+  border-radius: 8px;
+
+  color: var(--color-text);
+}
+
+.sd-icon-link:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+
+/* XP */
+
+.sd-level-xp {
+  gap: 12px;
+  margin: 21px 0 10px;
+
+  color: var(--sd-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sd-level-bottom {
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* =========================================================
+   STREAK — SMALL BUT READABLE
+   ========================================================= */
+
+.sd-streak,
+.sd-week-xp {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--sd-muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sd-streak {
+  padding: 6px 11px;
+
+  border: 1px solid var(--sd-border);
+  border-radius: 99px;
+}
+
+.sd-streak strong {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sd-streak svg,
+.sd-week-xp svg {
+  width: 15px;
+  height: 15px;
+  color: var(--sd-muted);
+}
+
+/* =========================================================
+   WORK AREA
+   ========================================================= */
+
+.sd-work {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.3fr)
+    minmax(0, 1fr);
+
+  gap: 16px;
+}
+
+.sd-panel {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 270px;
+  padding: 0 22px;
+}
+
+/* PANEL HEADER */
+
+.sd-panel-header {
+  min-height: 65px;
+  gap: 14px;
+
+  border-bottom: 1px solid var(--sd-border);
+}
+
+.sd-panel-title {
+  justify-content: flex-start;
+  gap: 11px;
+  min-width: 0;
+}
+
+.sd-panel-title h2 {
+  color: var(--color-text);
+
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* COUNT */
+
+.sd-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 27px;
+  height: 25px;
+  padding: 0 7px;
+
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--sd-border);
+  border-radius: 7px;
+
+  color: var(--sd-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* PANEL LINKS */
+
+.sd-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--sd-muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sd-text-link:hover,
+.sd-panel-footer a:hover,
+.sd-bottom-links a:hover {
+  color: var(--color-text);
+}
+
+/* PANEL CONTENT */
+
+.sd-panel-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+/* =========================================================
+   EMPTY STATES
+   ========================================================= */
+
+.sd-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  min-height: 145px;
+  padding: 18px 12px;
+
+  color: var(--sd-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.sd-empty > svg {
+  width: 23px;
+  height: 23px;
+  color: var(--color-text-muted);
+}
+
+.sd-empty > span {
+  max-width: 320px;
+}
+
+.sd-empty a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  margin-top: 2px;
+
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sd-empty a:hover {
+  text-decoration: underline;
+}
+
+.sd-empty a svg {
+  width: 15px;
+  height: 15px;
+  color: currentColor;
+}
+
+/* =========================================================
+   TASK AND EVENT LISTS
+   ========================================================= */
+
+.sd-list {
+  list-style: none;
+  margin: 0;
+  padding: 7px 0;
+}
+
+.sd-list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 49px;
+  padding: 9px 0;
+
+  border-bottom: 1px solid var(--sd-border);
+}
+
+.sd-list-row:last-child {
+  border-bottom: 0;
+}
+
+/* TASK PRIORITY */
+
+.sd-task-mark {
+  flex: 0 0 auto;
+
+  width: 9px;
+  height: 9px;
+
+  border: 1px solid var(--color-text-muted);
+  border-radius: 50%;
+}
+
+.sd-task-mark.is-high {
+  background: var(--color-text);
+  border-color: var(--color-text);
+}
+
+.sd-task-mark.is-low {
+  opacity: 0.45;
+}
+
+/* LIST TEXT */
+
+.sd-list-copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sd-list-copy > strong {
+  display: block;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sd-list-copy > small {
+  display: block;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: var(--sd-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.sd-late,
+.sd-today {
+  flex: 0 0 auto;
+
+  color: var(--sd-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sd-late {
+  color: var(--color-danger);
+}
+
+/* EVENT DATE */
+
+.sd-date-box {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 41px;
+  height: 43px;
+
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--sd-border);
+  border-radius: 8px;
+
+  line-height: 1.15;
+}
+
+.sd-date-box strong {
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sd-date-box small {
+  margin-top: 2px;
+
+  color: var(--sd-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   PANEL FOOTER
+   ========================================================= */
+
+.sd-panel-footer {
+  min-height: 46px;
+  gap: 12px;
+
+  border-top: 1px solid var(--sd-border);
+
+  color: var(--sd-muted);
+  font-size: 13px;
+}
+
+.sd-panel-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sd-panel-footer a {
+  color: var(--sd-muted);
+  font-weight: 500;
+}
+
+/* =========================================================
+   BOTTOM SHORTCUTS
+   ========================================================= */
+
+.sd-bottom-links {
+  gap: 14px;
+  padding: 1px 3px;
+
+  color: var(--sd-muted);
+  font-size: 13px;
+}
+
+.sd-bottom-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--sd-muted);
+  font-weight: 500;
+}
+
+/* =========================================================
+   DESKTOP CONTENT AREA
+   ========================================================= */
+
+@media (min-width: 1101px) {
+  .app-shell-v2-main:has(> .sd-page) {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .sd-top,
+  .sd-work {
+    grid-template-columns: 1fr;
+  }
+
+  .sd-page {
+    gap: 15px;
+  }
+
+  .sd-focus,
+  .sd-level {
+    min-height: auto;
+  }
+
+  .sd-panel {
+    min-height: 220px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .sd-page {
+    gap: 13px;
+  }
+
+  .sd-header {
+    gap: 12px;
+    min-height: 60px;
+  }
+
+  .sd-heading h1 {
+    font-size: 25px;
+  }
+
+  .sd-refresh {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+
+  .sd-refresh span {
+    display: none;
+  }
+
+  .sd-focus,
+  .sd-level {
+    padding: 18px;
+  }
+
+  .sd-focus-main {
+    gap: 12px;
+  }
+
+  .sd-focus-numbers {
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .sd-focus-numbers strong {
+    font-size: 36px;
+  }
+
+  .sd-primary-action {
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .sd-level h2 {
+    font-size: 21px;
+  }
+
+  .sd-level-bottom {
+    flex-wrap: wrap;
+  }
+
+  .sd-panel {
+    min-height: 220px;
+    padding: 0 15px;
+  }
+
+  .sd-panel-header {
+    min-height: 60px;
+  }
+
+  .sd-panel-title h2 {
+    font-size: 17px;
+  }
+
+  .sd-empty {
+    min-height: 115px;
+  }
+
+  .sd-bottom-links {
+    flex-wrap: wrap;
+    padding-bottom: 15px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-track > span {
+    transition: none;
+  }
+
+  .sd-spin {
+    animation: none;
+  }
+}

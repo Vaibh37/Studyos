@@ -1,0 +1,1019 @@
+
+/* ===========================================================
+   STUDYOS NOTES — PHASE 2
+   Mobile masonry grid and bottom-sheet editor.
+   =========================================================== */
+
+.n3-page,
+.n3-page * {
+  box-sizing: border-box;
+}
+
+.n3-page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-bottom: 48px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.n3-page button,
+.n3-page input,
+.n3-page textarea {
+  font: inherit;
+}
+
+.n3-page button {
+  cursor: pointer;
+}
+
+.n3-page button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.n3-page :is(button, input, textarea):focus-visible {
+  outline: 2px solid var(--color-text-secondary);
+  outline-offset: 3px;
+}
+
+/* HEADER */
+
+.n3-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.n3-eyebrow {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.n3-header h1 {
+  margin: 4px 0 3px;
+  font-size: clamp(29px, 3vw, 38px);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.n3-header p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.n3-new,
+.n3-save,
+.n3-empty-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--color-solid);
+  border-radius: 11px;
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.n3-new:hover:not(:disabled),
+.n3-save:hover:not(:disabled),
+.n3-empty-action:hover:not(:disabled) {
+  background: var(--color-solid-hover);
+}
+
+.n3-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 0 0 16px;
+  border: 1px solid var(--color-danger);
+  border-radius: 11px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.n3-error span {
+  flex: 1;
+}
+
+.n3-error button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* SUMMARY */
+
+.n3-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+
+.n3-summary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.n3-summary strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.n3-summary > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 7px 2px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.n3-summary > button:hover {
+  color: var(--color-text);
+}
+
+/* SEARCH AND FILTERS */
+
+.n3-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px 170px;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.n3-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  min-width: 0;
+  padding: 0 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.n3-search:focus-within {
+  border-color: var(--color-border-strong);
+}
+
+.n3-search input {
+  width: 100%;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: 14px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.n3-search input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.n3-search button {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  background: transparent;
+  border: 0;
+  color: var(--color-text-muted);
+}
+
+.n3-select {
+  min-width: 0;
+}
+
+.n3-select .study-select-trigger,
+.n3-editor-select .study-select-trigger {
+  width: 100%;
+  min-height: 46px;
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 11px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.n3-select .study-select-trigger:hover,
+.n3-editor-select .study-select-trigger:hover {
+  border-color: var(--color-border-strong) !important;
+}
+
+/* LIBRARY */
+
+.n3-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 410px);
+  align-items: start;
+  gap: 20px;
+}
+
+.n3-workspace.is-empty {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.n3-library {
+  min-width: 0;
+}
+
+.n3-library-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+
+.n3-library-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.n3-library-heading > span {
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* MASONRY CARDS */
+
+.n3-masonry {
+  columns: 2;
+  column-gap: 13px;
+}
+
+.n3-tile {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: top;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 13px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    background 0.15s;
+}
+
+.n3-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 17px;
+  right: 17px;
+  height: 2px;
+  border-radius: 0 0 4px 4px;
+  background: var(--n3-accent);
+  opacity: 0.78;
+}
+
+.n3-tile:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+  transform: translateY(-2px);
+}
+
+.n3-tile.is-active {
+  border-color: var(--color-border-strong);
+}
+
+.n3-tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.n3-tile-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-subtle);
+}
+
+.n3-tile-pin {
+  color: var(--color-text-secondary);
+}
+
+.n3-tile-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.n3-tile-preview {
+  display: -webkit-box;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 8px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.n3-tile:nth-child(3n + 2) .n3-tile-preview {
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+
+.n3-tile-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 7px;
+  width: 100%;
+  margin-top: 21px;
+  color: var(--color-text-faint);
+  font-size: 11px;
+}
+
+.n3-subject-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.n3-subject-tag i {
+  display: block;
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--n3-accent);
+}
+
+/* EMPTY STATE */
+
+.n3-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 32px 20px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 14px;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.n3-empty-art {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 17px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+}
+
+.n3-empty h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.n3-empty p {
+  max-width: 240px;
+  margin: 0 0 17px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* DESKTOP EDITOR */
+
+.n3-editor-layer {
+  min-width: 0;
+}
+
+.n3-editor-backdrop,
+.n3-sheet-handle {
+  display: none;
+}
+
+.n3-editor {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 580px;
+  max-height: calc(100vh - 150px);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+}
+
+.n3-editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 56px;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.n3-back {
+  display: none;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+
+.n3-save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.n3-editor-tools {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.n3-editor-tools button {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.n3-editor-tools button:hover {
+  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+}
+
+.n3-editor-tools .n3-delete-trigger:hover {
+  color: var(--color-danger);
+}
+
+.n3-editor-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 24px 22px;
+}
+
+.n3-title-input {
+  display: block;
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 28px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.n3-title-input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.n3-note-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 21px;
+}
+
+.n3-editor-select {
+  min-width: 160px;
+  max-width: 235px;
+}
+
+.n3-editor-select .study-select-trigger {
+  min-height: 37px;
+}
+
+.n3-note-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.n3-editor-paper {
+  min-height: 260px;
+}
+
+.n3-editor-paper textarea {
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.78;
+  white-space: pre-wrap;
+}
+
+.n3-editor-paper textarea::placeholder {
+  color: var(--color-text-faint);
+}
+
+.n3-editor-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--color-text-faint);
+  font-size: 12px;
+}
+
+.n3-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 15px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.n3-footer-hint {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.n3-save {
+  min-height: 40px;
+  font-size: 13px;
+}
+
+/* DELETE CONFIRMATION */
+
+.n3-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.n3-confirm {
+  width: min(410px, 100%);
+  padding: 24px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+}
+
+.n3-confirm-icon {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  margin-bottom: 15px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-danger);
+}
+
+.n3-confirm h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.n3-confirm p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.n3-confirm > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.n3-confirm > div button {
+  min-height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.n3-confirm > div button.is-danger {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* DESKTOP BREAKPOINTS */
+
+@media (max-width: 1200px) and (min-width: 901px) {
+  .n3-workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    gap: 14px;
+  }
+
+  .n3-masonry {
+    columns: 2;
+    column-gap: 10px;
+  }
+}
+
+@media (min-width: 1360px) {
+  .n3-masonry {
+    columns: 3;
+  }
+}
+
+/* MOBILE GRID + BOTTOM-SHEET EDITOR */
+
+@media (max-width: 900px) {
+  .n3-page {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+
+  .n3-header {
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .n3-header h1 {
+    margin: 0;
+    font-size: 29px;
+  }
+
+  .n3-header .n3-eyebrow,
+  .n3-header p {
+    display: none;
+  }
+
+  .n3-new {
+    min-height: 41px;
+    padding: 0 13px;
+    font-size: 13px;
+  }
+
+  .n3-summary {
+    margin-bottom: 15px;
+    gap: 8px;
+  }
+
+  .n3-summary > span {
+    font-size: 12px;
+    padding: 6px 9px;
+  }
+
+  .n3-summary > button {
+    font-size: 0;
+    gap: 0;
+    padding: 8px;
+  }
+
+  .n3-summary > button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .n3-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-bottom: 19px;
+  }
+
+  .n3-search {
+    grid-column: 1 / -1;
+    min-height: 45px;
+  }
+
+  .n3-select .study-select-trigger {
+    min-height: 41px !important;
+    font-size: 12px !important;
+    padding: 0 9px !important;
+  }
+
+  .n3-workspace {
+    display: block;
+  }
+
+  .n3-library-heading h2 {
+    font-size: 18px;
+  }
+
+  .n3-masonry {
+    columns: 2;
+    column-gap: 10px;
+  }
+
+  .n3-tile {
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .n3-tile::before {
+    left: 12px;
+    right: 12px;
+  }
+
+  .n3-tile-top {
+    margin-bottom: 12px;
+  }
+
+  .n3-tile-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .n3-tile-title {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .n3-tile-preview {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .n3-tile-bottom {
+    margin-top: 17px;
+    font-size: 10px;
+    align-items: flex-start;
+  }
+
+  .n3-subject-tag {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .n3-empty {
+    min-height: 245px;
+    padding: 25px 16px;
+  }
+
+  /* MOBILE EDITOR SHEET */
+
+  .n3-editor-layer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+  }
+
+  .n3-editor-layer.is-open {
+    display: block;
+  }
+
+  .n3-editor-backdrop {
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+  }
+
+  .n3-editor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: min(93dvh, 1000px);
+    max-height: none;
+    min-height: 0;
+    border: 1px solid var(--color-border-strong);
+    border-bottom: 0;
+    border-radius: 20px 20px 0 0;
+    background: var(--color-bg);
+    animation: n3-rise 0.2s ease-out;
+  }
+
+  .n3-sheet-handle {
+    display: block;
+    align-self: center;
+    width: 37px;
+    height: 4px;
+    margin: 9px 0 4px;
+    flex: 0 0 auto;
+    border-radius: 9px;
+    background: var(--color-border-strong);
+  }
+
+  .n3-back {
+    display: grid;
+  }
+
+  .n3-editor-bar {
+    min-height: 54px;
+    padding: 8px 16px 12px;
+  }
+
+  .n3-editor-scroll {
+    padding: 24px 20px 32px;
+  }
+
+  .n3-title-input {
+    font-size: 30px;
+  }
+
+  .n3-note-meta {
+    gap: 12px;
+    margin-bottom: 23px;
+  }
+
+  .n3-editor-paper textarea {
+    min-height: 40dvh;
+    font-size: 16px;
+  }
+
+  .n3-editor-footer {
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .n3-save {
+    min-height: 43px;
+  }
+}
+
+/* SMALL SCREENS */
+
+@media (max-width: 380px) {
+  .n3-masonry {
+    column-gap: 8px;
+  }
+
+  .n3-tile {
+    padding: 11px;
+    margin-bottom: 8px;
+  }
+
+  .n3-tile-title {
+    font-size: 14px;
+  }
+
+  .n3-tile-preview {
+    font-size: 12px;
+  }
+
+  .n3-editor-scroll {
+    padding: 20px 16px 28px;
+  }
+
+  .n3-title-input {
+    font-size: 27px;
+  }
+}
+
+@keyframes n3-rise {
+  from {
+    transform: translateY(18px);
+    opacity: 0.85;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.n3-spin {
+  animation: n3-spin 1s linear infinite;
+}
+
+@keyframes n3-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .n3-page *,
+  .n3-page *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* Hide the browser's built-in search clear button.
+   StudyOS already provides its own clear button. */
+
+.n3-search input[type="search"]::-webkit-search-cancel-button,
+.n3-search input[type="search"]::-webkit-search-decoration,
+.n3-search input[type="search"]::-webkit-search-results-button,
+.n3-search input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+  -webkit-appearance: none;
+  appearance: none;
+}

@@ -1,0 +1,1226 @@
+
+/* =========================================================
+   STUDYOS — FOCUS FIRST DASHBOARD
+   Complete replacement: dashboard-professional.css
+   Desktop: two-column layout
+   Mobile: Focus Hero + XP Rail + Unified Agenda
+   ========================================================= */
+
+.sdb {
+  --dash-gap: 16px;
+  --dash-border: var(--color-border);
+  --dash-muted: var(--color-text-muted);
+
+  width: min(100%, 1320px);
+  margin: 0 auto;
+  padding: 12px 0 24px;
+  color: var(--color-text);
+
+  font: 400 15px/1.5 var(--font-sans);
+}
+
+.sdb *,
+.sdb *::before,
+.sdb *::after {
+  box-sizing: border-box;
+}
+
+.sdb :is(h1, h2, p) {
+  margin: 0;
+}
+
+.sdb a {
+  text-decoration: none;
+}
+
+.sdb button {
+  font: inherit;
+}
+
+.sdb :is(a, button):focus-visible {
+  outline: 1px solid var(--color-text-secondary);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.sdb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.sdb-kicker {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 4px;
+
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sdb-kicker span {
+  color: var(--color-text-faint);
+}
+
+.sdb-header h1 {
+  font-size: clamp(28px, 2.25vw, 32px);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.03em;
+}
+
+.sdb-header-subtitle {
+  margin-top: 6px !important;
+  color: var(--dash-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.sdb-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 8px;
+
+  min-height: 40px;
+  padding: 0 16px;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 10px);
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.sdb-button--secondary {
+  background: var(--color-surface);
+  border-color: var(--dash-border);
+  color: var(--color-text);
+}
+
+.sdb-button--secondary:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+
+.sdb-button--primary {
+  color: var(--color-solid-text);
+  background: var(--color-solid);
+  border-color: var(--color-solid);
+}
+
+.sdb-button--primary:hover:not(:disabled) {
+  background: var(--color-solid-hover);
+}
+
+.sdb-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ERROR */
+
+.sdb-error {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+
+  border: 1px solid var(--color-danger);
+  border-radius: 10px;
+
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   DESKTOP GRID
+   ========================================================= */
+
+.sdb-overview,
+.sdb-work {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.18fr)
+    minmax(0, 1fr);
+
+  gap: var(--dash-gap);
+  align-items: stretch;
+}
+
+.sdb-overview {
+  margin-bottom: var(--dash-gap);
+}
+
+.sdb-card {
+  min-width: 0;
+
+  border: 1px solid var(--dash-border);
+  border-radius: var(--radius-lg, 14px);
+
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.sdb-card:focus-within {
+  border-color: var(--color-border-strong);
+}
+
+.sdb-focus,
+.sdb-level {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  min-height: 184px;
+  padding: 20px 22px;
+}
+
+.sdb-card-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+
+  color: var(--color-text-secondary);
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sdb-card-label svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 2;
+}
+
+/* =========================================================
+   DAILY FOCUS
+   ========================================================= */
+
+.sdb-focus {
+  border-color: var(--color-border-strong);
+}
+
+.sdb-focus-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin: 15px 0 18px;
+}
+
+.sdb-focus-value {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sdb-focus-value strong {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sdb-focus-value span {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.sdb-progress {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-surface-hover);
+}
+
+.sdb-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--color-solid);
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+
+.sdb-progress-caption,
+.sdb-level-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sdb-progress-caption {
+  margin-top: 10px;
+}
+
+.sdb-progress-caption strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* =========================================================
+   LEVEL PROGRESS
+   ========================================================= */
+
+.sdb-level-heading,
+.sdb-level-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sdb-level h2 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.sdb-level h2 span {
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.sdb-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  border: 1px solid var(--dash-border);
+  border-radius: 10px;
+
+  color: var(--color-text-secondary);
+}
+
+.sdb-icon-button:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.sdb-level-caption {
+  margin: 14px 0 9px;
+}
+
+.sdb-level-meta {
+  margin-top: 13px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sdb-streak,
+.sdb-weekly {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.sdb-streak {
+  padding: 4px 9px;
+  border: 1px solid var(--dash-border);
+  border-radius: 999px;
+}
+
+.sdb-streak strong {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.sdb-streak svg,
+.sdb-weekly svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* =========================================================
+   TASKS AND UPCOMING
+   ========================================================= */
+
+.sdb-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 174px;
+  padding: 0 20px;
+}
+
+.sdb-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  min-height: 58px;
+  border-bottom: 1px solid var(--dash-border);
+}
+
+.sdb-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sdb-panel-title h2 {
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+.sdb-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 25px;
+  height: 24px;
+  padding: 0 7px;
+
+  border: 1px solid var(--dash-border);
+  border-radius: 7px;
+  background: var(--color-surface-subtle);
+
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sdb-link,
+.sdb-inline-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 7px;
+
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sdb-link:hover,
+.sdb-inline-action:hover {
+  color: var(--color-text);
+}
+
+/* EMPTY STATES */
+
+.sdb-empty {
+  display: grid;
+  grid-template-columns:
+    36px minmax(0, 1fr) auto;
+
+  align-items: center;
+  gap: 12px;
+
+  min-height: 112px;
+  padding: 16px 0;
+}
+
+.sdb-empty > svg {
+  width: 36px;
+  height: 36px;
+  padding: 9px;
+
+  border: 1px solid var(--dash-border);
+  border-radius: 10px;
+
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+}
+
+.sdb-empty > div {
+  min-width: 0;
+}
+
+.sdb-empty strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sdb-empty p {
+  margin-top: 3px;
+  color: var(--dash-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.sdb-inline-action {
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: var(--color-text);
+}
+
+.sdb-inline-action:hover {
+  background: var(--color-surface-hover);
+}
+
+.sdb-placeholder {
+  padding: 22px 0;
+  color: var(--dash-muted);
+  font-size: 14px;
+}
+
+/* TASK ROWS */
+
+.sdb-list {
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.sdb-task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 56px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--dash-border);
+}
+
+.sdb-task:last-child {
+  border-bottom: 0;
+}
+
+.sdb-task-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--color-text-muted);
+  border-radius: 50%;
+}
+
+.sdb-calendar-icon {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+}
+
+.sdb-item-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sdb-item-text strong,
+.sdb-item-text span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sdb-item-text strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sdb-item-text span {
+  margin-top: 3px;
+  color: var(--dash-muted);
+  font-size: 13px;
+}
+
+.sdb-overdue,
+.sdb-today {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sdb-overdue {
+  color: var(--color-danger);
+}
+
+.sdb-panel-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+
+  border-top: 1px solid var(--dash-border);
+  color: var(--dash-muted);
+  font-size: 13px;
+}
+
+.sdb-panel-footer a {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.sdb-panel-footer a:hover {
+  color: var(--color-text);
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .sdb-overview,
+  .sdb-work {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sdb-focus,
+  .sdb-level {
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   MOBILE — SIGNATURE FOCUS FIRST DESIGN
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+  .sdb {
+    --dash-gap: 10px;
+
+    width: 100%;
+    padding:
+      0 0
+      calc(96px + env(safe-area-inset-bottom));
+
+    font-size: 14px;
+  }
+
+  /* EDITORIAL HEADING */
+
+  .sdb-header {
+    position: relative;
+    display: block;
+    min-height: 0;
+    margin-bottom: 17px;
+    padding-right: 47px;
+  }
+
+  .sdb-kicker {
+    display: block;
+    margin: 0 0 5px;
+    max-width: 100%;
+
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .sdb-kicker span {
+    opacity: 0.65;
+  }
+
+  .sdb-header h1 {
+    max-width: 100%;
+    font-size: clamp(24px, 7vw, 29px);
+    line-height: 1.15;
+    font-weight: 750;
+    letter-spacing: -0.037em;
+  }
+
+  .sdb-header-subtitle {
+    display: none;
+  }
+
+  .sdb-header .sdb-button {
+    position: absolute;
+    top: 1px;
+    right: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+
+    padding: 0;
+    border-radius: 12px;
+
+    font-size: 0;
+    gap: 0;
+  }
+
+  .sdb-header .sdb-button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sdb-error {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  /* OVERVIEW */
+
+  .sdb-overview {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .sdb-card {
+    border-radius: 16px;
+  }
+
+  .sdb-focus,
+  .sdb-level {
+    min-height: 0;
+  }
+
+  /* ======================================================
+     THE FOCUS HERO
+     Light on dark, dark on light.
+     Uses existing theme colours.
+     ====================================================== */
+
+  .sdb-focus {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    padding: 17px 17px 15px;
+
+    background: var(--color-solid);
+    color: var(--color-solid-text);
+    border-color: transparent;
+
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
+  }
+
+  .sdb-focus::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+
+    top: -81px;
+    right: -71px;
+
+    width: 182px;
+    height: 182px;
+
+    border: 1px solid currentColor;
+    border-radius: 50%;
+
+    opacity: 0.11;
+
+    box-shadow:
+      0 0 0 21px
+        color-mix(
+          in srgb,
+          currentColor 5%,
+          transparent
+        ),
+      0 0 0 42px
+        color-mix(
+          in srgb,
+          currentColor 3%,
+          transparent
+        );
+
+    pointer-events: none;
+  }
+
+  .sdb-focus .sdb-card-label {
+    color: var(--color-solid-text);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .sdb-focus .sdb-card-label svg {
+    width: 18px;
+    height: 18px;
+    color: inherit;
+  }
+
+  .sdb-focus-main {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin: 14px 0 13px;
+  }
+
+  .sdb-focus-value {
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 3px 6px;
+    min-width: 0;
+  }
+
+  .sdb-focus-value strong {
+    font-size: clamp(39px, 11vw, 49px);
+    line-height: 1;
+    font-weight: 750;
+    letter-spacing: -0.055em;
+    color: var(--color-solid-text);
+  }
+
+  .sdb-focus-value span {
+    color: var(--color-solid-text);
+    opacity: 0.72;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* Inverted focus button */
+
+  .sdb-focus-main .sdb-button {
+    flex: 0 0 auto;
+    gap: 6px;
+
+    min-height: 43px;
+    padding: 0 14px;
+
+    border-radius: 10px;
+    border: 1px solid var(--color-solid-text);
+
+    background: var(--color-solid-text);
+    color: var(--color-solid);
+
+    font-size: 13px;
+    font-weight: 750;
+  }
+
+  .sdb-focus-main .sdb-button:hover:not(:disabled) {
+    background: color-mix(
+      in srgb,
+      var(--color-solid-text) 86%,
+      transparent
+    );
+  }
+
+  .sdb-focus-main .sdb-button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .sdb-focus .sdb-progress {
+    height: 6px;
+    background: color-mix(
+      in srgb,
+      var(--color-solid-text) 14%,
+      transparent
+    );
+  }
+
+  .sdb-focus .sdb-progress > span {
+    background: var(--color-solid-text);
+  }
+
+  .sdb-focus .sdb-progress-caption {
+    margin-top: 9px;
+    color: var(--color-solid-text);
+
+    font-size: 12px;
+    font-weight: 550;
+    opacity: 0.8;
+  }
+
+  .sdb-focus .sdb-progress-caption strong {
+    color: var(--color-solid-text);
+    font-weight: 750;
+  }
+
+  .sdb-focus:focus-within {
+    border-color: transparent;
+  }
+
+  /* ======================================================
+     COMPACT XP RAIL
+     ====================================================== */
+
+  .sdb-level {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr) 34px;
+
+    grid-template-rows: auto auto auto;
+    align-items: center;
+
+    gap: 0 10px;
+    padding: 14px 16px 13px;
+
+    border: 1px solid var(--dash-border);
+    background: var(--color-surface);
+  }
+
+  .sdb-level-heading {
+    display: contents;
+  }
+
+  .sdb-level-heading > div {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .sdb-level .sdb-card-label {
+    gap: 7px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .sdb-level .sdb-card-label svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .sdb-level h2 {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+  }
+
+  .sdb-level h2 span {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .sdb-level .sdb-icon-button {
+    grid-column: 2;
+    grid-row: 1;
+
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  .sdb-level-caption {
+    grid-column: 1 / -1;
+    grid-row: 2;
+
+    margin: 11px 0 7px;
+
+    color: var(--color-text-secondary);
+    font-size: 11px;
+  }
+
+  .sdb-level .sdb-progress {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    height: 5px;
+  }
+
+  .sdb-level-meta {
+    grid-column: 1 / -1;
+    grid-row: 4;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+    margin-top: 11px;
+
+    font-size: 12px;
+  }
+
+  .sdb-streak {
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .sdb-streak strong {
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 750;
+  }
+
+  .sdb-weekly {
+    gap: 5px;
+    font-size: 12px;
+  }
+
+  .sdb-streak svg,
+  .sdb-weekly svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ======================================================
+     UNIFIED DAILY AGENDA
+     Tasks and Upcoming share one surface.
+     ====================================================== */
+
+  .sdb-work {
+    display: block;
+    overflow: hidden;
+
+    padding: 0 15px 2px;
+
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+
+    background: var(--color-surface);
+  }
+
+  .sdb-work > .sdb-panel {
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .sdb-work > .sdb-panel + .sdb-panel {
+    border-top: 1px solid var(--dash-border);
+  }
+
+  .sdb-panel-header {
+    min-height: 51px;
+    border-bottom: 0;
+    gap: 8px;
+  }
+
+  .sdb-panel-title {
+    gap: 8px;
+  }
+
+  .sdb-panel-title h2 {
+    font-size: 15px;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+  }
+
+  .sdb-counter {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 7px;
+    font-size: 11px;
+  }
+
+  .sdb-link {
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--color-text-secondary);
+  }
+
+  .sdb-link svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Compact task/event empty states */
+
+  .sdb-empty {
+    grid-template-columns:
+      28px minmax(0, 1fr) auto;
+
+    gap: 8px;
+    min-height: 42px;
+    padding: 1px 0 14px;
+  }
+
+  .sdb-empty > svg {
+    width: 28px;
+    height: 28px;
+    padding: 6px;
+    border-radius: 9px;
+  }
+
+  .sdb-empty strong {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .sdb-empty p {
+    display: none;
+  }
+
+  .sdb-inline-action {
+    gap: 4px;
+    min-height: 32px;
+    padding: 0 1px;
+
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .sdb-inline-action svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .sdb-placeholder {
+    padding: 8px 0 15px;
+    font-size: 13px;
+  }
+
+  /* Populated task rows */
+
+  .sdb-list {
+    padding: 0 0 8px;
+  }
+
+  .sdb-task {
+    min-height: 44px;
+    padding: 8px 0;
+    gap: 9px;
+  }
+
+  .sdb-item-text strong {
+    font-size: 13px;
+  }
+
+  .sdb-item-text span {
+    font-size: 12px;
+  }
+
+  .sdb-panel-footer {
+    padding: 8px 0;
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+  .sdb-header h1 {
+    font-size: 24px;
+  }
+
+  .sdb-focus {
+    padding: 16px 14px 14px;
+  }
+
+  .sdb-focus-value strong {
+    font-size: 38px;
+  }
+
+  .sdb-focus-main .sdb-button {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .sdb-level {
+    padding: 13px 14px;
+  }
+
+  .sdb-work {
+    padding: 0 12px;
+  }
+
+  .sdb-empty {
+    grid-template-columns:
+      25px minmax(0, 1fr) auto;
+    gap: 6px;
+  }
+
+  .sdb-empty > svg {
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+  }
+
+  .sdb-inline-action {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY AND MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sdb *,
+  .sdb *::before,
+  .sdb *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@keyframes sdb-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sdb-spinning {
+  animation: sdb-turn 1s linear infinite;
+}

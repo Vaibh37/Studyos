@@ -1,0 +1,708 @@
+
+/* ===================================================
+   STUDYOS — LIVING FLAME
+   Shape-morphing SVG + wind + fire glow
+   =================================================== */
+
+.sf2-trigger,
+.sf2-overlay,
+.sf2-overlay * {
+  box-sizing: border-box;
+}
+
+/* ===================================================
+   TOP RIGHT FLAME BADGE
+   =================================================== */
+
+.sf2-trigger {
+  position: fixed;
+  z-index: 110;
+
+  top: calc(14px + env(safe-area-inset-top));
+  right: calc(14px + env(safe-area-inset-right));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  min-width: 65px;
+  height: 44px;
+
+  padding: 0 10px 0 6px;
+
+  border: 1px solid #754222;
+  border-radius: 14px;
+
+  background: #211710;
+  color: #ff9634;
+
+  box-shadow:
+    0 5px 22px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(255, 175, 82, 0.13);
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.sf2-trigger strong {
+  color: #fff3e2;
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf2-trigger:hover {
+  transform: scale(1.05);
+}
+
+.sf2-trigger.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sf2-trigger:focus-visible,
+.sf2-close:focus-visible,
+.sf2-continue:focus-visible {
+  outline: 2px solid #ffbd65 !important;
+  outline-offset: 3px !important;
+}
+
+/* ===================================================
+   ORGANIC ANIMATED FLAME
+   =================================================== */
+
+.sf2-mini-fire {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width: 30px;
+  height: 35px;
+
+  isolation: isolate;
+}
+
+.sf2-mini-fire::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 8px 4px 2px;
+  border-radius: 50%;
+
+  background: #ff6b17;
+
+  filter: blur(10px);
+  opacity: 0.42;
+
+  animation: sf2-glow-breathe 1.6s ease-in-out infinite;
+}
+
+.sf2-flame-svg {
+  display: block;
+  position: relative;
+
+  overflow: visible;
+
+  transform-origin: 50% 95%;
+  will-change: transform;
+
+  filter: drop-shadow(
+    0 0 5px rgba(255, 102, 18, 0.56)
+  );
+}
+
+.sf2-flame-small {
+  width: 28px;
+  height: 34px;
+}
+
+.sf2-flame-large {
+  width: 135px;
+  height: 162px;
+
+  filter:
+    drop-shadow(0 0 16px rgba(255, 96, 4, 0.72));
+}
+
+/* Three layers, three different movements.
+   The lower flame remains anchored while
+   its tips sway and stretch. */
+
+.sf2-outer-layer {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+
+  animation:
+    sf2-wind-outer 2.2s ease-in-out infinite alternate;
+}
+
+.sf2-middle-layer {
+  transform-box: fill-box;
+  transform-origin: 50% 95%;
+
+  animation:
+    sf2-wind-middle 1.35s ease-in-out infinite alternate;
+}
+
+.sf2-core-layer {
+  transform-box: fill-box;
+  transform-origin: 50% 95%;
+
+  animation:
+    sf2-wind-core 0.95s ease-in-out infinite alternate;
+}
+
+/* Actual flowing movement, not rotation
+   of the entire fire icon. */
+
+@keyframes sf2-wind-outer {
+  0% {
+    transform:
+      translateX(-2px)
+      skewX(-3deg)
+      scale(0.98, 1.02);
+  }
+
+  25% {
+    transform:
+      translateX(2px)
+      skewX(3deg)
+      scale(1.02, 0.98);
+  }
+
+  55% {
+    transform:
+      translateX(-1px)
+      skewX(-2deg)
+      scale(0.97, 1.055);
+  }
+
+  80% {
+    transform:
+      translateX(3px)
+      skewX(4deg)
+      scale(1.01, 0.97);
+  }
+
+  100% {
+    transform:
+      translateX(-3px)
+      skewX(-4deg)
+      scale(0.99, 1.04);
+  }
+}
+
+@keyframes sf2-wind-middle {
+  0% {
+    transform:
+      translateX(2px)
+      skewX(4deg)
+      scale(0.93, 1.03);
+  }
+
+  40% {
+    transform:
+      translateX(-3px)
+      skewX(-5deg)
+      scale(1.04, 0.95);
+  }
+
+  70% {
+    transform:
+      translateX(1px)
+      skewX(2deg)
+      scale(0.97, 1.06);
+  }
+
+  100% {
+    transform:
+      translateX(3px)
+      skewX(5deg)
+      scale(1.01, 0.98);
+  }
+}
+
+@keyframes sf2-wind-core {
+  0% {
+    transform:
+      translateX(-1px)
+      scale(0.91, 0.96);
+    opacity: 0.75;
+  }
+
+  50% {
+    transform:
+      translateX(2px)
+      scale(1.05, 1.11);
+    opacity: 1;
+  }
+
+  100% {
+    transform:
+      translateX(-2px)
+      scale(0.94, 1.02);
+    opacity: 0.85;
+  }
+}
+
+@keyframes sf2-glow-breathe {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.27;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.32;
+  }
+}
+
+/* ===================================================
+   FULL SCREEN CELEBRATION
+   =================================================== */
+
+.sf2-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(93, 36, 7, 0.27),
+      rgba(0, 0, 0, 0.86) 72%
+    );
+
+  backdrop-filter: blur(9px);
+
+  animation: sf2-overlay-in 0.25s ease-out both;
+}
+
+/* CENTER STAGE */
+
+.sf2-stage {
+  position: fixed;
+
+  top: 50%;
+  left: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: min(340px, calc(100vw - 34px));
+  padding: 20px 18px 24px;
+
+  transform: translate(-50%, -50%);
+
+  background: transparent;
+  border: 0;
+
+  color: #fff6ec;
+  text-align: center;
+  font-family: var(--font-sans, system-ui);
+
+  animation:
+    sf2-popup 0.42s cubic-bezier(
+      0.2, 1.3, 0.3, 1
+    ) both;
+}
+
+.sf2-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  display: grid;
+  place-items: center;
+
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.06);
+  color: #d3c2b8;
+
+  cursor: pointer;
+}
+
+/* ===================================================
+   BIG FIRE SCENE
+   =================================================== */
+
+.sf2-fire-scene {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 192px;
+  height: 192px;
+
+  margin-bottom: 6px;
+
+  isolation: isolate;
+}
+
+.sf2-big-glow {
+  position: absolute;
+
+  width: 110px;
+  height: 120px;
+
+  border-radius: 50%;
+
+  background: #ff731d;
+  filter: blur(43px);
+  opacity: 0.37;
+
+  animation:
+    sf2-glow-breathe 1.8s ease-in-out infinite;
+}
+
+/* Ripples appear when celebration begins. */
+
+.sf2-ring {
+  position: absolute;
+
+  width: 112px;
+  height: 112px;
+
+  border: 1px solid rgba(255, 159, 66, 0.28);
+  border-radius: 50%;
+
+  animation:
+    sf2-ring-burst 1.25s ease-out both;
+}
+
+.sf2-ring-two {
+  animation-delay: 0.18s;
+}
+
+/* EMBERS */
+
+.sf2-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sf2-particles i {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+  background: #ffc064;
+
+  box-shadow: 0 0 9px #ff7b18;
+
+  opacity: 0;
+
+  animation:
+    sf2-spark 1.15s ease-out var(--delay) both;
+}
+
+/* ===================================================
+   CELEBRATION TEXT
+   =================================================== */
+
+.sf2-kicker {
+  margin-top: 2px;
+
+  color: #ffb866;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.sf2-stage h2 {
+  margin: 10px 0 4px;
+
+  color: #fff8ef;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.18;
+}
+
+.sf2-count {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+
+  margin-top: 12px;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.sf2-count strong {
+  color: #ffac45;
+
+  font-size: 76px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -0.065em;
+
+  text-shadow:
+    0 0 30px rgba(255, 117, 16, 0.3);
+}
+
+.sf2-count span {
+  color: #ffdbad;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.sf2-subtitle {
+  margin: 12px 0 0;
+
+  color: #e4c8b1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.sf2-best {
+  margin: 8px 0 0;
+
+  color: #b8a08d;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* CONTINUE */
+
+.sf2-continue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  width: min(225px, 100%);
+  height: 48px;
+
+  margin-top: 25px;
+
+  border: 0;
+  border-radius: 12px;
+
+  background: #ffac51;
+  color: #251306;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    transform 0.15s;
+}
+
+.sf2-continue:hover {
+  background: #ffc078;
+}
+
+.sf2-continue:active {
+  transform: scale(0.97);
+}
+
+.sf2-hint {
+  margin-top: 12px;
+  color: #8d7563;
+  font-size: 11px;
+}
+
+/* ===================================================
+   RETURN TO TOP RIGHT
+   =================================================== */
+
+.sf2-overlay.is-returning {
+  animation:
+    sf2-overlay-out 0.5s ease forwards;
+
+  pointer-events: none;
+}
+
+.sf2-overlay.is-returning .sf2-stage {
+  animation:
+    sf2-return 0.5s cubic-bezier(
+      0.4, 0, 0.8, 0.45
+    ) forwards;
+}
+
+/* ===================================================
+   ANIMATION KEYFRAMES
+   =================================================== */
+
+@keyframes sf2-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sf2-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes sf2-popup {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%) scale(0.55);
+  }
+
+  75% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%) scale(1.06);
+  }
+
+  100% {
+    transform:
+      translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes sf2-return {
+  from {
+    opacity: 1;
+
+    transform:
+      translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 0;
+
+    transform:
+      translate(
+        calc(-50% + var(--sf2-x)),
+        calc(-50% + var(--sf2-y))
+      )
+      scale(0.13);
+  }
+}
+
+@keyframes sf2-ring-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  35% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@keyframes sf2-spark {
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angle))
+      translateY(0)
+      scale(0.5);
+  }
+
+  25% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angle))
+      translateY(-95px)
+      scale(0.1);
+  }
+}
+
+/* ===================================================
+   MOBILE
+   =================================================== */
+
+@media (max-width: 900px) {
+  .sf2-trigger {
+    top: calc(10px + env(safe-area-inset-top));
+    right: calc(12px + env(safe-area-inset-right));
+
+    min-width: 59px;
+    height: 41px;
+    border-radius: 12px;
+  }
+
+  .sf2-stage {
+    width: min(320px, calc(100vw - 32px));
+  }
+
+  .sf2-fire-scene {
+    width: 174px;
+    height: 174px;
+  }
+
+  .sf2-flame-large {
+    width: 120px;
+    height: 146px;
+  }
+
+  .sf2-count strong {
+    font-size: 67px;
+  }
+
+  .sf2-stage h2 {
+    font-size: 26px;
+  }
+
+  /* Avoid overlap with Dashboard refresh. */
+
+  .sdb-header .sdb-button--secondary {
+    right: 67px !important;
+  }
+}
+
+/* ===================================================
+   REDUCED MOTION
+   =================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .sf2-trigger *,
+  .sf2-overlay *,
+  .sf2-overlay {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .sf2-flame-svg animate {
+    display: none;
+  }
+}

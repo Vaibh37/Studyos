@@ -1,0 +1,730 @@
+
+
+/* =========================================================
+   StudyOS — Study Groups redesign
+   Loads after groups-v2.css
+   ========================================================= */
+
+.v2g-page {
+  max-width: 1380px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+
+.v2g-header {
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.v2g-header h1 {
+  margin: 5px 0 7px;
+  font-family: var(--font-sans);
+  font-size: clamp(29px, 2.7vw, 36px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+}
+
+.v2g-header p {
+  max-width: 730px;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.v2g-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.v2g-refresh {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   PRIMARY ACTION LAYOUT
+   ========================================================= */
+
+.sg3-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.13fr)
+    minmax(360px, 0.87fr);
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 16px;
+}
+
+.sg3-layout *,
+.sg3-layout *::before,
+.sg3-layout *::after {
+  box-sizing: border-box;
+}
+
+.sg3-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  padding: 22px 24px;
+}
+
+.sg3-join {
+  border-color: var(--color-border-strong);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(145, 145, 145, 0.08),
+      transparent 43%
+    ),
+    var(--color-surface);
+}
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+.sg3-symbol {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 11px;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.sg3-symbol-subtle {
+  flex-shrink: 0;
+  border-color: var(--color-border);
+  background: var(--color-surface-subtle);
+}
+
+.sg3-kicker {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.09em;
+}
+
+.sg3-intro .sg3-kicker {
+  margin-top: 15px;
+}
+
+.sg3-intro h2,
+.sg3-create-heading h2 {
+  margin: 5px 0;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.24;
+  letter-spacing: -0.026em;
+}
+
+.sg3-intro p,
+.sg3-create-heading p {
+  margin: 0;
+  max-width: 540px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   INVITATION CODE
+   ========================================================= */
+
+.sg3-invite {
+  margin-top: 24px;
+}
+
+.sg3-field-heading,
+.sg3-code-assist {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sg3-field-heading {
+  margin-bottom: 10px;
+}
+
+.sg3-field-heading label,
+.sg3-form-field label,
+.sg3-form-field .sg3-label {
+  display: block;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.sg3-field-heading > span {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* CODE BOXES */
+
+.sg3-code-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+  cursor: text;
+}
+
+.sg3-code-slot {
+  display: flex;
+  min-width: 0;
+  height: 58px;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9px;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-faint);
+
+  font-family: var(--font-mono);
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1;
+
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.sg3-code-slot.is-filled {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.sg3-code-boxes.is-focused .sg3-code-slot.is-current {
+  border-color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+  box-shadow:
+    inset 0 0 0 1px var(--color-border-strong);
+}
+
+.sg3-code-boxes.is-ready .sg3-code-slot {
+  border-color: var(--color-text-secondary);
+}
+
+/* ACTUAL INPUT FOR KEYBOARD AND PASTE */
+
+.sg3-code-native {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+
+  opacity: 0;
+  border: 0;
+  cursor: text;
+  font-size: 16px;
+}
+
+.sg3-code-native:focus {
+  outline: none;
+}
+
+/* VALIDATION */
+
+.sg3-code-assist {
+  min-height: 22px;
+  margin-top: 9px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sg3-code-assist > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sg3-code-valid {
+  color: var(--color-success);
+}
+
+/* PASTE */
+
+.sg3-paste {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 35px;
+  margin-top: 6px;
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sg3-paste:hover:not(:disabled) {
+  color: var(--color-text);
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.sg3-join-action,
+.sg3-create-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 46px;
+  padding: 0 18px;
+
+  border: 1px solid var(--color-solid);
+  border-radius: 9px;
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.sg3-join-action {
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+}
+
+.sg3-join-action:hover:not(:disabled),
+.sg3-create-action:hover:not(:disabled) {
+  background: var(--color-solid-hover);
+}
+
+.sg3-join-action:disabled,
+.sg3-create-action:disabled {
+  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.sg3-paste:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sg3-footnote {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  margin: 12px 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   CREATE GROUP
+   ========================================================= */
+
+.sg3-create-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.sg3-create-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.sg3-create-heading .sg3-kicker {
+  margin-top: 1px;
+}
+
+.sg3-create-heading h2 {
+  margin-top: 5px;
+  font-size: 21px;
+}
+
+.sg3-create-toggle {
+  display: none;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.sg3-create-content {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+/* FORM FIELDS */
+
+.sg3-form-field label,
+.sg3-label {
+  margin-bottom: 7px;
+}
+
+.sg3-form-field label > span:first-child {
+  color: var(--color-text-muted);
+}
+
+.sg3-optional {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.sg3-form-field input,
+.sg3-form-field textarea {
+  display: block;
+  width: 100%;
+  margin: 0;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  outline: none;
+
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+
+  transition: border-color 120ms ease;
+}
+
+.sg3-form-field input {
+  min-height: 43px;
+  padding: 0 12px;
+}
+
+.sg3-form-field textarea {
+  min-height: 62px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.sg3-form-field :is(input, textarea)::placeholder {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.sg3-form-field :is(input, textarea):focus {
+  border-color: var(--color-text-secondary);
+}
+
+/* VISIBILITY SELECTOR */
+
+.sg3-create-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.sg3-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+
+  min-height: 43px;
+  padding: 3px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-subtle);
+}
+
+.sg3-segmented button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-muted);
+
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sg3-segmented button.is-selected {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.sg3-create-action {
+  min-height: 43px;
+  white-space: nowrap;
+}
+
+/* KEYBOARD ACCESSIBILITY */
+
+.sg3-layout :is(button, input, textarea):focus-visible {
+  outline: 2px solid var(--color-text-secondary);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   MY GROUPS
+   ========================================================= */
+
+.v2g-groups-section {
+  margin-bottom: 16px;
+  padding: 19px 22px 22px;
+  border-radius: 14px;
+}
+
+.v2g-section-heading {
+  align-items: center;
+  margin-bottom: 13px;
+}
+
+.v2g-section-heading h2 {
+  margin-top: 4px;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.v2g-count-pill {
+  min-height: 28px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* EMPTY STATE */
+
+.v2g-empty-card.compact {
+  min-height: 110px;
+  padding: 17px;
+
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-surface-subtle);
+}
+
+.v2g-empty-card.compact > svg {
+  width: 22px;
+  height: 22px;
+}
+
+.v2g-empty-card.compact h3 {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.v2g-empty-card.compact p {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* EXISTING GROUP CARDS */
+
+.v2g-group-grid {
+  gap: 12px;
+}
+
+.v2g-group-card {
+  min-height: 142px;
+  padding: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.v2g-group-card > strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.v2g-group-card > p {
+  min-height: 0;
+  font-size: 13px;
+}
+
+.v2g-group-meta {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 1120px) {
+  .sg3-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sg3-create-bottom {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .v2g-header {
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .v2g-header h1 {
+    font-size: 29px;
+  }
+
+  .v2g-refresh {
+    width: auto;
+  }
+
+  .sg3-layout {
+    gap: 12px;
+  }
+
+  .sg3-card {
+    padding: 18px;
+  }
+
+  .sg3-join-action {
+    margin-top: 18px;
+  }
+
+  .sg3-create-toggle {
+    display: inline-flex;
+  }
+
+  .sg3-create-heading {
+    margin-bottom: 0;
+  }
+
+  .sg3-create-toggle svg {
+    transition: transform 140ms ease;
+  }
+
+  .sg3-create.is-open .sg3-create-toggle svg {
+    transform: rotate(180deg);
+  }
+
+  .sg3-create:not(.is-open) .sg3-create-content {
+    display: none;
+  }
+
+  .sg3-create.is-open .sg3-create-content {
+    margin-top: 18px;
+  }
+
+  .v2g-groups-section {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sg3-card {
+    padding: 16px;
+  }
+
+  .sg3-intro h2 {
+    font-size: 21px;
+  }
+
+  .sg3-code-boxes {
+    gap: 5px;
+  }
+
+  .sg3-code-slot {
+    height: 49px;
+    border-radius: 7px;
+    font-size: 20px;
+  }
+
+  .sg3-create-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .sg3-create-action {
+    width: 100%;
+  }
+
+  .v2g-refresh {
+    align-self: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sg3-layout :is(button, input, textarea),
+  .sg3-code-slot,
+  .sg3-create-toggle svg {
+    transition: none;
+  }
+}

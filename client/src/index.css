@@ -1,5 +1,10 @@
+
 @import "./styles/tokens.css";
 @import "./styles/base.css";
+
+/* =========================================================
+   STUDYOS — GLOBAL STYLES
+   ========================================================= */
 
 .route-loading {
   display: flex;
@@ -24,4 +29,76 @@
   color: var(--color-solid-text, #0a0a0a);
   font-size: 12px;
   font-weight: 700;
+}
+
+/* =========================================================
+   GLOBAL FOCUS SYSTEM
+
+   Prevent oversized browser focus rectangles.
+   Applies to all StudyOS pages.
+   ========================================================= */
+
+/* Remove the harsh focus outline from text fields */
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+[contenteditable="true"]:focus,
+[contenteditable="true"]:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Use an existing border instead of a bright rectangle */
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: var(--color-border-strong) !important;
+}
+
+/* Subtle focus styling for search containers */
+
+.n3-search:focus-within,
+.v2n-search:focus-within {
+  border-color: var(--color-border-strong) !important;
+  box-shadow: none !important;
+}
+
+/* Keep keyboard navigation visible, but understated */
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 1px solid var(--color-text-muted) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* Prevent mobile browser tap flashes */
+
+button,
+a,
+input,
+textarea,
+select,
+[role="button"],
+[role="tab"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

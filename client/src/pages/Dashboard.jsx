@@ -1,2201 +1,684 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
 import {
-  AlertTriangle,
-  Award,
-  BookOpen,
+  ArrowRight,
   CalendarDays,
   CheckCircle2,
-  Clock3,
   Flame,
+  Play,
+  Plus,
   RefreshCw,
   Target,
-  Timer,
-  TrendingUp,
   Zap,
 } from "lucide-react";
 
-import {
-  useAuth,
-} from "../context/AuthContext";
-
+import { useAuth } from "../context/AuthContext";
 import apiRequest from "../services/api";
+import { localDb } from "../services/localDb";
+import { getCalendarEvents } from "../services/calendarData";
+import { getStudySessions } from "../services/studySessionData";
+import { calculateGamification } from "../services/gamification";
+import "../styles/dashboard-professional.css";
 
-import {
-  localDb,
-} from "../services/localDb";
-
-import {
-  getCalendarEvents,
-} from "../services/calendarData";
-
-import {
-  getStudySessions,
-} from "../services/studySessionData";
-
-import {
-  calculateGamification,
-  formatGamificationXp,
-} from "../services/gamification";
-
-
-// =========================================================
-// HELPERS
-// =========================================================
-
-const startOfDay = (
-  value = new Date()
-) => {
-  const date =
-    new Date(value);
-
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate()
-  );
-};
-
-
-const getDateKey = (
-  value
-) => {
-  if (!value) {
-    return "";
-  }
-
-  const date =
-    new Date(value);
+const dateKey = (input) => {
+  if (!input) return "";
 
   if (
-    Number.isNaN(
-      date.getTime()
-    )
+    typeof input === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(input)
   ) {
-    return "";
+    return input;
   }
 
-  return [
-    date.getFullYear(),
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return "";
 
-    String(
-      date.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    ),
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
 
-    String(
-      date.getDate()
-    ).padStart(
-      2,
-      "0"
-    ),
-  ].join("-");
+  return `${year}-${month}-${day}`;
 };
 
+const formatDuration = (seconds) => {
+  const safe = Math.max(0, Math.floor(Number(seconds) || 0));
+  const hours = Math.floor(safe / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
 
-const subtractDays = (
-  value,
-  amount
-) => {
-  const date =
-    startOfDay(value);
+  if (hours) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+};
 
-  date.setDate(
-    date.getDate() -
-      amount
+const getDailyGoal = () => {
+  const hours = Number(
+    localStorage.getItem("studyos_study_goal")
   );
 
-  return date;
+  return Number.isFinite(hours) && hours > 0
+    ? Math.round(hours * 60)
+    : 120;
 };
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
 
-const formatStudyTime = (
-  seconds
-) => {
-  const safe =
-    Math.max(
-      0,
-      Number(seconds) || 0
-    );
-
-  const totalMinutes =
-    Math.floor(
-      safe / 60
-    );
-
-  const hours =
-    Math.floor(
-      totalMinutes / 60
-    );
-
-  const minutes =
-    totalMinutes % 60;
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  if (totalMinutes > 0) {
-    return `${totalMinutes}m`;
-  }
-
-  if (safe > 0) {
-    return `${Math.floor(
-      safe
-    )}s`;
-  }
-
-  return "0m";
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 };
 
-
-const formatTaskTime = (
-  value
-) => {
-  if (!value) {
-    return "";
-  }
-
-  const [
-    hours,
-    minutes,
-  ] =
-    String(value)
-      .split(":")
-      .map(Number);
-
-  if (
-    Number.isNaN(hours) ||
-    Number.isNaN(minutes)
-  ) {
-    return value;
-  }
-
-  const date =
-    new Date();
-
-  date.setHours(
-    hours,
-    minutes,
-    0,
-    0
-  );
-
-  return date.toLocaleTimeString(
-    "en-IN",
-    {
-      hour:
-        "numeric",
-
-      minute:
-        "2-digit",
-    }
-  );
-};
-
-
-const formatShortDate = (
-  value
-) => {
-  if (!value) {
-    return "";
-  }
-
-  const date =
-    new Date(value);
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return "";
-  }
-
-  return date.toLocaleDateString(
-    "en-IN",
-    {
-      day:
-        "numeric",
-
-      month:
-        "short",
-    }
-  );
-};
-
-
-const normalizePriority = (
-  value
-) => {
-  if (
-    value === "high" ||
-    value === "low"
-  ) {
-    return value;
-  }
-
-  return "medium";
-};
-
-
-const PRIORITY_ORDER = {
+const priorityOrder = {
   high: 0,
   medium: 1,
   low: 2,
 };
 
-
-// =========================================================
-// DASHBOARD
-// =========================================================
-
 function Dashboard() {
-  const {
-    isGuest,
-    firebaseUser,
-  } = useAuth();
+  const { isGuest, firebaseUser } = useAuth();
 
+  const [tasks, setTasks] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [calendarItems, setCalendarItems] = useState([]);
 
-  // =======================================================
-  // DATA
-  // =======================================================
+  const [dailyGoal, setDailyGoal] = useState(getDailyGoal);
 
-  const [
-    tasks,
-    setTasks,
-  ] = useState([]);
-
-  const [
-    subjects,
-    setSubjects,
-  ] = useState([]);
-
-  const [
-    sessions,
-    setSessions,
-  ] = useState([]);
-
-  const [
-    calendarItems,
-    setCalendarItems,
-  ] = useState([]);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    refreshing,
-    setRefreshing,
-  ] = useState(false);
-
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-
-  // =======================================================
-  // NAME
-  // =======================================================
-
-  const [
-    name,
-    setName,
-  ] = useState(
+  const [name, setName] = useState(
     () =>
-      localStorage.getItem(
-        "studyos_name"
-      ) ||
+      localStorage.getItem("studyos_name") ||
       firebaseUser?.displayName ||
       ""
   );
 
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
 
-  // =======================================================
-  // DAILY GOAL
-  // =======================================================
+  // LOAD DATA
 
-  const getGoalMinutes =
-    () => {
-      const hours =
-        Number(
-          localStorage.getItem(
-            "studyos_study_goal"
-          )
-        );
+  const loadDashboard = useCallback(
+    async (manual = false) => {
+      if (manual) setRefreshing(true);
+      else setLoading(true);
 
-      if (
-        Number.isFinite(hours) &&
-        hours > 0
-      ) {
-        return Math.round(
-          hours * 60
-        );
-      }
+      setError("");
 
-      return 120;
-    };
-
-
-  const [
-    dailyGoalMinutes,
-    setDailyGoalMinutes,
-  ] = useState(
-    getGoalMinutes
-  );
-
-
-  // =======================================================
-  // GREETING
-  // =======================================================
-
-  const getGreeting =
-    () => {
-      const hour =
-        new Date()
-          .getHours();
-
-      if (hour < 12) {
-        return "Good morning";
-      }
-
-      if (hour < 17) {
-        return "Good afternoon";
-      }
-
-      return "Good evening";
-    };
-
-
-  // =======================================================
-  // LOAD
-  // =======================================================
-
-  const loadDashboard =
-    async (
-      manual = false
-    ) => {
       try {
-        if (manual) {
-          setRefreshing(
-            true
-          );
-        } else {
-          setLoading(
-            true
-          );
-        }
-
-        setError("");
-
-        const tasksPromise =
-          isGuest
-            ? localDb.getAll(
-                "tasks"
-              )
-            : apiRequest(
-                "/api/tasks"
-              );
-
-        const subjectsPromise =
-          isGuest
-            ? localDb.getAll(
-                "subjects"
-              )
-            : apiRequest(
-                "/api/subjects"
-              );
-
-        const [
-          taskData,
-          subjectData,
-          sessionData,
-          calendarData,
-        ] =
+        const [taskData, sessionData, eventData] =
           await Promise.all([
-            tasksPromise,
+            isGuest
+              ? localDb.getAll("tasks")
+              : apiRequest("/api/tasks"),
 
-            subjectsPromise,
-
-            getStudySessions(
-              isGuest
-            ),
-
-            getCalendarEvents(
-              isGuest
-            ),
+            getStudySessions(isGuest),
+            getCalendarEvents(isGuest),
           ]);
 
         setTasks(
-          Array.isArray(
-            taskData
-          )
-            ? taskData
-            : []
-        );
-
-        setSubjects(
-          Array.isArray(
-            subjectData
-          )
-            ? subjectData
-            : []
+          Array.isArray(taskData) ? taskData : []
         );
 
         setSessions(
-          Array.isArray(
-            sessionData
-          )
-            ? sessionData
-            : []
+          Array.isArray(sessionData) ? sessionData : []
         );
 
         setCalendarItems(
-          Array.isArray(
-            calendarData
-          )
-            ? calendarData
-            : []
+          Array.isArray(eventData) ? eventData : []
         );
 
-        setDailyGoalMinutes(
-          getGoalMinutes()
-        );
-      } catch (
-        loadError
-      ) {
-        console.error(
-          "Dashboard load failed:",
-          loadError
-        );
+        setDailyGoal(getDailyGoal());
+      } catch (cause) {
+        console.error("Dashboard load failed:", cause);
 
         setError(
-          loadError?.message ||
-            "Could not load dashboard data."
+          cause?.message ||
+            "Could not load your dashboard. Please retry."
         );
       } finally {
-        setLoading(
-          false
-        );
-
-        setRefreshing(
-          false
-        );
+        setLoading(false);
+        setRefreshing(false);
       }
+    },
+    [isGuest]
+  );
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  // PROFILE NAME
+
+  useEffect(() => {
+    const updateName = () => {
+      setName(
+        localStorage.getItem("studyos_name") ||
+          firebaseUser?.displayName ||
+          ""
+      );
     };
 
-
-  // =======================================================
-  // INITIAL LOAD
-  // =======================================================
-
-  useEffect(() => {
-    loadDashboard(
-      false
-    );
-  }, [
-    isGuest,
-  ]);
-
-
-  // =======================================================
-  // NAME UPDATES
-  // =======================================================
-
-  useEffect(() => {
-    const refreshName =
-      () => {
-        setName(
-          localStorage.getItem(
-            "studyos_name"
-          ) ||
-            firebaseUser?.displayName ||
-            ""
-        );
-      };
-
-    refreshName();
+    updateName();
 
     window.addEventListener(
       "studyos-name-updated",
-      refreshName
+      updateName
     );
 
     return () => {
       window.removeEventListener(
         "studyos-name-updated",
-        refreshName
+        updateName
       );
     };
-  }, [
-    firebaseUser?.displayName,
-  ]);
+  }, [firebaseUser?.displayName]);
 
-
-  // =======================================================
-  // LIVE DATA UPDATES
-  // =======================================================
+  // DATA REFRESH EVENTS
 
   useEffect(() => {
-    const refresh =
-      () => {
-        loadDashboard(
-          false
-        );
-      };
-
     const events = [
       "studyos-tasks-updated",
-      "studyos-subjects-updated",
       "studyos-events-updated",
       "studyos-sessions-updated",
       "studyos-preferences-updated",
       "studyos-focus-settings-updated",
     ];
 
-    events.forEach(
-      (
-        eventName
-      ) => {
-        window.addEventListener(
-          eventName,
-          refresh
-        );
-      }
-    );
+    const refresh = () => loadDashboard();
+
+    events.forEach((event) => {
+      window.addEventListener(event, refresh);
+    });
 
     return () => {
-      events.forEach(
-        (
-          eventName
-        ) => {
-          window.removeEventListener(
-            eventName,
-            refresh
-          );
-        }
-      );
+      events.forEach((event) => {
+        window.removeEventListener(event, refresh);
+      });
     };
-  }, [
-    isGuest,
-  ]);
+  }, [loadDashboard]);
 
+  // PROGRESS
 
-  // =======================================================
-  // TODAY
-  // =======================================================
+  const today = dateKey(new Date());
 
-  const today =
-    startOfDay(
-      new Date()
-    );
-
-  const todayKey =
-    getDateKey(
-      today
-    );
-
-
-  // =======================================================
-  // GAMIFICATION
-  // =======================================================
-
-  const gamification =
-    useMemo(
-      () =>
-        calculateGamification({
-          sessions,
-          tasks,
-          referenceDate:
-            new Date(),
-        }),
-      [
+  const stats = useMemo(
+    () =>
+      calculateGamification({
         sessions,
         tasks,
-      ]
-    );
+        referenceDate: new Date(),
+      }),
+    [sessions, tasks]
+  );
 
+  const todaySessions = useMemo(
+    () =>
+      sessions.filter(
+        (session) =>
+          dateKey(
+            session.startedAt ||
+              session.endedAt ||
+              session.createdAt
+          ) === today
+      ),
+    [sessions, today]
+  );
 
-  // =======================================================
-  // TODAY FOCUS
-  // =======================================================
+  const focusedSeconds = todaySessions.reduce(
+    (sum, session) =>
+      sum + (Number(session.durationSeconds) || 0),
+    0
+  );
 
-  const todaySessions =
-    useMemo(() => {
-      return sessions.filter(
-        (
-          session
-        ) => {
-          const date =
-            new Date(
-              session.startedAt ||
-                session.endedAt ||
-                session.createdAt
-            );
+  const focusedMinutes = Math.floor(focusedSeconds / 60);
 
-          if (
-            Number.isNaN(
-              date.getTime()
-            )
-          ) {
-            return false;
-          }
-
-          return (
-            getDateKey(
-              date
-            ) ===
-            todayKey
-          );
-        }
-      );
-    }, [
-      sessions,
-      todayKey,
-    ]);
-
-
-  const todayFocusSeconds =
-    useMemo(() => {
-      return todaySessions.reduce(
-        (
-          total,
-          session
-        ) =>
-          total +
-          Number(
-            session.durationSeconds ||
-              0
-          ),
-        0
-      );
-    }, [
-      todaySessions,
-    ]);
-
-
-  const todayFocusMinutes =
-    Math.floor(
-      todayFocusSeconds /
-        60
-    );
-
-
-  const goalProgress =
-    dailyGoalMinutes > 0
+  const goalPercent =
+    dailyGoal > 0
       ? Math.min(
           100,
-          Math.round(
-            (
-              todayFocusMinutes /
-              dailyGoalMinutes
-            ) *
-              100
-          )
+          Math.round((focusedMinutes / dailyGoal) * 100)
         )
       : 0;
 
+  const remainingMinutes = Math.max(
+    0,
+    dailyGoal - focusedMinutes
+  );
 
-  // =======================================================
   // TASKS
-  // =======================================================
 
-  const pendingTasks =
-    useMemo(() => {
-      return tasks.filter(
-        (
-          task
-        ) =>
-          !task.completed
-      );
-    }, [
-      tasks,
-    ]);
+  const pendingTasks = useMemo(
+    () => tasks.filter((task) => !task.completed),
+    [tasks]
+  );
 
+  const completedToday = tasks.filter(
+    (task) =>
+      task.completed &&
+      dateKey(task.completedAt) === today
+  ).length;
 
-  const completedToday =
-    useMemo(() => {
-      return tasks.filter(
-        (
-          task
-        ) => {
-          if (
-            !task.completed ||
-            !task.completedAt
-          ) {
-            return false;
-          }
-
-          return (
-            getDateKey(
-              task.completedAt
-            ) ===
-            todayKey
-          );
-        }
-      ).length;
-    }, [
-      tasks,
-      todayKey,
-    ]);
-
-
-  const dueTodayTasks =
-    useMemo(() => {
-      return pendingTasks.filter(
-        (
-          task
-        ) =>
-          getDateKey(
-            task.dueDate
-          ) ===
-          todayKey
-      );
-    }, [
-      pendingTasks,
-      todayKey,
-    ]);
-
-
-  const overdueTasks =
-    useMemo(() => {
-      return pendingTasks.filter(
-        (
-          task
-        ) => {
-          const dueKey =
-            getDateKey(
-              task.dueDate
-            );
-
-          return (
-            dueKey &&
-            dueKey <
-              todayKey
-          );
-        }
-      );
-    }, [
-      pendingTasks,
-      todayKey,
-    ]);
-
-
-  // =======================================================
-  // TODAY PLAN
-  // =======================================================
-
-  const todayPlan =
-    useMemo(() => {
-      const candidates =
-        pendingTasks.filter(
-          (
-            task
-          ) => {
-            const dueKey =
-              getDateKey(
-                task.dueDate
-              );
-
-            return (
-              !dueKey ||
-              dueKey <=
-                todayKey
-            );
-          }
-        );
-
-      return [
-        ...candidates,
-      ]
-        .sort(
-          (
-            first,
-            second
-          ) => {
-            const firstDate =
-              getDateKey(
-                first.dueDate
-              );
-
-            const secondDate =
-              getDateKey(
-                second.dueDate
-              );
-
-            if (
-              firstDate &&
-              secondDate &&
-              firstDate !==
-                secondDate
-            ) {
-              return firstDate.localeCompare(
-                secondDate
-              );
-            }
-
-            if (
-              firstDate &&
-              !secondDate
-            ) {
-              return -1;
-            }
-
-            if (
-              !firstDate &&
-              secondDate
-            ) {
-              return 1;
-            }
-
-            return (
-              PRIORITY_ORDER[
-                normalizePriority(
-                  first.priority
-                )
-              ] -
-              PRIORITY_ORDER[
-                normalizePriority(
-                  second.priority
-                )
-              ]
-            );
-          }
-        )
-        .slice(
-          0,
-          6
-        );
-    }, [
-      pendingTasks,
-      todayKey,
-    ]);
-
-
-  // =======================================================
-  // WEEK
-  // =======================================================
-
-  const weeklyActivity =
-    useMemo(() => {
-      const result =
-        [];
-
-      for (
-        let index = 6;
-        index >= 0;
-        index--
-      ) {
-        const date =
-          subtractDays(
-            new Date(),
-            index
-          );
-
-        const key =
-          getDateKey(
-            date
-          );
-
-        const daySeconds =
-          sessions.reduce(
-            (
-              total,
-              session
-            ) => {
-              const sessionDate =
-                new Date(
-                  session.startedAt ||
-                    session.endedAt ||
-                    session.createdAt
-                );
-
-              if (
-                Number.isNaN(
-                  sessionDate.getTime()
-                )
-              ) {
-                return total;
-              }
-
-              if (
-                getDateKey(
-                  sessionDate
-                ) !==
-                key
-              ) {
-                return total;
-              }
-
-              return (
-                total +
-                Number(
-                  session.durationSeconds ||
-                    0
-                )
-              );
-            },
-            0
-          );
-
-        result.push({
-          date,
-          key,
-
-          seconds:
-            daySeconds,
-
-          label:
-            date.toLocaleDateString(
-              "en-IN",
-              {
-                weekday:
-                  "short",
-              }
-            ),
-        });
-      }
-
-      return result;
-    }, [
-      sessions,
-    ]);
-
-
-  const weeklyFocusSeconds =
-    weeklyActivity.reduce(
-      (
-        total,
-        day
-      ) =>
-        total +
-        day.seconds,
-      0
-    );
-
-
-  const maxWeeklySeconds =
-    Math.max(
-      ...weeklyActivity.map(
-        (
-          day
-        ) =>
-          day.seconds
-      ),
-      1
-    );
-
-
-  // =======================================================
-  // TOP SUBJECT
-  // =======================================================
-
-  const topSubject =
-    useMemo(() => {
-      const earliest =
-        subtractDays(
-          new Date(),
-          6
-        );
-
-      const totals =
-        new Map();
-
-      sessions.forEach(
-        (
-          session
-        ) => {
-          const date =
-            new Date(
-              session.startedAt ||
-                session.endedAt ||
-                session.createdAt
-            );
-
-          if (
-            Number.isNaN(
-              date.getTime()
-            ) ||
-            date <
-              earliest
-          ) {
-            return;
-          }
-
-          const subjectName =
-            session.subjectName ||
-            "General Study";
-
-          totals.set(
-            subjectName,
-            (
-              totals.get(
-                subjectName
-              ) || 0
-            ) +
-              Number(
-                session.durationSeconds ||
-                  0
-              )
-          );
-        }
-      );
-
-      if (
-        totals.size === 0
-      ) {
-        return null;
-      }
-
-      return [
-        ...totals.entries(),
-      ]
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            second[1] -
-            first[1]
-        )
-        .map(
-          ([
-            subjectName,
-            seconds,
-          ]) => ({
-            subjectName,
-            seconds,
-          })
-        )[0];
-    }, [
-      sessions,
-      subjects,
-    ]);
-
-
-  // =======================================================
-  // UPCOMING
-  // =======================================================
-
-  const upcomingItems =
-    useMemo(() => {
-      return calendarItems
-        .map(
-          (
-            item
-          ) => ({
-            ...item,
-
-            parsedDate:
-              new Date(
-                item.date
-              ),
-          })
-        )
+  const todayTasks = useMemo(
+    () =>
+      pendingTasks
         .filter(
-          (
-            item
-          ) => {
-            if (
-              Number.isNaN(
-                item.parsedDate.getTime()
-              )
-            ) {
-              return false;
-            }
+          (task) =>
+            !task.dueDate ||
+            dateKey(task.dueDate) <= today
+        )
+        .sort((a, b) => {
+          const firstDate = dateKey(a.dueDate);
+          const secondDate = dateKey(b.dueDate);
 
-            return (
-              startOfDay(
-                item.parsedDate
-              ) >=
-              today
-            );
+          if (
+            firstDate &&
+            secondDate &&
+            firstDate !== secondDate
+          ) {
+            return firstDate.localeCompare(secondDate);
           }
+
+          if (firstDate !== secondDate) {
+            return firstDate ? -1 : 1;
+          }
+
+          return (
+            (priorityOrder[a.priority] ?? 1) -
+            (priorityOrder[b.priority] ?? 1)
+          );
+        }),
+    [pendingTasks, today]
+  );
+
+  // CALENDAR
+
+  const upcoming = useMemo(
+    () =>
+      calendarItems
+        .filter(
+          (event) => dateKey(event.date) >= today
         )
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            first.parsedDate -
-            second.parsedDate
-        )
-        .slice(
-          0,
-          5
-        );
-    }, [
-      calendarItems,
-      todayKey,
-    ]);
+        .sort((a, b) =>
+          String(a.date).localeCompare(String(b.date))
+        ),
+    [calendarItems, today]
+  );
 
+  const todayLabel = new Date().toLocaleDateString(
+    "en-IN",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    }
+  );
 
-  // =======================================================
-  // RECENT FOCUS
-  // =======================================================
-
-  const recentSessions =
-    useMemo(() => {
-      return [
-        ...sessions,
-      ]
-        .sort(
-          (
-            first,
-            second
-          ) =>
-            new Date(
-              second.startedAt ||
-                second.endedAt ||
-                0
-            ) -
-            new Date(
-              first.startedAt ||
-                first.endedAt ||
-                0
-            )
-        )
-        .slice(
-          0,
-          4
-        );
-    }, [
-      sessions,
-    ]);
-
-
-  // =======================================================
-  // RENDER
-  // =======================================================
+  const number = (value) =>
+    Number(value || 0).toLocaleString("en-IN");
 
   return (
-    <div className="v2d-page">
-
+    <div className="sdb" aria-busy={loading}>
       {/* HEADER */}
 
-      <header className="v2d-header">
-
-        <div className="v2d-header-copy">
-
-          <span className="v2d-eyebrow">
-            Workspace
-          </span>
-
-          <h1 className="v2d-title">
-            {getGreeting()}
-            {name
-              ? `, ${name}`
-              : ""}
-            .
-          </h1>
-
-          <p className="v2d-description">
-            Plan what matters, focus on the work,
-            and review your progress.
+      <header className="sdb-header">
+        <div>
+          <p className="sdb-kicker">
+            Dashboard
+            <span aria-hidden="true">/</span>
+            {todayLabel}
           </p>
 
+          <h1>
+            {getGreeting()}
+            {name ? `, ${name}` : ""}.
+          </h1>
+
+          <p className="sdb-header-subtitle">
+            Your study plan for today, all in one place.
+          </p>
         </div>
 
         <button
           type="button"
-          className="v2d-refresh"
-          disabled={
-            loading ||
-            refreshing
-          }
-          onClick={() =>
-            loadDashboard(
-              true
-            )
-          }
+          className="sdb-button sdb-button--secondary"
+          onClick={() => loadDashboard(true)}
+          disabled={loading || refreshing}
         >
           <RefreshCw
-            size={15}
-            className={
-              refreshing
-                ? "v2d-spin"
-                : ""
-            }
+            size={17}
+            className={refreshing ? "sdb-spinning" : ""}
           />
-
-          <span>
-            {refreshing
-              ? "Refreshing"
-              : "Refresh"}
-          </span>
+          Refresh
         </button>
-
       </header>
 
-
-      {/* ERROR */}
-
       {error && (
-        <div className="v2d-error">
-
-          <AlertTriangle
-            size={16}
-          />
-
-          <span>
-            {error}
-          </span>
-
+        <div className="sdb-error" role="alert">
+          {error}
         </div>
       )}
 
+      {/* DAILY OVERVIEW */}
 
-      {/* LEVEL */}
-
-      <section className="v2d-level">
-
-        <div className="v2d-level-main">
-
-          <div className="v2d-level-mark">
-
-            <Award
-              size={20}
-            />
-
-            <span>
-              {gamification.level}
-            </span>
-
+      <section
+        className="sdb-overview"
+        aria-label="Today's study summary"
+      >
+        <article className="sdb-card sdb-focus">
+          <div className="sdb-card-label">
+            <Target size={18} />
+            Daily focus
           </div>
 
-          <div className="v2d-level-content">
-
-            <div className="v2d-level-heading">
-
-              <div>
-
-                <span className="v2d-kicker">
-                  Current level
-                </span>
-
-                <h2>
-                  {gamification.title}
-                </h2>
-
-              </div>
-
+          <div className="sdb-focus-main">
+            <div className="sdb-focus-value">
               <strong>
-                {formatGamificationXp(
-                  gamification.totalXp
-                )}
+                {loading
+                  ? "—"
+                  : formatDuration(focusedSeconds)}
               </strong>
 
+              <span>of {dailyGoal} min goal</span>
             </div>
 
-            <div className="v2d-progress-track">
-
-              <div
-                className="v2d-progress-fill"
-                style={{
-                  width:
-                    `${gamification.progress}%`,
-                }}
-              />
-
-            </div>
-
-            <div className="v2d-level-footer">
-
-              <span>
-                {gamification.xpIntoLevel.toLocaleString(
-                  "en-IN"
-                )}{" "}
-                /{" "}
-                {gamification.xpRequiredForLevel.toLocaleString(
-                  "en-IN"
-                )} XP
-              </span>
-
-              <span>
-                {gamification.xpToNextLevel.toLocaleString(
-                  "en-IN"
-                )}{" "}
-                XP to level{" "}
-                {gamification.level +
-                  1}
-              </span>
-
-            </div>
-
+            <Link
+              to="/app/focus"
+              className="sdb-button sdb-button--primary"
+            >
+              <Play size={16} fill="currentColor" />
+              Start focus
+            </Link>
           </div>
-
-        </div>
-
-        <div className="v2d-level-metrics">
-
-          <div>
-            <span>
-              XP this week
-            </span>
-
-            <strong>
-              {gamification.weeklyXp.toLocaleString(
-                "en-IN"
-              )}
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              Current streak
-            </span>
-
-            <strong>
-              {gamification.streak}d
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              Total sessions
-            </span>
-
-            <strong>
-              {gamification.sessionCount}
-            </strong>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* STATS */}
-
-      <section className="v2d-stats">
-
-        <MetricCard
-          icon={
-            <Timer
-              size={18}
-            />
-          }
-          label="Focus today"
-          value={
-            loading
-              ? "—"
-              : formatStudyTime(
-                  todayFocusSeconds
-                )
-          }
-          detail={`${todaySessions.length} ${
-            todaySessions.length ===
-            1
-              ? "session"
-              : "sessions"
-          }`}
-        />
-
-        <MetricCard
-          icon={
-            <Target
-              size={18}
-            />
-          }
-          label="Daily goal"
-          value={`${goalProgress}%`}
-          detail={`${todayFocusMinutes} / ${dailyGoalMinutes} min`}
-        />
-
-        <MetricCard
-          icon={
-            <CheckCircle2
-              size={18}
-            />
-          }
-          label="Pending"
-          value={
-            pendingTasks.length
-          }
-          detail={`${completedToday} completed today`}
-        />
-
-        <MetricCard
-          icon={
-            <Flame
-              size={18}
-            />
-          }
-          label="Study streak"
-          value={`${gamification.streak}d`}
-          detail={`Best ${gamification.longestStreak} days`}
-        />
-
-      </section>
-
-
-      {/* DAILY GOAL */}
-
-      <section className="v2d-goal">
-
-        <div className="v2d-goal-copy">
-
-          <div>
-
-            <span className="v2d-kicker">
-              Today
-            </span>
-
-            <h2>
-              Daily focus goal
-            </h2>
-
-          </div>
-
-          <strong>
-            {formatStudyTime(
-              todayFocusSeconds
-            )}
-          </strong>
-
-        </div>
-
-        <div className="v2d-goal-track">
 
           <div
-            className="v2d-goal-fill"
-            style={{
-              width:
-                `${goalProgress}%`,
-            }}
-          />
-
-        </div>
-
-        <div className="v2d-goal-meta">
-
-          <span>
-            {goalProgress >=
-            100
-              ? "Goal completed"
-              : `${Math.max(
-                  0,
-                  dailyGoalMinutes -
-                    todayFocusMinutes
-                )} min remaining`}
-          </span>
-
-          <span>
-            Goal {dailyGoalMinutes} min
-          </span>
-
-        </div>
-
-      </section>
-
-
-      {/* PLAN */}
-
-      <section className="v2d-main-grid">
-
-        <div className="v2d-panel">
-
-          <PanelHeader
-            eyebrow="Plan"
-            title="Today's tasks"
-            count={
-              todayPlan.length
-            }
-          />
-
-          <div className="v2d-task-list">
-
-            {loading ? (
-
-              <EmptyState
-                icon={
-                  <Clock3
-                    size={20}
-                  />
-                }
-                title="Loading tasks"
-                description="Getting today's plan ready."
-              />
-
-            ) : todayPlan.length ===
-              0 ? (
-
-              <EmptyState
-                icon={
-                  <CheckCircle2
-                    size={20}
-                  />
-                }
-                title="You're clear"
-                description="No overdue or unscheduled tasks need attention."
-              />
-
-            ) : (
-
-              todayPlan.map(
-                (
-                  task
-                ) => {
-                  const dueKey =
-                    getDateKey(
-                      task.dueDate
-                    );
-
-                  const overdue =
-                    Boolean(
-                      dueKey &&
-                        dueKey <
-                          todayKey
-                    );
-
-                  const priority =
-                    normalizePriority(
-                      task.priority
-                    );
-
-                  return (
-                    <div
-                      className={`v2d-task ${
-                        overdue
-                          ? "is-overdue"
-                          : ""
-                      }`}
-                      key={
-                        task._id
-                      }
-                    >
-
-                      <span
-                        className={`v2d-task-priority is-${priority}`}
-                      />
-
-                      <div className="v2d-task-copy">
-
-                        <strong>
-                          {task.title}
-                        </strong>
-
-                        <div className="v2d-task-meta">
-
-                          {task.subjectName && (
-                            <span>
-                              <BookOpen
-                                size={12}
-                              />
-
-                              {
-                                task.subjectName
-                              }
-                            </span>
-                          )}
-
-                          {task.dueDate && (
-                            <span
-                              className={
-                                overdue
-                                  ? "is-danger"
-                                  : ""
-                              }
-                            >
-                              <CalendarDays
-                                size={12}
-                              />
-
-                              {overdue
-                                ? "Overdue · "
-                                : ""}
-
-                              {formatShortDate(
-                                task.dueDate
-                              )}
-                            </span>
-                          )}
-
-                          {task.dueTime && (
-                            <span>
-                              <Clock3
-                                size={12}
-                              />
-
-                              {formatTaskTime(
-                                task.dueTime
-                              )}
-                            </span>
-                          )}
-
-                        </div>
-
-                      </div>
-
-                      <span
-                        className={`v2d-priority-label is-${priority}`}
-                      >
-                        {priority}
-                      </span>
-
-                    </div>
-                  );
-                }
-              )
-
-            )}
-
+            className="sdb-progress"
+            role="progressbar"
+            aria-label="Daily focus progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={goalPercent}
+          >
+            <span
+              style={{ width: `${goalPercent}%` }}
+            />
           </div>
 
-          {(dueTodayTasks.length >
-            0 ||
-            overdueTasks.length >
-              0) && (
-            <div className="v2d-task-summary">
+          <div className="sdb-progress-caption">
+            <span>
+              {goalPercent === 100
+                ? "Daily goal complete"
+                : `${remainingMinutes} min remaining`}
+            </span>
 
-              <span>
-                {dueTodayTasks.length} due today
-              </span>
+            <strong>{goalPercent}%</strong>
+          </div>
+        </article>
 
-              <span>
-                {overdueTasks.length} overdue
-              </span>
+        {/* LEVEL */}
 
+        <article className="sdb-card sdb-level">
+          <div className="sdb-level-heading">
+            <div>
+              <div className="sdb-card-label">
+                <Zap size={18} />
+                Level progress
+              </div>
+
+              <h2>
+                Level {stats.level}
+                <span>{stats.title}</span>
+              </h2>
             </div>
+
+            <Link
+              className="sdb-icon-button"
+              to="/app/progress"
+              aria-label="Open progress details"
+            >
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+
+          <div className="sdb-level-caption">
+            <span>
+              {number(stats.xpIntoLevel)} /{" "}
+              {number(stats.xpRequiredForLevel)} XP
+            </span>
+
+            <span>
+              {number(stats.totalXp)} total XP
+            </span>
+          </div>
+
+          <div
+            className="sdb-progress"
+            role="progressbar"
+            aria-label="Level progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={stats.progress}
+          >
+            <span
+              style={{ width: `${stats.progress}%` }}
+            />
+          </div>
+
+          <div className="sdb-level-meta">
+            <span className="sdb-streak">
+              <Flame size={16} />
+              <strong>{stats.streak}d</strong>
+              streak
+            </span>
+
+            <span className="sdb-weekly">
+              <Zap size={16} />
+              {number(stats.weeklyXp)} XP this week
+            </span>
+          </div>
+        </article>
+      </section>
+
+      {/* TASKS AND CALENDAR */}
+
+      <section
+        className="sdb-work"
+        aria-label="Study plan"
+      >
+        {/* TASKS */}
+
+        <article className="sdb-card sdb-panel">
+          <div className="sdb-panel-header">
+            <div className="sdb-panel-title">
+              <h2>Today's tasks</h2>
+              <span className="sdb-counter">
+                {todayTasks.length}
+              </span>
+            </div>
+
+            <Link
+              to="/app/tasks"
+              className="sdb-link"
+            >
+              All tasks
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          {loading ? (
+            <p className="sdb-placeholder">
+              Loading tasks…
+            </p>
+          ) : todayTasks.length === 0 ? (
+            <div className="sdb-empty">
+              <CheckCircle2 size={22} />
+
+              <div>
+                <strong>You're all caught up</strong>
+                <p>
+                  Nothing needs your attention today.
+                </p>
+              </div>
+
+              <Link
+                to="/app/tasks"
+                className="sdb-inline-action"
+              >
+                <Plus size={16} />
+                Add task
+              </Link>
+            </div>
+          ) : (
+            <ul className="sdb-list">
+              {todayTasks.slice(0, 4).map(
+                (task, index) => {
+                  const isOverdue =
+                    dateKey(task.dueDate) < today &&
+                    Boolean(task.dueDate);
+
+                  return (
+                    <li
+                      className="sdb-task"
+                      key={task._id || index}
+                    >
+                      <span
+                        className="sdb-task-dot"
+                        aria-hidden="true"
+                      />
+
+                      <div className="sdb-item-text">
+                        <strong>{task.title}</strong>
+                        <span>
+                          {task.subjectName || "General"}
+                          {task.dueDate
+                            ? ` · ${
+                                isOverdue
+                                  ? "Overdue"
+                                  : "Due today"
+                              }`
+                            : ""}
+                        </span>
+                      </div>
+
+                      {isOverdue && (
+                        <span className="sdb-overdue">
+                          Overdue
+                        </span>
+                      )}
+                    </li>
+                  );
+                }
+              )}
+            </ul>
           )}
 
-        </div>
+          {(todayTasks.length > 4 ||
+            completedToday > 0) && (
+            <div className="sdb-panel-footer">
+              <span>
+                {completedToday} completed today
+              </span>
 
+              {todayTasks.length > 4 && (
+                <Link to="/app/tasks">
+                  View {todayTasks.length - 4} more
+                </Link>
+              )}
+            </div>
+          )}
+        </article>
 
         {/* UPCOMING */}
 
-        <div className="v2d-panel">
-
-          <PanelHeader
-            eyebrow="Schedule"
-            title="Upcoming"
-            count={
-              upcomingItems.length
-            }
-          />
-
-          <div className="v2d-upcoming-list">
-
-            {upcomingItems.length ===
-            0 ? (
-
-              <EmptyState
-                icon={
-                  <CalendarDays
-                    size={20}
-                  />
-                }
-                title="Nothing upcoming"
-                description="Tasks with deadlines and calendar events appear here."
-              />
-
-            ) : (
-
-              upcomingItems.map(
-                (
-                  item
-                ) => {
-                  const taskItem =
-                    item.source ===
-                      "task" ||
-                    item.type ===
-                      "task";
-
-                  return (
-                    <div
-                      className="v2d-upcoming"
-                      key={
-                        item._id
-                      }
-                    >
-
-                      <div className="v2d-date">
-
-                        <strong>
-                          {item.parsedDate.getDate()}
-                        </strong>
-
-                        <span>
-                          {item.parsedDate.toLocaleDateString(
-                            "en-IN",
-                            {
-                              month:
-                                "short",
-                            }
-                          )}
-                        </span>
-
-                      </div>
-
-                      <div className="v2d-upcoming-copy">
-
-                        <strong>
-                          {item.title}
-                        </strong>
-
-                        <div>
-
-                          <span>
-                            {taskItem
-                              ? "Task"
-                              : item.type ||
-                                "Event"}
-                          </span>
-
-                          {item.subjectName && (
-                            <>
-                              <span>·</span>
-
-                              <span>
-                                {
-                                  item.subjectName
-                                }
-                              </span>
-                            </>
-                          )}
-
-                          {item.dueTime && (
-                            <>
-                              <span>·</span>
-
-                              <span>
-                                {formatTaskTime(
-                                  item.dueTime
-                                )}
-                              </span>
-                            </>
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    </div>
-                  );
-                }
-              )
-
-            )}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* REVIEW */}
-
-      <section className="v2d-review-grid">
-
-        <div className="v2d-panel">
-
-          <div className="v2d-panel-heading">
-
-            <div>
-
-              <span className="v2d-kicker">
-                Activity
+        <article className="sdb-card sdb-panel">
+          <div className="sdb-panel-header">
+            <div className="sdb-panel-title">
+              <h2>Upcoming</h2>
+              <span className="sdb-counter">
+                {upcoming.length}
               </span>
-
-              <h2>
-                Last 7 days
-              </h2>
-
-              <p>
-                Focus time recorded through StudyOS.
-              </p>
-
             </div>
 
-            <div className="v2d-week-total">
-
-              <TrendingUp
-                size={15}
-              />
-
-              <strong>
-                {formatStudyTime(
-                  weeklyFocusSeconds
-                )}
-              </strong>
-
-            </div>
-
+            <Link
+              to="/app/calendar"
+              className="sdb-link"
+            >
+              Calendar
+              <ArrowRight size={16} />
+            </Link>
           </div>
 
-          <div className="v2d-chart">
+          {loading ? (
+            <p className="sdb-placeholder">
+              Loading calendar…
+            </p>
+          ) : upcoming.length === 0 ? (
+            <div className="sdb-empty">
+              <CalendarDays size={22} />
 
-            {weeklyActivity.map(
-              (
-                day
-              ) => {
-                const height =
-                  day.seconds ===
-                  0
-                    ? 3
-                    : Math.max(
-                        8,
-                        (
-                          day.seconds /
-                          maxWeeklySeconds
-                        ) *
-                          100
-                      );
+              <div>
+                <strong>No upcoming events</strong>
+                <p>
+                  Your schedule is clear for now.
+                </p>
+              </div>
 
-                const currentDay =
-                  day.key ===
-                  todayKey;
-
-                return (
-                  <div
-                    className="v2d-chart-column"
-                    key={
-                      day.key
-                    }
+              <Link
+                to="/app/calendar"
+                className="sdb-inline-action"
+              >
+                <Plus size={16} />
+                Add event
+              </Link>
+            </div>
+          ) : (
+            <ul className="sdb-list">
+              {upcoming.slice(0, 4).map(
+                (event, index) => (
+                  <li
+                    className="sdb-task"
+                    key={event._id || index}
                   >
-
-                    <span className="v2d-chart-value">
-                      {day.seconds >
-                      0
-                        ? formatStudyTime(
-                            day.seconds
-                          )
-                        : "0"}
+                    <span className="sdb-calendar-icon">
+                      <CalendarDays size={17} />
                     </span>
 
-                    <div className="v2d-chart-track">
-
-                      <div
-                        className={`v2d-chart-bar ${
-                          currentDay
-                            ? "is-today"
-                            : ""
-                        }`}
-                        style={{
-                          height:
-                            `${height}%`,
-                        }}
-                      />
-
+                    <div className="sdb-item-text">
+                      <strong>{event.title}</strong>
+                      <span>
+                        {new Date(
+                          event.date
+                        ).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                        {event.subjectName
+                          ? ` · ${event.subjectName}`
+                          : ""}
+                      </span>
                     </div>
 
-                    <span
-                      className={`v2d-chart-label ${
-                        currentDay
-                          ? "is-today"
-                          : ""
-                      }`}
-                    >
-                      {day.label}
-                    </span>
-
-                  </div>
-                );
-              }
-            )}
-
-          </div>
-
-        </div>
-
-
-        {/* OVERVIEW */}
-
-        <div className="v2d-panel">
-
-          <PanelHeader
-            eyebrow="Review"
-            title="Study overview"
-          />
-
-          <div className="v2d-insights">
-
-            <Insight
-              icon={
-                <BookOpen
-                  size={16}
-                />
-              }
-              label="Top subject"
-              value={
-                topSubject
-                  ? topSubject.subjectName
-                  : "No data"
-              }
-              detail={
-                topSubject
-                  ? formatStudyTime(
-                      topSubject.seconds
-                    )
-                  : "Complete focus sessions to build insights."
-              }
-            />
-
-            <Insight
-              icon={
-                <Zap
-                  size={16}
-                />
-              }
-              label="XP this week"
-              value={
-                formatGamificationXp(
-                  gamification.weeklyXp
-                )
-              }
-              detail={`${gamification.weeklyFocusXp} focus · ${gamification.weeklyTaskXp} tasks`}
-            />
-
-            <Insight
-              icon={
-                <CheckCircle2
-                  size={16}
-                />
-              }
-              label="Completed today"
-              value={
-                completedToday
-              }
-              detail="Tasks finished today"
-            />
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* RECENT */}
-
-      <section className="v2d-panel v2d-recent">
-
-        <PanelHeader
-          eyebrow="Focus"
-          title="Recent sessions"
-          count={
-            recentSessions.length
-          }
-        />
-
-        {recentSessions.length ===
-        0 ? (
-
-          <EmptyState
-            icon={
-              <Timer
-                size={20}
-              />
-            }
-            title="No focus sessions yet"
-            description="Your latest study sessions will appear here."
-          />
-
-        ) : (
-
-          <div className="v2d-session-grid">
-
-            {recentSessions.map(
-              (
-                session
-              ) => (
-                <div
-                  className="v2d-session"
-                  key={
-                    session._id
-                  }
-                >
-
-                  <span className="v2d-session-icon">
-                    <BookOpen
-                      size={15}
-                    />
-                  </span>
-
-                  <div className="v2d-session-copy">
-
-                    <strong>
-                      {session.subjectName ||
-                        "General Study"}
-                    </strong>
-
-                    <span>
-                      {formatShortDate(
-                        session.startedAt ||
-                          session.endedAt
-                      )}
-                    </span>
-
-                  </div>
-
-                  <strong className="v2d-session-time">
-                    {formatStudyTime(
-                      session.durationSeconds
+                    {dateKey(event.date) === today && (
+                      <span className="sdb-today">
+                        Today
+                      </span>
                     )}
-                  </strong>
+                  </li>
+                )
+              )}
+            </ul>
+          )}
 
-                </div>
-              )
-            )}
-
-          </div>
-
-        )}
-
+          {upcoming.length > 4 && (
+            <div className="sdb-panel-footer">
+              <span />
+              <Link to="/app/calendar">
+                View {upcoming.length - 4} more
+              </Link>
+            </div>
+          )}
+        </article>
       </section>
-
     </div>
   );
 }
-
-
-// =========================================================
-// METRIC
-// =========================================================
-
-function MetricCard({
-  icon,
-  label,
-  value,
-  detail,
-}) {
-  return (
-    <article className="v2d-metric">
-
-      <div className="v2d-metric-label">
-
-        <span className="v2d-metric-icon">
-          {icon}
-        </span>
-
-        <span>
-          {label}
-        </span>
-
-      </div>
-
-      <strong className="v2d-metric-value">
-        {value}
-      </strong>
-
-      <span className="v2d-metric-detail">
-        {detail}
-      </span>
-
-    </article>
-  );
-}
-
-
-// =========================================================
-// PANEL HEADER
-// =========================================================
-
-function PanelHeader({
-  eyebrow,
-  title,
-  count,
-}) {
-  return (
-    <div className="v2d-panel-heading">
-
-      <div>
-
-        <span className="v2d-kicker">
-          {eyebrow}
-        </span>
-
-        <h2>
-          {title}
-        </h2>
-
-      </div>
-
-      {count !==
-        undefined && (
-        <span className="v2d-count">
-          {count}
-        </span>
-      )}
-
-    </div>
-  );
-}
-
-
-// =========================================================
-// INSIGHT
-// =========================================================
-
-function Insight({
-  icon,
-  label,
-  value,
-  detail,
-}) {
-  return (
-    <div className="v2d-insight">
-
-      <span className="v2d-insight-icon">
-        {icon}
-      </span>
-
-      <div>
-
-        <span>
-          {label}
-        </span>
-
-        <strong>
-          {value}
-        </strong>
-
-        <small>
-          {detail}
-        </small>
-
-      </div>
-
-    </div>
-  );
-}
-
-
-// =========================================================
-// EMPTY
-// =========================================================
-
-function EmptyState({
-  icon,
-  title,
-  description,
-}) {
-  return (
-    <div className="v2d-empty">
-
-      {icon}
-
-      <strong>
-        {title}
-      </strong>
-
-      <span>
-        {description}
-      </span>
-
-    </div>
-  );
-}
-
 
 export default Dashboard;
