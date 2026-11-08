@@ -12,6 +12,10 @@ import {
 } from "react-router";
 
 import {
+  Analytics,
+} from "@vercel/analytics/react";
+
+import {
   useAuth,
 } from "./context/AuthContext";
 
@@ -404,6 +408,8 @@ function App() {
   return (
     <>
       <RouteScrollManager />
+
+      <Analytics />
 
       <Suspense
         fallback={
