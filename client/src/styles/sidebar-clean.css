@@ -1,0 +1,364 @@
+
+/* =========================================================
+   STUDYOS - COLLAPSIBLE SIDEBAR
+   ========================================================= */
+
+.app-shell-v2 .study-sidebar {
+  box-sizing: border-box;
+  background: var(--color-surface) !important;
+  border-right: 1px solid var(--color-border) !important;
+  font-family: var(--font-sans, Inter, sans-serif);
+  overflow: hidden;
+}
+
+/* =========================================================
+   BRAND HEADER
+   ========================================================= */
+
+.app-shell-v2 .study-sidebar .app-shell-v2-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  margin: 0 0 22px;
+  flex: 0 0 auto;
+}
+
+.app-shell-v2 .study-sidebar .app-shell-v2-brand {
+  min-width: 0;
+  flex: 1;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.app-shell-v2 .study-sidebar .logo-mark {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.app-shell-v2 .study-sidebar .app-shell-v2-brand-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+/* =========================================================
+   SIDEBAR CONTROLS
+   ========================================================= */
+
+.app-shell-v2 .study-sidebar .ss-collapse,
+.app-shell-v2 .study-sidebar .app-shell-v2-sidebar-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+
+  background: transparent !important;
+  color: var(--color-text-muted);
+
+  cursor: pointer;
+}
+
+.app-shell-v2 .study-sidebar
+:is(.ss-collapse, .app-shell-v2-sidebar-close):hover {
+  background: var(--color-surface-hover) !important;
+  color: var(--color-text);
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.app-shell-v2 .study-sidebar .app-shell-v2-nav-section {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-shell-v2 .study-sidebar .app-shell-v2-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+
+  gap: 16px;
+  padding: 2px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+}
+
+.app-shell-v2 .study-sidebar
+.app-shell-v2-nav::-webkit-scrollbar {
+  display: block;
+  width: 4px;
+}
+
+.study-sidebar .ss-group {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* CATEGORY LABELS */
+
+.app-shell-v2 .study-sidebar .app-shell-v2-nav-label {
+  margin: 0 0 4px;
+  padding: 0 8px;
+
+  font-size: 12px !important;
+  font-weight: 600;
+  line-height: 1.5;
+
+  text-transform: none;
+  letter-spacing: 0.01em;
+
+  color: var(--color-text-muted);
+}
+
+/* =========================================================
+   NAVIGATION ITEMS
+   ========================================================= */
+
+.app-shell-v2 .study-sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  min-height: 36px !important;
+  height: auto;
+  width: 100%;
+
+  gap: 10px;
+  padding: 7px 9px !important;
+  margin: 0;
+
+  border: 1px solid transparent !important;
+  border-radius: 6px;
+
+  background: transparent !important;
+  color: var(--color-text-secondary) !important;
+
+  font-size: 15px !important;
+  font-weight: 500;
+  line-height: 1.4;
+
+  text-decoration: none;
+  transform: none !important;
+}
+
+.app-shell-v2 .study-sidebar .nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+
+  color: var(--color-text-muted) !important;
+}
+
+.app-shell-v2 .study-sidebar .nav-item > span {
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* HOVER AND ACTIVE STATES */
+
+.app-shell-v2 .study-sidebar .nav-item:hover,
+.app-shell-v2 .study-sidebar .nav-item.active {
+  background: var(--color-surface-hover) !important;
+  color: var(--color-text) !important;
+  border-color: transparent !important;
+}
+
+.app-shell-v2 .study-sidebar .nav-item.active {
+  font-weight: 600;
+}
+
+.app-shell-v2 .study-sidebar .nav-item.active::before {
+  left: 0;
+  height: 17px;
+  width: 2px;
+}
+
+.app-shell-v2 .study-sidebar .nav-item.active svg,
+.app-shell-v2 .study-sidebar .nav-item:hover svg {
+  color: var(--color-text) !important;
+}
+
+/* KEYBOARD ACCESSIBILITY */
+
+.app-shell-v2 .study-sidebar :is(a, button):focus-visible {
+  outline: 2px solid var(--color-text-muted) !important;
+  outline-offset: -2px !important;
+}
+
+/* =========================================================
+   SETTINGS FOOTER
+   ========================================================= */
+
+.app-shell-v2 .study-sidebar .sidebar-bottom {
+  flex: 0 0 auto;
+
+  margin: 12px 0 0;
+  padding: 9px 2px 0;
+
+  border-top: 1px solid var(--color-border) !important;
+}
+
+/* =========================================================
+   DESKTOP SIDEBAR
+   ========================================================= */
+
+@media (min-width: 901px) {
+
+  .app-shell-v2 {
+    --sidebar-width: 224px;
+  }
+
+  .app-shell-v2:has(> .study-sidebar.is-collapsed) {
+    --sidebar-width: 64px;
+  }
+
+  .app-shell-v2 .study-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+
+    width: var(--sidebar-width) !important;
+    min-width: var(--sidebar-width) !important;
+    max-width: var(--sidebar-width) !important;
+
+    flex: 0 0 var(--sidebar-width) !important;
+
+    height: 100dvh;
+    min-height: 0;
+
+    padding: 16px 10px 12px;
+
+    transition:
+      width 160ms ease,
+      min-width 160ms ease,
+      max-width 160ms ease,
+      flex-basis 160ms ease;
+  }
+
+  /* Automatically expand the workspace */
+
+  .app-shell-v2 .app-shell-v2-content {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+
+  .app-shell-v2 .study-sidebar .ss-collapse {
+    display: inline-flex;
+  }
+
+  /* =======================================================
+     COLLAPSED ICON-ONLY MODE
+     ======================================================= */
+
+  .app-shell-v2 .study-sidebar.is-collapsed {
+    padding-inline: 8px;
+  }
+
+  .app-shell-v2 .study-sidebar.is-collapsed
+  .app-shell-v2-sidebar-header {
+    flex-direction: column;
+    gap: 9px;
+    padding: 0;
+    margin-bottom: 12px;
+  }
+
+  .app-shell-v2 .study-sidebar.is-collapsed
+  .app-shell-v2-brand {
+    flex: 0 0 auto;
+    justify-content: center;
+  }
+
+  .app-shell-v2 .study-sidebar.is-collapsed
+  :is(
+    .app-shell-v2-brand-name,
+    .app-shell-v2-nav-label,
+    .nav-item > span
+  ) {
+    display: none !important;
+  }
+
+  .app-shell-v2 .study-sidebar.is-collapsed
+  .app-shell-v2-nav {
+    gap: 10px;
+  }
+
+  /* Category separators */
+
+  .app-shell-v2 .study-sidebar.is-collapsed
+  .ss-group + .ss-group {
+    border-top: 1px solid var(--color-border);
+    padding-top: 10px;
+  }
+
+  .app-shell-v2 .study-sidebar.is-collapsed .nav-item {
+    justify-content: center;
+
+    min-height: 38px !important;
+    padding: 7px 0 !important;
+
+    gap: 0;
+  }
+
+  .app-shell-v2 .study-sidebar.is-collapsed .nav-item svg {
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+  }
+}
+
+/* =========================================================
+   MOBILE DRAWER
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .app-shell-v2 .study-sidebar .app-shell-v2-sidebar-close {
+    display: inline-flex;
+
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+
+  .app-shell-v2 .study-sidebar .nav-item {
+    min-height: 44px !important;
+  }
+
+  .app-shell-v2 .study-sidebar .app-shell-v2-nav {
+    gap: 13px;
+  }
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .app-shell-v2 .study-sidebar,
+  .app-shell-v2 .study-sidebar * {
+    transition: none !important;
+  }
+}

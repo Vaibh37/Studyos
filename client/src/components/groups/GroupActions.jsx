@@ -1,15 +1,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  ArrowRight,
   Check,
   ClipboardPaste,
   Globe2,
   KeyRound,
   LockKeyhole,
   Plus,
-  UsersRound,
-  ChevronDown,
+  X,
 } from "lucide-react";
 
 const CODE_LENGTH = 8;
@@ -35,12 +33,7 @@ function InviteCodeField({ code, onChange, disabled }) {
   const value = cleanCode(code);
   const ready = CODE_PATTERN.test(value);
 
-  useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const invite = query.get("invite") || query.get("code");
 
-    if (invite) onChange(cleanCode(invite));
-  }, [onChange]);
 
   const setValue = (text) => {
     onChange(cleanCode(text));
@@ -166,6 +159,7 @@ function InviteCodeField({ code, onChange, disabled }) {
   );
 }
 
+
 export default function GroupActions({
   inviteCode,
   setInviteCode,
@@ -179,198 +173,304 @@ export default function GroupActions({
   setGroupVisibility,
   creating,
   createGroup,
+  error,
+  clearError,
 }) {
-  const [createOpen, setCreateOpen] = useState(false);
+  const dialogRef = useRef(null);
 
-  const readyToJoin = CODE_PATTERN.test(cleanCode(inviteCode));
-  const readyToCreate = groupName.trim().length >= 2;
+  const [mode, setMode] = useState("join");
+
+  const busy = joining || creating;
+
+  const readyToJoin = CODE_PATTERN.test(
+    cleanCode(inviteCode)
+  );
+
+  const readyToCreate =
+    groupName.trim().length >= 2;
+
+  const open = (next) => {
+    clearError?.();
+
+    setMode(next);
+
+    requestAnimationFrame(() => {
+      if (!dialogRef.current?.open) {
+        dialogRef.current?.showModal();
+      }
+
+      dialogRef.current
+        ?.querySelector("input")
+        ?.focus();
+    });
+  };
+
+  const close = () => {
+    if (!busy) {
+      dialogRef.current?.close();
+    }
+  };
+
+  useEffect(() => {
+    const desktop = window.matchMedia(
+      "(min-width: 761px)"
+    );
+
+    const query = new URLSearchParams(
+      window.location.search
+    );
+
+    const invite =
+      query.get("invite") ||
+      query.get("code");
+
+    if (desktop.matches && invite) {
+      setInviteCode(cleanCode(invite));
+
+      if (!dialogRef.current?.open) {
+        dialogRef.current?.showModal();
+      }
+    }
+
+    const resize = () => {
+      if (!desktop.matches) {
+        dialogRef.current?.close();
+      }
+    };
+
+    desktop.addEventListener(
+      "change",
+      resize
+    );
+
+    return () => {
+      desktop.removeEventListener(
+        "change",
+        resize
+      );
+    };
+  }, [setInviteCode]);
+
+  const submit = async (event) => {
+    const ok = await (
+      mode === "join"
+        ? joinGroup(event)
+        : createGroup(event)
+    );
+
+    if (ok === true) {
+      dialogRef.current?.close();
+    }
+  };
 
   return (
     <section
-      className="sg3-layout"
-      aria-label="Create or join a study group"
+      className="cg-actions"
+      aria-label="Group actions"
     >
-      {/* PRIMARY: JOIN ROOM */}
 
-      <form className="sg3-card sg3-join" onSubmit={joinGroup}>
-        <div className="sg3-intro">
-          <span className="sg3-symbol">
-            <KeyRound size={22} aria-hidden="true" />
-          </span>
-
-          <span className="sg3-kicker">
-            HAVE AN INVITATION?
-          </span>
-
-          <h2>Join a study room</h2>
-
-          <p>
-            Enter your friend's code to join their room
-            and study together.
-          </p>
-        </div>
-
-        <InviteCodeField
-          code={inviteCode}
-          onChange={setInviteCode}
-          disabled={joining}
-        />
-
-        <button
-          className="sg3-join-action"
-          type="submit"
-          disabled={joining || !readyToJoin}
-        >
-          <span>
-            {joining ? "Joining room…" : "Join room"}
-          </span>
-
-          <ArrowRight size={19} aria-hidden="true" />
-        </button>
-
-        <p className="sg3-footnote">
-          <LockKeyhole size={14} aria-hidden="true" />
-          Joining doesn't change your existing rooms.
-        </p>
-      </form>
-
-      {/* SECONDARY: CREATE GROUP */}
-
-      <form
-        className={`sg3-card sg3-create${
-          createOpen ? " is-open" : ""
-        }`}
-        onSubmit={createGroup}
+      <button
+        type="button"
+        className="cg-button"
+        onClick={() => open("join")}
       >
-        <div className="sg3-create-heading">
-          <span className="sg3-symbol sg3-symbol-subtle">
-            <UsersRound size={21} aria-hidden="true" />
-          </span>
+        <KeyRound size={16} />
+        Join group
+      </button>
 
-          <div>
-            <span className="sg3-kicker">
-              START SOMETHING NEW
-            </span>
+      <button
+        type="button"
+        className="cg-button cg-primary"
+        onClick={() => open("create")}
+      >
+        <Plus size={17} />
+        Create group
+      </button>
 
-            <h2>Create a group</h2>
+      <dialog
+        ref={dialogRef}
+        className="cg-dialog"
+        aria-labelledby="cg-dialog-title"
+        onCancel={(event) => {
+          if (busy) {
+            event.preventDefault();
+          }
+        }}
+        onClick={(event) => {
+          if (
+            event.target ===
+            event.currentTarget
+          ) {
+            close();
+          }
+        }}
+      >
 
-            <p>Make a space for your study circle.</p>
-          </div>
+        <form
+          className="cg-dialog-form"
+          onSubmit={submit}
+        >
 
-          <button
-            type="button"
-            className="sg3-create-toggle"
-            onClick={() => setCreateOpen(!createOpen)}
-            aria-expanded={createOpen}
-            aria-label={
-              createOpen
-                ? "Collapse create group"
-                : "Expand create group"
-            }
-          >
-            <ChevronDown size={20} aria-hidden="true" />
-          </button>
-        </div>
+          <header className="cg-dialog-header">
 
-        <div className="sg3-create-content">
-          <div className="sg3-form-field">
-            <label htmlFor="sg3-group-name">
-              Group name <span>*</span>
-            </label>
+            <div>
 
-            <input
-              id="sg3-group-name"
-              type="text"
-              maxLength={60}
-              minLength={2}
-              required
-              placeholder="e.g. Machine Learning Club"
-              value={groupName}
-              onChange={(event) =>
-                setGroupName(event.target.value)
-              }
-              disabled={creating}
-            />
-          </div>
+              <h2 id="cg-dialog-title">
+                {mode === "join"
+                  ? "Join a study group"
+                  : "Create a group"}
+              </h2>
 
-          <div className="sg3-form-field">
-            <label htmlFor="sg3-group-description">
-              Description
-              <span className="sg3-optional">
-                {" "}Optional
-              </span>
-            </label>
+              <p>
+                {mode === "join"
+                  ? "Enter the invite code shared by a member."
+                  : "Set up a room for your study circle."}
+              </p>
 
-            <textarea
-              id="sg3-group-description"
-              rows={2}
-              maxLength={300}
-              placeholder="What will your group study?"
-              value={groupDescription}
-              onChange={(event) =>
-                setGroupDescription(event.target.value)
-              }
-              disabled={creating}
-            />
-          </div>
-
-          <div className="sg3-create-bottom">
-            <div className="sg3-form-field sg3-privacy">
-              <span
-                className="sg3-label"
-                id="sg3-privacy-label"
-              >
-                Visibility
-              </span>
-
-              <div
-                className="sg3-segmented"
-                role="group"
-                aria-labelledby="sg3-privacy-label"
-              >
-                <button
-                  type="button"
-                  aria-pressed={groupVisibility === "private"}
-                  className={
-                    groupVisibility === "private"
-                      ? "is-selected"
-                      : ""
-                  }
-                  onClick={() => setGroupVisibility("private")}
-                  disabled={creating}
-                >
-                  <LockKeyhole size={15} aria-hidden="true" />
-                  Private
-                </button>
-
-                <button
-                  type="button"
-                  aria-pressed={groupVisibility === "public"}
-                  className={
-                    groupVisibility === "public"
-                      ? "is-selected"
-                      : ""
-                  }
-                  onClick={() => setGroupVisibility("public")}
-                  disabled={creating}
-                >
-                  <Globe2 size={15} aria-hidden="true" />
-                  Public
-                </button>
-              </div>
             </div>
 
             <button
-              type="submit"
-              className="sg3-create-action"
-              disabled={creating || !readyToCreate}
+              type="button"
+              className="cg-icon"
+              aria-label="Close dialog"
+              onClick={close}
+              disabled={busy}
             >
-              <Plus size={18} aria-hidden="true" />
-              {creating ? "Creating…" : "Create group"}
+              <X size={19} />
             </button>
-          </div>
-        </div>
-      </form>
+
+          </header>
+
+          {mode === "join" ? (
+
+            <InviteCodeField
+              code={inviteCode}
+              onChange={setInviteCode}
+              disabled={busy}
+            />
+
+          ) : (
+
+            <div className="cg-fields">
+
+              <label>
+
+                Group name
+
+                <input
+                  value={groupName}
+                  onChange={(event) =>
+                    setGroupName(event.target.value)
+                  }
+                  required
+                  minLength={2}
+                  maxLength={60}
+                  disabled={busy}
+                  placeholder="Machine Learning Club"
+                />
+
+              </label>
+
+              <label>
+
+                Description (optional)
+
+                <textarea
+                  value={groupDescription}
+                  onChange={(event) =>
+                    setGroupDescription(
+                      event.target.value
+                    )
+                  }
+                  maxLength={300}
+                  rows={3}
+                  disabled={busy}
+                  placeholder="What will your group study?"
+                />
+
+              </label>
+
+              <fieldset className="cg-visibility">
+
+                <legend>Visibility</legend>
+
+                {[
+                  ["private", LockKeyhole],
+                  ["public", Globe2],
+                ].map(([value, Icon]) => (
+
+                  <button
+                    type="button"
+                    key={value}
+                    className="cg-button"
+                    aria-pressed={
+                      groupVisibility === value
+                    }
+                    disabled={busy}
+                    onClick={() =>
+                      setGroupVisibility(value)
+                    }
+                  >
+
+                    <Icon size={16} />
+
+                    {value === "private"
+                      ? "Private"
+                      : "Public"}
+
+                  </button>
+
+                ))}
+
+              </fieldset>
+
+            </div>
+
+          )}
+
+          {error && (
+            <p
+              className="cg-dialog-error"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
+
+          <footer className="cg-dialog-footer">
+
+            <button
+              type="button"
+              className="cg-button"
+              onClick={close}
+              disabled={busy}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="cg-button cg-primary"
+              disabled={
+                busy ||
+                !(mode === "join"
+                  ? readyToJoin
+                  : readyToCreate)
+              }
+            >
+              {busy
+                ? "Working..."
+                : mode === "join"
+                  ? "Join group"
+                  : "Create group"}
+            </button>
+
+          </footer>
+
+        </form>
+
+      </dialog>
+
     </section>
   );
 }

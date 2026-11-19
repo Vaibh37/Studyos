@@ -2319,12 +2319,108 @@ function Settings() {
   const ActiveSectionIcon =
     activeSectionMeta.icon;
 
+  useEffect(() => {
+    if (
+      !showImportModal &&
+      !showResetModal &&
+      !showDeleteAllModal
+    ) return;
+
+    const modal = document.querySelector(
+      ".settings-clean .settings-v2-modal"
+    );
+
+    if (!modal) return;
+
+    const previousFocus = document.activeElement;
+
+    const cancelButton = modal.querySelector(
+      ".settings-v2-modal-actions .settings-v2-secondary-button"
+    );
+
+    const getFocusable = () =>
+      Array.from(
+        modal.querySelectorAll(
+          'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex="0"]'
+        )
+      ).filter(
+        (element) => element.getClientRects().length > 0
+      );
+
+    const frame = requestAnimationFrame(() => {
+      if (cancelButton && !cancelButton.disabled) {
+        cancelButton.focus();
+      } else {
+        modal.focus();
+      }
+    });
+
+    const handleKey = (event) => {
+      if (event.key === "Escape") {
+        if (cancelButton && !cancelButton.disabled) {
+          event.preventDefault();
+          cancelButton.click();
+        }
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const elements = getFocusable();
+
+      if (!elements.length) {
+        event.preventDefault();
+        modal.focus();
+        return;
+      }
+
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+
+      if (!elements.includes(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (
+        event.shiftKey &&
+        document.activeElement === first
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKey);
+
+    return () => {
+      cancelAnimationFrame(frame);
+
+      document.removeEventListener(
+        "keydown",
+        handleKey
+      );
+
+      if (previousFocus?.isConnected) {
+        previousFocus.focus();
+      }
+    };
+  }, [
+    showImportModal,
+    showResetModal,
+    showDeleteAllModal,
+  ]);
+
   // =======================================================
   // UI
   // =======================================================
 
   return (
-    <div className="dashboard settings-page settings-v2-page">
+    <div className="dashboard settings-page settings-v2-page settings-clean">
 
       {/* ===================================================
           HEADER
@@ -2343,11 +2439,7 @@ function Settings() {
           </h1>
 
           <p>
-            Manage your account,
-            profile, study goals,
-            Focus defaults, browser
-            permissions, backups and
-            StudyOS data.
+            Manage your account and preferences.
           </p>
 
         </div>
@@ -2502,6 +2594,7 @@ function Settings() {
                       section.id
                     }
                     type="button"
+                    data-section={section.id}
                     className={`settings-v2-nav-item ${
                       isActive
                         ? "active"
@@ -3890,7 +3983,7 @@ function Settings() {
         >
 
           <div
-            className="settings-v2-modal"
+            className="settings-v2-modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-reset-heading" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-import-heading"
             onClick={(
               event
             ) =>
@@ -3906,7 +3999,7 @@ function Settings() {
 
             </div>
 
-            <h2>
+            <h2 id="settings-import-heading">
               Import StudyOS backup?
             </h2>
 
@@ -3995,7 +4088,7 @@ function Settings() {
 
             </div>
 
-            <h2>
+            <h2 id="settings-reset-heading">
               Reset preferences?
             </h2>
 
@@ -4054,7 +4147,7 @@ function Settings() {
         >
 
           <div
-            className="settings-v2-modal settings-v2-modal-danger"
+            className="settings-v2-modal settings-v2-modal-danger" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-delete-heading"
             onClick={(
               event
             ) =>
@@ -4070,7 +4163,7 @@ function Settings() {
 
             </div>
 
-            <h2>
+            <h2 id="settings-delete-heading">
               Delete all StudyOS data?
             </h2>
 

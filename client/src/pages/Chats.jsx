@@ -55,6 +55,7 @@ import useGroupTyping from "../hooks/useGroupTyping";
 import useGroupReactions from "../hooks/useGroupReactions";
 
 import "../styles/chats.css";
+import "../styles/community-clean.css";
 
 
 // =========================================================
@@ -528,6 +529,30 @@ const getReplyPreviewText =
 // =========================================================
 // CHATS
 // =========================================================
+
+function ChatMemberAvatar({ src, name }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <span
+        className="chats-message-avatar fallback"
+        aria-hidden="true"
+      >
+        {getInitial(name)}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      className="chats-message-avatar"
+      src={src}
+      alt=""
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 function Chats() {
   const {
@@ -4651,7 +4676,7 @@ function Chats() {
 
   if (isGuest) {
     return (
-      <div className="chats-page">
+      <div className="chats-page community-chats">
 
         <section className="chats-guest-card">
 
@@ -4693,7 +4718,7 @@ function Chats() {
 
   return (
     <div
-      className={`chats-page ${
+      className={`chats-page community-chats ${
         isFullscreen
           ? "is-fullscreen"
           : ""
@@ -4946,6 +4971,7 @@ function Chats() {
                       key={
                         groupId
                       }
+                      aria-pressed={active}
                       className={`chats-room-item ${
                         active
                           ? "is-active"
@@ -4999,7 +5025,7 @@ function Chats() {
                             {Number(
                               group.memberCount
                             ) || 1}{" "}
-                            members
+                            {(Number(group.memberCount) || 1) === 1 ? "member" : "members"}
                           </span>
 
                           <span>
@@ -5118,7 +5144,7 @@ function Chats() {
                       {Number(
                         selectedGroup.memberCount
                       ) || 1}{" "}
-                      members
+                      {(Number(selectedGroup.memberCount) || 1) === 1 ? "member" : "members"}
                       {" · "}
                       {selectedGroup.role ||
                         "member"}
@@ -5375,30 +5401,13 @@ function Chats() {
 
                                 <div className="chats-message-avatar-slot">
 
-                                  {showSender &&
-                                    (
-                                      chatMessage.picture ? (
-
-                                        <img
-                                          src={
-                                            chatMessage.picture
-                                          }
-                                          alt=""
-                                          className="chats-message-avatar"
-                                        />
-
-                                      ) : (
-
-                                        <span className="chats-message-avatar fallback">
-
-                                          {getInitial(
-                                            senderName
-                                          )}
-
-                                        </span>
-
-                                      )
-                                    )}
+                                  {showSender && (
+                                    <ChatMemberAvatar
+                                      key={chatMessage.picture || "fallback"}
+                                      src={chatMessage.picture}
+                                      name={senderName}
+                                    />
+                                  )}
 
                                 </div>
 

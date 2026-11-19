@@ -1017,3 +1017,1819 @@
   -webkit-appearance: none;
   appearance: none;
 }
+
+
+/* =========================================================
+   STUDYOS - DOCUMENT WORKSPACE
+   ========================================================= */
+
+.n3-page.n3-clean {
+  width: 100%;
+  max-width: 1250px;
+  min-width: 0;
+  margin: 0 auto;
+  padding-bottom: 20px;
+}
+
+.n3-clean .n3-header {
+  align-items: center;
+  margin: 0 0 20px;
+  gap: 12px;
+}
+
+.n3-clean .n3-eyebrow {
+  display: none;
+}
+
+.n3-clean .n3-header h1 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.n3-clean .n3-header p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.n3-clean .n3-new {
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* WORKSPACE */
+
+.n3-clean .n3-workspace,
+.n3-clean .n3-workspace.is-empty {
+  display: grid;
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  height: clamp(400px, calc(100dvh - 160px), 1000px);
+  min-width: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.n3-clean .n3-library {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  padding: 14px 16px 0 0;
+  border-right: 1px solid var(--color-border);
+}
+
+/* LIBRARY CONTROLS */
+
+.n3-clean .n3-summary {
+  flex-shrink: 0;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.n3-clean .n3-summary > span {
+  padding: 0;
+  gap: 5px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 11px;
+}
+
+.n3-clean .n3-summary > span svg {
+  width: 13px;
+  height: 13px;
+}
+
+.n3-clean .n3-summary > button {
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  padding: 0;
+  gap: 0;
+  font-size: 0;
+  border-radius: 6px;
+}
+
+.n3-clean .n3-summary > button:hover {
+  background: var(--color-surface-hover);
+}
+
+.n3-clean .n3-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+.n3-clean .n3-search {
+  grid-column: 1 / -1;
+  min-height: 36px;
+  padding: 0 9px;
+  border-radius: 7px;
+  gap: 7px;
+}
+
+.n3-clean .n3-search input {
+  font-size: 12px;
+}
+
+.n3-clean .n3-search > svg {
+  width: 15px;
+  height: 15px;
+}
+
+.n3-clean .n3-select .study-select-trigger {
+  min-height: 34px;
+  padding-inline: 8px;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+
+.n3-clean .n3-library-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 11px;
+  flex-shrink: 0;
+}
+
+.n3-clean .n3-library-heading h2 {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.n3-clean .n3-library-heading > span {
+  border: 0;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* COMPACT NOTE LIST */
+
+.n3-clean .n3-masonry {
+  display: block;
+  columns: auto !important;
+  column-gap: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.n3-clean .nr-note-group {
+  margin-bottom: 18px;
+}
+
+.n3-clean .nr-group-label {
+  padding: 7px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.n3-clean .n3-tile {
+  display: flex;
+  position: relative;
+  width: 100%;
+  margin: 0 0 3px;
+  padding: 10px 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text);
+  transition: background 120ms ease;
+}
+
+.n3-clean .n3-tile::before {
+  display: none;
+}
+
+.n3-clean .n3-tile:hover {
+  transform: none;
+  border-color: transparent;
+  background: var(--color-surface-hover);
+}
+
+.n3-clean .n3-tile.is-active {
+  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+}
+
+.n3-clean .n3-tile-top {
+  position: absolute;
+  top: 10px;
+  right: 9px;
+  width: auto;
+  margin: 0;
+}
+
+.n3-clean .n3-tile-icon {
+  display: none;
+}
+
+.n3-clean .n3-tile-pin {
+  width: 12px;
+  height: 12px;
+}
+
+.n3-clean .n3-tile-title {
+  max-width: calc(100% - 14px);
+  padding-right: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.n3-clean .n3-tile-preview,
+.n3-clean .n3-tile:nth-child(3n + 2) .n3-tile-preview {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: normal;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.n3-clean .n3-tile-bottom {
+  margin-top: 9px;
+  gap: 6px;
+  font-size: 10px;
+  align-items: center;
+}
+
+.n3-clean .n3-subject-tag {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.n3-clean .n3-subject-tag i {
+  width: 5px;
+  height: 5px;
+}
+
+/* DOCUMENT EDITOR */
+
+.n3-clean .n3-editor-layer {
+  min-width: 0;
+  min-height: 0;
+}
+
+.n3-clean .n3-editor {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.n3-clean .n3-editor-bar {
+  min-height: 46px;
+  padding: 6px 14px 6px 22px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.n3-clean .n3-save-status {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.n3-clean .n3-save-status.is-error,
+.n3-clean .n3-footer-hint.is-error {
+  color: var(--color-danger);
+}
+
+.n3-clean .n3-editor-tools {
+  gap: 3px;
+}
+
+.n3-clean .n3-editor-tools button {
+  width: 31px;
+  height: 31px;
+  border-radius: 6px;
+}
+
+.n3-clean .n3-editor-tools button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.n3-clean .n3-editor-scroll {
+  width: 100%;
+  min-width: 0;
+  padding: 28px clamp(20px, 4vw, 56px) 28px;
+  scrollbar-width: thin;
+}
+
+.n3-clean .n3-title-input {
+  margin: 0 0 14px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+}
+
+.n3-clean .n3-title-input:focus-visible {
+  outline: none;
+}
+
+.n3-clean .n3-note-meta {
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.n3-clean .n3-editor-select {
+  min-width: 100px;
+  max-width: 240px;
+}
+
+.n3-clean .n3-editor-select .study-select-trigger {
+  min-height: 32px;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.n3-clean .n3-note-meta > span {
+  font-size: 11px;
+}
+
+.n3-clean .n3-editor-paper {
+  min-height: 260px;
+}
+
+/* VISUAL / MARKDOWN SWITCH */
+
+.nr-mode-switch {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.nr-mode-options {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.nr-mode-options button {
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.nr-mode-options button.is-active {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* FORMATTING TOOLBAR */
+
+.nr-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 6px 0;
+  margin-bottom: 20px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.nr-toolbar .nr-tool {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.nr-toolbar .nr-tool:hover:not(:disabled),
+.nr-toolbar .nr-tool.is-active {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.nr-tool-divider {
+  display: block;
+  width: 1px;
+  height: 18px;
+  margin: 0 3px;
+  background: var(--color-border);
+}
+
+.nr-paragraph {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nr-code-symbol {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* DOCUMENT TYPOGRAPHY */
+
+.nr-document {
+  min-height: 280px;
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  outline: none;
+}
+
+.nr-document:focus {
+  outline: none;
+}
+
+.nr-document > :first-child {
+  margin-top: 0;
+}
+
+.nr-document p {
+  margin: 0 0 10px;
+}
+
+.nr-document h1 {
+  margin: 24px 0 12px;
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+}
+
+.nr-document h2 {
+  margin: 20px 0 10px;
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.nr-document h3 {
+  margin: 16px 0 8px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.nr-document strong {
+  font-weight: 700;
+}
+
+.nr-document a {
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.nr-document ul,
+.nr-document ol {
+  margin: 8px 0 14px;
+  padding-left: 24px;
+}
+
+.nr-document ul {
+  list-style: disc;
+}
+
+.nr-document ol {
+  list-style: decimal;
+}
+
+.nr-document li {
+  padding: 1px 0;
+}
+
+.nr-document li > p {
+  margin: 0;
+}
+
+.nr-document blockquote {
+  margin: 15px 0;
+  padding: 3px 0 3px 14px;
+  border-left: 3px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+}
+
+.nr-document blockquote > p:last-child {
+  margin-bottom: 0;
+}
+
+.nr-document hr {
+  margin: 25px 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+/* PROGRAMMING NOTES */
+
+.nr-document code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--color-surface-hover);
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+}
+
+.nr-document pre {
+  margin: 15px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.nr-document pre code {
+  display: block;
+  padding: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: pre;
+}
+
+/* INTERACTIVE CHECKLISTS */
+
+.nr-document ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.nr-document ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.nr-document ul[data-type="taskList"] li > label {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.nr-document ul[data-type="taskList"] li > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.nr-document ul[data-type="taskList"] input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--color-solid);
+}
+
+.nr-document li[data-checked="true"] > div > p {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.nr-document ul[data-type="taskList"]
+ul[data-type="taskList"] {
+  padding-left: 12px;
+}
+
+/* EMPTY DOCUMENT PLACEHOLDER */
+
+.nr-document p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-text-muted);
+}
+
+/* MARKDOWN SOURCE MODE */
+
+.n3-clean .n3-editor-paper .nr-markdown-source {
+  display: block;
+  width: 100%;
+  min-height: 340px;
+  padding: 14px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  tab-size: 4;
+}
+
+/* EDITOR FOOTER */
+
+.n3-clean .n3-editor-count {
+  margin-top: 16px;
+  font-size: 10px;
+}
+
+.n3-clean .n3-editor-footer {
+  min-height: 43px;
+  padding: 7px 18px 7px 22px;
+  background: transparent;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.n3-clean .n3-footer-hint {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.n3-clean .n3-save {
+  min-height: 29px;
+  padding: 0 10px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.n3-clean .n3-save:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.n3-clean .n3-save svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* EMPTY STATES */
+
+.n3-clean .n3-empty {
+  min-height: 150px;
+  padding: 20px 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.n3-clean .n3-empty-art {
+  width: 35px;
+  height: 35px;
+  border: 0;
+  background: transparent;
+}
+
+.n3-clean .n3-empty-art svg {
+  width: 23px;
+  height: 23px;
+}
+
+.n3-clean .n3-empty h3 {
+  font-size: 14px;
+}
+
+.n3-clean .n3-empty p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.n3-clean .n3-empty-action {
+  min-height: 34px;
+  padding-inline: 10px;
+  font-size: 11px;
+  border-radius: 6px;
+}
+
+.nr-no-document {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.nr-no-document h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nr-no-document p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.nr-editor-loading {
+  padding: 25px 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* SMALL DESKTOP */
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .n3-clean .n3-workspace,
+  .n3-clean .n3-workspace.is-empty {
+    grid-template-columns: 225px minmax(0, 1fr);
+  }
+
+  .n3-clean .n3-library {
+    padding-right: 10px;
+  }
+
+  .n3-clean .n3-editor-scroll {
+    padding-inline: 22px;
+  }
+}
+
+/* FULL-SCREEN MOBILE EDITOR */
+
+@media (max-width: 900px) {
+
+  .n3-page.n3-clean {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+
+  .n3-clean .n3-workspace,
+  .n3-clean .n3-workspace.is-empty {
+    display: block;
+    min-height: 0;
+    height: auto;
+  }
+
+  .n3-clean .n3-library {
+    padding: 14px 0;
+    border: 0;
+  }
+
+  .n3-clean .n3-header {
+    margin-bottom: 15px;
+  }
+
+  .n3-clean .n3-header h1 {
+    font-size: 27px;
+  }
+
+  .n3-clean .n3-new {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .n3-clean .n3-summary {
+    margin-bottom: 12px;
+  }
+
+  .n3-clean .n3-summary > span {
+    font-size: 12px;
+  }
+
+  .n3-clean .n3-search {
+    min-height: 44px;
+  }
+
+  .n3-clean .n3-search input {
+    font-size: 14px;
+  }
+
+  .n3-clean .n3-select .study-select-trigger {
+    min-height: 40px !important;
+    font-size: 12px !important;
+  }
+
+  .n3-clean .n3-masonry {
+    overflow: visible;
+  }
+
+  .n3-clean .n3-tile {
+    padding: 13px 10px;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 6px;
+  }
+
+  .n3-clean .n3-tile-title {
+    font-size: 14px;
+  }
+
+  .n3-clean .n3-tile-preview {
+    font-size: 12px;
+  }
+
+  .n3-clean .n3-tile-bottom {
+    font-size: 11px;
+  }
+
+  .n3-clean .n3-editor-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+  }
+
+  .n3-clean .n3-editor {
+    position: absolute;
+    inset: 0;
+    height: 100dvh;
+    width: 100%;
+    min-height: 0;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    background: var(--color-bg);
+    animation: none;
+  }
+
+  .n3-clean .n3-editor-backdrop,
+  .n3-clean .n3-sheet-handle {
+    display: none;
+  }
+
+  .n3-clean .n3-back {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+  }
+
+  .n3-clean .n3-editor-bar {
+    padding:
+      max(7px, env(safe-area-inset-top))
+      12px
+      7px;
+    min-height: 55px;
+  }
+
+  .n3-clean .n3-editor-tools button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .n3-clean .n3-editor-scroll {
+    padding: 22px 17px 26px;
+  }
+
+  .n3-clean .n3-title-input {
+    font-size: 29px;
+  }
+
+  .n3-clean .n3-note-meta {
+    margin-bottom: 17px;
+  }
+
+  .nr-mode-options button {
+    min-height: 32px;
+  }
+
+  .nr-toolbar {
+    gap: 3px;
+    margin-bottom: 16px;
+  }
+
+  .nr-toolbar .nr-tool {
+    width: 35px;
+    height: 38px;
+  }
+
+  .nr-tool-divider {
+    display: none;
+  }
+
+  .nr-document {
+    font-size: 16px;
+    min-height: 40dvh;
+  }
+
+  .nr-document h1 {
+    font-size: 25px;
+  }
+
+  .nr-document h2 {
+    font-size: 21px;
+  }
+
+  .nr-document pre {
+    padding: 12px;
+  }
+
+  .n3-clean .n3-editor-footer {
+    padding: 8px 15px calc(8px + env(safe-area-inset-bottom));
+    background: var(--color-bg);
+  }
+
+  .n3-clean .n3-save {
+    min-height: 36px;
+  }
+
+  .nr-no-document {
+    display: none;
+  }
+}
+
+@media (max-width: 350px) {
+  .n3-clean .n3-editor-scroll {
+    padding-inline: 12px;
+  }
+
+  .nr-toolbar .nr-tool {
+    width: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .n3-clean *,
+  .n3-clean *::before {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+/* STUDYOS - SEAMLESS DOCUMENT EDITOR */
+
+.n3-clean .n3-workspace,
+.n3-clean .n3-workspace.is-empty {
+  height: auto !important;
+  min-height: 420px;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.n3-clean .n3-library {
+  overflow: visible !important;
+}
+
+.n3-clean .n3-masonry {
+  flex: 0 1 auto;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.n3-clean .n3-editor-layer {
+  height: auto;
+  max-height: none;
+}
+
+.n3-clean .n3-editor {
+  height: auto !important;
+  min-height: 450px;
+  max-height: none !important;
+  overflow: visible !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.n3-clean .n3-editor-scroll {
+  flex: 1 0 auto;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto;
+  padding: 24px clamp(20px, 4vw, 48px);
+}
+
+/* Remove unnecessary editor spacing */
+
+.n3-clean .n3-title-input {
+  margin-bottom: 12px;
+}
+
+.n3-clean .n3-note-meta {
+  margin-bottom: 12px;
+}
+
+.n3-clean .nr-mode-switch {
+  margin-bottom: 5px;
+}
+
+.n3-clean .nr-toolbar {
+  position: static;
+  margin-bottom: 16px;
+  padding: 5px 0;
+}
+
+/* Remove rectangular focus outline */
+
+.n3-clean .nr-document,
+.n3-clean .nr-document:focus,
+.n3-clean .nr-document:focus-visible,
+.n3-clean .ProseMirror,
+.n3-clean .ProseMirror:focus,
+.n3-clean .ProseMirror-focused,
+.n3-clean [contenteditable="true"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+/* Natural writing surface */
+
+.n3-clean .n3-editor-paper {
+  min-height: 200px;
+  height: auto !important;
+  overflow: visible !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.n3-clean .nr-document {
+  min-height: 200px;
+  height: auto;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Clean Markdown writing mode */
+
+.n3-clean .n3-editor-paper .nr-markdown-source {
+  min-height: 200px;
+  field-sizing: content;
+  padding: 0;
+  resize: vertical;
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Compact footer */
+
+.n3-clean .n3-editor-count {
+  margin-top: 12px;
+}
+
+.n3-clean .n3-editor-footer {
+  position: static;
+  min-height: 38px;
+  padding: 8px 20px;
+}
+
+/* Mobile: single scrollable document */
+
+@media (max-width: 900px) {
+
+  .n3-clean .n3-workspace,
+  .n3-clean .n3-workspace.is-empty {
+    min-height: 0;
+  }
+
+  .n3-clean .n3-editor-layer.is-open {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain;
+    background: var(--color-bg);
+  }
+
+  .n3-clean .n3-editor {
+    position: relative !important;
+    inset: auto !important;
+    min-height: 100dvh;
+    height: auto !important;
+    border-radius: 0 !important;
+  }
+
+  .n3-clean .n3-editor-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-bg);
+  }
+
+  .n3-clean .n3-editor-scroll {
+    padding: 20px 17px;
+  }
+
+  .n3-clean .nr-document {
+    min-height: 220px;
+    font-size: 16px;
+  }
+}
+
+
+
+/* =========================================================
+   STUDYOS - PROFESSIONAL EDITOR CONTROLS
+   ========================================================= */
+
+/* FORMATTING TOOLBAR */
+
+.n3-clean .nr-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 0;
+  margin-bottom: 19px;
+  overflow: visible;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.n3-clean .nr-toolbar .nr-tool {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-text-muted);
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.n3-clean .nr-toolbar .nr-tool:hover:not(:disabled) {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.n3-clean .nr-toolbar .nr-tool.is-active {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+}
+
+.n3-clean .nr-toolbar .nr-tool:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.n3-clean .nr-toolbar .nr-tool:focus-visible {
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: 2px;
+}
+
+/* CUSTOM TOOLBAR TOOLTIPS */
+
+.n3-clean .nr-tool[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translate(-50%, -3px);
+  padding: 6px 9px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 5px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 4px 12px #0002;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 100ms ease,
+    transform 100ms ease;
+}
+
+@media (hover: hover) {
+  .n3-clean .nr-tool[data-tooltip]:hover:not(:disabled)::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition-delay: 350ms;
+  }
+}
+
+.n3-clean .nr-tool[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.n3-clean .nr-tool-divider {
+  height: 17px;
+  margin-inline: 4px;
+  opacity: 0.8;
+}
+
+/* VISUAL / MARKDOWN CONTROL */
+
+.n3-clean .nr-mode-options {
+  padding: 3px;
+  gap: 2px;
+  border-radius: 6px;
+  background: var(--color-surface);
+}
+
+.n3-clean .nr-mode-options button {
+  min-height: 27px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.n3-clean .nr-mode-options button:hover {
+  color: var(--color-text);
+}
+
+.n3-clean .nr-mode-options button.is-active {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* PIN, DELETE AND BACK BUTTONS */
+
+.n3-clean .n3-editor-tools button,
+.n3-clean .n3-back,
+.n3-clean .n3-summary > button {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.n3-clean .n3-editor-tools button:hover,
+.n3-clean .n3-back:hover,
+.n3-clean .n3-summary > button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.n3-clean .n3-editor-tools .n3-delete-trigger:hover {
+  background: var(--color-danger-bg, #dc262615);
+  color: var(--color-danger, #ef4444);
+}
+
+/* SEARCH AND DROPDOWN TRIGGERS */
+
+.n3-clean .n3-search {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 6px;
+  transition: border-color 120ms ease;
+}
+
+.n3-clean .n3-search:focus-within {
+  border-color: var(--color-text-muted);
+  box-shadow: none;
+}
+
+.n3-clean .n3-search input:focus-visible {
+  outline: none;
+}
+
+.n3-clean .study-select-trigger {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  background: var(--color-surface) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+
+.n3-clean .study-select-trigger:hover {
+  border-color: var(--color-border-strong) !important;
+  background: var(--color-surface-hover) !important;
+}
+
+.n3-clean .study-select-menu {
+  padding: 4px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: 0 8px 24px #0003;
+}
+
+.n3-clean .study-select-option {
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.n3-clean .study-select-option:hover {
+  background: var(--color-surface-hover);
+}
+
+/* =========================================================
+   CUSTOM LINK DIALOG
+   ========================================================= */
+
+.n3-clean .nr-link-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(420px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  background: var(--color-surface, #171717);
+  color: var(--color-text, #f5f5f5);
+  box-shadow: 0 24px 80px #0005;
+}
+
+.n3-clean .nr-link-dialog[open] {
+  animation: nr-dialog-enter 150ms ease-out;
+}
+
+.n3-clean .nr-link-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.nr-link-form {
+  padding: 22px;
+}
+
+.nr-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.nr-dialog-icon {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.nr-dialog-close {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.nr-dialog-close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.nr-link-form h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.nr-dialog-description {
+  margin: 6px 0 21px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.nr-dialog-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.nr-url-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 41px;
+  padding: 0 11px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 7px;
+  background: var(--color-bg);
+  transition: border-color 120ms ease;
+}
+
+.nr-url-field > svg {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.nr-url-field:focus-within {
+  border-color: var(--color-text-muted);
+}
+
+.n3-clean .nr-url-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.nr-url-field input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.nr-url-field.is-invalid {
+  border-color: var(--color-danger, #ef4444);
+}
+
+.nr-link-error {
+  display: block;
+  margin-top: 7px;
+  color: var(--color-danger, #ef4444);
+  font-size: 12px;
+}
+
+/* DIALOG BUTTONS */
+
+.nr-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid var(--color-border);
+}
+
+.nr-dialog-right {
+  display: flex;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.n3-clean .nr-dialog-actions button {
+  min-height: 35px;
+  padding: 0 13px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nr-cancel {
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.nr-cancel:hover {
+  background: var(--color-surface-hover);
+}
+
+.nr-apply {
+  border: 1px solid var(--color-solid);
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+}
+
+.nr-apply:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.nr-remove-link {
+  border: 0;
+  padding-inline: 0 !important;
+  background: transparent;
+  color: var(--color-danger, #ef4444);
+}
+
+.nr-remove-link:hover {
+  text-decoration: underline;
+}
+
+@keyframes nr-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   DELETE CONFIRMATION
+   ========================================================= */
+
+.n3-clean .n3-confirm-overlay {
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.n3-clean .n3-confirm {
+  width: min(400px, 100%);
+  padding: 22px;
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: 0 24px 80px #0005;
+}
+
+.n3-clean .n3-confirm-icon {
+  width: 37px;
+  height: 37px;
+  border-radius: 8px;
+  background: var(--color-danger-bg, #dc262615);
+  border: 0;
+}
+
+.n3-clean .n3-confirm-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.n3-clean .n3-confirm h2 {
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.n3-clean .n3-confirm p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.n3-clean .n3-confirm > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid var(--color-border);
+}
+
+.n3-clean .n3-confirm > div button {
+  min-height: 35px;
+  padding: 0 13px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.n3-clean .n3-confirm > div button.is-danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+.n3-clean .n3-confirm > div button.is-danger:hover {
+  background: #b91c1c;
+}
+
+/* =========================================================
+   DOCUMENT ELEMENTS
+   ========================================================= */
+
+.n3-clean .nr-document a {
+  color: #4c8df6;
+  text-decoration-color: #4c8df680;
+  text-underline-offset: 3px;
+}
+
+.n3-clean .nr-document pre {
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  padding: 15px;
+}
+
+.n3-clean .nr-document blockquote {
+  border-left: 2px solid var(--color-text-muted);
+  padding-left: 13px;
+}
+
+.n3-clean .nr-document ::selection {
+  background: #4c8df640;
+}
+
+.n3-clean .nr-document input[type="checkbox"] {
+  accent-color: var(--color-solid);
+  cursor: pointer;
+}
+
+/* SAVE CONTROLS */
+
+.n3-clean .n3-save {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  min-height: 32px;
+  font-size: 12px;
+}
+
+.n3-clean .n3-save:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+
+  .n3-clean .nr-toolbar .nr-tool {
+    width: 38px;
+    height: 40px;
+  }
+
+  .n3-clean .nr-toolbar {
+    gap: 3px;
+  }
+
+  .n3-clean .nr-link-dialog {
+    width: calc(100vw - 28px);
+  }
+
+  .nr-link-form {
+    padding: 18px;
+  }
+
+  .n3-clean .nr-url-field input {
+    font-size: 16px;
+  }
+
+  .n3-clean .nr-dialog-actions button,
+  .n3-clean .n3-confirm > div button {
+    min-height: 42px;
+  }
+
+  .nr-dialog-close {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .n3-clean .nr-link-dialog,
+  .n3-clean .nr-tool,
+  .n3-clean .nr-tool::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* STUDYOS TYPOGRAPHY START */
+
+/* NOTES TYPOGRAPHY */
+
+.n3-page.n3-clean .n3-header h1 {
+  font-size: 28px !important;
+  font-weight: 700;
+}
+
+.n3-page.n3-clean .n3-header p {
+  font-size: 15px !important;
+}
+
+.n3-page.n3-clean .n3-new,
+.n3-page.n3-clean .n3-search input {
+  font-size: 14px !important;
+}
+
+.n3-page.n3-clean .n3-select .study-select-trigger {
+  font-size: 13px !important;
+}
+
+.n3-page.n3-clean .n3-summary > span,
+.n3-page.n3-clean .n3-library-heading > span,
+.n3-page.n3-clean .nr-group-label {
+  font-size: 13px !important;
+}
+
+.n3-page.n3-clean .n3-library-heading h2 {
+  font-size: 16px !important;
+}
+
+.n3-page.n3-clean .n3-tile-title {
+  font-size: 15px !important;
+  font-weight: 600;
+}
+
+.n3-page.n3-clean .n3-tile-preview {
+  font-size: 14px !important;
+}
+
+.n3-page.n3-clean .n3-tile-bottom,
+.n3-page.n3-clean .n3-subject-tag {
+  font-size: 12px !important;
+}
+
+.n3-page.n3-clean .n3-title-input {
+  font-size: 32px !important;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.n3-page.n3-clean .n3-note-meta > span,
+.n3-page.n3-clean .n3-save-status,
+.n3-page.n3-clean .n3-editor-count,
+.n3-page.n3-clean .n3-footer-hint {
+  font-size: 13px !important;
+}
+
+.n3-page.n3-clean .n3-editor-select .study-select-trigger,
+.n3-page.n3-clean .nr-mode-options button,
+.n3-page.n3-clean .n3-save {
+  font-size: 14px !important;
+}
+
+.n3-page.n3-clean .nr-document {
+  font-size: 16px !important;
+  line-height: 1.8;
+}
+
+.n3-page.n3-clean .nr-document h1 {
+  font-size: 28px !important;
+}
+
+.n3-page.n3-clean .nr-document h2 {
+  font-size: 23px !important;
+}
+
+.n3-page.n3-clean .nr-document h3 {
+  font-size: 19px !important;
+}
+
+.n3-page.n3-clean .nr-document pre code,
+.n3-page.n3-clean .nr-markdown-source {
+  font-size: 14px !important;
+  line-height: 1.75;
+}
+
+.n3-page.n3-clean .nr-tool[data-tooltip]::after {
+  font-size: 12px !important;
+}
+
+.n3-page.n3-clean .nr-dialog-description,
+.n3-page.n3-clean .nr-url-field input,
+.n3-page.n3-clean .nr-dialog-actions button {
+  font-size: 14px !important;
+}
+
+.n3-page.n3-clean .nr-dialog-label,
+.n3-page.n3-clean .nr-link-error {
+  font-size: 13px !important;
+}
+
+/* STUDYOS TYPOGRAPHY END */

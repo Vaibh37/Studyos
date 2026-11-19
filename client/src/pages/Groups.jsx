@@ -41,6 +41,7 @@ import GroupActions from "../components/groups/GroupActions";
 import MobileGroupActions from "../components/groups/MobileGroupActions";
 import "../styles/groups-v2.css";
 import "../styles/groups-polish.css";
+import "../styles/community-clean.css";
 
 
 // =========================================================
@@ -178,6 +179,30 @@ const getInitial =
 // GROUPS
 // =========================================================
 
+function CommunityAvatar({ src, name }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <span
+        className="v2g-member-avatar"
+        aria-hidden="true"
+      >
+        {getInitial(name)}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt=""
+      className="v2g-member-picture"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 function Groups() {
   const {
     isGuest,
@@ -212,7 +237,7 @@ function Groups() {
   const [
     mobileMembersOpen,
     setMobileMembersOpen,
-  ] = useState(false);
+  ] = useState(() => window.matchMedia("(min-width: 761px)").matches);
 
   const [
     members,
@@ -1059,6 +1084,7 @@ function Groups() {
         showMessage(
           "Study group created"
         );
+        return true;
       } catch (
         createError
       ) {
@@ -1133,6 +1159,7 @@ function Groups() {
         showMessage(
           "Joined study group"
         );
+        return true;
       } catch (
         joinError
       ) {
@@ -1298,7 +1325,7 @@ function Groups() {
 
   if (isGuest) {
     return (
-      <div className="v2g-page">
+      <div className="v2g-page community-groups">
 
         <header className="v2g-header">
 
@@ -1347,7 +1374,7 @@ function Groups() {
   // =======================================================
 
   return (
-    <div className="v2g-page">
+    <div className="v2g-page community-groups">
 
       <header className="v2g-header">
 
@@ -1406,6 +1433,8 @@ function Groups() {
 
       <div className="sgm-desktop">
       <GroupActions
+        error={error}
+        clearError={() => setError("")}
         inviteCode={inviteCode}
         setInviteCode={setInviteCode}
         joining={joining}
@@ -1494,7 +1523,7 @@ function Groups() {
             </h3>
 
             <p>
-              Create one above or join a friend's room with an invite code.
+              Create a group or join with an invite code.
             </p>
 
           </div>
@@ -1521,6 +1550,7 @@ function Groups() {
                     key={
                       group._id
                     }
+                    aria-pressed={active}
                     className={`v2g-group-card ${
                       active
                         ? "is-active"
@@ -1573,7 +1603,7 @@ function Groups() {
                       ) ||
                         1}{" "}
 
-                      members Â·{" "}
+                      {(Number(group.memberCount) || 1) === 1 ? "member" : "members"} ·{" "}
 
                       {group.visibility ||
                         "private"}
@@ -1763,25 +1793,7 @@ function Groups() {
                           }
                         >
 
-                          {liveUser.picture ? (
-
-                            <img
-                              src={
-                                liveUser.picture
-                              }
-                              alt=""
-                              className="v2g-member-picture"
-                            />
-
-                          ) : (
-
-                            <span className="v2g-member-avatar">
-                              {getInitial(
-                                name
-                              )}
-                            </span>
-
-                          )}
+                          <CommunityAvatar key={liveUser.picture || "fallback"} src={liveUser.picture} name={name} />
 
 
                           <div className="v2g-live-copy">
@@ -2002,26 +2014,7 @@ function Groups() {
                         }
                       >
 
-                        {member.picture ? (
-
-                          <img
-                            src={
-                              member.picture
-                            }
-                            alt=""
-                            className="v2g-member-picture"
-                          />
-
-                        ) : (
-
-                          <span className="v2g-member-avatar">
-                            {getInitial(
-                              member.displayName ||
-                                "Student"
-                            )}
-                          </span>
-
-                        )}
+                        <CommunityAvatar key={member.picture || "fallback"} src={member.picture} name={member.displayName || "Student"} />
 
 
                         <div className="v2g-member-copy">
@@ -2209,25 +2202,7 @@ function Groups() {
                         </div>
 
 
-                        {entry.picture ? (
-
-                          <img
-                            src={
-                              entry.picture
-                            }
-                            alt=""
-                            className="v2g-member-picture"
-                          />
-
-                        ) : (
-
-                          <span className="v2g-member-avatar">
-                            {getInitial(
-                              displayName
-                            )}
-                          </span>
-
-                        )}
+                        <CommunityAvatar key={entry.picture || "fallback"} src={entry.picture} name={displayName} />
 
 
                         <div className="v2g-leaderboard-copy">
@@ -2262,7 +2237,7 @@ function Groups() {
                               ? "session"
                               : "sessions"}
 
-                            {" Â· "}
+                            {" · "}
 
                             {entry.role ||
                               "member"}

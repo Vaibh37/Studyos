@@ -21,6 +21,7 @@ import {
 
 import StudyDatePicker from "./StudyDatePicker";
 import StudySelect from "./StudySelect";
+import StudyTimePicker from "./StudyTimePicker";
 
 // =========================================================
 // HELPERS
@@ -291,7 +292,7 @@ function DeleteTaskModal({
 
   return createPortal(
     <div
-      className="studyos-modal-backdrop"
+      className="studyos-modal-backdrop task-clean-backdrop"
       onMouseDown={(
         event
       ) => {
@@ -370,7 +371,7 @@ function DeleteTaskModal({
 
             <button
               type="button"
-              className="task-modal-cancel"
+              className="task-modal-cancel" autoFocus
               onClick={
                 onCancel
               }
@@ -1069,23 +1070,18 @@ function TaskItem({
 
               </span>
 
-              <input
-                type="time"
-                value={
-                  editForm.dueTime
+              <StudyTimePicker
+                value={editForm.dueTime}
+                onChange={(value) =>
+                  updateEditField("dueTime", value)
                 }
-                onChange={(
-                  event
-                ) =>
-                  updateEditField(
-                    "dueTime",
-                    event.target.value
-                  )
+                disabled={saving || !editForm.dueDate}
+                placeholder={
+                  editForm.dueDate
+                    ? "No time"
+                    : "Add date first"
                 }
-                disabled={
-                  saving ||
-                  !editForm.dueDate
-                }
+                ariaLabel="Choose task due time"
               />
 
             </label>
@@ -1198,7 +1194,7 @@ function TaskItem({
 
         <button
           type="button"
-          className="task-complete-button"
+          className="task-complete-button" aria-pressed={Boolean(task.completed)}
           onClick={() =>
             onToggle(
               task._id

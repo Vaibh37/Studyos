@@ -21,6 +21,28 @@ import apiRequest from "../services/api";
 import { createLocalId, localDb } from "../services/localDb";
 import { useAuth } from "../context/AuthContext";
 import StudySelect from "../components/StudySelect";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { Markdown } from "@tiptap/markdown";
+import { TaskList, TaskItem } from "@tiptap/extension-list";
+import Placeholder from "@tiptap/extension-placeholder";
+
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  List,
+  ListOrdered,
+  ListChecks,
+  Heading1,
+  Heading2,
+  Code,
+  Quote,
+  Link2,
+  Undo2,
+  Redo2,
+} from "lucide-react";
+
 import "../styles/notes-phase2.css";
 
 const idOf = (value) =>
@@ -67,6 +89,7 @@ function NoteTile({ note, subject, active, onOpen }) {
       style={{
         "--n3-accent": subject?.color || "#858585",
       }}
+      aria-current={active ? "true" : undefined}
       onClick={() => onOpen(note)}
     >
       <span className="n3-tile-top">
@@ -109,6 +132,593 @@ function NoteTile({ note, subject, active, onOpen }) {
   );
 }
 
+function EditorButton({
+  children,
+  label,
+  active,
+  disabled,
+  onClick,
+}) {
+  return (
+    <button
+      type="button"
+      className={`nr-tool${active ? " is-active" : ""}`}
+      data-tooltip={label}
+      aria-label={label}
+      aria-pressed={active}
+      disabled={disabled}
+      onMouseDown={(event) => event.preventDefault()}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+
+function VisualNoteEditor({ value, onChange }) {
+  const lastValue = useRef(value);
+
+  const linkDialogRef = useRef(null);
+  const linkInputRef = useRef(null);
+  const linkSelection = useRef(null);
+
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkError, setLinkError] = useState("");
+  const changeRef = useRef(onChange);
+
+  changeRef.current = onChange;
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+        underline: false,
+        link: {
+          openOnClick: false,
+          autolink: true,
+          defaultProtocol: "https",
+        },
+      }),
+
+      TaskList,
+
+      TaskItem.configure({
+        nested: true,
+      }),
+
+      Placeholder.configure({
+        placeholder: "Start writing, or use Markdown shortcuts...",
+      }),
+
+      Markdown.configure({
+        markedOptions: {
+          gfm: true,
+          breaks: true,
+        },
+      }),
+    ],
+
+    content: value || "",
+
+    contentType: "markdown",
+
+    immediatelyRender: false,
+
+    shouldRerenderOnTransaction: true,
+
+    editorProps: {
+      attributes: {
+        class: "nr-document",
+        role: "textbox",
+        "aria-label": "Note content",
+        "aria-multiline": "true",
+        spellcheck: "true",
+      },
+    },
+
+    onUpdate: ({ editor }) => {
+      const markdown = editor.getMarkdown();
+
+      lastValue.current = markdown;
+
+      changeRef.current(markdown);
+    },
+  });
+
+  useEffect(() => {
+    if (!editor || lastValue.current === value) return;
+
+    lastValue.current = value;
+
+    editor.commands.setContent(value || "", {
+      contentType: "markdown",
+      emitUpdate: false,
+    });
+  }, [editor, value]);
+
+  if (!editor) {
+    return (
+      <div className="nr-editor-loading">
+        Loading editor...
+      </div>
+    );
+  }
+
+  const addLink = () => {
+    const dialog = linkDialogRef.current;
+
+    if (!dialog) return;
+
+    linkSelection.current = {
+      from: editor.state.selection.from,
+      to: editor.state.selection.to,
+    };
+
+    setLinkUrl(
+      editor.getAttributes("link").href || ""
+    );
+
+    setLinkError("");
+
+    dialog.showModal();
+
+    requestAnimationFrame(() => {
+      linkInputRef.current?.focus();
+      linkInputRef.current?.select();
+    });
+  };
+
+  const closeLinkDialog = () => {
+    linkDialogRef.current?.close();
+    setLinkError("");
+  };
+
+  const removeLink = () => {
+    const selection = linkSelection.current;
+
+    closeLinkDialog();
+
+    const chain = editor.chain().focus();
+
+    if (selection) {
+      chain.setTextSelection(selection);
+    }
+
+    chain
+      .extendMarkRange("link")
+      .unsetLink()
+      .run();
+  };
+
+  const applyLink = (event) => {
+    event.preventDefault();
+
+    let url = linkUrl.trim();
+
+    if (!url) {
+      setLinkError("Enter a URL.");
+      return;
+    }
+
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) {
+      url = `https://${url}`;
+    }
+
+    try {
+      const parsed = new URL(url);
+
+      if (
+        !["http:", "https:"].includes(parsed.protocol) ||
+        !parsed.hostname
+      ) {
+        throw new Error("Invalid URL");
+      }
+
+      url = parsed.href;
+    } catch {
+      setLinkError("Enter a valid HTTP or HTTPS URL.");
+      return;
+    }
+
+    const selection = linkSelection.current;
+
+    closeLinkDialog();
+
+    const chain = editor.chain().focus();
+
+    if (selection) {
+      chain.setTextSelection(selection);
+    }
+
+    if (
+      selection &&
+      selection.from === selection.to &&
+      !editor.isActive("link")
+    ) {
+      chain.insertContent({
+        type: "text",
+        text: url,
+        marks: [
+          {
+            type: "link",
+            attrs: { href: url },
+          },
+        ],
+      }).run();
+
+      return;
+    }
+
+    chain
+      .extendMarkRange("link")
+      .setLink({ href: url })
+      .run();
+  };
+
+  return (
+    <>
+      <div
+        className="nr-toolbar"
+        role="group"
+        aria-label="Text formatting"
+      >
+
+        <EditorButton
+          label="Paragraph"
+          active={editor.isActive("paragraph")}
+          onClick={() =>
+            editor.chain().focus().setParagraph().run()
+          }
+        >
+          <span className="nr-paragraph">T</span>
+        </EditorButton>
+
+        <EditorButton
+          label="Heading 1"
+          active={editor.isActive("heading", { level: 1 })}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+        >
+          <Heading1 size={17} />
+        </EditorButton>
+
+        <EditorButton
+          label="Heading 2"
+          active={editor.isActive("heading", { level: 2 })}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+        >
+          <Heading2 size={17} />
+        </EditorButton>
+
+        <i className="nr-tool-divider" />
+
+        <EditorButton
+          label="Bold (Ctrl+B)"
+          active={editor.isActive("bold")}
+          onClick={() =>
+            editor.chain().focus().toggleBold().run()
+          }
+        >
+          <Bold size={16} />
+        </EditorButton>
+
+        <EditorButton
+          label="Italic (Ctrl+I)"
+          active={editor.isActive("italic")}
+          onClick={() =>
+            editor.chain().focus().toggleItalic().run()
+          }
+        >
+          <Italic size={16} />
+        </EditorButton>
+
+        <EditorButton
+          label="Strikethrough"
+          active={editor.isActive("strike")}
+          onClick={() =>
+            editor.chain().focus().toggleStrike().run()
+          }
+        >
+          <Strikethrough size={16} />
+        </EditorButton>
+
+        <i className="nr-tool-divider" />
+
+        <EditorButton
+          label="Bullet list"
+          active={editor.isActive("bulletList")}
+          onClick={() =>
+            editor.chain().focus().toggleBulletList().run()
+          }
+        >
+          <List size={17} />
+        </EditorButton>
+
+        <EditorButton
+          label="Numbered list"
+          active={editor.isActive("orderedList")}
+          onClick={() =>
+            editor.chain().focus().toggleOrderedList().run()
+          }
+        >
+          <ListOrdered size={17} />
+        </EditorButton>
+
+        <EditorButton
+          label="Checklist"
+          active={editor.isActive("taskList")}
+          onClick={() =>
+            editor.chain().focus().toggleTaskList().run()
+          }
+        >
+          <ListChecks size={17} />
+        </EditorButton>
+
+        <i className="nr-tool-divider" />
+
+        <EditorButton
+          label="Inline code"
+          active={editor.isActive("code")}
+          onClick={() =>
+            editor.chain().focus().toggleCode().run()
+          }
+        >
+          <Code size={17} />
+        </EditorButton>
+
+        <EditorButton
+          label="Code block"
+          active={editor.isActive("codeBlock")}
+          onClick={() =>
+            editor.chain().focus().toggleCodeBlock().run()
+          }
+        >
+          <span className="nr-code-symbol">{"{ }"}</span>
+        </EditorButton>
+
+        <EditorButton
+          label="Blockquote"
+          active={editor.isActive("blockquote")}
+          onClick={() =>
+            editor.chain().focus().toggleBlockquote().run()
+          }
+        >
+          <Quote size={16} />
+        </EditorButton>
+
+        <EditorButton
+          label="Insert or edit link"
+          active={editor.isActive("link")}
+          onClick={addLink}
+        >
+          <Link2 size={17} />
+        </EditorButton>
+
+        <i className="nr-tool-divider" />
+
+        <EditorButton
+          label="Undo"
+          disabled={!editor.can().undo()}
+          onClick={() =>
+            editor.chain().focus().undo().run()
+          }
+        >
+          <Undo2 size={17} />
+        </EditorButton>
+
+        <EditorButton
+          label="Redo"
+          disabled={!editor.can().redo()}
+          onClick={() =>
+            editor.chain().focus().redo().run()
+          }
+        >
+          <Redo2 size={17} />
+        </EditorButton>
+
+      </div>
+
+      <EditorContent editor={editor} />
+
+      <dialog
+        ref={linkDialogRef}
+        className="nr-link-dialog"
+        aria-labelledby="nr-link-heading"
+        onCancel={closeLinkDialog}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            closeLinkDialog();
+          }
+        }}
+      >
+
+        <form
+          className="nr-link-form"
+          onSubmit={applyLink}
+          noValidate
+        >
+
+          <header className="nr-dialog-header">
+
+            <span className="nr-dialog-icon">
+              <Link2 size={19} />
+            </span>
+
+            <button
+              type="button"
+              className="nr-dialog-close"
+              aria-label="Close dialog"
+              onClick={closeLinkDialog}
+            >
+              <X size={18} />
+            </button>
+
+          </header>
+
+          <h2 id="nr-link-heading">
+            {editor.isActive("link")
+              ? "Edit link"
+              : "Insert link"}
+          </h2>
+
+          <p className="nr-dialog-description">
+            Add a web link to your note.
+          </p>
+
+          <label
+            htmlFor="nr-link-url"
+            className="nr-dialog-label"
+          >
+            URL
+          </label>
+
+          <div
+            className={`nr-url-field${
+              linkError ? " is-invalid" : ""
+            }`}
+          >
+
+            <Link2 size={16} />
+
+            <input
+              id="nr-link-url"
+              ref={linkInputRef}
+              type="text"
+              inputMode="url"
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="https://example.com"
+              value={linkUrl}
+              aria-invalid={Boolean(linkError)}
+              aria-describedby={
+                linkError ? "nr-link-error" : undefined
+              }
+              onChange={(event) => {
+                setLinkUrl(event.target.value);
+                setLinkError("");
+              }}
+            />
+
+          </div>
+
+          {linkError && (
+            <span
+              id="nr-link-error"
+              className="nr-link-error"
+              role="alert"
+            >
+              {linkError}
+            </span>
+          )}
+
+          <footer className="nr-dialog-actions">
+
+            {editor.isActive("link") && (
+              <button
+                type="button"
+                className="nr-remove-link"
+                onClick={removeLink}
+              >
+                Remove link
+              </button>
+            )}
+
+            <div className="nr-dialog-right">
+
+              <button
+                type="button"
+                className="nr-cancel"
+                onClick={closeLinkDialog}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="nr-apply"
+                disabled={!linkUrl.trim()}
+              >
+                {editor.isActive("link")
+                  ? "Save link"
+                  : "Insert link"}
+              </button>
+
+            </div>
+
+          </footer>
+
+        </form>
+
+      </dialog>
+    </>
+  );
+}
+
+
+function RichNoteEditor({ value, onChange }) {
+  const [sourceMode, setSourceMode] = useState(false);
+
+  return (
+    <div className="nr-rich-editor">
+
+      <div className="nr-mode-switch">
+
+        <div
+          className="nr-mode-options"
+          role="group"
+          aria-label="Editor mode"
+        >
+          <button
+            type="button"
+            className={!sourceMode ? "is-active" : ""}
+            aria-pressed={!sourceMode}
+            onClick={() => setSourceMode(false)}
+          >
+            Visual
+          </button>
+
+          <button
+            type="button"
+            className={sourceMode ? "is-active" : ""}
+            aria-pressed={sourceMode}
+            onClick={() => setSourceMode(true)}
+          >
+            Markdown
+          </button>
+        </div>
+
+      </div>
+
+      {sourceMode ? (
+        <textarea
+          className="nr-markdown-source"
+          value={value}
+          maxLength={200000}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
+          placeholder="Write Markdown..."
+          aria-label="Markdown source"
+          spellCheck={false}
+        />
+      ) : (
+        <VisualNoteEditor
+          value={value}
+          onChange={onChange}
+        />
+      )}
+
+    </div>
+  );
+}
+
+
 export default function Notes() {
   const { isGuest } = useAuth();
 
@@ -138,6 +748,16 @@ export default function Notes() {
   const [savedNotice, setSavedNotice] = useState("");
 
   const selectedNoteRef = useRef(null);
+  const savingRef = useRef(false);
+  const editVersion = useRef(0);
+  const titleInputRef = useRef(null);
+  const focusNewTitle = useRef(false);
+
+  const markEdited = () => {
+    editVersion.current += 1;
+    setSavedNotice("");
+    setError("");
+  };
 
   const subjectsById = useMemo(
     () =>
@@ -270,8 +890,22 @@ export default function Notes() {
     pinned,
     silent = false,
   } = {}) => {
-    if (!selectedNote || saving) return false;
+    if (
+      !selectedNote ||
+      savingRef.current ||
+      refreshing ||
+      creating ||
+      deleting
+    ) return false;
 
+    if (content.length > 200000) {
+      setError("Note exceeds the 200,000 character limit.");
+      return false;
+    }
+
+    const savedVersion = editVersion.current;
+
+    savingRef.current = true;
     setSaving(true);
     setError("");
 
@@ -316,7 +950,17 @@ export default function Notes() {
         )
       );
 
-      selectNote(updated);
+      selectedNoteRef.current = updated;
+      setSelectedNote(updated);
+
+      const unchanged =
+        editVersion.current === savedVersion;
+
+      if (unchanged) {
+        setTitle(updated.title || "");
+        setContent(updated.content || "");
+        setSubjectId(idOf(updated.subjectId));
+      }
 
       if (!silent) {
         setSavedNotice("Saved");
@@ -326,7 +970,7 @@ export default function Notes() {
         new Event("studyos-notes-updated")
       );
 
-      return true;
+      return unchanged;
     } catch (failure) {
       console.error("Saving note failed", failure);
 
@@ -337,12 +981,27 @@ export default function Notes() {
 
       return false;
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   };
 
   const openNote = async (note) => {
-    if (saving || creating || deleting) return;
+    if (
+      savingRef.current ||
+      creating ||
+      deleting ||
+      loading ||
+      refreshing ||
+      confirmDelete
+    ) return;
+
+    if (idOf(selectedNote?._id) === idOf(note._id)) {
+      setEditorOpen(
+        window.matchMedia("(max-width: 900px)").matches
+      );
+      return;
+    }
 
     if (
       selectedNote &&
@@ -364,7 +1023,7 @@ export default function Notes() {
   };
 
   const closeEditor = async () => {
-    if (saving || deleting) return;
+    if (savingRef.current || deleting || refreshing) return;
 
     if (dirty) {
       const saved = await saveNote({
@@ -378,7 +1037,7 @@ export default function Notes() {
   };
 
   const createNote = async () => {
-    if (creating || saving || deleting) return;
+    if (creating || savingRef.current || deleting || loading || refreshing) return;
 
     if (dirty) {
       const saved = await saveNote({
@@ -399,7 +1058,7 @@ export default function Notes() {
           : "";
 
       const payload = {
-        title: `Untitled Note ${notes.length + 1}`,
+        title: "Untitled Note",
         content: "",
         subjectId: initialSubject || null,
         pinned: false,
@@ -439,6 +1098,7 @@ export default function Notes() {
         setSubjectFilter("all");
       }
 
+      focusNewTitle.current = true;
       selectNote(newNote);
 
       setEditorOpen(
@@ -461,7 +1121,7 @@ export default function Notes() {
   };
 
   const togglePin = async () => {
-    if (!selectedNote || pinning || saving) return;
+    if (!selectedNote || pinning || savingRef.current || refreshing || deleting) return;
 
     setPinning(true);
 
@@ -484,7 +1144,7 @@ export default function Notes() {
   };
 
   const deleteNote = async () => {
-    if (!selectedNote || deleting || saving) return;
+    if (!selectedNote || deleting || savingRef.current || refreshing) return;
 
     setDeleting(true);
     setError("");
@@ -675,8 +1335,84 @@ export default function Notes() {
     };
   });
 
+  useEffect(() => {
+    if (
+      !dirty ||
+      saving ||
+      creating ||
+      deleting ||
+      pinning ||
+      refreshing ||
+      loading ||
+      confirmDelete ||
+      error
+    ) return;
+
+    const timer = window.setTimeout(() => {
+      saveNote({ silent: true });
+    }, 1000);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    dirty,
+    title,
+    content,
+    subjectId,
+    selectedNote,
+    subjectsById,
+    isGuest,
+    saving,
+    creating,
+    deleting,
+    pinning,
+    refreshing,
+    loading,
+    confirmDelete,
+    error,
+  ]);
+
+  useEffect(() => {
+    if (!dirty && !saving) return;
+
+    const warn = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", warn);
+
+    return () =>
+      window.removeEventListener("beforeunload", warn);
+  }, [dirty, saving]);
+
+  useEffect(() => {
+    if (!focusNewTitle.current || creating) return;
+
+    focusNewTitle.current = false;
+
+    const frame = requestAnimationFrame(() => {
+      titleInputRef.current?.focus();
+      titleInputRef.current?.select();
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [selectedNote, creating, editorOpen]);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 900px)");
+
+    const onResize = () => {
+      if (!query.matches) setEditorOpen(false);
+    };
+
+    query.addEventListener("change", onResize);
+
+    return () =>
+      query.removeEventListener("change", onResize);
+  }, []);
+
   return (
-    <div className="n3-page">
+    <div className="n3-page n3-clean">
       <header className="n3-header">
         <div>
           <span className="n3-eyebrow">
@@ -694,7 +1430,7 @@ export default function Notes() {
           className="n3-new"
           type="button"
           onClick={createNote}
-          disabled={creating || saving}
+          disabled={creating || saving || loading || refreshing || deleting}
         >
           <Plus size={19} />
 
@@ -721,6 +1457,15 @@ export default function Notes() {
       )}
 
       <div
+        className={`n3-workspace${
+          selectedNote ? "" : " is-empty"
+        }`}
+      >
+        <section
+          className="n3-library"
+          aria-label="Your notes"
+        >
+      <div
         className="n3-summary"
         aria-label="Note library summary"
       >
@@ -737,7 +1482,7 @@ export default function Notes() {
         <button
           type="button"
           onClick={() => loadNotes(true)}
-          disabled={refreshing || saving || dirty}
+          disabled={loading || refreshing || saving || dirty || creating || deleting}
           title="Refresh notes"
         >
           <RefreshCw
@@ -796,15 +1541,7 @@ export default function Notes() {
         />
       </section>
 
-      <div
-        className={`n3-workspace${
-          selectedNote ? "" : " is-empty"
-        }`}
-      >
-        <section
-          className="n3-library"
-          aria-label="Your notes"
-        >
+
           <div className="n3-library-heading">
             <h2>Your notes</h2>
 
@@ -857,21 +1594,54 @@ export default function Notes() {
             </div>
           ) : (
             <div className="n3-masonry">
-              {visibleNotes.map((note) => (
-                <NoteTile
-                  key={note._id}
-                  note={note}
-                  subject={subjectFor(note)}
-                  active={
-                    idOf(selectedNote?._id) ===
-                    idOf(note._id)
-                  }
-                  onOpen={openNote}
-                />
-              ))}
+
+              {[
+                {
+                  label: "Pinned",
+                  items: visibleNotes.filter((note) => note.pinned),
+                },
+                {
+                  label: "All notes",
+                  items: visibleNotes.filter((note) => !note.pinned),
+                },
+              ].map((group) =>
+                group.items.length > 0 ? (
+                  <div
+                    className="nr-note-group"
+                    key={group.label}
+                  >
+
+                    <div className="nr-group-label">
+                      {group.label}
+                    </div>
+
+                    {group.items.map((note) => (
+                      <NoteTile
+                        key={note._id}
+                        note={note}
+                        subject={subjectFor(note)}
+                        active={
+                          idOf(selectedNote?._id) === idOf(note._id)
+                        }
+                        onOpen={openNote}
+                      />
+                    ))}
+
+                  </div>
+                ) : null
+              )}
+
             </div>
           )}
         </section>
+
+        {!selectedNote && (
+          <div className="nr-no-document">
+            <BookOpen size={30} />
+            <h2>No note selected</h2>
+            <p>Create a note to start writing.</p>
+          </div>
+        )}
 
         {selectedNote && (
           <div
@@ -910,9 +1680,17 @@ export default function Notes() {
                   <ArrowLeft size={20} />
                 </button>
 
-                <span className="n3-save-status">
-                  {dirty ? (
-                    "Unsaved changes"
+                <span
+                  className={`n3-save-status${dirty && error ? " is-error" : ""}`}
+                  role="status"
+                >
+                  {saving ? (
+                    <>
+                      <RefreshCw size={14} className="n3-spin" />
+                      Saving...
+                    </>
+                  ) : dirty ? (
+                    error ? "Save failed" : "Saving shortly..."
                   ) : (
                     <>
                       <Check size={15} />
@@ -962,13 +1740,14 @@ export default function Notes() {
               <div className="n3-editor-scroll">
                 <input
                   className="n3-title-input"
+                  ref={titleInputRef}
                   type="text"
                   maxLength={160}
                   value={title}
                   placeholder="Untitled note"
                   onChange={(event) => {
                     setTitle(event.target.value);
-                    setSavedNotice("");
+                    markEdited();
                   }}
                   aria-label="Note title"
                 />
@@ -978,10 +1757,8 @@ export default function Notes() {
                     className="n3-editor-select"
                     value={subjectId}
                     onChange={(value) => {
-                      setSubjectId(
-                        String(value)
-                      );
-                      setSavedNotice("");
+                      setSubjectId(String(value));
+                      markEdited();
                     }}
                     options={editorSubjectOptions}
                     ariaLabel="Choose note subject"
@@ -998,20 +1775,16 @@ export default function Notes() {
                 </div>
 
                 <div className="n3-editor-paper">
-                  <textarea
+
+                  <RichNoteEditor
+                    key={idOf(selectedNote._id)}
                     value={content}
-                    maxLength={200000}
-                    placeholder={
-                      "Start writing…\n\nOne idea at a time."
-                    }
-                    onChange={(event) => {
-                      setContent(
-                        event.target.value
-                      );
-                      setSavedNotice("");
+                    onChange={(value) => {
+                      setContent(value);
+                      markEdited();
                     }}
-                    aria-label="Note content"
                   />
+
                 </div>
 
                 <div className="n3-editor-count">
@@ -1028,10 +1801,12 @@ export default function Notes() {
               </div>
 
               <div className="n3-editor-footer">
-                <span className="n3-footer-hint">
-                  {dirty
-                    ? "Save your changes"
-                    : "Changes saved"}
+                <span
+                  className={`n3-footer-hint${error && dirty ? " is-error" : ""}`}
+                >
+                  {error && dirty
+                    ? error
+                    : "Autosave enabled"}
                 </span>
 
                 <button

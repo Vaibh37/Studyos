@@ -5,7 +5,6 @@ import {
 import {
   BookOpen,
   CalendarDays,
-  ChevronUp,
   Clock3,
   Flag,
   Plus,
@@ -277,246 +276,178 @@ function AddTask({
   // UI
   // =======================================================
 
+  const detailCount = [
+    Boolean(form.subjectId),
+    form.priority !== "medium",
+    Boolean(form.dueDate),
+    Boolean(form.dueTime),
+  ].filter(Boolean).length;
+
   return (
     <form
-      className={`add-task-form-v2 ${
-        expanded
-          ? "expanded"
-          : ""
+      className={`add-task-form-v2 tc-clean ${
+        expanded ? "expanded" : ""
       }`}
-      onSubmit={
-        handleSubmit
-      }
+      onSubmit={handleSubmit}
     >
-
-      {/* ===================================================
-          MAIN ROW
-      =================================================== */}
 
       <div className="add-task-main-row">
 
         <div className="add-task-title-field">
-
-          <Plus
-            size={18}
-            className="add-task-title-icon"
-          />
-
           <input
             type="text"
-            value={
-              form.title
-            }
-            onFocus={() =>
-              setExpanded(
-                true
-              )
-            }
-            onChange={(
-              event
-            ) =>
-              updateField(
-                "title",
-                event.target.value
-              )
+            value={form.title}
+            onChange={(event) =>
+              updateField("title", event.target.value)
             }
             placeholder="What needs to get done?"
+            aria-label="Task title"
             maxLength={200}
             autoComplete="off"
-            disabled={
-              submitting
-            }
+            disabled={submitting}
           />
+        </div>
+
+        <div className="tc-actions">
+
+          {expanded && (
+            <button
+              type="button"
+              className="tc-reset"
+              title="Reset task draft"
+              aria-label="Reset task draft"
+              onClick={resetForm}
+              disabled={submitting}
+            >
+              <RotateCcw size={15} />
+            </button>
+          )}
+
+          <button
+            type="button"
+            className={`tc-details-toggle ${
+              expanded ? "is-active" : ""
+            }`}
+            aria-expanded={expanded}
+            aria-controls="tc-optional-details"
+            aria-label="Toggle task details"
+            title="Task details"
+            onClick={() =>
+              setExpanded((current) => !current)
+            }
+            disabled={submitting}
+          >
+            <Flag size={15} />
+
+            <span>Details</span>
+
+            {detailCount > 0 && (
+              <small>{detailCount}</small>
+            )}
+          </button>
+
+          <button
+            type="submit"
+            className="add-task-submit"
+            aria-label="Add task"
+            disabled={submitting || !form.title.trim()}
+          >
+            <Plus size={16} />
+
+            <span>
+              {submitting ? "Adding..." : "Add task"}
+            </span>
+          </button>
 
         </div>
 
-        <button
-          type="submit"
-          className="add-task-submit"
-          disabled={
-            submitting ||
-            !form.title.trim()
-          }
-        >
-
-          <Plus
-            size={17}
-          />
-
-          <span>
-            {submitting
-              ? "Adding..."
-              : "Add task"}
-          </span>
-
-        </button>
-
       </div>
 
-      {/* ===================================================
-          DETAILS
-      =================================================== */}
+      <div
+        id="tc-optional-details"
+        hidden={!expanded}
+      >
 
-      {expanded && (
-        <>
+        {expanded && (
           <div className="add-task-details">
-
-            {/* =================================================
-                SUBJECT
-            ================================================= */}
-
-            <label className="add-task-field">
-
-              <span className="add-task-field-label">
-
-                <BookOpen
-                  size={14}
-                />
-
-                Subject
-
-              </span>
-
-              <StudySelect
-                value={
-                  form.subjectId
-                }
-                onChange={(
-                  value
-                ) =>
-                  updateField(
-                    "subjectId",
-                    value
-                  )
-                }
-                options={
-                  subjectOptions
-                }
-                placeholder="No subject"
-                className="task-study-select add-task-study-select"
-                disabled={
-                  submitting
-                }
-                ariaLabel="Choose task subject"
-              />
-
-            </label>
-
-            {/* =================================================
-                PRIORITY
-            ================================================= */}
-
-            <label className="add-task-field">
-
-              <span className="add-task-field-label">
-
-                <Flag
-                  size={14}
-                />
-
-                Priority
-
-              </span>
-
-              <StudySelect
-                value={
-                  form.priority
-                }
-                onChange={(
-                  value
-                ) =>
-                  updateField(
-                    "priority",
-                    value
-                  )
-                }
-                options={
-                  priorityOptions
-                }
-                placeholder="Medium"
-                className="task-study-select add-task-study-select"
-                disabled={
-                  submitting
-                }
-                ariaLabel="Choose task priority"
-              />
-
-            </label>
-
-            {/* =================================================
-                DATE
-            ================================================= */}
 
             <div className="add-task-field">
 
               <span className="add-task-field-label">
-
-                <CalendarDays
-                  size={14}
-                />
-
-                Due date
-
+                <BookOpen size={13} />
+                Subject
               </span>
 
-              <StudyDatePicker
-                value={
-                  form.dueDate
+              <StudySelect
+                value={form.subjectId}
+                onChange={(value) =>
+                  updateField("subjectId", value)
                 }
-                onChange={(
-                  value
-                ) =>
-                  updateField(
-                    "dueDate",
-                    value
-                  )
-                }
-                placeholder="No due date"
-                disabled={
-                  submitting
-                }
+                options={subjectOptions}
+                placeholder="No subject"
+                className="task-study-select add-task-study-select"
+                disabled={submitting}
+                ariaLabel="Choose task subject"
               />
 
             </div>
 
-            {/* =================================================
-                TIME
-            ================================================= */}
+            <div className="add-task-field">
 
-            <label
+              <span className="add-task-field-label">
+                <Flag size={13} />
+                Priority
+              </span>
+
+              <StudySelect
+                value={form.priority}
+                onChange={(value) =>
+                  updateField("priority", value)
+                }
+                options={priorityOptions}
+                placeholder="Medium"
+                className="task-study-select add-task-study-select"
+                disabled={submitting}
+                ariaLabel="Choose task priority"
+              />
+
+            </div>
+
+            <div className="add-task-field">
+
+              <span className="add-task-field-label">
+                <CalendarDays size={13} />
+                Due date
+              </span>
+
+              <StudyDatePicker
+                value={form.dueDate}
+                onChange={(value) =>
+                  updateField("dueDate", value)
+                }
+                placeholder="No due date"
+                disabled={submitting}
+              />
+
+            </div>
+
+            <div
               className={`add-task-field ${
-                !form.dueDate
-                  ? "disabled"
-                  : ""
+                !form.dueDate ? "disabled" : ""
               }`}
             >
 
               <span className="add-task-field-label">
-
-                <Clock3
-                  size={14}
-                />
-
+                <Clock3 size={13} />
                 Due time
-
               </span>
 
               <StudyTimePicker
-                value={
-                  form.dueTime
+                value={form.dueTime}
+                onChange={(value) =>
+                  updateField("dueTime", value)
                 }
-                onChange={(
-                  value
-                ) =>
-                  updateField(
-                    "dueTime",
-                    value
-                  )
-                }
-                disabled={
-                  submitting ||
-                  !form.dueDate
-                }
+                disabled={submitting || !form.dueDate}
                 placeholder={
                   form.dueDate
                     ? "No time"
@@ -525,68 +456,17 @@ function AddTask({
                 ariaLabel="Choose task due time"
               />
 
-            </label>
-
-          </div>
-
-          <div className="add-task-footer">
-
-            <div className="add-task-footer-left">
-
-              {error ? (
-                <span className="add-task-error">
-                  {error}
-                </span>
-              ) : (
-                <span className="add-task-hint">
-                  Optional details
-                </span>
-              )}
-
-            </div>
-
-            <div className="add-task-footer-actions">
-
-              <button
-                type="button"
-                className="add-task-reset"
-                onClick={
-                  resetForm
-                }
-                disabled={
-                  submitting
-                }
-              >
-                <RotateCcw
-                  size={13}
-                />
-
-                Reset
-              </button>
-
-              <button
-                type="button"
-                className="add-task-collapse"
-                onClick={() =>
-                  setExpanded(
-                    false
-                  )
-                }
-                disabled={
-                  submitting
-                }
-              >
-                <ChevronUp
-                  size={14}
-                />
-
-                Collapse
-              </button>
-
             </div>
 
           </div>
-        </>
+        )}
+
+      </div>
+
+      {error && (
+        <p className="tc-error" role="alert">
+          {error}
+        </p>
       )}
 
     </form>

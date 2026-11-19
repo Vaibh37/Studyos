@@ -844,7 +844,7 @@ function Calendar() {
       let nextDay = 1;
 
       while (
-        days.length < 42
+        days.length % 7 !== 0
       ) {
         days.push({
           date:
@@ -1538,7 +1538,7 @@ function Calendar() {
   // =======================================================
 
   return (
-    <div className="v2c-page">
+    <div className="v2c-page v2c-clean">
 
       {/* HEADER */}
 
@@ -1555,8 +1555,7 @@ function Calendar() {
           </h1>
 
           <p>
-            Plan upcoming work and see what you
-            actually studied throughout the month.
+            Your schedule and study activity.
           </p>
 
         </div>
@@ -1566,7 +1565,7 @@ function Calendar() {
 
           <button
             type="button"
-            className="v2c-secondary-button"
+            className="v2c-secondary-button" aria-label="Refresh calendar" title="Refresh calendar"
             disabled={
               refreshing
             }
@@ -2015,6 +2014,10 @@ function Calendar() {
                     key={`${getDateKey(
                       date
                     )}-${index}`}
+                    aria-pressed={selected}
+                    aria-current={today ? "date" : undefined}
+                    aria-label={`${formatSelectedDate(date)}, ${dayEvents.length} scheduled, ${formatStudyTime(dayStudySeconds)} focused`}
+                    title={`${formatSelectedDate(date)} - ${dayEvents.length} scheduled - ${formatStudyTime(dayStudySeconds)} focused`}
                     className={[
                       "v2c-day",
 
@@ -2109,8 +2112,19 @@ function Calendar() {
 
           </div>
 
-        </section>
+          <div className="v2c-calendar-legend">
+            <span>
+              <i className="v2c-legend-event" />
+              Scheduled events
+            </span>
 
+            <span>
+              <Timer size={12} />
+              Focus recorded
+            </span>
+          </div>
+
+        </section>
 
         {/* SELECTED DAY */}
 

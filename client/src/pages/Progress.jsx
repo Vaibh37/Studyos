@@ -1919,1259 +1919,626 @@ function Progress() {
   // UI
   // =======================================================
 
+  const [showAllActivity, setShowAllActivity] = useState(false);
+  const [showAllSubjects, setShowAllSubjects] = useState(false);
+
+  const axisStep = Math.max(
+    900,
+    Math.ceil(chartMax / 4 / 900) * 900
+  );
+
+  const axisMax = axisStep * 4;
+
+  const axisTicks = Array.from(
+    { length: 5 },
+    (_, index) => axisMax - index * axisStep
+  );
+
+  const visibleActivity = showAllActivity
+    ? recentActivity
+    : recentActivity.slice(0, 3);
+
+  const visibleSubjects = showAllSubjects
+    ? subjectBreakdown
+    : subjectBreakdown.slice(0, 4);
+
+  const trendText =
+    weekTrend.value === null
+      ? weekTrend.label
+      : `${weekTrend.direction === "up" ? "+" : weekTrend.direction === "down" ? "-" : ""}${weekTrend.value}% ${weekTrend.label}`;
+
+  const bestDate = bestDay.date
+    ? bestDay.date.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+      })
+    : "—";
+
   return (
-    <div className="v2p-page">
+    <div className="sp-page">
 
-      <header className="v2p-header">
+      {/* HEADER */}
 
+      <header className="sp-header">
         <div>
-
-          <span className="v2p-eyebrow">
-            Study analytics
-          </span>
-
-          <h1>
-            Progress
-          </h1>
-
-          <p>
-            Understand your focus time,
-            consistency, task completion and
-            overall study patterns.
-          </p>
-
+          <h1>Progress</h1>
+          <p>Your study activity at a glance.</p>
         </div>
-
 
         <button
           type="button"
-          className="v2p-refresh"
-          disabled={
-            refreshing
-          }
-          onClick={() =>
-            loadProgress(
-              true
-            )
-          }
+          className="sp-icon-button"
+          disabled={refreshing}
+          onClick={() => loadProgress(true)}
+          aria-label="Refresh progress"
+          title="Refresh progress"
         >
-
           <RefreshCw
-            size={16}
-            className={
-              refreshing
-                ? "v2p-spin"
-                : ""
-            }
+            size={17}
+            className={refreshing ? "sp-spin" : ""}
           />
-
-          {refreshing
-            ? "Refreshing"
-            : "Refresh"}
-
         </button>
-
       </header>
 
-
       {error && (
-        <div className="v2p-error">
-
+        <div className="sp-error" role="alert">
           <div>
-
-            <strong>
-              Progress could not load
-            </strong>
-
-            <span>
-              {error}
-            </span>
-
+            <strong>Progress could not load</strong>
+            <span>{error}</span>
           </div>
-
-
           <button
             type="button"
-            onClick={() =>
-              loadProgress(
-                true
-              )
-            }
+            onClick={() => loadProgress(true)}
           >
             Retry
           </button>
-
         </div>
       )}
 
-
       {loading ? (
-
-        <section className="v2p-loading">
-
-          <RefreshCw
-            size={23}
-            className="v2p-spin"
-          />
-
-          <strong>
-            Calculating your progress
-          </strong>
-
-          <span>
-            Reading Focus, tasks,
-            subjects and notes.
-          </span>
-
-        </section>
-
+        <div className="sp-loading">
+          <RefreshCw size={22} className="sp-spin" />
+          <strong>Loading progress</strong>
+          <span>Reading your study activity.</span>
+        </div>
       ) : (
         <>
 
-          {/* =================================================
-              TOP STATS
-              ================================================= */}
+          {/* PRIMARY METRICS */}
 
-          <section className="v2p-stats">
+          <section className="sp-stats" aria-label="Key metrics">
 
-            <ProgressStat
-              icon={
-                <Timer
-                  size={19}
-                />
-              }
+            <StudyMetric
               label="Today"
-              value={
-                formatStudyTime(
-                  todayFocusSeconds
-                )
-              }
-              description={`${goalPercent}% of daily goal`}
+              value={formatStudyTime(todayFocusSeconds)}
+              detail={`${goalPercent}% of daily goal`}
             />
 
-
-            <ProgressStat
-              icon={
-                <BarChart3
-                  size={19}
-                />
-              }
+            <StudyMetric
               label="Last 7 days"
-              value={
-                formatStudyTime(
-                  weekStudySeconds
-                )
-              }
-              description={
-                weekTrend.value ===
-                null
-                  ? weekTrend.label
-                  : `${weekTrend.value}% ${weekTrend.label}`
-              }
-              trend={
-                weekTrend.direction
-              }
+              value={formatStudyTime(weekStudySeconds)}
+              detail={trendText}
+              trend={weekTrend.direction}
             />
 
-
-            <ProgressStat
-              icon={
-                <Flame
-                  size={19}
-                />
-              }
+            <StudyMetric
               label="Focus streak"
-              value={`${currentStreak} ${
-                currentStreak ===
-                1
-                  ? "day"
-                  : "days"
-              }`}
-              description="Consecutive active days"
+              value={`${currentStreak} ${currentStreak === 1 ? "day" : "days"}`}
+              detail="Consecutive active days"
             />
 
-
-            <ProgressStat
-              icon={
-                <CheckCircle2
-                  size={19}
-                />
-              }
+            <StudyMetric
               label="Task completion"
               value={`${completionRate}%`}
-              description={`${completedCount} of ${totalTasks} completed`}
+              detail={`${completedCount} of ${totalTasks} completed`}
             />
 
           </section>
 
+          {/* DAILY GOAL */}
 
-          {/* =================================================
-              DAILY GOAL
-              ================================================= */}
+          <section className="sp-daily-goal">
 
-          <section className="v2p-goal">
-
-            <div className="v2p-goal-top">
-
+            <div className="sp-section-heading">
               <div>
-
-                <span className="v2p-eyebrow">
-                  Today's target
-                </span>
-
-                <h2>
-                  Daily focus goal
-                </h2>
-
+                <h2>Daily focus goal</h2>
                 <p>
-                  {formatStudyTime(
-                    todayFocusSeconds
-                  )} completed
-                  {" · "}
-
-                  {remainingGoalMinutes >
-                  0
-                    ? `${formatStudyTime(
-                        remainingGoalMinutes *
-                          60
-                      )} remaining`
-                    : "Goal reached"}
+                  {formatStudyTime(todayFocusSeconds)}
+                  {" / "}
+                  {formatStudyTime(dailyGoalMinutes * 60)}
                 </p>
-
               </div>
 
-
-              <div className="v2p-goal-value">
-
-                <Target
-                  size={18}
-                />
-
-                <strong>
-                  {goalPercent}%
-                </strong>
-
-              </div>
-
-            </div>
-
-
-            <div className="v2p-goal-track">
-
-              <div
-                style={{
-                  width:
-                    `${goalBarPercent}%`,
-                }}
-              />
-
-            </div>
-
-
-            <div className="v2p-goal-footer">
-
-              <span>
-                0m
-              </span>
-
-              <strong>
-                Goal{" "}
-                {formatStudyTime(
-                  dailyGoalMinutes *
-                    60
-                )}
+              <strong className="sp-goal-percent">
+                {goalPercent}%
               </strong>
+            </div>
 
+            <div
+              className="sp-track"
+              role="progressbar"
+              aria-label="Daily focus goal"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={goalBarPercent}
+              aria-valuetext={`${goalPercent}%`}
+            >
+              <div style={{ width: `${goalBarPercent}%` }} />
+            </div>
+
+            <div className="sp-goal-caption">
+              {remainingGoalMinutes > 0
+                ? `${formatStudyTime(remainingGoalMinutes * 60)} remaining`
+                : "Daily goal reached"}
             </div>
 
           </section>
 
+          {/* WEEKLY CHART AND OVERVIEW */}
 
-          {/* =================================================
-              WEEK
-              ================================================= */}
+          <section className="sp-main-grid">
 
-          <section className="v2p-main-grid">
+            <article className="sp-chart-panel">
 
-            <article className="v2p-panel">
-
-              <div className="v2p-panel-header">
+              <div className="sp-section-heading">
 
                 <div>
-
-                  <span className="v2p-eyebrow">
-                    Focus trend
-                  </span>
-
-                  <h2>
-                    Last 7 days
-                  </h2>
-
-                  <p>
-                    Daily focused study time.
-                  </p>
-
+                  <h2>Focus activity</h2>
+                  <p>Last 7 days</p>
                 </div>
 
-
-                <div
-                  className={`v2p-trend is-${weekTrend.direction}`}
-                >
-
-                  <TrendIcon
-                    size={16}
-                  />
-
-                  <span>
-                    {weekTrend.value ===
-                    null
-                      ? "New"
-                      : `${weekTrend.value}%`}
-                  </span>
-
-                </div>
+                <span className={`sp-trend is-${weekTrend.direction}`}>
+                  <TrendIcon size={15} />
+                  {weekTrend.value === null
+                    ? "New activity"
+                    : `${weekTrend.value}%`}
+                </span>
 
               </div>
 
+              <div className="sp-chart">
 
-              <div className="v2p-chart">
+                <div className="sp-axis" aria-hidden="true">
+                  {axisTicks.map((tick) => (
+                    <span key={tick}>
+                      {tick === 0 ? "0" : formatChartValue(tick)}
+                    </span>
+                  ))}
+                </div>
 
-                {weekActivity.map(
-                  (
-                    day
-                  ) => {
-                    const percent =
-                      day.focusSeconds >
-                      0
-                        ? Math.max(
-                            6,
-                            (
-                              day.focusSeconds /
-                              chartMax
-                            ) *
-                              100
-                          )
-                        : 0;
+                <div className="sp-chart-content">
 
-                    return (
+                  <div className="sp-chart-gridlines" aria-hidden="true">
+                    {axisTicks.map((tick) => (
+                      <div key={tick} />
+                    ))}
+                  </div>
+
+                  <div className="sp-chart-columns">
+
+                    {weekActivity.map((day) => (
                       <div
-                        className="v2p-chart-column"
-                        key={
-                          day.key
-                        }
+                        key={day.key}
+                        className={`sp-chart-column ${day.isToday ? "is-today" : ""}`}
+                        title={`${day.label}: ${formatStudyTime(day.focusSeconds)}`}
                       >
 
-                        <span className="v2p-chart-value">
-                          {day.focusSeconds >
-                          0
-                            ? formatChartValue(
-                                day.focusSeconds
-                              )
-                            : "0"}
+                        <span className="sp-chart-value">
+                          {formatStudyTime(day.focusSeconds)}
                         </span>
 
-
-                        <div className="v2p-chart-track">
-
+                        <div className="sp-chart-slot">
                           <div
-                            className={`v2p-chart-bar ${
-                              day.isToday
-                                ? "is-today"
-                                : ""
-                            }`}
+                            className="sp-chart-bar"
                             style={{
-                              height:
-                                `${percent}%`,
+                              height: `${Math.min(100, (day.focusSeconds / axisMax) * 100)}%`,
                             }}
                           />
-
                         </div>
 
-
-                        <strong
-                          className={
-                            day.isToday
-                              ? "is-today"
-                              : ""
-                          }
-                        >
-                          {day.label}
-                        </strong>
-
-                        <small>
-                          {day.shortDate}
-                        </small>
+                        <strong>{day.label}</strong>
+                        <small>{day.shortDate}</small>
 
                       </div>
-                    );
-                  }
-                )}
+                    ))}
 
+                  </div>
+                </div>
               </div>
 
             </article>
 
+            <article className="sp-overview">
 
-            <article className="v2p-panel v2p-overview">
+              <div className="sp-section-heading">
+                <h2>Study overview</h2>
+                <Clock3 size={17} />
+              </div>
 
-              <div className="v2p-panel-header">
+              <div className="sp-total">
+                <strong>{formatStudyTime(totalStudySeconds)}</strong>
+                <span>Total focus time</span>
+              </div>
 
-                <div>
+              <div className="sp-info-list">
 
-                  <span className="v2p-eyebrow">
-                    Focus sessions
-                  </span>
+                <StudyDetail
+                  label="Sessions"
+                  value={validSessions.length}
+                />
 
-                  <h2>
-                    Study overview
-                  </h2>
+                <StudyDetail
+                  label="Average session"
+                  value={formatStudyTime(averageSession)}
+                />
 
-                </div>
+                <StudyDetail
+                  label="Longest session"
+                  value={formatStudyTime(longestSession)}
+                />
 
-                <Clock3
-                  size={20}
+                <StudyDetail
+                  label="Best day"
+                  value={bestDate}
                 />
 
               </div>
-
-
-              <div className="v2p-total-focus">
-
-                <strong>
-                  {formatStudyTime(
-                    totalStudySeconds
-                  )}
-                </strong>
-
-                <span>
-                  total focus time
-                </span>
-
-              </div>
-
-
-              <div className="v2p-overview-list">
-
-                <div>
-                  <span>
-                    Sessions
-                  </span>
-
-                  <strong>
-                    {validSessions.length}
-                  </strong>
-                </div>
-
-
-                <div>
-                  <span>
-                    Average
-                  </span>
-
-                  <strong>
-                    {formatStudyTime(
-                      averageSession
-                    )}
-                  </strong>
-                </div>
-
-
-                <div>
-                  <span>
-                    Longest
-                  </span>
-
-                  <strong>
-                    {formatStudyTime(
-                      longestSession
-                    )}
-                  </strong>
-                </div>
-
-
-                <div>
-                  <span>
-                    Best day
-                  </span>
-
-                  <strong>
-                    {bestDay.date
-                      ? bestDay.date.toLocaleDateString(
-                          "en-IN",
-                          {
-                            day:
-                              "numeric",
-
-                            month:
-                              "short",
-                          }
-                        )
-                      : "—"}
-                  </strong>
-                </div>
-
-              </div>
-
             </article>
 
           </section>
 
+          {/* CONSISTENCY */}
 
-          {/* =================================================
-              INSIGHTS
-              ================================================= */}
+          <section className="sp-consistency">
 
-          <section className="v2p-insights">
-
-            <ProgressInsight
-              icon={
-                <CalendarCheck2
-                  size={19}
-                />
-              }
-              label="Active days"
-              value={`${active30Days}/30`}
-              description="Study activity in last 30 days"
-            />
-
-
-            <ProgressInsight
-              icon={
-                <Target
-                  size={19}
-                />
-              }
-              label="Goal days"
-              value={
-                goalDays
-              }
-              description="Days your daily focus goal was reached"
-            />
-
-
-            <ProgressInsight
-              icon={
-                <Award
-                  size={19}
-                />
-              }
-              label="Best focus day"
-              value={
-                bestDay.seconds >
-                0
-                  ? formatStudyTime(
-                      bestDay.seconds
-                    )
-                  : "—"
-              }
-              description={
-                bestDay.date
-                  ? bestDay.date.toLocaleDateString(
-                      "en-IN",
-                      {
-                        day:
-                          "numeric",
-
-                        month:
-                          "short",
-                      }
-                    )
-                  : "No focus data yet"
-              }
-            />
-
-
-            <ProgressInsight
-              icon={
-                <TrendingUp
-                  size={19}
-                />
-              }
-              label="Weekly direction"
-              value={
-                weekTrend.direction ===
-                "up"
-                  ? "Improving"
-                  : weekTrend.direction ===
-                      "down"
-                    ? "Lower"
-                    : "Stable"
-              }
-              description={
-                weekTrend.label
-              }
-            />
-
-          </section>
-
-
-          {/* =================================================
-              CONSISTENCY
-              ================================================= */}
-
-          <section className="v2p-panel v2p-consistency">
-
-            <div className="v2p-panel-header">
+            <div className="sp-section-heading">
 
               <div>
-
-                <span className="v2p-eyebrow">
-                  Consistency
-                </span>
-
-                <h2>
-                  Last 30 days
-                </h2>
-
-                <p>
-                  Focus and completed-task activity.
-                </p>
-
+                <h2>Consistency</h2>
+                <p>Activity over the last 30 days</p>
               </div>
 
-
-              <span className="v2p-count-badge">
+              <span className="sp-muted">
                 {active30Days} active days
               </span>
 
             </div>
 
+            <div className="sp-consistency-body">
 
-            <div className="v2p-heatmap">
+              <div className="sp-heatmap-wrap">
 
-              {consistencyDays.map(
-                (
-                  day
-                ) => (
-                  <div
-                    key={
-                      day.key
-                    }
-                    className={`v2p-heatmap-day level-${day.level}`}
-                    title={`${day.date.toLocaleDateString(
-                      "en-IN",
-                      {
-                        day:
-                          "numeric",
+                <div className="sp-heatmap">
 
-                        month:
-                          "short",
-                      }
-                    )}: ${formatStudyTime(
-                      day.focusSeconds
-                    )}, ${day.taskCount} ${
-                      day.taskCount ===
-                      1
-                        ? "task"
-                        : "tasks"
-                    }`}
-                  >
+                  {consistencyDays.map((day) => {
+                    const description =
+                      `${day.date.toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                      })}: ${formatStudyTime(day.focusSeconds)}, ${day.taskCount} tasks`;
 
-                    <span>
-                      {day.date.getDate()}
-                    </span>
+                    return (
+                      <div
+                        key={day.key}
+                        className={`sp-heatmap-cell level-${day.level}`}
+                        title={description}
+                        aria-label={description}
+                      >
+                        {day.date.getDate()}
+                      </div>
+                    );
+                  })}
 
-                  </div>
-                )
+                </div>
+
+                <div className="sp-heatmap-legend">
+                  <span>Less</span>
+                  {[0, 1, 2, 3, 4].map((level) => (
+                    <i
+                      key={level}
+                      className={`level-${level}`}
+                    />
+                  ))}
+                  <span>Goal</span>
+                </div>
+
+              </div>
+
+              <div className="sp-consistency-metrics">
+
+                <StudyMetric
+                  label="Active days"
+                  value={`${active30Days}/30`}
+                />
+
+                <StudyMetric
+                  label="Goal days"
+                  value={goalDays}
+                />
+
+                <StudyMetric
+                  label="Best focus day"
+                  value={
+                    bestDay.seconds > 0
+                      ? formatStudyTime(bestDay.seconds)
+                      : "—"
+                  }
+                  detail={bestDate}
+                />
+
+                <StudyMetric
+                  label="Weekly direction"
+                  value={
+                    weekTrend.direction === "up"
+                      ? "Improving"
+                      : weekTrend.direction === "down"
+                        ? "Lower"
+                        : "Stable"
+                  }
+                />
+
+              </div>
+
+            </div>
+          </section>
+
+          {/* SUBJECT DISTRIBUTION */}
+
+          <section className="sp-subjects">
+
+            <div className="sp-section-heading">
+
+              <div>
+                <h2>Study distribution</h2>
+                <p>Focus time by subject</p>
+              </div>
+
+              {subjectBreakdown.length > 4 && (
+                <button
+                  type="button"
+                  className="sp-text-button"
+                  aria-expanded={showAllSubjects}
+                  aria-controls="sp-subject-list"
+                  onClick={() => setShowAllSubjects((value) => !value)}
+                >
+                  {showAllSubjects
+                    ? "Show less"
+                    : `View all (${subjectBreakdown.length})`}
+                </button>
               )}
 
             </div>
 
+            {subjectBreakdown.length === 0 ? (
+              <StudyEmpty
+                icon={<BookOpen size={24} />}
+                title="No subject activity"
+                text="Link sessions, tasks or notes to a subject."
+              />
+            ) : (
+              <div id="sp-subject-list">
 
-            <div className="v2p-heatmap-legend">
-
-              <span>
-                Less
-              </span>
-
-              <i className="level-0" />
-              <i className="level-1" />
-              <i className="level-2" />
-              <i className="level-3" />
-              <i className="level-4" />
-
-              <span>
-                Goal
-              </span>
-
-            </div>
-
-          </section>
-
-
-          {/* =================================================
-              LOWER FLOW
-              ================================================= */}
-
-          <section className="v2p-lower-grid">
-
-            {/* LEFT COLUMN */}
-
-            <div className="v2p-lower-column">
-
-              {/* SUBJECT DISTRIBUTION */}
-
-              <article className="v2p-panel">
-
-                <div className="v2p-panel-header">
-
-                  <div>
-
-                    <span className="v2p-eyebrow">
-                      Subjects
-                    </span>
-
-                    <h2>
-                      Study distribution
-                    </h2>
-
-                    <p>
-                      Where your focused time is going.
-                    </p>
-
-                  </div>
-
-
-                  {topSubject && (
-                    <span className="v2p-top-subject">
-
-                      <BookOpen
-                        size={14}
-                      />
-
-                      {topSubject.name}
-
-                    </span>
-                  )}
-
+                <div className="sp-subject-table-head">
+                  <span>Subject</span>
+                  <span>Focus time</span>
+                  <span>Distribution</span>
+                  <span>Tasks</span>
                 </div>
 
+                {visibleSubjects.map((subject) => {
 
-                {subjectBreakdown.length ===
-                0 ? (
+                  const focusPercent =
+                    totalSubjectFocus > 0
+                      ? Math.round(
+                          subject.focusSeconds /
+                          totalSubjectFocus * 100
+                        )
+                      : 0;
 
-                  <ProgressEmpty
-                    icon={
-                      <BookOpen
-                        size={26}
-                      />
-                    }
-                    title="No subject activity"
-                    text="Link focus sessions, tasks or notes to subjects to build this view."
-                  />
+                  const taskPercent =
+                    subject.tasks > 0
+                      ? Math.round(
+                          subject.completedTasks /
+                          subject.tasks * 100
+                        )
+                      : 0;
 
-                ) : (
+                  return (
 
-                  <div className="v2p-subject-list">
+                    <article
+                      className="sp-subject-row"
+                      key={subject.id}
+                      style={{ "--sp-subject-color": subject.color }}
+                    >
 
-                    {subjectBreakdown.map(
-                      (
-                        subject
-                      ) => {
-                        const focusPercent =
-                          totalSubjectFocus >
-                          0
-                            ? Math.round(
-                                (
-                                  subject.focusSeconds /
-                                  totalSubjectFocus
-                                ) *
-                                  100
-                              )
-                            : 0;
+                      <div className="sp-subject-name">
 
+                        <span className="sp-subject-dot" />
 
-                        const taskPercent =
-                          subject.tasks >
-                          0
-                            ? Math.round(
-                                (
-                                  subject.completedTasks /
-                                  subject.tasks
-                                ) *
-                                  100
-                              )
-                            : 0;
+                        <div>
+                          <strong>{subject.name}</strong>
+                          <small>
+                            {subject.sessions} {subject.sessions === 1 ? "session" : "sessions"}
+                            {" · "}
+                            {subject.notes} {subject.notes === 1 ? "note" : "notes"}
+                          </small>
+                        </div>
 
+                      </div>
 
-                        return (
+                      <div className="sp-subject-time">
+                        <strong>{formatStudyTime(subject.focusSeconds)}</strong>
+                      </div>
+
+                      <div className="sp-subject-share">
+
+                        <div className="sp-track">
                           <div
-                            className="v2p-subject"
-                            key={
-                              subject.id
-                            }
                             style={{
-                              "--subject-progress-color":
-                                subject.color,
+                              width: `${focusPercent}%`,
+                              background: subject.color,
                             }}
-                          >
+                          />
+                        </div>
 
-                            <div className="v2p-subject-top">
+                        <span>{focusPercent}%</span>
+                      </div>
 
-                              <div className="v2p-subject-name">
+                      <div className="sp-subject-tasks">
 
-                                <span className="v2p-subject-dot" />
+                        <strong>
+                          {subject.completedTasks}/{subject.tasks}
+                        </strong>
 
+                        <small>
+                          {subject.tasks > 0
+                            ? `${taskPercent}% done`
+                            : "No tasks"}
+                        </small>
 
-                                <div>
+                      </div>
 
-                                  <strong>
-                                    {subject.name}
-                                  </strong>
+                    </article>
 
-                                  <span>
-                                    {subject.sessions}{" "}
-                                    {subject.sessions ===
-                                    1
-                                      ? "session"
-                                      : "sessions"}
-                                    {" · "}
-                                    {subject.notes}{" "}
-                                    {subject.notes ===
-                                    1
-                                      ? "note"
-                                      : "notes"}
-                                  </span>
+                  );
+                })}
 
-                                </div>
-
-                              </div>
-
-
-                              <div className="v2p-subject-focus">
-
-                                <strong>
-                                  {formatStudyTime(
-                                    subject.focusSeconds
-                                  )}
-                                </strong>
-
-                                <span>
-                                  {focusPercent}%
-                                </span>
-
-                              </div>
-
-                            </div>
-
-
-                            <div className="v2p-subject-track">
-
-                              <div
-                                style={{
-                                  width:
-                                    `${focusPercent}%`,
-                                }}
-                              />
-
-                            </div>
-
-
-                            <div className="v2p-subject-meta">
-
-                              <span>
-
-                                <CheckCircle2
-                                  size={14}
-                                />
-
-                                {subject.completedTasks}
-                                /
-                                {subject.tasks}
-                                {" tasks"}
-
-                              </span>
-
-                              <span>
-                                {subject.tasks >
-                                0
-                                  ? `${taskPercent}% completion`
-                                  : "No linked tasks"}
-                              </span>
-
-                            </div>
-
-                          </div>
-                        );
-                      }
-                    )}
-
-                  </div>
-                )}
-
-              </article>
-
-
-              {/* RECENT ACTIVITY */}
-
-              <article className="v2p-panel">
-
-                <div className="v2p-panel-header">
-
-                  <div>
-
-                    <span className="v2p-eyebrow">
-                      Recent
-                    </span>
-
-                    <h2>
-                      Study activity
-                    </h2>
-
-                    <p>
-                      Your latest focus sessions and completed tasks.
-                    </p>
-
-                  </div>
-
-
-                  <Activity
-                    size={20}
-                  />
-
-                </div>
-
-
-                {recentActivity.length ===
-                0 ? (
-
-                  <ProgressEmpty
-                    icon={
-                      <Activity
-                        size={26}
-                      />
-                    }
-                    title="No activity yet"
-                    text="Focus sessions and completed tasks will appear here."
-                  />
-
-                ) : (
-
-                  <div className="v2p-recent-list">
-
-                    {recentActivity.map(
-                      (
-                        item
-                      ) => {
-                        const ItemIcon =
-                          item.type ===
-                          "session"
-                            ? Timer
-                            : CheckCircle2;
-
-                        return (
-                          <div
-                            className="v2p-recent-item"
-                            key={
-                              item.id
-                            }
-                          >
-
-                            <span
-                              className={`v2p-recent-icon is-${item.type}`}
-                            >
-
-                              <ItemIcon
-                                size={16}
-                              />
-
-                            </span>
-
-
-                            <div className="v2p-recent-copy">
-
-                              <strong>
-                                {item.title}
-                              </strong>
-
-                              <span>
-                                {formatRelativeActivity(
-                                  item.date
-                                )}
-                              </span>
-
-                            </div>
-
-
-                            <strong className="v2p-recent-meta">
-                              {item.meta}
-                            </strong>
-
-                          </div>
-                        );
-                      }
-                    )}
-
-                  </div>
-                )}
-
-              </article>
-
-            </div>
-
-
-            {/* RIGHT COLUMN */}
-
-            <div className="v2p-lower-column">
-
-              {/* TASKS */}
-
-              <article className="v2p-panel">
-
-                <div className="v2p-panel-header">
-
-                  <div>
-
-                    <span className="v2p-eyebrow">
-                      Tasks
-                    </span>
-
-                    <h2>
-                      Completion
-                    </h2>
-
-                  </div>
-
-
-                  <span className="v2p-rate">
-                    {completionRate}%
-                  </span>
-
-                </div>
-
-
-                <div className="v2p-task-track">
-
-                  <div
-                    style={{
-                      width:
-                        `${completionRate}%`,
-                    }}
-                  />
-
-                </div>
-
-
-                <div className="v2p-small-grid">
-
-                  <div>
-                    <span>
-                      Total
-                    </span>
-
-                    <strong>
-                      {totalTasks}
-                    </strong>
-                  </div>
-
-
-                  <div>
-                    <span>
-                      Completed
-                    </span>
-
-                    <strong>
-                      {completedCount}
-                    </strong>
-                  </div>
-
-
-                  <div>
-                    <span>
-                      Pending
-                    </span>
-
-                    <strong>
-                      {pendingCount}
-                    </strong>
-                  </div>
-
-
-                  <div>
-                    <span>
-                      Today
-                    </span>
-
-                    <strong>
-                      {completedToday}
-                    </strong>
-                  </div>
-
-                </div>
-
-              </article>
-
-
-              {/* NOTES */}
-
-              <article className="v2p-panel">
-
-                <div className="v2p-panel-header">
-
-                  <div>
-
-                    <span className="v2p-eyebrow">
-                      Notes
-                    </span>
-
-                    <h2>
-                      Knowledge base
-                    </h2>
-
-                  </div>
-
-
-                  <FileText
-                    size={20}
-                  />
-
-                </div>
-
-
-                <div className="v2p-note-grid">
-
-                  <div>
-
-                    <FileText
-                      size={17}
-                    />
-
-                    <span>
-                      Total
-                    </span>
-
-                    <strong>
-                      {notes.length}
-                    </strong>
-
-                  </div>
-
-
-                  <div>
-
-                    <Link2
-                      size={17}
-                    />
-
-                    <span>
-                      Linked
-                    </span>
-
-                    <strong>
-                      {linkedNotes}
-                    </strong>
-
-                  </div>
-
-
-                  <div>
-
-                    <Pin
-                      size={17}
-                    />
-
-                    <span>
-                      Pinned
-                    </span>
-
-                    <strong>
-                      {pinnedNotes}
-                    </strong>
-
-                  </div>
-
-
-                  <div>
-
-                    <TrendingUp
-                      size={17}
-                    />
-
-                    <span>
-                      Updated 7d
-                    </span>
-
-                    <strong>
-                      {notesUpdatedThisWeek}
-                    </strong>
-
-                  </div>
-
-                </div>
-
-              </article>
-
-
-              {/* STUDYOS INSIGHT */}
-
-              <article className="v2p-study-insight">
-
-                <span className="v2p-study-insight-icon">
-
-                  <InsightIcon
-                    size={24}
-                  />
-
-                </span>
-
-
-                <div className="v2p-study-insight-copy">
-
-                  <span className="v2p-eyebrow">
-                    StudyOS insight
-                  </span>
-
-                  <h2>
-                    {insight.title}
-                  </h2>
-
-                  <p>
-                    {insight.text}
-                  </p>
-
-                </div>
-
-
-                <div className="v2p-study-insight-footer">
-
-                  <span>
-
-                    <BarChart3
-                      size={15}
-                    />
-
-                    Total focus
-
-                    <strong>
-                      {formatStudyTime(
-                        totalStudySeconds
-                      )}
-                    </strong>
-
-                  </span>
-
-
-                  <span>
-
-                    <CheckCircle2
-                      size={15}
-                    />
-
-                    Completed
-
-                    <strong>
-                      {completedCount}
-                    </strong>
-
-                  </span>
-
-                </div>
-
-              </article>
-
-            </div>
+              </div>
+            )}
 
           </section>
+
+          {/* TASKS AND NOTES */}
+
+          <section className="sp-secondary-grid">
+
+            <article className="sp-summary-panel">
+
+              <div className="sp-section-heading">
+                <h2>Tasks</h2>
+                <strong>{completionRate}%</strong>
+              </div>
+
+              <div
+                className="sp-track"
+                role="progressbar"
+                aria-label="Task completion"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={completionRate}
+              >
+                <div style={{ width: `${completionRate}%` }} />
+              </div>
+
+              <div className="sp-mini-stats">
+
+                <StudyMetric label="Total" value={totalTasks} />
+                <StudyMetric label="Completed" value={completedCount} />
+                <StudyMetric label="Pending" value={pendingCount} />
+                <StudyMetric label="Today" value={completedToday} />
+
+              </div>
+
+            </article>
+
+            <article className="sp-summary-panel">
+
+              <div className="sp-section-heading">
+                <h2>Notes</h2>
+                <FileText size={17} />
+              </div>
+
+              <div className="sp-mini-stats">
+
+                <StudyMetric label="Total" value={notes.length} />
+                <StudyMetric label="Linked" value={linkedNotes} />
+                <StudyMetric label="Pinned" value={pinnedNotes} />
+                <StudyMetric label="Updated 7d" value={notesUpdatedThisWeek} />
+
+              </div>
+
+            </article>
+
+          </section>
+
+          {/* RECENT ACTIVITY */}
+
+          <section className="sp-activity">
+
+            <div className="sp-section-heading">
+
+              <h2>Recent activity</h2>
+
+              {recentActivity.length > 3 && (
+                <button
+                  type="button"
+                  className="sp-text-button"
+                  aria-expanded={showAllActivity}
+                  aria-controls="sp-activity-list"
+                  onClick={() => setShowAllActivity((value) => !value)}
+                >
+                  {showAllActivity ? "Show less" : "View all"}
+                </button>
+              )}
+
+            </div>
+
+            {recentActivity.length === 0 ? (
+              <StudyEmpty
+                icon={<Activity size={24} />}
+                title="No activity yet"
+                text="Focus sessions and completed tasks will appear here."
+              />
+            ) : (
+              <div id="sp-activity-list">
+
+                {visibleActivity.map((item) => {
+
+                  const ItemIcon =
+                    item.type === "session"
+                      ? Timer
+                      : CheckCircle2;
+
+                  return (
+                    <article
+                      className="sp-activity-row"
+                      key={item.id}
+                    >
+
+                      <span className={`sp-activity-icon is-${item.type}`}>
+                        <ItemIcon size={18} />
+                      </span>
+
+                      <div className="sp-activity-copy">
+                        <strong>{item.title}</strong>
+                        <small>{formatRelativeActivity(item.date)}</small>
+                      </div>
+
+                      <strong className="sp-activity-meta">
+                        {item.meta}
+                      </strong>
+
+                    </article>
+                  );
+                })}
+
+              </div>
+            )}
+
+          </section>
+
+          {/* INSIGHT */}
+
+          <aside className="sp-insight">
+
+            <InsightIcon size={19} />
+
+            <div>
+              <strong>{insight.title}</strong>
+              <p>{insight.text}</p>
+            </div>
+
+          </aside>
 
         </>
       )}
@@ -3181,113 +2548,43 @@ function Progress() {
 }
 
 
-// =========================================================
-// HERO STAT
-// =========================================================
-
-function ProgressStat({
-  icon,
-  label,
-  value,
-  description,
-  trend,
-}) {
+function StudyMetric({ label, value, detail, trend }) {
   return (
-    <article className="v2p-stat">
+    <div className="sp-metric">
 
-      <span className="v2p-stat-icon">
-        {icon}
+      <span className="sp-metric-label">
+        {label}
       </span>
 
+      <strong>{value}</strong>
 
-      <div>
-
-        <span className="v2p-stat-label">
-          {label}
-        </span>
-
-        <strong>
-          {value}
-        </strong>
-
-        <small
-          className={
-            trend
-              ? `is-${trend}`
-              : ""
-          }
-        >
-          {description}
+      {detail && (
+        <small className={trend ? `is-${trend}` : ""}>
+          {detail}
         </small>
+      )}
 
-      </div>
-
-    </article>
+    </div>
   );
 }
 
 
-// =========================================================
-// INSIGHT
-// =========================================================
-
-function ProgressInsight({
-  icon,
-  label,
-  value,
-  description,
-}) {
+function StudyDetail({ label, value }) {
   return (
-    <article className="v2p-insight">
-
-      <span className="v2p-insight-icon">
-        {icon}
-      </span>
-
-
-      <div>
-
-        <span>
-          {label}
-        </span>
-
-        <strong>
-          {value}
-        </strong>
-
-        <small>
-          {description}
-        </small>
-
-      </div>
-
-    </article>
+    <div className="sp-info-row">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
   );
 }
 
 
-// =========================================================
-// EMPTY
-// =========================================================
-
-function ProgressEmpty({
-  icon,
-  title,
-  text,
-}) {
+function StudyEmpty({ icon, title, text }) {
   return (
-    <div className="v2p-empty">
-
+    <div className="sp-empty">
       {icon}
-
-      <strong>
-        {title}
-      </strong>
-
-      <p>
-        {text}
-      </p>
-
+      <strong>{title}</strong>
+      <span>{text}</span>
     </div>
   );
 }

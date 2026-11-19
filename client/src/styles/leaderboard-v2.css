@@ -1573,3 +1573,665 @@
     font-size: 22px;
   }
 }
+
+
+/* =========================================================
+   STUDYOS - UNIFIED LEADERBOARD
+   ========================================================= */
+
+.v2l-page.slb-page {
+  width: 100%;
+  max-width: 1100px;
+  min-width: 0;
+  margin: 0 auto;
+  padding-bottom: 20px;
+
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.slb-page,
+.slb-page * {
+  box-sizing: border-box;
+}
+
+.slb-page button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.slb-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.slb-page button:focus-visible,
+.slb-page summary:focus-visible {
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: 3px;
+}
+
+.slb-page h1,
+.slb-page h2,
+.slb-page p {
+  margin: 0;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.slb-page .slb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.slb-page .slb-header h1 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.slb-page .slb-header p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.slb-page .slb-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.slb-page .slb-refresh:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* =========================================================
+   PERSONAL STATISTICS
+   ========================================================= */
+
+.slb-page .slb-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  padding: 3px 0 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.slb-page .slb-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 5px;
+  padding: 0 22px;
+  border-left: 1px solid var(--color-border);
+}
+
+.slb-page .slb-stat:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.slb-page .slb-stat > span {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slb-page .slb-stat > strong {
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   BOARD HEADER
+   ========================================================= */
+
+.slb-page .slb-board {
+  padding-top: 18px;
+  min-width: 0;
+}
+
+.slb-page .slb-board-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.slb-page .slb-board-heading h2 {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.slb-page .slb-board-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   RANKING TABLE
+   ========================================================= */
+
+.slb-page .slb-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 15px;
+}
+
+.slb-page .slb-col-rank {
+  width: 90px;
+}
+
+.slb-page .slb-col-focus {
+  width: 17%;
+}
+
+.slb-page .slb-col-tasks {
+  width: 13%;
+}
+
+.slb-page .slb-col-score {
+  width: 15%;
+}
+
+.slb-page .slb-table thead th {
+  height: 34px;
+  padding: 6px 10px;
+  background: transparent;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.slb-page .slb-table th:last-child,
+.slb-page .slb-table td:last-child {
+  text-align: right;
+}
+
+.slb-page .slb-table tbody td,
+.slb-page .slb-table tbody th {
+  height: 46px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.slb-page .slb-table tbody td:last-child {
+  text-align: right;
+}
+
+.slb-page .slb-row {
+  transition: background 120ms ease;
+}
+
+.slb-page .slb-row:hover {
+  background: var(--color-surface-hover);
+}
+
+/* Current user - subtle highlight */
+
+.slb-page .slb-row.is-current {
+  background: color-mix(
+    in srgb,
+    var(--color-text) 5%,
+    transparent
+  );
+}
+
+.slb-page .slb-row.is-current > td:first-child {
+  box-shadow: inset 2px 0 0 var(--color-text);
+}
+
+/* =========================================================
+   RANK INDICATORS
+   ========================================================= */
+
+.slb-page .slb-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.slb-page .slb-medal {
+  display: inline-flex;
+  align-items: center;
+}
+
+.slb-page .slb-medal:empty {
+  display: none;
+}
+
+.slb-page .slb-rank.rank-1 {
+  color: #bc963d;
+}
+
+.slb-page .slb-rank.rank-2 {
+  color: var(--color-text-secondary, var(--color-text-muted));
+}
+
+.slb-page .slb-rank.rank-3 {
+  color: #b98155;
+}
+
+/* =========================================================
+   STUDENT DETAILS
+   ========================================================= */
+
+.slb-page .slb-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.slb-page .slb-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.slb-page .slb-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 3px 8px;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.slb-page .slb-name > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.slb-page .slb-name > small {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.slb-page .slb-table tbody td.slb-score {
+  color: var(--color-text);
+  font-weight: 650;
+}
+
+/* =========================================================
+   LOAD MORE
+   ========================================================= */
+
+.slb-page .slb-more {
+  display: block;
+  margin: 14px auto 0;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slb-page .slb-more:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* =========================================================
+   FAIR PLAY RULES
+   ========================================================= */
+
+.slb-page .slb-rules {
+  margin-top: 13px;
+}
+
+.slb-page .slb-rules > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 5px 0;
+  list-style: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.slb-page .slb-rules > summary::-webkit-details-marker {
+  display: none;
+}
+
+.slb-page .slb-rules > summary:hover {
+  color: var(--color-text);
+}
+
+.slb-page .slb-chevron {
+  margin-left: auto;
+  transition: transform 150ms ease;
+}
+
+.slb-page .slb-rules[open] .slb-chevron {
+  transform: rotate(180deg);
+}
+
+.slb-page .slb-rules p {
+  max-width: 850px;
+  padding: 3px 0 10px 25px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   PRIVATE NOTICE AND ERROR STATES
+   ========================================================= */
+
+.slb-page .slb-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.slb-page .slb-notice > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.slb-page .slb-notice strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.slb-page .slb-notice p {
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.slb-page .slb-notice.is-error {
+  color: var(--color-danger, #ef4444);
+  border-color: var(--color-danger, #ef4444);
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   EMPTY / GUEST / LOADING
+   ========================================================= */
+
+.slb-page .slb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 24px 12px;
+  gap: 10px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.slb-page .slb-empty h2 {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--color-text);
+}
+
+.slb-page .slb-empty strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.slb-page .slb-empty p {
+  max-width: 460px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.slb-page .slb-spin {
+  animation: slb-spin 0.9s linear infinite;
+}
+
+@keyframes slb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .slb-page .slb-col-rank {
+    width: 76px;
+  }
+
+  .slb-page .slb-col-focus {
+    width: 18%;
+  }
+
+  .slb-page .slb-table thead th,
+  .slb-page .slb-table tbody td,
+  .slb-page .slb-table tbody th {
+    padding-inline: 7px;
+  }
+
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .slb-page .slb-header {
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .slb-page .slb-header h1 {
+    font-size: 28px;
+  }
+
+  .slb-page .slb-header p {
+    font-size: 13px;
+  }
+
+  .slb-page .slb-refresh {
+    min-height: 42px;
+    padding-inline: 9px;
+    font-size: 13px;
+  }
+
+  .slb-page .slb-stat {
+    padding: 0 10px;
+    gap: 6px;
+  }
+
+  .slb-page .slb-stat > span {
+    font-size: 13px;
+  }
+
+  .slb-page .slb-stat > strong {
+    font-size: 22px;
+  }
+
+  .slb-page .slb-board {
+    padding-top: 16px;
+  }
+
+  .slb-page .slb-board-heading h2 {
+    font-size: 17px;
+  }
+
+  .slb-page .slb-col-rank {
+    width: 15%;
+  }
+
+  .slb-page .slb-col-focus {
+    width: 17%;
+  }
+
+  .slb-page .slb-col-tasks {
+    width: 13%;
+  }
+
+  .slb-page .slb-col-score {
+    width: 15%;
+  }
+
+  .slb-page .slb-table thead th {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+
+  .slb-page .slb-table tbody td,
+  .slb-page .slb-table tbody th {
+    height: 48px;
+    padding: 8px 4px;
+    font-size: 13px;
+  }
+
+  .slb-page .slb-person {
+    gap: 6px;
+  }
+
+  .slb-page .slb-name {
+    font-size: 14px;
+  }
+
+  .slb-page .slb-avatar {
+    width: 25px;
+    height: 25px;
+    font-size: 11px;
+  }
+
+  .slb-page .slb-rank {
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  .slb-page .slb-medal svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .slb-page .slb-more,
+  .slb-page .slb-rules > summary {
+    min-height: 44px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .slb-page .slb-avatar {
+    display: none;
+  }
+
+  .slb-page .slb-medal {
+    display: none;
+  }
+
+  .slb-page .slb-header p {
+    font-size: 12px;
+  }
+
+  .slb-page .slb-name {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .slb-page .slb-name > small {
+    font-size: 11px;
+  }
+
+  .slb-page .slb-col-rank {
+    width: 13%;
+  }
+
+  .slb-page .slb-stat > strong {
+    font-size: 20px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .slb-page *,
+  .slb-page *::before {
+    transition: none !important;
+    animation: none !important;
+  }
+
+}

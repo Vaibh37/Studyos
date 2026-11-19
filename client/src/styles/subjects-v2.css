@@ -1660,3 +1660,736 @@ div {
     width: 100%;
   }
 }
+
+
+/* =========================================================
+   STUDYOS - MINIMAL SUBJECTS
+   ========================================================= */
+
+.v2s-page.v2s-clean {
+  max-width: 1100px;
+  min-width: 0;
+  width: 100%;
+  margin: 0 auto;
+  color: var(--color-text);
+}
+
+.v2s-clean,
+.v2s-clean * {
+  box-sizing: border-box;
+}
+
+.v2s-clean button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.v2s-clean button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.v2s-clean button:focus-visible {
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.v2s-clean .v2s-header {
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 22px;
+}
+
+.v2s-clean .v2s-header .v2s-eyebrow {
+  display: none;
+}
+
+.v2s-clean .v2s-header h1 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.v2s-clean .v2s-header p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.v2s-clean .v2s-header .v2s-primary-button {
+  width: auto;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.v2s-clean .v2s-stats {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 4px 0 20px;
+  margin: 0 0 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.v2s-clean .v2s-stat {
+  min-width: 0;
+  min-height: 0;
+  padding: 0 20px;
+  border: 0;
+  border-left: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.v2s-clean .v2s-stat:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.v2s-clean .v2s-stat-heading {
+  margin: 0 0 6px;
+  font-size: 12px;
+  gap: 0;
+  line-height: 1.3;
+}
+
+.v2s-clean .v2s-stat-icon,
+.v2s-clean .v2s-stat > small {
+  display: none;
+}
+
+.v2s-clean .v2s-stat > strong {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   SEARCH AND SORT
+   ========================================================= */
+
+.v2s-clean .v2s-toolbar {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(140px, 180px)
+    36px;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.v2s-clean .v2s-search,
+.v2s-clean .v2s-sort-select .study-select-trigger {
+  min-height: 36px;
+  min-width: 0;
+  border-radius: 7px;
+  font-size: 13px;
+  background: var(--color-surface);
+}
+
+.v2s-clean .v2s-search {
+  padding: 0 10px;
+}
+
+.v2s-clean .v2s-search input {
+  min-width: 0;
+  font-size: 13px;
+}
+
+.v2s-clean .v2s-refresh {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  gap: 0;
+  font-size: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.v2s-clean .v2s-refresh:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* =========================================================
+   SUBJECT LIST
+   ========================================================= */
+
+.v2s-clean .sl-list {
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.v2s-clean .sl-list-heading,
+.v2s-clean .sl-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 2.2fr)
+    minmax(0, 0.8fr)
+    minmax(0, 0.8fr)
+    minmax(90px, 1fr)
+    68px;
+  gap: 14px;
+  align-items: center;
+}
+
+.v2s-clean .sl-list-heading {
+  padding: 10px 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.v2s-clean .sl-list-heading > span:last-child {
+  text-align: right;
+}
+
+.v2s-clean .sl-item {
+  min-width: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.v2s-clean .sl-row {
+  min-height: 65px;
+  padding: 10px 0;
+}
+
+/* =========================================================
+   SUBJECT NAME
+   ========================================================= */
+
+.v2s-clean .sl-name-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  border-radius: 5px;
+}
+
+.v2s-clean .sl-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform 160ms ease;
+}
+
+.v2s-clean .sl-name-button:hover .sl-chevron {
+  color: var(--color-text);
+}
+
+.v2s-clean .sl-item.is-expanded .sl-chevron {
+  transform: rotate(90deg);
+}
+
+.v2s-clean .sl-subject-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--sl-color);
+  flex-shrink: 0;
+}
+
+.v2s-clean .sl-name-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.v2s-clean .sl-name-copy strong {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.v2s-clean .sl-name-copy small {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   FOCUS METRICS
+   ========================================================= */
+
+.v2s-clean .sl-metric {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.v2s-clean .sl-metric strong {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.v2s-clean .sl-mobile-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   TASK COMPLETION
+   ========================================================= */
+
+.v2s-clean .sl-completion {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 6px;
+}
+
+.v2s-clean .sl-completion-copy {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.v2s-clean .sl-completion-copy strong {
+  color: var(--color-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.v2s-clean .sl-track {
+  width: 100%;
+  height: 4px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--color-surface-hover);
+}
+
+.v2s-clean .sl-track > div {
+  height: 100%;
+  max-width: 100%;
+  background: var(--sl-color);
+  border-radius: inherit;
+}
+
+/* =========================================================
+   EDIT AND DELETE ACTIONS
+   ========================================================= */
+
+.v2s-clean .sl-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.v2s-clean .sl-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 34px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.v2s-clean .sl-actions button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.v2s-clean .sl-actions button.is-danger:hover {
+  color: var(--color-danger);
+}
+
+/* =========================================================
+   EXPANDABLE SUBJECT DETAILS
+   ========================================================= */
+
+.v2s-clean .sl-details {
+  padding: 2px 0 18px 41px;
+  min-width: 0;
+}
+
+.v2s-clean .sl-details[hidden] {
+  display: none;
+}
+
+.v2s-clean .sl-details p {
+  max-width: 750px;
+  margin: 0 0 15px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.v2s-clean .sl-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.v2s-clean .sl-detail-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.v2s-clean .sl-detail-stats dt {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.v2s-clean .sl-detail-stats dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   FORMS AND EMPTY STATES
+   ========================================================= */
+
+.v2s-clean .v2s-form-card {
+  padding: 17px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+}
+
+.v2s-clean .v2s-form-header .v2s-eyebrow {
+  display: none;
+}
+
+.v2s-clean .v2s-empty {
+  min-height: 150px;
+  border: 0;
+  background: transparent;
+}
+
+/* =========================================================
+   SMALL DESKTOP
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+  .v2s-clean .v2s-stat {
+    padding-inline: 12px;
+  }
+
+  .v2s-clean .v2s-stat > strong {
+    font-size: 22px;
+  }
+
+}
+
+/* =========================================================
+   RESPONSIVE SUBJECT ROWS
+   ========================================================= */
+
+@container (max-width: 610px) {
+
+  .v2s-clean .sl-list-heading {
+    display: none;
+  }
+
+  .v2s-clean .sl-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 12px;
+    padding: 10px 0 13px;
+  }
+
+  .v2s-clean .sl-name-button {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+
+  .v2s-clean .sl-actions {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .v2s-clean .sl-total {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .v2s-clean .sl-week {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .v2s-clean .sl-completion {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .v2s-clean .sl-mobile-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+
+  .v2s-clean .sl-actions button {
+    width: 40px;
+    height: 44px;
+  }
+
+  .v2s-clean .sl-details {
+    padding-left: 0;
+  }
+
+  .v2s-clean .sl-detail-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .v2s-clean .v2s-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    margin: 0 0 18px !important;
+  }
+
+  .v2s-clean .v2s-header h1 {
+    font-size: 27px !important;
+    letter-spacing: -0.035em !important;
+  }
+
+  .v2s-clean .v2s-header .v2s-primary-button {
+    min-height: 42px !important;
+    border-radius: 7px !important;
+    font-size: 12px !important;
+  }
+
+  .v2s-clean .v2s-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px 0;
+    padding-bottom: 17px;
+  }
+
+  .v2s-clean .v2s-stat:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .v2s-clean .v2s-stat-heading {
+    font-size: 11px;
+  }
+
+  .v2s-clean .v2s-stat > strong {
+    font-size: 22px;
+  }
+
+  .v2s-clean .v2s-toolbar {
+    grid-template-columns: minmax(0, 1fr) 44px !important;
+    gap: 7px !important;
+  }
+
+  .v2s-clean .v2s-search {
+    grid-column: 1 / -1;
+    min-height: 44px !important;
+    border-radius: 7px !important;
+  }
+
+  .v2s-clean .v2s-search input {
+    font-size: 14px !important;
+  }
+
+  .v2s-clean .v2s-sort-select .study-select-trigger {
+    min-height: 42px !important;
+    border-radius: 7px !important;
+    font-size: 13px !important;
+  }
+
+  .v2s-clean .v2s-refresh {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 42px !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .v2s-clean .v2s-form-card {
+    border-radius: 8px !important;
+  }
+
+  .v2s-clean .v2s-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .v2s-clean .v2s-field > span,
+  .v2s-clean .v2s-color-field > span {
+    font-size: 12px !important;
+  }
+
+  .v2s-clean .v2s-input {
+    min-height: 44px !important;
+  }
+
+  .v2s-clean .v2s-input input,
+  .v2s-clean .v2s-field textarea {
+    font-size: 16px !important;
+  }
+
+  .v2s-clean .v2s-field small {
+    font-size: 11px !important;
+  }
+
+  .v2s-clean .v2s-form-actions button {
+    min-height: 44px !important;
+    font-size: 13px !important;
+  }
+
+  .v2s-clean .v2s-empty h2 {
+    font-size: 15px !important;
+  }
+
+  .v2s-clean .v2s-empty p {
+    font-size: 12px !important;
+  }
+
+}
+
+/* REDUCED MOTION */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .v2s-clean .sl-chevron,
+  .v2s-clean button {
+    transition: none;
+  }
+
+  .v2s-clean .v2s-spin {
+    animation: none;
+  }
+
+}
+
+/* STUDYOS TYPOGRAPHY START */
+
+/* SUBJECTS TYPOGRAPHY */
+
+.v2s-page.v2s-clean .v2s-header h1 {
+  font-size: 28px !important;
+  font-weight: 700;
+}
+
+.v2s-page.v2s-clean .v2s-header p {
+  font-size: 15px !important;
+}
+
+.v2s-page.v2s-clean .v2s-stat-heading {
+  font-size: 14px !important;
+}
+
+.v2s-page.v2s-clean .v2s-stat > strong {
+  font-size: 26px !important;
+}
+
+.v2s-page.v2s-clean .v2s-primary-button,
+.v2s-page.v2s-clean .v2s-search input,
+.v2s-page.v2s-clean .study-select-trigger {
+  font-size: 14px !important;
+}
+
+.v2s-clean .sl-list-heading {
+  font-size: 13px !important;
+}
+
+.v2s-clean .sl-name-copy strong {
+  font-size: 15px !important;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.v2s-clean .sl-name-copy small,
+.v2s-clean .sl-completion-copy,
+.v2s-clean .sl-mobile-label {
+  font-size: 13px !important;
+}
+
+.v2s-clean .sl-metric strong {
+  font-size: 15px !important;
+}
+
+.v2s-clean .sl-details p {
+  font-size: 15px !important;
+  line-height: 1.65;
+}
+
+.v2s-clean .sl-detail-stats dt {
+  font-size: 13px !important;
+}
+
+.v2s-clean .sl-detail-stats dd {
+  font-size: 15px !important;
+}
+
+.v2s-page.v2s-clean .v2s-field > span,
+.v2s-page.v2s-clean .v2s-color-field > span,
+.v2s-page.v2s-clean .v2s-form-actions button {
+  font-size: 14px !important;
+}
+
+.v2s-page.v2s-clean .v2s-input input,
+.v2s-page.v2s-clean .v2s-field textarea {
+  font-size: 15px !important;
+}
+
+/* STUDYOS TYPOGRAPHY END */

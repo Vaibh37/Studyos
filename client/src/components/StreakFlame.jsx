@@ -469,7 +469,9 @@ export default function StreakFlame() {
     return () => clearTimeout(returnTimer.current);
   }, []);
 
-  if (!ready) return null;
+  const isDashboard = /^\/app\/dashboard\/?$/.test(pathname);
+
+  if (!ready || !isDashboard) return null;
 
   const days = record?.count || 0;
   const best = record?.best || days;

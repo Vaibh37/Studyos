@@ -704,7 +704,9 @@ function LeaderboardSettings() {
                       ? "on"
                       : ""
                   }`}
-                  aria-pressed={
+                  role="switch"
+                  aria-label="Join global leaderboard"
+                  aria-checked={
                     isPublic
                   }
                   onClick={() => {

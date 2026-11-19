@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   BookOpen,
   CheckCircle2,
+  ChevronRight,
   Clock3,
   Hash,
   ListChecks,
@@ -1294,8 +1295,18 @@ function Subjects() {
   // UI
   // =======================================================
 
+  const [expandedSubjectId, setExpandedSubjectId] = useState(null);
+
+  useEffect(() => {
+    if (showForm) {
+      document
+        .querySelector(".v2s-clean .v2s-form-card")
+        ?.scrollIntoView({ block: "nearest" });
+    }
+  }, [showForm, editingSubject]);
+
   return (
-    <div className="v2s-page">
+    <div className="v2s-page v2s-clean">
 
       <header className="v2s-header">
 
@@ -1310,9 +1321,7 @@ function Subjects() {
           </h1>
 
           <p>
-            Keep coursework organized and see
-            focus, tasks, notes and recent activity
-            for every subject.
+            Manage your study areas and track their progress.
           </p>
 
         </div>
@@ -1701,7 +1710,7 @@ function Subjects() {
             value={
               search
             }
-            placeholder="Search subjects..."
+            placeholder="Search subjects..." aria-label="Search subjects"
             onChange={(
               event
             ) =>
@@ -1744,7 +1753,7 @@ function Subjects() {
 
         <button
           type="button"
-          className="v2s-refresh"
+          className="v2s-refresh" aria-label="Refresh subjects" title="Refresh subjects"
           onClick={() =>
             loadSubjectsHub(
               true
@@ -1812,7 +1821,18 @@ function Subjects() {
           description="Try another search term."
         />
       ) : (
-        <section className="v2s-grid">
+        <section className="sl-list" aria-label="Subjects">
+
+          <div
+            className="sl-list-heading"
+            aria-hidden="true"
+          >
+            <span>Subject</span>
+            <span>Total focus</span>
+            <span>This week</span>
+            <span>Tasks</span>
+            <span>Actions</span>
+          </div>
 
           {visibleSubjects.map(
             (
@@ -1835,91 +1855,66 @@ function Subjects() {
                   lastStudiedAt: null,
                 };
 
+              const id = String(subject._id);
+              const expanded = expandedSubjectId === id;
+              const detailId = `subject-details-${id}`;
+
               return (
                 <article
-                  key={
-                    subject._id
-                  }
-                  className="v2s-card"
+                  key={id}
+                  className={`sl-item${expanded ? " is-expanded" : ""}`}
                   style={{
-                    "--subject-color":
-                      subject.color ||
-                      "#475569",
+                    "--sl-color": subject.color || "#475569",
                   }}
                 >
 
-                  <div className="v2s-card-accent" />
+                  <div className="sl-row">
 
+                    <button
+                      type="button"
+                      className="sl-name-button"
+                      aria-expanded={expanded}
+                      aria-controls={detailId}
+                      onClick={() =>
+                        setExpandedSubjectId((current) =>
+                          current === id ? null : id
+                        )
+                      }
+                    >
 
-                  <div className="v2s-card-header">
-
-                    <div className="v2s-card-icon">
-                      <BookOpen
-                        size={20}
+                      <ChevronRight
+                        size={15}
+                        className="sl-chevron"
+                        aria-hidden="true"
                       />
-                    </div>
 
-                    <div className="v2s-card-title">
+                      <span className="sl-subject-icon">
+                        <BookOpen
+                          size={17}
+                          aria-hidden="true"
+                        />
+                      </span>
 
-                      <h2>
-                        {subject.name}
-                      </h2>
+                      <span className="sl-name-copy">
 
-                      {subject.code && (
-                        <span>
-                          {subject.code}
-                        </span>
-                      )}
+                        <strong>
+                          {subject.name}
+                        </strong>
 
-                    </div>
+                        {subject.code && (
+                          <small>
+                            {subject.code}
+                          </small>
+                        )}
 
+                      </span>
 
-                    <div className="v2s-card-actions">
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openEditForm(
-                            subject
-                          )
-                        }
-                        title="Edit subject"
-                        aria-label={`Edit ${subject.name}`}
-                      >
-                        <Pencil size={16} />
-                      </button>
-
-                      <button
-                        type="button"
-                        className="is-danger"
-                        onClick={() =>
-                          setDeleteTarget(
-                            subject
-                          )
-                        }
-                        title="Delete subject"
-                        aria-label={`Delete ${subject.name}`}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-
-                    </div>
-
-                  </div>
+                    </button>
 
 
-                  <p className="v2s-description">
-                    {subject.description ||
-                      "No description added yet."}
-                  </p>
+                    <div className="sl-metric sl-total">
 
-
-                  <div className="v2s-focus">
-
-                    <div>
-
-                      <span>
-                        <Timer size={15} />
+                      <span className="sl-mobile-label">
                         Total focus
                       </span>
 
@@ -1931,10 +1926,10 @@ function Subjects() {
 
                     </div>
 
-                    <div>
 
-                      <span>
-                        <Clock3 size={15} />
+                    <div className="sl-metric sl-week">
+
+                      <span className="sl-mobile-label">
                         This week
                       </span>
 
@@ -1946,91 +1941,118 @@ function Subjects() {
 
                     </div>
 
-                  </div>
 
+                    <div className="sl-completion">
 
-                  <div className="v2s-progress">
+                      <div className="sl-completion-copy">
 
-                    <div className="v2s-progress-heading">
+                        <span>
+                          {metrics.taskCount
+                            ? `${metrics.completedTasks}/${metrics.taskCount} tasks`
+                            : "No tasks"}
+                        </span>
 
-                      <span>
-                        Task completion
-                      </span>
+                        {metrics.taskCount > 0 && (
+                          <strong>
+                            {metrics.completionRate}%
+                          </strong>
+                        )}
 
-                      <strong>
-                        {metrics.completionRate}%
-                      </strong>
+                      </div>
 
-                    </div>
+                      {metrics.taskCount > 0 && (
+                        <div
+                          className="sl-track"
+                          role="progressbar"
+                          aria-label={`Task completion for ${subject.name}`}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={metrics.completionRate}
+                        >
 
-                    <div className="v2s-progress-track">
+                          <div
+                            style={{
+                              width: `${metrics.completionRate}%`,
+                            }}
+                          />
 
-                      <div
-                        className="v2s-progress-fill"
-                        style={{
-                          width:
-                            `${metrics.completionRate}%`,
-                        }}
-                      />
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="v2s-mini-stats">
-
-                    <div>
-                      <span>
-                        Pending
-                      </span>
-
-                      <strong>
-                        {metrics.pendingTasks}
-                      </strong>
-                    </div>
-
-                    <div>
-                      <span>
-                        Completed
-                      </span>
-
-                      <strong>
-                        {metrics.completedTasks}
-                      </strong>
-                    </div>
-
-                    <div>
-                      <span>
-                        Sessions
-                      </span>
-
-                      <strong>
-                        {metrics.sessionCount}
-                      </strong>
-                    </div>
-
-                  </div>
-
-
-                  <footer className="v2s-card-footer">
-
-                    <span>
-                      {metrics.noteCount}{" "}
-                      {metrics.noteCount ===
-                      1
-                        ? "note"
-                        : "notes"}
-                    </span>
-
-                    <span>
-                      Last studied{" "}
-                      {formatRelativeDate(
-                        metrics.lastStudiedAt
+                        </div>
                       )}
-                    </span>
 
-                  </footer>
+                    </div>
+
+
+                    <div className="sl-actions">
+
+                      <button
+                        type="button"
+                        title="Edit subject"
+                        aria-label={`Edit ${subject.name}`}
+                        onClick={() => openEditForm(subject)}
+                      >
+                        <Pencil size={15} />
+                      </button>
+
+                      <button
+                        type="button"
+                        className="is-danger"
+                        title="Delete subject"
+                        aria-label={`Delete ${subject.name}`}
+                        onClick={() => setDeleteTarget(subject)}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    className="sl-details"
+                    id={detailId}
+                    hidden={!expanded}
+                  >
+
+                    <p>
+                      {subject.description ||
+                        "No description added yet."}
+                    </p>
+
+                    <dl className="sl-detail-stats">
+
+                      <div>
+                        <dt>Pending</dt>
+                        <dd>{metrics.pendingTasks}</dd>
+                      </div>
+
+                      <div>
+                        <dt>Completed</dt>
+                        <dd>{metrics.completedTasks}</dd>
+                      </div>
+
+                      <div>
+                        <dt>Sessions</dt>
+                        <dd>{metrics.sessionCount}</dd>
+                      </div>
+
+                      <div>
+                        <dt>Notes</dt>
+                        <dd>{metrics.noteCount}</dd>
+                      </div>
+
+                      <div>
+                        <dt>Last studied</dt>
+                        <dd>
+                          {formatRelativeDate(
+                            metrics.lastStudiedAt
+                          )}
+                        </dd>
+                      </div>
+
+                    </dl>
+
+                  </div>
 
                 </article>
               );

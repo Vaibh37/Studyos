@@ -8,9 +8,7 @@ import {
 import {
   BookOpen,
   CheckCircle2,
-  Clock3,
-  Flame,
-  History,
+  MoreHorizontal,
   Pause,
   Play,
   RefreshCw,
@@ -2745,315 +2743,140 @@ function Focus() {
   // UI
   // =======================================================
 
-  return (
-    <div className="v2f-page">
+  const [showAllSessions, setShowAllSessions] = useState(false);
+  const [openSessionMenu, setOpenSessionMenu] = useState(null);
 
-      {/* HEADER */}
+  useEffect(() => {
+    if (openSessionMenu === null) return;
+
+    const dismiss = (event) => {
+      if (!event.target.closest?.(".v2f-history-menu")) {
+        setOpenSessionMenu(null);
+      }
+    };
+
+    const escape = (event) => {
+      if (event.key === "Escape") {
+        setOpenSessionMenu(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [openSessionMenu]);
+
+  const visibleSessions = showAllSessions
+    ? sessions
+    : sessions.slice(0, 3);
+
+  return (
+    <div className="v2f-page v2f-clean">
 
       <header className="v2f-header">
-
         <div>
-
-          <span className="v2f-eyebrow">
-            Deep work
-          </span>
-
-          <h1>
-            Focus
-          </h1>
-
-          <p>
-            Run distraction-free study sessions
-            and build an accurate record of your
-            focused work.
-          </p>
-
+          <h1>Focus</h1>
+          <p>Make time for deep work.</p>
         </div>
-
 
         <button
           type="button"
           className="v2f-refresh"
-          disabled={
-            refreshing
-          }
-          onClick={
-            refreshData
-          }
+          disabled={refreshing}
+          onClick={refreshData}
+          aria-label="Refresh study sessions"
+          title="Refresh study sessions"
         >
-
           <RefreshCw
             size={16}
-            className={
-              refreshing
-                ? "v2f-spin"
-                : ""
-            }
+            className={refreshing ? "v2f-spin" : ""}
           />
-
-          {refreshing
-            ? "Refreshing"
-            : "Refresh"}
-
         </button>
-
       </header>
 
-
-      {/* SUCCESS */}
-
       {message && (
-        <div className="v2f-message is-success">
-
-          <CheckCircle2
-            size={17}
-          />
-
-          <span>
-            {message}
-          </span>
-
+        <div className="v2f-message is-success" role="status">
+          <CheckCircle2 size={17} />
+          <span>{message}</span>
         </div>
       )}
 
-
-      {/* ERROR */}
-
       {error && (
-        <div className="v2f-message is-error">
-
+        <div className="v2f-message is-error" role="alert">
           <div>
-
-            <strong>
-              Something went wrong
-            </strong>
-
-            <span>
-              {error}
-            </span>
-
+            <strong>Something went wrong</strong>
+            <span>{error}</span>
           </div>
 
           <button
             type="button"
-            onClick={() =>
-              setError("")
-            }
+            onClick={() => setError("")}
           >
             Dismiss
           </button>
-
         </div>
       )}
 
-
       {loading ? (
-
         <section className="v2f-loading">
-
-          <RefreshCw
-            size={22}
-            className="v2f-spin"
-          />
-
-          <strong>
-            Loading Focus
-          </strong>
-
-          <span>
-            Preparing your timer and study history.
-          </span>
-
+          <RefreshCw size={22} className="v2f-spin" />
+          <strong>Loading Focus</strong>
         </section>
-
       ) : (
         <>
-
-          {/* STATS */}
-
-          <section className="v2f-stats">
+          <section className="v2f-stats" aria-label="Focus statistics">
 
             <FocusStat
-              icon={
-                <Clock3
-                  size={19}
-                />
-              }
               label="Today"
-              value={
-                formatStudyTime(
-                  stats.todaySeconds
-                )
-              }
-              description="Focused today"
+              value={formatStudyTime(stats.todaySeconds)}
             />
 
             <FocusStat
-              icon={
-                <Flame
-                  size={19}
-                />
-              }
               label="Last 7 days"
-              value={
-                formatStudyTime(
-                  stats.weekSeconds
-                )
-              }
-              description="Recent focus"
+              value={formatStudyTime(stats.weekSeconds)}
             />
 
             <FocusStat
-              icon={
-                <History
-                  size={19}
-                />
-              }
               label="Sessions"
-              value={
-                stats.sessionCount
-              }
-              description="Completed sessions"
+              value={stats.sessionCount}
             />
 
             <FocusStat
-              icon={
-                <Timer
-                  size={19}
-                />
-              }
               label="Total focus"
-              value={
-                formatStudyTime(
-                  stats.totalSeconds
-                )
-              }
-              description="All-time study"
+              value={formatStudyTime(stats.totalSeconds)}
             />
 
           </section>
 
-
-          {/* TIMER WORKSPACE */}
-
-          <section className="v2f-workspace">
-
-            {/* TIMER */}
-
-            <main className="v2f-timer-card">
-
-              {/* CONFIG */}
+          <section
+            className="v2f-workspace"
+            aria-label="Focus timer"
+          >
+            <div className="v2f-timer-card">
 
               <div className="v2f-config">
 
                 <div className="v2f-config-block">
-
                   <span className="v2f-config-label">
                     Subject
                   </span>
 
                   <StudySelect
-                    value={
-                      selectedSubjectId
+                    value={selectedSubjectId}
+                    onChange={(value) =>
+                      setSelectedSubjectId(String(value))
                     }
-                    onChange={(
-                      value
-                    ) =>
-                      setSelectedSubjectId(
-                        String(
-                          value
-                        )
-                      )
-                    }
-                    options={
-                      subjectOptions
-                    }
+                    options={subjectOptions}
                     placeholder="General Study"
                     className="v2f-subject-select"
-                    disabled={
-                      status !==
-                      "idle"
-                    }
+                    disabled={status !== "idle"}
                     ariaLabel="Choose Focus subject"
                   />
-
                 </div>
-
-
-                <div className="v2f-config-block">
-
-                  <span className="v2f-config-label">
-                    Duration
-                  </span>
-
-                  <div className="v2f-duration-row">
-
-                    <div className="v2f-presets">
-
-                      {PRESET_DURATIONS.map(
-                        (
-                          minutes
-                        ) => (
-                          <button
-                            key={
-                              minutes
-                            }
-                            type="button"
-                            disabled={
-                              status !==
-                              "idle"
-                            }
-                            className={
-                              plannedMinutes ===
-                                minutes &&
-                              customMinutes ===
-                                ""
-                                ? "is-active"
-                                : ""
-                            }
-                            onClick={() =>
-                              chooseDuration(
-                                minutes
-                              )
-                            }
-                          >
-                            {minutes} min
-                          </button>
-                        )
-                      )}
-
-                    </div>
-
-
-                    <label className="v2f-custom">
-
-                      <input
-                        type="number"
-                        min="1"
-                        max="720"
-                        placeholder="Custom"
-                        value={
-                          customMinutes
-                        }
-                        disabled={
-                          status !==
-                          "idle"
-                        }
-                        onChange={
-                          handleCustomMinutes
-                        }
-                      />
-
-                      <span>
-                        min
-                      </span>
-
-                    </label>
-
-                  </div>
-
-                </div>
-
 
                 <div className="v2f-config-block">
 
@@ -3062,49 +2885,27 @@ function Focus() {
                   </span>
 
                   <StudySelect
-                    value={
-                      selectedShareGroupId
+                    value={selectedShareGroupId}
+                    onChange={(value) =>
+                      setSelectedShareGroupId(String(value))
                     }
-                    onChange={(
-                      value
-                    ) =>
-                      setSelectedShareGroupId(
-                        String(
-                          value
-                        )
-                      )
-                    }
-                    options={
-                      shareGroupOptions
-                    }
+                    options={shareGroupOptions}
                     placeholder="Private"
                     className="v2f-share-select"
-                    disabled={
-                      status !==
-                        "idle" ||
-                      isGuest
-                    }
-                    ariaLabel="Choose where to share live focus status"
+                    disabled={status !== "idle" || isGuest}
+                    ariaLabel="Choose live sharing group"
                   />
 
-                  <span className="v2f-config-hint">
-                    {isGuest
-                      ? "Sign in to share live study status."
-                      : groups.length ===
-                        0
-                      ? "Private by default. Join a study group to share live."
-                      : "Optional — group members will see you studying in real time."}
-                  </span>
+                  {isGuest && (
+                    <span className="v2f-config-hint">
+                      Sign in to share live.
+                    </span>
+                  )}
 
                 </div>
-
               </div>
 
-
-              {/* TIMER */}
-
               <div className="v2f-timer-area">
-
                 <div className="v2f-ring">
 
                   <svg
@@ -3128,485 +2929,320 @@ function Focus() {
                       r="52"
                       pathLength="100"
                       strokeDasharray="100"
-                      strokeDashoffset={
-                        100 -
-                        progressPercent
-                      }
+                      strokeDashoffset={100 - progressPercent}
                     />
 
                   </svg>
 
-
                   <div className="v2f-ring-content">
 
-                    <span
-                      className={`v2f-status is-${status}`}
-                    >
+                    <span className={`v2f-status is-${status}`}>
                       <span />
                       {timerStatusLabel()}
                     </span>
 
-
-                    <strong className="v2f-time">
-                      {formatTimer(
-                        remainingSeconds
-                      )}
+                    <strong
+                      className={`v2f-time${
+                        remainingSeconds >= 3600 ? " is-long" : ""
+                      }`}
+                    >
+                      {formatTimer(remainingSeconds)}
                     </strong>
 
-
-                    <span className="v2f-timer-subject">
-                      {status ===
-                      "idle"
+                    <span
+                      className="v2f-timer-subject"
+                      title={
+                        status === "idle"
+                          ? undefined
+                          : activeSubjectName
+                      }
+                    >
+                      {status === "idle"
                         ? `${plannedMinutes} minute session`
                         : activeSubjectName}
                     </span>
 
                   </div>
+                </div>
+              </div>
+
+              <div
+                className="v2f-duration-row"
+                role="group"
+                aria-label="Session duration"
+              >
+
+                <div className="v2f-presets">
+
+                  {PRESET_DURATIONS.map((minutes) => (
+                    <button
+                      key={minutes}
+                      type="button"
+                      disabled={status !== "idle"}
+                      className={
+                        plannedMinutes === minutes &&
+                        customMinutes === ""
+                          ? "is-active"
+                          : ""
+                      }
+                      aria-pressed={
+                        plannedMinutes === minutes &&
+                        customMinutes === ""
+                      }
+                      onClick={() => chooseDuration(minutes)}
+                    >
+                      {minutes} min
+                    </button>
+                  ))}
 
                 </div>
 
+                <label className="v2f-custom">
+                  <input
+                    type="number"
+                    min="1"
+                    max="720"
+                    placeholder="Custom"
+                    aria-label="Custom duration in minutes"
+                    value={customMinutes}
+                    disabled={status !== "idle"}
+                    onChange={handleCustomMinutes}
+                  />
+                  <span>min</span>
+                </label>
+
               </div>
-
-
-              {/* CONTROLS */}
 
               <div className="v2f-controls">
 
-                {status ===
-                  "idle" && (
+                {status === "idle" && (
                   <>
-
                     <button
                       type="button"
                       className="v2f-primary-action"
-                      onClick={
-                        startSession
-                      }
+                      onClick={startSession}
                     >
-
-                      <Play
-                        size={19}
-                      />
-
+                      <Play size={17} />
                       Start focus
-
                     </button>
-
 
                     <button
                       type="button"
-                      className="v2f-secondary-action"
-                      onClick={
-                        resetIdleTimer
-                      }
+                      className="v2f-secondary-action v2f-reset"
+                      onClick={resetIdleTimer}
+                      title="Reset timer"
+                      aria-label="Reset timer"
                     >
-
-                      <RotateCcw
-                        size={18}
-                      />
-
-                      Reset
-
+                      <RotateCcw size={17} />
                     </button>
-
                   </>
                 )}
 
-
-                {status ===
-                  "running" && (
+                {status === "running" && (
                   <>
-
                     <button
                       type="button"
                       className="v2f-primary-action"
-                      onClick={
-                        pauseSession
-                      }
+                      onClick={pauseSession}
                     >
-
-                      <Pause
-                        size={19}
-                      />
-
+                      <Pause size={17} />
                       Pause
-
                     </button>
-
 
                     <button
                       type="button"
                       className="v2f-secondary-action"
-                      disabled={
-                        savingSession
-                      }
-                      onClick={() =>
-                        finishSession(
-                          false
-                        )
-                      }
+                      disabled={savingSession}
+                      onClick={() => finishSession(false)}
                     >
-
-                      <CheckCircle2
-                        size={18}
-                      />
-
-                      {savingSession
-                        ? "Saving..."
-                        : "Finish"}
-
+                      <CheckCircle2 size={17} />
+                      {savingSession ? "Saving..." : "Finish"}
                     </button>
-
                   </>
                 )}
 
-
-                {status ===
-                  "paused" && (
+                {status === "paused" && (
                   <>
-
-                    {remainingSeconds >
-                      0 && (
+                    {remainingSeconds > 0 && (
                       <button
                         type="button"
                         className="v2f-primary-action"
-                        onClick={
-                          resumeSession
-                        }
+                        onClick={resumeSession}
                       >
-
-                        <Play
-                          size={19}
-                        />
-
+                        <Play size={17} />
                         Resume
-
                       </button>
                     )}
-
 
                     <button
                       type="button"
                       className="v2f-secondary-action"
-                      disabled={
-                        savingSession
-                      }
-                      onClick={() =>
-                        finishSession(
-                          false
-                        )
-                      }
+                      disabled={savingSession}
+                      onClick={() => finishSession(false)}
                     >
-
-                      <CheckCircle2
-                        size={18}
-                      />
-
-                      {savingSession
-                        ? "Saving..."
-                        : "Finish"}
-
+                      <CheckCircle2 size={17} />
+                      {savingSession ? "Saving..." : "Finish"}
                     </button>
-
                   </>
                 )}
 
               </div>
 
+              {status === "idle" ? (
+                <p className="v2f-persistence-note">
+                  Your timer stays active when you leave this page.
+                </p>
+              ) : (
+                <div className="v2f-inline-session">
 
-              <p className="v2f-persistence-note">
-                Your timer keeps running if you refresh
-                StudyOS or move to another page.
-              </p>
+                  <span
+                    className={`v2f-share-state ${
+                      activeGroupId ? "is-live" : "is-private"
+                    }`}
+                  >
+                    <span className="v2f-share-dot" />
 
-            </main>
-
-
-            {/* CURRENT SESSION */}
-
-            <aside className="v2f-session-card">
-
-              <span className="v2f-eyebrow">
-                Current session
-              </span>
-
-
-              <h2>
-                {status ===
-                "idle"
-                  ? "Ready when you are."
-                  : activeSubjectName}
-              </h2>
-
-
-              <p>
-                {status ===
-                "idle"
-                  ? "Choose a subject and duration, then start a focused block."
-                  : status ===
-                    "running"
-                  ? "Timer is running. Keep your attention on the work in front of you."
-                  : "Session is paused. Resume whenever you're ready."}
-              </p>
-
-
-              {status !==
-                "idle" && (
-                <div
-                  className={`v2f-share-state ${
-                    activeGroupId
-                      ? "is-live"
-                      : "is-private"
-                  }`}
-                >
-
-                  <span className="v2f-share-dot" />
+                    {activeGroupId
+                      ? `Live in ${activeGroupName || "study group"}`
+                      : "Private session"}
+                  </span>
 
                   <span>
-                    {activeGroupId
-                      ? `Live in ${
-                          activeGroupName ||
-                          "study group"
-                        }`
-                      : "Private session"}
+                    {formatStudyTime(elapsedSeconds)} /
+                    {" "}{plannedMinutes} min
+                    {" "}&middot;{" "}
+                    {Math.round(progressPercent)}%
                   </span>
 
                 </div>
               )}
 
-
-              <div className="v2f-session-metrics">
-
-                <div>
-
-                  <span>
-                    Target
-                  </span>
-
-                  <strong>
-                    {plannedMinutes} min
-                  </strong>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    Studied
-                  </span>
-
-                  <strong>
-                    {formatStudyTime(
-                      elapsedSeconds
-                    )}
-                  </strong>
-
-                </div>
-
-
-                <div>
-
-                  <span>
-                    Progress
-                  </span>
-
-                  <strong>
-                    {Math.round(
-                      progressPercent
-                    )}%
-                  </strong>
-
-                </div>
-
-              </div>
-
-
-              <div className="v2f-progress">
-
-                <div
-                  style={{
-                    width:
-                      `${progressPercent}%`,
-                  }}
-                />
-
-              </div>
-
-
-              <div className="v2f-session-note">
-
-                <Clock3
-                  size={16}
-                />
-
-                <span>
-                  {status ===
-                  "idle"
-                    ? "Start whenever you're ready."
-                    : status ===
-                      "running"
-                    ? "Session is being tracked."
-                    : "Progress is safely paused."}
-                </span>
-
-              </div>
-
-            </aside>
-
+            </div>
           </section>
 
-
-          {/* HISTORY */}
-
-          <section className="v2f-history">
+          <section
+            className="v2f-history"
+            aria-label="Study history"
+          >
 
             <div className="v2f-history-header">
 
-              <div>
+              <div className="v2f-history-heading">
+                <h2>Recent sessions</h2>
 
-                <span className="v2f-eyebrow">
-                  History
+                <span className="v2f-history-count">
+                  {sessions.length}
                 </span>
-
-                <h2>
-                  Study sessions
-                </h2>
-
-                <p>
-                  Your most recent completed focus blocks.
-                </p>
-
               </div>
 
-
-              <span className="v2f-history-count">
-                {sessions.length}{" "}
-                {sessions.length ===
-                1
-                  ? "session"
-                  : "sessions"}
-              </span>
+              {sessions.length > 3 && (
+                <button
+                  type="button"
+                  className="v2f-view-all"
+                  aria-expanded={showAllSessions}
+                  aria-controls="v2f-history-list"
+                  onClick={() => {
+                    setShowAllSessions((value) => !value);
+                    setOpenSessionMenu(null);
+                  }}
+                >
+                  {showAllSessions ? "Show less" : "View all"}
+                </button>
+              )}
 
             </div>
 
-
-            {sessions.length ===
-            0 ? (
-
+            {sessions.length === 0 ? (
               <div className="v2f-empty">
-
-                <Timer
-                  size={28}
-                />
-
-                <strong>
-                  No study sessions yet
-                </strong>
-
+                <Timer size={24} />
+                <strong>No study sessions yet</strong>
                 <span>
-                  Finish your first Focus session and
-                  it will appear here.
+                  Completed focus sessions will appear here.
                 </span>
-
               </div>
-
             ) : (
+              <div
+                className="v2f-history-list"
+                id="v2f-history-list"
+              >
 
-              <div className="v2f-history-list">
+                {visibleSessions.map((session) => (
+                  <article
+                    className="v2f-history-item"
+                    key={session._id}
+                  >
 
-                {sessions
-                  .slice(
-                    0,
-                    10
-                  )
-                  .map(
-                    (
-                      session
-                    ) => (
-                      <article
-                        className="v2f-history-item"
-                        key={
-                          session._id
+                    <span className="v2f-history-icon">
+                      <BookOpen size={17} />
+                    </span>
+
+                    <div className="v2f-history-copy">
+                      <strong>
+                        {session.subjectName || "General Study"}
+                      </strong>
+                      <span>
+                        {formatSessionDate(
+                          session.endedAt || session.startedAt
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="v2f-history-duration">
+                      <strong>
+                        {formatStudyTime(session.durationSeconds)}
+                      </strong>
+
+                      <span>
+                        {session.plannedMinutes
+                          ? `Target ${session.plannedMinutes} min`
+                          : "Focus session"}
+                      </span>
+                    </div>
+
+                    <div className="v2f-history-menu">
+
+                      <button
+                        type="button"
+                        className="v2f-more"
+                        aria-label="Session actions"
+                        aria-expanded={openSessionMenu === session._id}
+                        onClick={() =>
+                          setOpenSessionMenu((id) =>
+                            id === session._id ? null : session._id
+                          )
                         }
                       >
+                        <MoreHorizontal size={19} />
+                      </button>
 
-                        <span className="v2f-history-icon">
+                      {openSessionMenu === session._id && (
+                        <div className="v2f-menu-popup">
 
-                          <BookOpen
-                            size={18}
-                          />
-
-                        </span>
-
-
-                        <div className="v2f-history-copy">
-
-                          <strong>
-                            {session.subjectName ||
-                              "General Study"}
-                          </strong>
-
-                          <span>
-                            {formatSessionDate(
-                              session.endedAt ||
-                                session.startedAt
-                            )}
-                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOpenSessionMenu(null);
+                              setSessionToDelete(session);
+                            }}
+                          >
+                            <Trash2 size={15} />
+                            Delete session
+                          </button>
 
                         </div>
+                      )}
 
+                    </div>
 
-                        <div className="v2f-history-duration">
-
-                          <strong>
-                            {formatStudyTime(
-                              session.durationSeconds
-                            )}
-                          </strong>
-
-                          <span>
-                            {session.plannedMinutes
-                              ? `Target ${session.plannedMinutes} min`
-                              : "Focus session"}
-                          </span>
-
-                        </div>
-
-
-                        <button
-                          type="button"
-                          className="v2f-delete"
-                          aria-label={`Delete ${
-                            session.subjectName ||
-                            "study"
-                          } session`}
-                          onClick={() =>
-                            setSessionToDelete(
-                              session
-                            )
-                          }
-                        >
-
-                          <Trash2
-                            size={17}
-                          />
-
-                        </button>
-
-                      </article>
-                    )
-                  )}
+                  </article>
+                ))}
 
               </div>
-
             )}
 
           </section>
-
         </>
       )}
-
 
       {/* DELETE MODAL */}
 
@@ -3631,7 +3267,7 @@ function Focus() {
           <div
             className="v2f-delete-modal"
             role="dialog"
-            aria-modal="true"
+            aria-modal="true" aria-labelledby="v2f-delete-title"
           >
 
             <span className="v2f-delete-icon">
@@ -3645,7 +3281,7 @@ function Focus() {
 
             <div className="v2f-delete-copy">
 
-              <h2>
+              <h2 id="v2f-delete-title">
                 Delete session?
               </h2>
 
@@ -3720,39 +3356,13 @@ function Focus() {
 // STAT
 // =========================================================
 
-function FocusStat({
-  icon,
-  label,
-  value,
-  description,
-}) {
+function FocusStat({ label, value }) {
   return (
     <article className="v2f-stat">
-
-      <span className="v2f-stat-icon">
-        {icon}
-      </span>
-
-
-      <div>
-
-        <span className="v2f-stat-label">
-          {label}
-        </span>
-
-        <strong>
-          {value}
-        </strong>
-
-        <small>
-          {description}
-        </small>
-
-      </div>
-
+      <span className="v2f-stat-label">{label}</span>
+      <strong>{value}</strong>
     </article>
   );
 }
-
 
 export default Focus;

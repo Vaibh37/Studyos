@@ -1284,7 +1284,7 @@ function Tasks() {
   // =======================================================
 
   return (
-    <div className="v2t-page">
+    <div className="v2t-page v2t-clean v2t-dense">
 
       {/* HEADER */}
 
@@ -1301,9 +1301,7 @@ function Tasks() {
           </h1>
 
           <p>
-            Organize your work,
-            prioritize what matters,
-            and stay ahead of deadlines.
+            Manage your work and deadlines.
           </p>
 
         </div>
@@ -1422,10 +1420,11 @@ function Tasks() {
 
         {/* TABS */}
 
-        <div className="v2t-tabs">
+        <div className="td-toolbar"><div className="v2t-tabs">
 
           <button
             type="button"
+            aria-pressed={activeView === "all"}
             className={
               activeView ===
               "all"
@@ -1443,6 +1442,7 @@ function Tasks() {
 
           <button
             type="button"
+            aria-pressed={activeView === "today"}
             className={
               activeView ===
               "today"
@@ -1467,6 +1467,7 @@ function Tasks() {
 
           <button
             type="button"
+            aria-pressed={activeView === "upcoming"}
             className={
               activeView ===
               "upcoming"
@@ -1484,6 +1485,7 @@ function Tasks() {
 
           <button
             type="button"
+            aria-pressed={activeView === "completed"}
             className={
               activeView ===
               "completed"
@@ -1524,7 +1526,7 @@ function Tasks() {
                   event.target.value
                 )
               }
-              placeholder="Search tasks..."
+              placeholder="Search tasks..." aria-label="Search tasks"
             />
 
           </label>
@@ -1574,7 +1576,7 @@ function Tasks() {
         </div>
 
 
-        {/* ERROR */}
+        </div>{/* ERROR */}
 
         {error && (
           <div
@@ -1593,6 +1595,18 @@ function Tasks() {
         {/* LIST */}
 
         <div className="v2t-list">
+
+          {!loading && filteredTasks.length > 0 && (
+            <div className="td-table-heading" aria-hidden="true">
+              <span />
+              <span>Task ({filteredTasks.length})</span>
+              <span>Priority</span>
+              <span>Subject</span>
+              <span>Due date</span>
+              <span>Time</span>
+              <span />
+            </div>
+          )}
 
           {loading ? (
 

@@ -19,7 +19,7 @@ import { localDb } from "../services/localDb";
 import { getCalendarEvents } from "../services/calendarData";
 import { getStudySessions } from "../services/studySessionData";
 import { calculateGamification } from "../services/gamification";
-import "../styles/dashboard-professional.css";
+import "../styles/dashboard-clean.css";
 
 const dateKey = (input) => {
   if (!input) return "";
@@ -46,6 +46,7 @@ const formatDuration = (seconds) => {
   const hours = Math.floor(safe / 3600);
   const minutes = Math.floor((safe % 3600) / 60);
 
+  if (safe > 0 && safe < 60) return `${safe}s`;
   if (hours) return `${hours}h ${minutes}m`;
   return `${minutes}m`;
 };
@@ -315,15 +316,41 @@ function Dashboard() {
   const number = (value) =>
     Number(value || 0).toLocaleString("en-IN");
 
+  const ready = !loading && !error;
+
+  const overview = [
+    {
+      label: "Daily focus",
+      value: formatDuration(focusedSeconds),
+      to: "/app/focus",
+    },
+    {
+      label: "Pending tasks",
+      value: number(pendingTasks.length),
+      to: "/app/tasks",
+    },
+    {
+      label: "Weekly XP",
+      value: number(stats.weeklyXp),
+      to: "/app/leaderboard",
+    },
+    {
+      label: "Current level",
+      value: number(stats.level),
+      to: "/app/progress",
+    },
+  ];
+
   return (
-    <div className="sdb" aria-busy={loading}>
+    <div className="ds-clean" aria-busy={loading}>
+
       {/* HEADER */}
 
-      <header className="sdb-header">
-        <div>
-          <p className="sdb-kicker">
-            Dashboard
-            <span aria-hidden="true">/</span>
+      <header className="ds-header">
+
+        <div className="ds-heading">
+
+          <p className="ds-date">
             {todayLabel}
           </p>
 
@@ -332,351 +359,601 @@ function Dashboard() {
             {name ? `, ${name}` : ""}.
           </h1>
 
-          <p className="sdb-header-subtitle">
-            Your study plan for today, all in one place.
-          </p>
         </div>
 
-        <button
-          type="button"
-          className="sdb-button sdb-button--secondary"
-          onClick={() => loadDashboard(true)}
-          disabled={loading || refreshing}
-        >
-          <RefreshCw
-            size={17}
-            className={refreshing ? "sdb-spinning" : ""}
-          />
-          Refresh
-        </button>
+        <div className="ds-header-actions">
+
+          <button
+            type="button"
+            className="ds-button ds-refresh"
+            aria-label="Refresh dashboard"
+            title="Refresh dashboard"
+            onClick={() => loadDashboard(true)}
+            disabled={loading || refreshing}
+          >
+            <RefreshCw
+              size={17}
+              className={refreshing ? "ds-spin" : ""}
+            />
+          </button>
+
+          <Link
+            to="/app/focus"
+            className="ds-button ds-primary"
+          >
+            <Play size={15} fill="currentColor" />
+            Start focus
+          </Link>
+
+        </div>
+
       </header>
 
+
+      {/* ERROR */}
+
       {error && (
-        <div className="sdb-error" role="alert">
+        <div className="ds-error" role="alert">
           {error}
         </div>
       )}
 
-      {/* DAILY OVERVIEW */}
+
+      {/* OVERVIEW */}
 
       <section
-        className="sdb-overview"
-        aria-label="Today's study summary"
+        className="ds-overview"
+        aria-label="Study overview"
       >
-        <article className="sdb-card sdb-focus">
-          <div className="sdb-card-label">
-            <Target size={18} />
-            Daily focus
+
+        {overview.map(item => (
+
+          <Link
+            key={item.label}
+            to={item.to}
+            className="ds-metric"
+          >
+
+            <span>{item.label}</span>
+
+            <strong>
+              {ready ? item.value : "—"}
+            </strong>
+
+          </Link>
+
+        ))}
+
+      </section>
+
+
+      {/* PROGRESS */}
+
+      <section
+        className="ds-progress-grid"
+        aria-label="Study progress"
+      >
+
+        {/* DAILY GOAL */}
+
+        <article className="ds-progress-card">
+
+          <div className="ds-section-heading">
+
+            <h2>
+              <Target size={17} />
+              Daily study goal
+            </h2>
+
+            <strong className="ds-percentage">
+              {ready ? `${goalPercent}%` : "—"}
+            </strong>
+
           </div>
 
-          <div className="sdb-focus-main">
-            <div className="sdb-focus-value">
-              <strong>
-                {loading
-                  ? "—"
-                  : formatDuration(focusedSeconds)}
-              </strong>
+          <div className="ds-progress-values">
 
-              <span>of {dailyGoal} min goal</span>
-            </div>
+            <strong>
+              {ready
+                ? formatDuration(focusedSeconds)
+                : "—"}
+            </strong>
 
-            <Link
-              to="/app/focus"
-              className="sdb-button sdb-button--primary"
-            >
-              <Play size={16} fill="currentColor" />
-              Start focus
-            </Link>
+            <span>
+              of {dailyGoal} min
+            </span>
+
           </div>
 
           <div
-            className="sdb-progress"
+            className="ds-track"
             role="progressbar"
-            aria-label="Daily focus progress"
+            aria-label="Daily study goal"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={goalPercent}
+            aria-valuenow={
+              ready ? goalPercent : undefined
+            }
           >
+
             <span
-              style={{ width: `${goalPercent}%` }}
+              style={{
+                width: `${ready ? goalPercent : 0}%`,
+              }}
             />
+
           </div>
 
-          <div className="sdb-progress-caption">
+          <div className="ds-progress-footer">
+
             <span>
-              {goalPercent === 100
-                ? "Daily goal complete"
-                : `${remainingMinutes} min remaining`}
+              {!ready
+                ? "—"
+                : goalPercent === 100
+                  ? "Daily goal complete"
+                  : `${remainingMinutes} min remaining`}
             </span>
-
-            <strong>{goalPercent}%</strong>
-          </div>
-        </article>
-
-        {/* LEVEL */}
-
-        <article className="sdb-card sdb-level">
-          <div className="sdb-level-heading">
-            <div>
-              <div className="sdb-card-label">
-                <Zap size={18} />
-                Level progress
-              </div>
-
-              <h2>
-                Level {stats.level}
-                <span>{stats.title}</span>
-              </h2>
-            </div>
 
             <Link
-              className="sdb-icon-button"
-              to="/app/progress"
-              aria-label="Open progress details"
+              to="/app/settings"
+              className="ds-text-link"
             >
-              <ArrowRight size={18} />
+              Edit goal
+              <ArrowRight size={14} />
             </Link>
+
           </div>
 
-          <div className="sdb-level-caption">
-            <span>
-              {number(stats.xpIntoLevel)} /{" "}
-              {number(stats.xpRequiredForLevel)} XP
-            </span>
+        </article>
 
-            <span>
-              {number(stats.totalXp)} total XP
-            </span>
+
+        {/* LEVEL PROGRESS */}
+
+        <article className="ds-progress-card">
+
+          <div className="ds-section-heading">
+
+            <h2>
+              <Zap size={17} />
+              Level progress
+            </h2>
+
+            <Link
+              to="/app/progress"
+              className="ds-text-link"
+              aria-label="View progress details"
+            >
+              <ArrowRight size={17} />
+            </Link>
+
+          </div>
+
+          <div className="ds-progress-values">
+
+            <strong>
+              {ready
+                ? `Level ${stats.level}`
+                : "—"}
+            </strong>
+
+            {ready && (
+              <span>{stats.title}</span>
+            )}
+
           </div>
 
           <div
-            className="sdb-progress"
+            className="ds-track"
             role="progressbar"
             aria-label="Level progress"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={stats.progress}
+            aria-valuenow={
+              ready ? stats.progress : undefined
+            }
           >
+
             <span
-              style={{ width: `${stats.progress}%` }}
+              style={{
+                width: `${ready ? stats.progress : 0}%`,
+              }}
             />
+
           </div>
 
-          <div className="sdb-level-meta">
-            <span className="sdb-streak">
-              <Flame size={16} />
-              <strong>{stats.streak}d</strong>
-              streak
+          <div className="ds-progress-footer">
+
+            <span>
+
+              {ready
+                ? `${number(stats.xpIntoLevel)} / ${number(stats.xpRequiredForLevel)} XP`
+                : "—"}
+
             </span>
 
-            <span className="sdb-weekly">
-              <Zap size={16} />
-              {number(stats.weeklyXp)} XP this week
+            <span
+              className="ds-study-streak"
+              title="Consecutive days with qualifying Focus sessions"
+            >
+              <Flame size={15} />
+
+              {ready
+                ? `${stats.streak}d study streak`
+                : "—"}
+
             </span>
+
           </div>
+
+          <div className="ds-total-xp">
+
+            {ready
+              ? `${number(stats.totalXp)} total XP`
+              : "—"}
+
+          </div>
+
         </article>
+
       </section>
 
-      {/* TASKS AND CALENDAR */}
+
+      {/* STUDY WORKSPACE */}
 
       <section
-        className="sdb-work"
+        className="ds-workspace"
         aria-label="Study plan"
       >
+
         {/* TASKS */}
 
-        <article className="sdb-card sdb-panel">
-          <div className="sdb-panel-header">
-            <div className="sdb-panel-title">
-              <h2>Today's tasks</h2>
-              <span className="sdb-counter">
-                {todayTasks.length}
+        <article className="ds-task-panel">
+
+          <div className="ds-panel-heading">
+
+            <h2>
+
+              Your tasks
+
+              <span className="ds-count">
+                {ready ? todayTasks.length : "—"}
               </span>
-            </div>
+
+            </h2>
 
             <Link
               to="/app/tasks"
-              className="sdb-link"
+              className="ds-text-link"
             >
               All tasks
-              <ArrowRight size={16} />
+              <ArrowRight size={15} />
             </Link>
+
           </div>
 
+          <p className="ds-panel-description">
+            Due today, overdue and unscheduled tasks.
+          </p>
+
           {loading ? (
-            <p className="sdb-placeholder">
-              Loading tasks…
+
+            <p className="ds-placeholder">
+              Loading tasks...
             </p>
+
+          ) : error ? (
+
+            <p className="ds-placeholder">
+              Tasks temporarily unavailable.
+            </p>
+
           ) : todayTasks.length === 0 ? (
-            <div className="sdb-empty">
+
+            <div className="ds-empty">
+
               <CheckCircle2 size={22} />
 
               <div>
+
                 <strong>You're all caught up</strong>
-                <p>
-                  Nothing needs your attention today.
-                </p>
+
+                <p>No tasks need your attention.</p>
+
               </div>
 
               <Link
                 to="/app/tasks"
-                className="sdb-inline-action"
+                className="ds-text-link"
               >
                 <Plus size={16} />
                 Add task
               </Link>
+
             </div>
+
           ) : (
-            <ul className="sdb-list">
-              {todayTasks.slice(0, 4).map(
+
+            <ul className="ds-list">
+
+              {todayTasks.slice(0, 5).map(
                 (task, index) => {
+
                   const isOverdue =
-                    dateKey(task.dueDate) < today &&
-                    Boolean(task.dueDate);
+                    Boolean(task.dueDate) &&
+                    dateKey(task.dueDate) < today;
+
+                  const isDueToday =
+                    dateKey(task.dueDate) === today;
 
                   return (
+
                     <li
-                      className="sdb-task"
-                      key={task._id || index}
+                      key={task._id || task.id || index}
+                      className="ds-task-row"
                     >
+
                       <span
-                        className="sdb-task-dot"
+                        className={`ds-task-dot ${
+                          isOverdue ? "is-overdue" : ""
+                        }`}
                         aria-hidden="true"
                       />
 
-                      <div className="sdb-item-text">
-                        <strong>{task.title}</strong>
+                      <div className="ds-item-copy">
+
+                        <strong>
+                          {task.title}
+                        </strong>
+
                         <span>
                           {task.subjectName || "General"}
-                          {task.dueDate
-                            ? ` · ${
-                                isOverdue
-                                  ? "Overdue"
-                                  : "Due today"
-                              }`
-                            : ""}
                         </span>
+
                       </div>
 
-                      {isOverdue && (
-                        <span className="sdb-overdue">
+                      {isOverdue ? (
+
+                        <span className="ds-overdue">
                           Overdue
                         </span>
-                      )}
+
+                      ) : isDueToday ? (
+
+                        <span className="ds-today">
+                          Today
+                        </span>
+
+                      ) : null}
+
                     </li>
+
                   );
+
                 }
               )}
+
             </ul>
+
           )}
 
-          {(todayTasks.length > 4 ||
-            completedToday > 0) && (
-            <div className="sdb-panel-footer">
+          {ready && (
+
+            <div className="ds-task-footer">
+
               <span>
+
+                <CheckCircle2 size={15} />
+
                 {completedToday} completed today
+
               </span>
 
-              {todayTasks.length > 4 && (
-                <Link to="/app/tasks">
-                  View {todayTasks.length - 4} more
+              {todayTasks.length > 5 && (
+
+                <Link
+                  to="/app/tasks"
+                  className="ds-text-link"
+                >
+                  View {todayTasks.length - 5} more
+                  <ArrowRight size={14} />
                 </Link>
+
               )}
+
             </div>
+
           )}
+
         </article>
 
-        {/* UPCOMING */}
 
-        <article className="sdb-card sdb-panel">
-          <div className="sdb-panel-header">
-            <div className="sdb-panel-title">
-              <h2>Upcoming</h2>
-              <span className="sdb-counter">
-                {upcoming.length}
-              </span>
-            </div>
+        {/* RIGHT COLUMN */}
 
-            <Link
-              to="/app/calendar"
-              className="sdb-link"
-            >
-              Calendar
-              <ArrowRight size={16} />
-            </Link>
-          </div>
+        <div className="ds-right-column">
 
-          {loading ? (
-            <p className="sdb-placeholder">
-              Loading calendar…
-            </p>
-          ) : upcoming.length === 0 ? (
-            <div className="sdb-empty">
-              <CalendarDays size={22} />
+          {/* UPCOMING EVENTS */}
 
-              <div>
-                <strong>No upcoming events</strong>
-                <p>
-                  Your schedule is clear for now.
-                </p>
-              </div>
+          <article className="ds-upcoming">
+
+            <div className="ds-panel-heading">
+
+              <h2>
+
+                Upcoming
+
+                <span className="ds-count">
+                  {ready ? upcoming.length : "—"}
+                </span>
+
+              </h2>
 
               <Link
                 to="/app/calendar"
-                className="sdb-inline-action"
+                className="ds-text-link"
+              >
+                Calendar
+                <ArrowRight size={15} />
+              </Link>
+
+            </div>
+
+            {loading ? (
+
+              <p className="ds-placeholder">
+                Loading calendar...
+              </p>
+
+            ) : error ? (
+
+              <p className="ds-placeholder">
+                Calendar temporarily unavailable.
+              </p>
+
+            ) : upcoming.length === 0 ? (
+
+              <div className="ds-empty ds-calendar-empty">
+
+                <CalendarDays size={22} />
+
+                <div>
+
+                  <strong>No upcoming events</strong>
+
+                  <p>Your schedule is clear.</p>
+
+                </div>
+
+              </div>
+
+            ) : (
+
+              <ul className="ds-list">
+
+                {upcoming.slice(0, 4).map(
+                  (event, index) => (
+
+                    <li
+                      className="ds-event-row"
+                      key={event._id || event.id || index}
+                    >
+
+                      <CalendarDays size={17} />
+
+                      <div className="ds-item-copy">
+
+                        <strong>{event.title}</strong>
+
+                        <span>
+
+                          {new Date(
+                            `${dateKey(event.date)}T00:00:00`
+                          ).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                          })}
+
+                          {event.subjectName
+                            ? ` · ${event.subjectName}`
+                            : ""}
+
+                        </span>
+
+                      </div>
+
+                      {dateKey(event.date) === today && (
+
+                        <span className="ds-today">
+                          Today
+                        </span>
+
+                      )}
+
+                    </li>
+
+                  )
+                )}
+
+              </ul>
+
+            )}
+
+            <div className="ds-upcoming-footer">
+
+              <Link
+                to="/app/calendar"
+                className="ds-text-link"
               >
                 <Plus size={16} />
                 Add event
               </Link>
-            </div>
-          ) : (
-            <ul className="sdb-list">
-              {upcoming.slice(0, 4).map(
-                (event, index) => (
-                  <li
-                    className="sdb-task"
-                    key={event._id || index}
-                  >
-                    <span className="sdb-calendar-icon">
-                      <CalendarDays size={17} />
-                    </span>
 
-                    <div className="sdb-item-text">
-                      <strong>{event.title}</strong>
-                      <span>
-                        {new Date(
-                          event.date
-                        ).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                        {event.subjectName
-                          ? ` · ${event.subjectName}`
-                          : ""}
-                      </span>
-                    </div>
+              {ready && upcoming.length > 4 && (
 
-                    {dateKey(event.date) === today && (
-                      <span className="sdb-today">
-                        Today
-                      </span>
-                    )}
-                  </li>
-                )
+                <Link
+                  to="/app/calendar"
+                  className="ds-text-link"
+                >
+                  View {upcoming.length - 4} more
+                </Link>
+
               )}
-            </ul>
-          )}
 
-          {upcoming.length > 4 && (
-            <div className="sdb-panel-footer">
-              <span />
-              <Link to="/app/calendar">
-                View {upcoming.length - 4} more
-              </Link>
             </div>
-          )}
-        </article>
+
+          </article>
+
+
+          {/* QUICK ACCESS */}
+
+          <article className="ds-quick-access">
+
+            <div className="ds-panel-heading">
+              <h2>Quick access</h2>
+            </div>
+
+            <nav aria-label="Quick access">
+
+              <Link to="/app/notes">
+
+                <span>
+                  <Plus size={16} />
+                  Notes
+                </span>
+
+                <ArrowRight size={15} />
+
+              </Link>
+
+              <Link to="/app/tasks">
+
+                <span>
+                  <CheckCircle2 size={16} />
+                  Manage tasks
+                </span>
+
+                <ArrowRight size={15} />
+
+              </Link>
+
+              <Link to="/app/progress">
+
+                <span>
+                  <Target size={16} />
+                  View progress
+                </span>
+
+                <ArrowRight size={15} />
+
+              </Link>
+
+            </nav>
+
+          </article>
+
+        </div>
+
       </section>
+
     </div>
   );
 }
