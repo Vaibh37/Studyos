@@ -111,6 +111,8 @@ const authRoutes =
     "./routes/authRoutes"
   );
 
+const accountDeletionRoutes = require("./routes/accountDeletionRoutes");
+
 const leaderboardRoutes =
   require(
     "./routes/leaderboardRoutes"
@@ -253,6 +255,8 @@ app.use(
   "/api/auth",
   authRoutes
 );
+
+app.use("/api/account", accountDeletionRoutes);
 
 // =========================================
 // STUDYOS ROUTES
@@ -435,5 +439,6 @@ const startServer =
   };
 
 startServer();
+
 
 

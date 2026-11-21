@@ -47,6 +47,7 @@ import {
 } from "../services/studySessionData";
 
 import LeaderboardSettings from "../components/LeaderboardSettings";
+import DeleteAccountSettings from "../components/DeleteAccountSettings";
 import StudySelect from "../components/StudySelect";
 
 import "./Settings.mobile.css";
@@ -2838,6 +2839,8 @@ function Settings() {
 
                 </div>
 
+                {isAuthenticated && <DeleteAccountSettings />}
+
               </div>
 
             </section>
@@ -4397,3 +4400,4 @@ function ThemeButton({
 }
 
 export default Settings;
+
