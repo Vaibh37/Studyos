@@ -6472,3 +6472,41 @@
   }
 
 }
+
+/* STUDYOS SHAREABLE GROUP INVITES */
+.v2g-invite-box code.v2g-invite-link {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: normal;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 22px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.v2g-invite-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.v2g-invite-actions .v2g-secondary-button {
+  width: 100%;
+  min-height: 40px;
+  margin: 0;
+}
+
+.v2g-invite-actions button:only-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 420px) {
+  .v2g-invite-actions {
+    grid-template-columns: 1fr;
+  }
+}

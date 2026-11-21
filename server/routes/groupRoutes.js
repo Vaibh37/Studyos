@@ -25,6 +25,8 @@ const GroupMessage = require(
   "../models/social/GroupMessage"
 );
 
+const { deleteStoredObject } = require("../services/r2Storage");
+
 const router = express.Router();
 
 
@@ -1755,6 +1757,33 @@ router.delete(
           });
       }
 
+
+      // -----------------------------------------------------
+      // GROUP R2 ATTACHMENT CLEANUP
+      // -----------------------------------------------------
+
+      const fileMessages = await GroupMessage.find({
+        groupId,
+        "attachments.0": { $exists: true }
+      })
+        .select("attachments.storageKey")
+        .lean();
+
+      const storageKeys = new Set();
+
+      for (const message of fileMessages) {
+        for (const attachment of message.attachments || []) {
+          if (attachment.storageKey) {
+            storageKeys.add(attachment.storageKey);
+          }
+        }
+      }
+
+      // If storage deletion fails, retain group records
+      // so the owner can retry the operation.
+      for (const key of storageKeys) {
+        await deleteStoredObject(key);
+      }
 
       // -----------------------------------------------------
       // CLEAN UP ALL GROUP DATA

@@ -11,6 +11,7 @@ import {
   Globe2,
   LockKeyhole,
   Copy,
+  Share2,
   Crown,
   LogIn,
   MessageCircle,
@@ -19,6 +20,10 @@ import {
   RefreshCw,
   ShieldCheck,
   Trophy,
+  MoreHorizontal,
+  Trash2,
+  LogOut,
+  Link2,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -42,6 +47,7 @@ import MobileGroupActions from "../components/groups/MobileGroupActions";
 import "../styles/groups-v2.css";
 import "../styles/groups-polish.css";
 import "../styles/community-clean.css";
+import "../styles/group-management.css";
 
 
 // =========================================================
@@ -348,6 +354,9 @@ function Groups() {
     setRegenerating,
   ] = useState(false);
 
+  const [memberMenu, setMemberMenu] = useState("");
+  const [groupActionBusy, setGroupActionBusy] = useState(false);
+
 
   // =======================================================
   // DERIVED
@@ -374,6 +383,14 @@ function Groups() {
       ]
     );
 
+
+
+  const inviteLink = selectedGroup?.inviteCode
+    ? new URL(
+        "/app/groups?invite=" + encodeURIComponent(selectedGroup.inviteCode),
+        window.location.origin
+      ).href
+    : "";
 
   const sortedLiveUsers =
     useMemo(
@@ -1152,6 +1169,16 @@ function Groups() {
 
         setInviteCode("");
 
+        const inviteUrl = new URL(window.location.href);
+        inviteUrl.searchParams.delete("invite");
+        inviteUrl.searchParams.delete("code");
+
+        window.history.replaceState(
+          window.history.state,
+          "",
+          inviteUrl.pathname + inviteUrl.search + inviteUrl.hash
+        );
+
         await loadGroups(
           joinedId
         );
@@ -1182,7 +1209,7 @@ function Groups() {
   // COPY INVITE
   // =======================================================
 
-  const copyInviteCode =
+  const copyInviteLink =
     async () => {
       if (
         !selectedGroup?.inviteCode
@@ -1192,7 +1219,7 @@ function Groups() {
 
       try {
         await navigator.clipboard.writeText(
-          selectedGroup.inviteCode
+          inviteLink
         );
 
         setCopied(true);
@@ -1212,10 +1239,33 @@ function Groups() {
         );
 
         showError(
-          "Couldn't copy the invite code."
+          "Couldn't copy the invite link."
         );
       }
     };
+
+
+  // =======================================================
+  // SHARE INVITE LINK
+  // =======================================================
+
+  const shareInviteLink = async () => {
+    if (!inviteLink) return;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join " + selectedGroup.name + " on StudyOS",
+          url: inviteLink,
+        });
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+
+    await copyInviteLink();
+  };
 
 
   // =======================================================
@@ -1248,7 +1298,7 @@ function Groups() {
         );
 
         showMessage(
-          "Invite code regenerated"
+          "Invite link regenerated"
         );
       } catch (
         regenerateError
@@ -1260,7 +1310,7 @@ function Groups() {
 
         showError(
           regenerateError?.message ||
-            "Couldn't regenerate the invite code."
+            "Couldn't regenerate the invite link."
         );
       } finally {
         setRegenerating(false);
@@ -1317,6 +1367,69 @@ function Groups() {
         setLoading(false);
       }
     };
+
+
+
+  const runGroupAction = async (operation, successMessage, exiting = false) => {
+    if (groupActionBusy || !selectedGroupId) return;
+
+    const groupId = selectedGroupId;
+    setGroupActionBusy(true);
+    setError("");
+
+    try {
+      await operation(groupId);
+      setMemberMenu("");
+
+      if (exiting) {
+        setMobileGroupOpen(false);
+        await loadGroups();
+      } else {
+        await Promise.all([
+          loadGroups(groupId),
+          loadMembers(groupId),
+        ]);
+      }
+
+      showMessage(successMessage);
+    } catch (actionError) {
+      showError(actionError?.message || "Group action failed.");
+    } finally {
+      setGroupActionBusy(false);
+    }
+  };
+
+  const changeMemberRole = (member) => runGroupAction(
+    groupId => apiRequest(
+      "/api/groups/" + groupId + "/members/" +
+        encodeURIComponent(member.userId) + "/role",
+      {
+        method: "PATCH",
+        body: JSON.stringify({
+          role: member.role === "admin" ? "member" : "admin"
+        }),
+      }
+    ),
+    "Member role updated"
+  );
+
+  const removeGroupMember = (member) => runGroupAction(
+    groupId => apiRequest(
+      "/api/groups/" + groupId + "/members/" +
+        encodeURIComponent(member.userId),
+      { method: "DELETE" }
+    ),
+    "Member removed"
+  );
+
+  const exitSelectedGroup = (deleteGroup) => runGroupAction(
+    groupId => apiRequest(
+      "/api/groups/" + groupId + (deleteGroup ? "" : "/leave"),
+      { method: "DELETE" }
+    ),
+    deleteGroup ? "Group deleted" : "You left the group",
+    true
+  );
 
 
   // =======================================================
@@ -1706,6 +1819,47 @@ function Groups() {
                 Open chat
               </NavLink>
 
+              <details className="sg-group-options">
+                <summary aria-label="Group options" title="Group options">
+                  <MoreHorizontal size={18} />
+                </summary>
+
+                <div className="sg-group-options-menu">
+                  {canManageInvite && (
+                    <button
+                      type="button"
+                      disabled={regenerating}
+                      onClick={event => {
+                        event.currentTarget.closest("details")
+                          ?.removeAttribute("open");
+                        regenerateInviteCode();
+                      }}
+                    >
+                      <RefreshCw size={15} />
+                      Regenerate invite link
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="is-danger"
+                    disabled={groupActionBusy}
+                    onClick={() =>
+                      exitSelectedGroup(selectedGroup.role === "owner")
+                    }
+                  >
+                    {selectedGroup.role === "owner"
+                      ? <Trash2 size={15} />
+                      : <LogOut size={15} />}
+                    {selectedGroup.role === "owner"
+                      ? "Delete group"
+                      : "Leave group"}
+                  </button>
+                </div>
+              </details>
+
+
+
             </div>
 
           </div>
@@ -1835,93 +1989,51 @@ function Groups() {
             </article>
 
 
-            <article className="v2g-panel">
 
+            <article className="v2g-panel sg-invite-card">
               <div className="v2g-panel-heading">
-
                 <div>
+                  <h3>Invite friends</h3>
+                </div>
+              </div>
 
-                  <span className="v2g-eyebrow">
-                    Access
-                  </span>
-
-                  <h3>
-                    Invite code
-                  </h3>
-
+              <div className="sg-invite-compact">
+                <div className="sg-invite-info">
+                  <Link2 size={17} />
+                  <div>
+                    <strong>Group invite link</strong>
+                    <span>Anyone with the link can join</span>
+                  </div>
                 </div>
 
-              </div>
+                <div className="sg-invite-buttons">
+                  <button
+                    type="button"
+                    className="v2g-secondary-button"
+                    onClick={copyInviteLink}
+                    disabled={!inviteLink}
+                  >
+                    {copied
+                      ? <Check size={15} />
+                      : <Copy size={15} />}
+                    {copied ? "Copied" : "Copy link"}
+                  </button>
 
-
-              <div className="v2g-invite-box">
-
-                <code>
-                  {selectedGroup.inviteCode ||
-                    "â€”"}
-                </code>
-
-
-                <button
-                  type="button"
-                  onClick={
-                    copyInviteCode
-                  }
-                  disabled={
-                    !selectedGroup.inviteCode
-                  }
-                  aria-label="Copy invite code"
-                >
-
-                  {copied ? (
-
-                    <Check
-                      size={17}
-                    />
-
-                  ) : (
-
-                    <Copy
-                      size={17}
-                    />
-
+                  {typeof navigator !== "undefined" &&
+                    typeof navigator.share === "function" && (
+                    <button
+                      type="button"
+                      className="sg-invite-share-button"
+                      onClick={shareInviteLink}
+                      disabled={!inviteLink}
+                      aria-label="Share invite link"
+                      title="Share invite link"
+                    >
+                      <Share2 size={16} />
+                    </button>
                   )}
-
-                </button>
-
+                </div>
               </div>
-
-
-              <p className="v2g-panel-copy">
-                Anyone with this code can join the group.
-              </p>
-
-
-              {canManageInvite && (
-
-                <button
-                  type="button"
-                  className="v2g-secondary-button full"
-                  onClick={
-                    regenerateInviteCode
-                  }
-                  disabled={
-                    regenerating
-                  }
-                >
-
-                  <RefreshCw
-                    size={16}
-                  />
-
-                  {regenerating
-                    ? "Regenerating..."
-                    : "Regenerate code"}
-
-                </button>
-
-              )}
-
             </article>
 
 
@@ -2067,6 +2179,48 @@ function Groups() {
 
                         </span>
 
+                        {String(member.userId) !== String(firebaseUser?.uid) &&
+                          ((selectedGroup.role === "owner" && member.role !== "owner") ||
+                            (selectedGroup.role === "admin" && member.role === "member")) && (
+                            <button
+                              type="button"
+                              className="sg-inline-member-menu"
+                              aria-label={"Actions for " + (member.displayName || "member")}
+                              aria-expanded={memberMenu === member.userId}
+                              disabled={groupActionBusy}
+                              onClick={() => setMemberMenu(
+                                current => current === member.userId ? "" : member.userId
+                              )}
+                            >
+                              <MoreHorizontal size={17} />
+                            </button>
+                          )}
+
+                        {memberMenu === member.userId &&
+                          String(member.userId) !== String(firebaseUser?.uid) &&
+                          ((selectedGroup.role === "owner" && member.role !== "owner") ||
+                            (selectedGroup.role === "admin" && member.role === "member")) && (
+                            <div className="sg-inline-member-actions">
+                              {selectedGroup.role === "owner" && (
+                                <button
+                                  type="button"
+                                  disabled={groupActionBusy}
+                                  onClick={() => changeMemberRole(member)}
+                                >
+                                  {member.role === "admin" ? "Remove admin" : "Make admin"}
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                className="is-danger"
+                                disabled={groupActionBusy}
+                                onClick={() => removeGroupMember(member)}
+                              >
+                                Remove member
+                              </button>
+                            </div>
+                          )}
+
                       </div>
                     )
                   )}
@@ -2074,6 +2228,8 @@ function Groups() {
                 </div>
 
               )}
+
+              
 
             </article>
 

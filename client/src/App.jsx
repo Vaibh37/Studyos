@@ -256,6 +256,14 @@ function GetStartedRoute() {
     mode,
   } = useAuth();
 
+  const location = useLocation();
+  const invite = new URLSearchParams(location.search).get("invite");
+  const validInvite = /^[A-F0-9]{8}$/i.test(invite || "");
+
+  const destination = validInvite
+    ? "/app/groups?invite=" + invite.toUpperCase()
+    : "/app";
+
   if (loading) {
     return (
       <RouteLoader />
@@ -268,7 +276,7 @@ function GetStartedRoute() {
   ) {
     return (
       <Navigate
-        to="/app"
+        to={destination}
         replace
       />
     );
@@ -289,6 +297,17 @@ function ProtectedStudyApp() {
     mode,
   } = useAuth();
 
+  const location = useLocation();
+  const invite = new URLSearchParams(location.search).get("invite");
+
+  const validInvite =
+    location.pathname === "/app/groups" &&
+    /^[A-F0-9]{8}$/i.test(invite || "");
+
+  const loginDestination = validInvite
+    ? "/get-started?invite=" + invite.toUpperCase()
+    : "/get-started";
+
   if (loading) {
     return (
       <RouteLoader />
@@ -298,7 +317,7 @@ function ProtectedStudyApp() {
   if (mode === "none") {
     return (
       <Navigate
-        to="/get-started"
+        to={loginDestination}
         replace
       />
     );
