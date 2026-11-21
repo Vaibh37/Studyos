@@ -21,6 +21,11 @@ const firebaseAuth =
     "../middleware/firebaseAuth"
   );
 
+const firebaseAdminAuth =
+  require(
+    "../config/firebaseAdmin"
+  );
+
 const {
   calculateLeaderboardScore,
   getLeaderboardStartDate,
@@ -81,6 +86,70 @@ const getDefaultName = (
   }
 
   return "StudyOS Student";
+};
+
+
+// =========================================================
+// VERIFY PUBLIC LEADERBOARD MEMBERS AGAINST FIREBASE
+//
+// Firebase account deletion does not remove MongoDB records.
+// Batch-check the UIDs on each leaderboard load and delete
+// profiles only when Firebase confirms they are missing.
+// Fail closed on lookup errors: never guess which users to
+// delete, and never return unverified rankings.
+// =========================================================
+
+const getActiveLeaderboardProfiles = async () => {
+  const storedProfiles = await LeaderboardProfile.find({
+    isPublic: true,
+  })
+    .select({
+      userId: 1,
+      displayName: 1,
+    })
+    .lean();
+
+  const missingUserIds = new Set();
+
+  for (let i = 0; i < storedProfiles.length; i += 100) {
+    const batch = storedProfiles.slice(i, i + 100);
+
+    const result = await firebaseAdminAuth.getUsers(
+      batch.map((profile) => ({ uid: profile.userId }))
+    );
+
+    if (
+      result.users.length + result.notFound.length !==
+      batch.length
+    ) {
+      throw new Error("Incomplete Firebase leaderboard lookup");
+    }
+
+    for (const user of result.notFound) {
+      missingUserIds.add(user.uid);
+    }
+  }
+
+  if (missingUserIds.size === 0) {
+    return storedProfiles;
+  }
+
+  const orphaned = storedProfiles.filter(
+    (profile) => missingUserIds.has(profile.userId)
+  );
+
+  await LeaderboardProfile.deleteMany({
+    _id: { $in: orphaned.map((profile) => profile._id) },
+    isPublic: true,
+  });
+
+  console.info(
+    `Removed ${orphaned.length} deleted Firebase accounts from leaderboard`
+  );
+
+  return storedProfiles.filter(
+    (profile) => !missingUserIds.has(profile.userId)
+  );
 };
 
 
@@ -268,17 +337,11 @@ router.get(
     req,
     res
   ) => {
+    res.set("Cache-Control", "no-store");
+
     try {
       const profiles =
-        await LeaderboardProfile.find({
-          isPublic:
-            true,
-        })
-          .select({
-            userId: 1,
-            displayName: 1,
-          })
-          .lean();
+        await getActiveLeaderboardProfiles();
 
       if (
         profiles.length ===
