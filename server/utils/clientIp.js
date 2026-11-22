@@ -23,7 +23,10 @@ function normalizeIp(input) {
 }
 
 function trustedProxyHops() {
-  // StudyOS currently runs behind one trusted Render reverse-proxy hop.
+  // Default 1 is for backwards compatibility, NOT the measured Render path.
+  // StudyOS Render probe (2026-11-22) indicated 3 trusted hops.
+  // Production Render must explicitly set STUDYOS_TRUST_PROXY_HOPS=3
+  // after validating the proxy topology and XFF spoofing behavior.
   // Set to 0 in environments where the app faces clients directly.
   const hops = Number(process.env.STUDYOS_TRUST_PROXY_HOPS ?? 1);
   if (!Number.isInteger(hops) || hops < 0 || hops > 8) {
