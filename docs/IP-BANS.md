@@ -22,11 +22,21 @@ The CLI is intentionally **not** exposed as an HTTP route.
 
 ## Reverse proxies
 
-`STUDYOS_TRUST_PROXY_HOPS` defaults to **1**, matching the existing Render
-configuration. Set it to **0** for direct connections without a proxy.
-The number must match the actual trusted proxy topology; the last trusted
-proxy must overwrite or correctly append forwarding headers, and untrusted
-clients must not be able to connect directly around that proxy.
+`STUDYOS_TRUST_PROXY_HOPS` currently defaults to **1** for backwards
+compatibility. **Do not use this default for the StudyOS Render deployment.**
+On November 22, 2026, a separate temporary Render probe observed:
+- Normal request: 3 `X-Forwarded-For` entries; 3 hops matched `CF-Connecting-IP`.
+- Request with a user-supplied fake `X-Forwarded-For` entry: 4 total entries;
+  3 hops still matched `CF-Connecting-IP`, but 4 hops did not.
+- For this specific Render deployment, set `STUDYOS_TRUST_PROXY_HOPS=3`
+  **before merging**, then verify API and Socket.IO behavior on Render.
+- Do not use `4` simply because it matched the initial no-spoof request.
+- Set to **0** for direct connections without a proxy.
+
+These observations support, but do not fully prove, the three-hop trust
+boundary. Confirm the last trusted proxy appends forwarding information
+correctly and there is no alternate shorter path that an untrusted client
+can reach. Recheck after CDN, domain, or infrastructure changes.
 
 If proxy settings are wrong, you can accidentally ban a shared proxy address
 or allow IP spoofing. Verify the effective client address in a private staging
