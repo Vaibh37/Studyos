@@ -48,6 +48,13 @@ const {
     "./config/socialDb"
   );
 
+const { trustedProxyHops } = require("./utils/clientIp");
+const {
+  blockBannedApiIp,
+  blockBannedSocketIp,
+  disconnectBannedSockets,
+} = require("./middleware/ipBans");
+
 // =========================================
 // SOCKET
 // =========================================
@@ -140,7 +147,7 @@ const app =
 
 app.set(
   "trust proxy",
-  1
+  trustedProxyHops()
 );
 
 const PORT =
@@ -173,6 +180,8 @@ const io =
 // SOCKET AUTH
 // =========================================
 
+io.use(blockBannedSocketIp);
+
 io.use(
   socketAuth
 );
@@ -204,6 +213,8 @@ app.use(
   "/api",
   globalApiLimiter
 );
+
+app.use("/api", blockBannedApiIp);
 
 app.use(
   express.json()
@@ -415,6 +426,13 @@ const startServer =
         connectDB(),
         connectSocialDB(),
       ]);
+
+      const banRecheck = setInterval(() => {
+        disconnectBannedSockets(io).catch((error) => {
+          console.error("IP ban socket recheck failed:", error.message);
+        });
+      }, 30 * 1000);
+      banRecheck.unref();
 
       server.listen(
         PORT,
