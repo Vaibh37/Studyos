@@ -1,0 +1,33 @@
+name: StudyOS IP ban security checks
+
+on:
+  pull_request:
+    paths:
+      - "server/server.js"
+      - "server/models/BannedIp.js"
+      - "server/utils/clientIp.js"
+      - "server/middleware/ipBans.js"
+      - "server/scripts/ipBan.js"
+      - "server/tests/clientIp.test.js"
+      - ".github/workflows/ip-ban-security-checks.yml"
+  push:
+    branches:
+      - "security/ip-ban-protection"
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check JavaScript syntax
+        run: |
+          node --check server/server.js
+          node --check server/models/BannedIp.js
+          node --check server/utils/clientIp.js
+          node --check server/middleware/ipBans.js
+          node --check server/scripts/ipBan.js
+      - name: Test client IP parsing
+        run: node --test server/tests/clientIp.test.js
