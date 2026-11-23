@@ -19,6 +19,8 @@ import {
   auth,
 } from "../firebase";
 
+import { disconnectSocket } from "../socket";
+
 import {
   loadGoogleIdentity,
   requestGoogleAccessToken,
@@ -136,6 +138,7 @@ export function AuthProvider({
 
               preloadStudyApp();
             } else {
+              disconnectSocket();
               setFirebaseUser(
                 null
               );
@@ -306,6 +309,7 @@ export function AuthProvider({
 
   const continueAsGuest =
     async () => {
+      disconnectSocket();
       preloadStudyApp();
 
       if (
@@ -336,6 +340,7 @@ export function AuthProvider({
 
   const logout =
     async () => {
+      disconnectSocket();
       localStorage.removeItem(
         GUEST_KEY
       );
