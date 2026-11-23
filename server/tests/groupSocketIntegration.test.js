@@ -41,11 +41,19 @@ test("removing one of two group members immediately revokes all live sockets and
         request === "../middleware/firebaseAuth") {
       return fakeAuth;
     }
+    // File operations are not exercised; never require real Cloudflare
+    // credentials for security integration tests.
+    if (request === "../services/r2Storage" &&
+        /(?:groupRoutes|liveStudySocket)\\.js$/.test(parent?.filename || "")) {
+      return { deleteStoredObject: async () => {} };
+    }
     return originalLoad.call(this, request, parent, isMain);
   };
   let groupRoutes;
+  let registerLiveStudySocket;
   try {
     groupRoutes = require("../routes/groupRoutes");
+    registerLiveStudySocket = require("../socket/liveStudySocket");
   } finally {
     Module._load = originalLoad;
   }
@@ -66,7 +74,6 @@ test("removing one of two group members immediately revokes all live sockets and
     return next();
   });
 
-  const registerLiveStudySocket = require("../socket/liveStudySocket");
   io.on("connection", (socket) => {
     // Exactly the production connection setup, including private user room.
     socket.join(getAuthenticatedUserRoom(socket.user.uid));
