@@ -46,6 +46,10 @@ jobs:
           node --check server/routes/studySessionRoutes.js
           node --check server/routes/leaderboardRoutes.js
           node --check server/tests/leaderboardIntegrity.test.js
+          node --check server/models/Task.js
+          node --check server/routes/taskRoutes.js
+          node --check server/utils/leaderboardScore.js
+          node --check server/tests/taskXpIntegrity.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
@@ -71,3 +75,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/leaderboardIntegrity.test.js
+      - name: Verify task completion XP integrity and anti-farming rules
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/taskXpIntegrity.test.js
