@@ -44,7 +44,8 @@ test("removing one of two group members immediately revokes all live sockets and
     // File operations are not exercised; never require real Cloudflare
     // credentials for security integration tests.
     if (request === "../services/r2Storage" &&
-        /(?:groupRoutes|liveStudySocket)\\.js$/.test(parent?.filename || "")) {
+        ["groupRoutes.js", "liveStudySocket.js"].some((name) =>
+          parent?.filename?.endsWith(name))) {
       return { deleteStoredObject: async () => {} };
     }
     return originalLoad.call(this, request, parent, isMain);
