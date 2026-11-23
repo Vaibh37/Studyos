@@ -17,6 +17,7 @@ const GroupStudySession = require("../models/social/GroupStudySession");
 const LiveSession = require("../models/social/LiveSession");
 
 const { deleteStoredObject } = require("../services/r2Storage");
+const { revokeMemberGroupAccess } = require("../utils/groupRoomAccess");
 
 const router = express.Router();
 
@@ -117,6 +118,10 @@ router.delete("/", firebaseAuth, async (req, res) => {
     const groupIds = new Set(
       memberships.map(m => String(m.groupId))
     );
+
+    for (const groupId of groupIds) {
+      revokeMemberGroupAccess(req.app.get("io"), groupId, uid);
+    }
 
     for (const groupId of groupIds) {
       const count = await GroupMember.countDocuments({ groupId });
