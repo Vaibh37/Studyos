@@ -16,6 +16,7 @@ const GroupMember = require(
 const GroupStudySession = require(
   "../models/social/GroupStudySession"
 );
+const GroupAttachmentUpload = require("../models/social/GroupAttachmentUpload");
 
 const LiveSession = require(
   "../models/social/LiveSession"
@@ -1780,7 +1781,18 @@ router.delete(
         .select("attachments.storageKey")
         .lean();
 
+      // Issued but unfinalized R2 uploads can exist independently of
+      // chat messages. Delete them when the owning group is destroyed.
+      const pendingUploads = await GroupAttachmentUpload.find({
+        groupId,
+        consumedAt: null,
+      }).select("storageKey").lean();
+
       const storageKeys = new Set();
+
+      for (const upload of pendingUploads) {
+        if (upload.storageKey) storageKeys.add(upload.storageKey);
+      }
 
       for (const message of fileMessages) {
         for (const attachment of message.attachments || []) {
@@ -1814,6 +1826,10 @@ router.delete(
         }),
 
         GroupMessage.deleteMany({
+          groupId,
+        }),
+
+        GroupAttachmentUpload.deleteMany({
           groupId,
         }),
       ]);
