@@ -23,8 +23,8 @@ Tokens are short-lived, single-use, and verified against Cloudflare Siteverify, 
 
 ## Activate Firebase App Check for the custom API
 
-1. In the Firebase console, under **App Check**, register the StudyOS web app using a **reCAPTCHA v3 provider** and the site's allowed domains. Create/obtain the provider site key.
-2. Set `VITE_FIREBASE_APP_CHECK_SITE_KEY` on Vercel to the **public reCAPTCHA v3 site key** and deploy the client.
+1. In Google Cloud console for project `studyos-89d8a`, open **Fraud Defense (reCAPTCHA Enterprise)**, enable the API if prompted, and create a **Website / score-based** key for `studyos37.space` (include any other real application hostnames). Keep checkbox challenges off. In Firebase **App Check → Apps → StudyOS Web → Register**, expand **Fraud Defense** and enter that public Enterprise site key. Do not use the deprecated reCAPTCHA Classic secret-key field. Check costs and quota before activating billing; the entry-level App Check flow does not need an automatic Blaze upgrade.
+2. Set `VITE_FIREBASE_APP_CHECK_SITE_KEY` on Vercel to the same **public reCAPTCHA Enterprise site key** and deploy the client. The StudyOS web code uses `ReCaptchaEnterpriseProvider`.
 3. Set `STUDYOS_APP_CHECK_MODE=audit` on Render. Review the sampled aggregate audit logs while checking multiple real signed-in workflows. In this mode bad/missing tokens are counted, *not rejected*.
 4. Only once the app consistently supplies valid App Check tokens, set `STUDYOS_APP_CHECK_MODE=enforce` to require verified App Check tokens for HTTP `/api` and Socket.IO connections. The server uses Firebase Admin SDK's `getAppCheck().verifyToken()`.
 5. Local development or preview sites need registered compatible hostnames or an explicitly managed Firebase App Check debug token configuration. **Never** put a debug token in a production build.

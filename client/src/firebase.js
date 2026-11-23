@@ -2,7 +2,7 @@ import {
   initializeApp,
 } from "firebase/app";
 
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
 import {
   browserLocalPersistence,
@@ -54,7 +54,7 @@ const app =
 // This is independent of Firebase Auth and has no effect with an empty key.
 export const appCheck = import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY
   ? initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider(import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY),
+      provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY),
       isTokenAutoRefreshEnabled: true,
     })
   : null;
