@@ -58,6 +58,11 @@ jobs:
           node --check server/routes/accountDeletionRoutes.js
           node --check server/routes/groupRoutes.js
           node --check server/tests/accountDeletionIntegrity.test.js
+          node --check server/services/r2OrphanSweep.js
+          node --check server/services/r2Storage.js
+          node --check server/models/social/R2OrphanCandidate.js
+          node --check server/models/social/R2OrphanScanState.js
+          node --check server/tests/r2OrphanSweep.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
@@ -99,3 +104,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/accountDeletionIntegrity.test.js
+      - name: Verify R2 orphan retention, audit, and safe cleanup
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/r2OrphanSweep.test.js
