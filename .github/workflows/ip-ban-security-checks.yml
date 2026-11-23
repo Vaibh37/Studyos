@@ -52,6 +52,9 @@ jobs:
           node --check server/tests/taskXpIntegrity.test.js
           node --check server/utils/socketInboundProtection.js
           node --check server/tests/socketInboundProtectionIntegration.test.js
+          node --check server/utils/literalSearch.js
+          node --check server/routes/noteRoutes.js
+          node --check server/tests/privateDataAuthorization.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
@@ -85,3 +88,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/socketInboundProtectionIntegration.test.js
+      - name: Verify private user data isolation and safe search
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/privateDataAuthorization.test.js
