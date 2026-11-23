@@ -37,6 +37,7 @@ import {
 } from "../context/AuthContext";
 
 import apiRequest from "../services/api";
+import { getTurnstileToken } from "../services/turnstile";
 
 import {
   connectSocket,
@@ -1062,6 +1063,7 @@ function Groups() {
       try {
         setCreating(true);
         setError("");
+        const turnstileToken = await getTurnstileToken("group-create");
 
         const data =
           await apiRequest(
@@ -1079,6 +1081,7 @@ function Groups() {
 
                   visibility:
                     groupVisibility,
+                  turnstileToken,
                 }),
             }
           );
@@ -1146,6 +1149,7 @@ function Groups() {
       try {
         setJoining(true);
         setError("");
+        const turnstileToken = await getTurnstileToken("group-join");
 
         const data =
           await apiRequest(
@@ -1158,6 +1162,7 @@ function Groups() {
                 JSON.stringify({
                   inviteCode:
                     code,
+                  turnstileToken,
                 }),
             }
           );
