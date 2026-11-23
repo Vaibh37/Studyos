@@ -38,10 +38,11 @@ jobs:
           node --check server/middleware/ipBans.js
           node --check server/routes/securityAdminRoutes.js
           node --check server/scripts/ipBan.js
+          node --check server/utils/groupRoomAccess.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
       - name: Test IP parsing and administrative API
-        run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js
+        run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js server/tests/groupRoomAccess.test.js
       - name: Install frontend dependencies exactly as locked
         run: npm ci --prefix client
       - name: Build the StudyOS UI
