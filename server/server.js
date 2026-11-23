@@ -146,6 +146,7 @@ const {
   runGroupOrphanSweep,
 } = require("./services/r2OrphanSweep");
 const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
+const appCheckGuard = require("./middleware/appCheckGuard");
 const {
   validateApiRequest,
   validateParsedJson,
@@ -199,6 +200,7 @@ const io =
 // =========================================
 
 io.use(blockBannedSocketIp);
+io.use(appCheckGuard.socket);
 
 io.use(
   socketAuth
@@ -240,6 +242,8 @@ app.use("/api", validateApiRequest);
 // Explicitly preserve Express's existing 100kb JSON parser budget.
 app.use(express.json({ limit: "100kb", strict: true }));
 app.use("/api", validateParsedJson);
+// Audit mode or explicit enforcement; disabled by default until rollout.
+app.use("/api", appCheckGuard.http);
 
 // Minimal API hardening that does not affect the frontend application.
 app.use("/api", (req, res, next) => {
