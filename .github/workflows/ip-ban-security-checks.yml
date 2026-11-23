@@ -51,3 +51,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/ipBansIntegration.test.js
+      - name: Two-user HTTP + live group Socket.IO revocation integration
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/groupSocketIntegration.test.js
