@@ -39,6 +39,9 @@ jobs:
           node --check server/routes/securityAdminRoutes.js
           node --check server/scripts/ipBan.js
           node --check server/utils/groupRoomAccess.js
+          node --check server/models/social/GroupAttachmentUpload.js
+          node --check server/routes/groupAttachmentRoutes.js
+          node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
       - name: Test IP parsing and administrative API
@@ -55,3 +58,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/groupSocketIntegration.test.js
+      - name: Verify group attachment upload ownership and downloads
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/groupAttachmentAuthorization.test.js
