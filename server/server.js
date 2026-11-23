@@ -138,6 +138,8 @@ const groupRoutes =
 const groupAttachmentRoutes =
   require("./routes/groupAttachmentRoutes");
 
+const securityAdminRoutes = require("./routes/securityAdminRoutes");
+
 const app =
   express();
 
@@ -268,6 +270,9 @@ app.use(
 );
 
 app.use("/api/account", accountDeletionRoutes);
+
+// Disabled unless STUDYOS_SECURITY_ADMIN_UID is configured.
+app.use("/api/security", securityAdminRoutes);
 
 // =========================================
 // STUDYOS ROUTES
