@@ -63,6 +63,10 @@ jobs:
           node --check server/models/social/R2OrphanCandidate.js
           node --check server/models/social/R2OrphanScanState.js
           node --check server/tests/r2OrphanSweep.test.js
+          node --check server/middleware/firebaseAuth.js
+          node --check server/socket/socketAuth.js
+          node --check server/utils/firebaseSocketSessionGuard.js
+          node --check server/tests/firebaseSessionRevocation.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
@@ -108,3 +112,5 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/r2OrphanSweep.test.js
+      - name: Verify revoked Firebase sessions lose HTTP and Socket.IO access
+        run: node --test server/tests/firebaseSessionRevocation.test.js

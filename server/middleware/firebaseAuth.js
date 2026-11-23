@@ -55,8 +55,10 @@ const firebaseAuth =
 
       const decodedToken =
         await firebaseAdminAuth
+          // Also reject revoked tokens and disabled/deleted Firebase users.
           .verifyIdToken(
-            token
+            token,
+            true
           );
 
       // =====================================
