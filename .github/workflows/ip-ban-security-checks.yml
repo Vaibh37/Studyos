@@ -1,0 +1,52 @@
+name: StudyOS security checks
+
+on:
+  pull_request:
+    paths:
+      - "server/**"
+      - "client/**"
+      - "docs/IP-BANS.md"
+      - ".github/workflows/ip-ban-security-checks.yml"
+  push:
+    branches:
+      - "security/ip-ban-protection"
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+      - name: Install server dependencies exactly as locked
+        run: npm ci --prefix server
+      - name: Validate backend syntax
+        run: |
+          node --check server/server.js
+          node --check server/models/BannedIp.js
+          node --check server/utils/clientIp.js
+          node --check server/middleware/ipBans.js
+          node --check server/routes/securityAdminRoutes.js
+          node --check server/scripts/ipBan.js
+      - name: Check production dependency advisories
+        run: npm audit --prefix server --omit=dev --audit-level=moderate
+      - name: Test IP parsing and administrative API
+        run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js
+      - name: Install frontend dependencies exactly as locked
+        run: npm ci --prefix client
+      - name: Build the StudyOS UI
+        run: npm run build --prefix client
+      - name: Real HTTP + Socket.IO isolated MongoDB integration
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/ipBansIntegration.test.js

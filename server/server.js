@@ -48,6 +48,13 @@ const {
     "./config/socialDb"
   );
 
+const { trustedProxyHops } = require("./utils/clientIp");
+const {
+  blockBannedApiIp,
+  blockBannedSocketIp,
+  disconnectBannedSockets,
+} = require("./middleware/ipBans");
+
 // =========================================
 // SOCKET
 // =========================================
@@ -131,6 +138,8 @@ const groupRoutes =
 const groupAttachmentRoutes =
   require("./routes/groupAttachmentRoutes");
 
+const securityAdminRoutes = require("./routes/securityAdminRoutes");
+
 const app =
   express();
 
@@ -140,7 +149,7 @@ const app =
 
 app.set(
   "trust proxy",
-  1
+  trustedProxyHops()
 );
 
 const PORT =
@@ -173,6 +182,8 @@ const io =
 // SOCKET AUTH
 // =========================================
 
+io.use(blockBannedSocketIp);
+
 io.use(
   socketAuth
 );
@@ -204,6 +215,8 @@ app.use(
   "/api",
   globalApiLimiter
 );
+
+app.use("/api", blockBannedApiIp);
 
 app.use(
   express.json()
@@ -257,6 +270,9 @@ app.use(
 );
 
 app.use("/api/account", accountDeletionRoutes);
+
+// Disabled unless STUDYOS_SECURITY_ADMIN_UID is configured.
+app.use("/api/security", securityAdminRoutes);
 
 // =========================================
 // STUDYOS ROUTES
@@ -415,6 +431,13 @@ const startServer =
         connectDB(),
         connectSocialDB(),
       ]);
+
+      const banRecheck = setInterval(() => {
+        disconnectBannedSockets(io).catch((error) => {
+          console.error("IP ban socket recheck failed:", error.message);
+        });
+      }, 30 * 1000);
+      banRecheck.unref();
 
       server.listen(
         PORT,

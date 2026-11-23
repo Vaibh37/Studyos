@@ -150,6 +150,9 @@ const Settings = lazy(
     )
 );
 
+// Unlisted route; permissions are enforced by the backend, not the UI.
+const SecurityAdmin = lazy(() => import("./pages/SecurityAdmin"));
+
 // =========================================================
 // APPLICATION ROUTES
 // =========================================================
@@ -548,6 +551,11 @@ function App() {
               element={
                 <Settings />
               }
+            />
+
+            <Route
+              path="security"
+              element={<SecurityAdmin />}
             />
 
             <Route
