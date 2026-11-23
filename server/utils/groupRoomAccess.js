@@ -20,8 +20,16 @@ function revokeDeletedGroupAccess(io, groupId) {
   io.in(room).socketsLeave(room);
 }
 
+// Terminate all active connections for a permanently deleted Firebase user.
+// Existing sockets authenticated earlier must not remain usable.
+function disconnectAccountSockets(io, uid) {
+  if (!io || !uid) return;
+  io.in(getAuthenticatedUserRoom(uid)).disconnectSockets(true);
+}
+
 module.exports = {
   getAuthenticatedUserRoom,
   revokeMemberGroupAccess,
   revokeDeletedGroupAccess,
+  disconnectAccountSockets,
 };
