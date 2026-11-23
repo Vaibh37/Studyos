@@ -72,11 +72,16 @@ jobs:
           node --check server/middleware/apiRequestSafety.js
           node --check server/scripts/auditTrackedSecrets.js
           node --check server/tests/apiRequestSafety.test.js
+          node --check server/middleware/appCheckGuard.js
+          node --check server/middleware/turnstileGuard.js
+          node --check server/tests/botProtection.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
       - name: Verify malformed API payloads fail safely
         run: node --test server/tests/apiRequestSafety.test.js
+      - name: Verify App Check and Turnstile bot protection
+        run: node --test server/tests/botProtection.test.js
       - name: Test IP parsing and administrative API
         run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js server/tests/groupRoomAccess.test.js
       - name: Install frontend dependencies exactly as locked
