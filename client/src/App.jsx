@@ -2,6 +2,7 @@ import {
   lazy,
   Suspense,
   useEffect,
+  useState,
 } from "react";
 
 import {
@@ -18,6 +19,7 @@ import {
 import {
   useAuth,
 } from "./context/AuthContext";
+import { apiRequest } from "./services/api";
 
 // =========================================================
 // PUBLIC PAGES
@@ -332,6 +334,55 @@ function ProtectedStudyApp() {
 }
 
 // =========================================================
+// PRIVATE SECURITY ROUTE
+// No navigation entry. Only the backend-confirmed owner can
+// load the admin screen; everyone else returns to Dashboard.
+// The backend independently enforces every admin API request.
+// =========================================================
+
+function PrivateSecurityRoute() {
+  const { mode, firebaseUser } = useAuth();
+  const [access, setAccess] = useState({ uid: null, authorized: false });
+  const uid = firebaseUser?.uid;
+
+  useEffect(() => {
+    if (mode !== "authenticated" || !uid) return;
+
+    let cancelled = false;
+
+    apiRequest("/api/security/me")
+      .then((data) => {
+        if (!cancelled) {
+          setAccess({ uid, authorized: data?.authorized === true });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAccess({ uid, authorized: false });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, uid]);
+
+  if (mode !== "authenticated" || !uid) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+  if (access.uid !== uid) {
+    return <RouteLoader />;
+  }
+
+  if (!access.authorized) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+  return <SecurityAdmin />;
+}
+
+// =========================================================
 // /app INDEX
 // =========================================================
 
@@ -555,7 +606,7 @@ function App() {
 
             <Route
               path="security"
-              element={<SecurityAdmin />}
+              element={<PrivateSecurityRoute />}
             />
 
             <Route
