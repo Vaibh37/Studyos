@@ -1,4 +1,5 @@
 ﻿const express = require("express");
+const { createTurnstileGuard } = require("../middleware/turnstileGuard");
 const crypto = require("crypto");
 
 const firebaseAuth = require(
@@ -116,6 +117,7 @@ const getStartOfWeek = () => {
 router.post(
   "/",
   firebaseAuth,
+  createTurnstileGuard("group-create"),
   async (
     req,
     res
@@ -362,6 +364,7 @@ router.get(
 router.post(
   "/join",
   firebaseAuth,
+  createTurnstileGuard("group-join"),
   async (
     req,
     res
