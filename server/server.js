@@ -140,6 +140,8 @@ const groupAttachmentRoutes =
 
 const securityAdminRoutes = require("./routes/securityAdminRoutes");
 
+const { getAuthenticatedUserRoom } = require("./utils/groupRoomAccess");
+
 const app =
   express();
 
@@ -335,6 +337,9 @@ io.on(
       socket.id,
       socket.user.uid
     );
+
+    // Every authenticated connection has a private revocation room.
+    socket.join(getAuthenticatedUserRoom(socket.user.uid));
 
     // =====================================
     // LIVE STUDY / CHAT EVENTS
