@@ -9,15 +9,17 @@ const Event = require("../models/Event");
 const StudySession = require("../models/StudySession");
 const VisitStreak = require("../models/VisitStreak");
 const LeaderboardProfile = require("../models/LeaderboardProfile");
+const FocusRun = require("../models/FocusRun");
 
 const Group = require("../models/social/Group");
 const GroupMember = require("../models/social/GroupMember");
 const GroupMessage = require("../models/social/GroupMessage");
 const GroupStudySession = require("../models/social/GroupStudySession");
 const LiveSession = require("../models/social/LiveSession");
+const GroupAttachmentUpload = require("../models/social/GroupAttachmentUpload");
 
 const { deleteStoredObject } = require("../services/r2Storage");
-const { revokeMemberGroupAccess } = require("../utils/groupRoomAccess");
+const { revokeMemberGroupAccess, disconnectAccountSockets } = require("../utils/groupRoomAccess");
 
 const router = express.Router();
 
@@ -66,6 +68,14 @@ router.delete("/", firebaseAuth, async (req, res) => {
       ]
     }).select("userId attachments").lean();
 
+    // Presigned uploads may have reached R2 without ever becoming messages.
+    // These are owned by the deleting user and must be cleared as well.
+    // Consumed uploads are deleted through their message attachments above.
+    const pendingUploads = await GroupAttachmentUpload.find({
+      userId: uid,
+      consumedAt: null
+    }).select("storageKey").lean();
+
     const storageKeys = new Set();
 
     for (const message of messages) {
@@ -77,6 +87,10 @@ router.delete("/", firebaseAuth, async (req, res) => {
           storageKeys.add(file.storageKey);
         }
       }
+    }
+
+    for (const upload of pendingUploads) {
+      if (upload.storageKey) storageKeys.add(upload.storageKey);
     }
 
     for (const key of storageKeys) {
@@ -114,6 +128,7 @@ router.delete("/", firebaseAuth, async (req, res) => {
     await GroupMember.deleteMany({ userId: uid });
     await LiveSession.deleteMany({ userId: uid });
     await GroupStudySession.deleteMany({ userId: uid });
+    await GroupAttachmentUpload.deleteMany({ userId: uid });
 
     const groupIds = new Set(
       memberships.map(m => String(m.groupId))
@@ -133,7 +148,7 @@ router.delete("/", firebaseAuth, async (req, res) => {
 
     const models = [
       Task, Subject, Note, Event,
-      StudySession, VisitStreak, LeaderboardProfile
+      StudySession, VisitStreak, LeaderboardProfile, FocusRun
     ];
 
     for (const model of models) {
@@ -142,6 +157,15 @@ router.delete("/", firebaseAuth, async (req, res) => {
 
     // Firebase is deleted last so earlier failures can be retried.
     await adminAuth.deleteUser(uid);
+
+    // If the browser had an authenticated Socket.IO connection, end it
+    // instead of waiting for the client to disconnect or its token to expire.
+    try {
+      disconnectAccountSockets(req.app.get("io"), uid);
+    } catch (socketError) {
+      console.error("ACCOUNT SOCKET DISCONNECT FAILED:", socketError);
+      // Authentication and account data were deleted successfully.
+    }
 
     return res.json({ deleted: true });
 
