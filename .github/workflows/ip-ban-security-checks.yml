@@ -80,14 +80,14 @@ jobs:
         run: npm audit --prefix server --omit=dev --audit-level=moderate
       - name: Verify malformed API payloads fail safely
         run: node --test server/tests/apiRequestSafety.test.js
-      - name: Verify App Check and Turnstile bot protection
-        run: node --test server/tests/botProtection.test.js
       - name: Test IP parsing and administrative API
         run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js server/tests/groupRoomAccess.test.js
       - name: Install frontend dependencies exactly as locked
         run: npm ci --prefix client
       - name: Build the StudyOS UI
         run: npm run build --prefix client
+      - name: Verify App Check and Turnstile bot protection
+        run: node --test server/tests/botProtection.test.js
       - name: Real HTTP + Socket.IO isolated MongoDB integration
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
