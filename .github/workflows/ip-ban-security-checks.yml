@@ -55,6 +55,9 @@ jobs:
           node --check server/utils/literalSearch.js
           node --check server/routes/noteRoutes.js
           node --check server/tests/privateDataAuthorization.test.js
+          node --check server/routes/accountDeletionRoutes.js
+          node --check server/routes/groupRoutes.js
+          node --check server/tests/accountDeletionIntegrity.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
@@ -92,3 +95,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/privateDataAuthorization.test.js
+      - name: Verify account and group deletion data cleanup
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/accountDeletionIntegrity.test.js
