@@ -139,8 +139,30 @@ const attachmentFinalizeLimiter =
   });
 
 
+// Immediate protection even before optional Turnstile/App Check keys exist.
+// One account cannot spray new groups or guess many invite codes quickly.
+// Quotas are per process; a distributed store is needed if scaling out.
+const groupCreateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  keyGenerator: userOrIpKey,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many new groups. Try again later." },
+});
+const groupJoinLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 12,
+  keyGenerator: userOrIpKey,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many group join attempts. Try again later." },
+});
+
 module.exports = {
   globalApiLimiter,
   attachmentUploadLimiter,
   attachmentFinalizeLimiter,
+  groupCreateLimiter,
+  groupJoinLimiter,
 };

@@ -1,4 +1,6 @@
 ﻿const express = require("express");
+const { createTurnstileGuard } = require("../middleware/turnstileGuard");
+const { groupCreateLimiter, groupJoinLimiter } = require("../middleware/rateLimiters");
 const crypto = require("crypto");
 
 const firebaseAuth = require(
@@ -116,6 +118,8 @@ const getStartOfWeek = () => {
 router.post(
   "/",
   firebaseAuth,
+  groupCreateLimiter,
+  createTurnstileGuard("group-create"),
   async (
     req,
     res
@@ -362,6 +366,8 @@ router.get(
 router.post(
   "/join",
   firebaseAuth,
+  groupJoinLimiter,
+  createTurnstileGuard("group-join"),
   async (
     req,
     res
@@ -389,6 +395,10 @@ router.post(
         inviteCode
           .trim()
           .toUpperCase();
+
+      if (!/^[A-F0-9]{8}$/.test(normalizedCode)) {
+        return res.status(400).json({ message: "Invalid invite code" });
+      }
 
       const group =
         await Group.findOne({
