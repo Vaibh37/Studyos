@@ -57,6 +57,15 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // Persist the first-ever completion so toggling a task cannot
+    // move its leaderboard reward into another day.
+    firstCompletedAt: { type: Date, default: null },
+    // Freeze the rewarded priority at the first completion.
+    scoredPriority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -91,12 +100,22 @@ taskSchema.pre("save", function () {
     this.dueTime = "";
   }
 
+  // Backfill older completed tasks on their first subsequent update.
+  if (!this.firstCompletedAt && this.completedAt) {
+    this.firstCompletedAt = this.completedAt;
+    this.scoredPriority = this.scoredPriority || this.priority;
+  }
+
   if (
     this.completed &&
     !this.completedAt
   ) {
     this.completedAt =
       new Date();
+  }
+  if (this.completed && !this.firstCompletedAt) {
+    this.firstCompletedAt = this.completedAt;
+    this.scoredPriority = this.priority;
   }
 
   if (!this.completed) {
