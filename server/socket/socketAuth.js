@@ -31,13 +31,20 @@ const socketAuth =
 
       const decodedToken =
         await firebaseAdminAuth
+          // Also reject revoked tokens and disabled/deleted Firebase users.
           .verifyIdToken(
-            token
+            token,
+            true
           );
 
       // =====================================
       // ATTACH USER TO SOCKET
       // =====================================
+
+      socket.data.firebaseSession = {
+        authTime: decodedToken.auth_time,
+        expiresAt: decodedToken.exp,
+      };
 
       socket.user = {
         uid:
