@@ -146,6 +146,10 @@ const {
   runGroupOrphanSweep,
 } = require("./services/r2OrphanSweep");
 const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
+const {
+  SOCKET_SESSION_CHECK_MS,
+  disconnectInvalidFirebaseSockets,
+} = require("./utils/firebaseSocketSessionGuard");
 
 const app =
   express();
@@ -479,6 +483,27 @@ const startServer =
         const orphanInterval = setInterval(sweepOrphans, 2 * 60 * 60 * 1000);
         orphanInterval.unref();
       }
+
+      // Existing sockets can outlive their original Firebase ID token.
+      // Recheck revocation/disabled state and disconnect expired sessions.
+      let firebaseRecheckRunning = false;
+      const firebaseRecheck = setInterval(async () => {
+        if (firebaseRecheckRunning) return;
+        firebaseRecheckRunning = true;
+        try {
+          const result = await disconnectInvalidFirebaseSockets(io);
+          if (result.disconnected) {
+            console.log("Firebase auth recheck disconnected sockets:",
+              result.disconnected);
+          }
+        } catch (error) {
+          console.error("Firebase socket session recheck failed:",
+            error.message);
+        } finally {
+          firebaseRecheckRunning = false;
+        }
+      }, SOCKET_SESSION_CHECK_MS);
+      firebaseRecheck.unref();
 
       const banRecheck = setInterval(() => {
         disconnectBannedSockets(io).catch((error) => {
