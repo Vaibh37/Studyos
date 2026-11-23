@@ -7,6 +7,8 @@ const mongoose =
 const Note =
   require("../models/Note");
 
+const { parseLiteralSearch } = require("../utils/literalSearch");
+
 const Subject =
   require("../models/Subject");
 
@@ -41,21 +43,6 @@ const createHttpError = (
     status;
 
   return error;
-};
-
-// =========================================================
-// ESCAPE SEARCH REGEX
-// =========================================================
-
-const escapeRegExp = (
-  value
-) => {
-  return String(
-    value
-  ).replace(
-    /[.*+?^${}()|[\]\\]/g,
-    "\\$&"
-  );
 };
 
 // =========================================================
@@ -255,37 +242,18 @@ router.get(
       // SEARCH
       // ===================================================
 
-      const search =
-        typeof req.query.q ===
-          "string"
-          ? req.query.q
-              .trim()
-          : "";
+      const { pattern: searchPattern, error: searchError } =
+        parseLiteralSearch(req.query.q);
 
-      if (search) {
-        const regex =
-          new RegExp(
-            escapeRegExp(
-              search
-            ),
-            "i"
-          );
+      if (searchError) {
+        return res.status(400).json({ message: searchError });
+      }
 
+      if (searchPattern) {
         filter.$or = [
-          {
-            title:
-              regex,
-          },
-
-          {
-            content:
-              regex,
-          },
-
-          {
-            subjectName:
-              regex,
-          },
+          { title: searchPattern },
+          { content: searchPattern },
+          { subjectName: searchPattern },
         ];
       }
 
