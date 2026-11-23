@@ -2,6 +2,7 @@ import { io } from "socket.io-client";
 
 import { auth } from "./firebase";
 import { API_URL } from "./services/api";
+import { getAppCheckToken } from "./services/appCheck";
 
 // All StudyOS pages share one socket and one token-refresh schedule.
 let socket = null;
@@ -23,7 +24,8 @@ const refreshAndReconnect = async (target, forceRefresh = true) => {
     // disabled, or no longer valid. Never reuse the previous access token.
     const token = await user.getIdToken(forceRefresh);
     if (target !== socket || auth.currentUser?.uid !== socketUserId) return;
-    target.auth = { token };
+    const appCheckToken = await getAppCheckToken();
+    target.auth = { token, appCheckToken };
     if (target.connected) target.disconnect();
     target.connect();
   } catch (error) {
@@ -39,6 +41,7 @@ export const connectSocket = async () => {
   if (!user) throw new Error("User is not logged in");
 
   const token = await user.getIdToken();
+  const appCheckToken = await getAppCheckToken();
   if (auth.currentUser?.uid !== user.uid) {
     throw new Error("Login changed while connecting");
   }
@@ -46,12 +49,12 @@ export const connectSocket = async () => {
   // Never reuse a previous user's socket after switching accounts.
   if (socket && socketUserId !== user.uid) disconnectSocket();
   if (socket) {
-    socket.auth = { token };
+    socket.auth = { token, appCheckToken };
     if (!socket.connected) socket.connect();
     return socket;
   }
 
-  const connectedSocket = io(API_URL, { auth: { token } });
+  const connectedSocket = io(API_URL, { auth: { token, appCheckToken } });
   socket = connectedSocket;
   socketUserId = user.uid;
 
