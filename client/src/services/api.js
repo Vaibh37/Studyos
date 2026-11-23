@@ -1,6 +1,7 @@
 import {
   auth,
 } from "../firebase";
+import { getAppCheckToken } from "./appCheck";
 
 // =========================================================
 // API BASE URL
@@ -98,6 +99,11 @@ export const apiRequest =
     ) {
       headers.Authorization =
         `Bearer ${token}`;
+    }
+
+    const appCheckToken = await getAppCheckToken();
+    if (appCheckToken) {
+      headers["X-Firebase-AppCheck"] = appCheckToken;
     }
 
     // =====================================================
