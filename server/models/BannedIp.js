@@ -16,6 +16,14 @@ const bannedIpSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  createdBy: {
+    type: String,
+    default: null,
+  },
+  updatedBy: {
+    type: String,
+    default: null,
+  },
 }, { timestamps: true });
 
 // MongoDB deletes expired records eventually. Checks still reject only active bans.
