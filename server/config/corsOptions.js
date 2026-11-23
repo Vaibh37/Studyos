@@ -67,6 +67,7 @@ const corsOptions = {
   allowedHeaders: [
     "Content-Type",
     "Authorization",
+    "X-Firebase-AppCheck",
   ],
 
   credentials: false,
