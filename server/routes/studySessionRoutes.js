@@ -268,10 +268,11 @@ router.post(
 
       const now = new Date();
       const skewMs = 90 * 1000;
+      const durationToleranceMs = 5 * 1000;
       if (
         startDate.getTime() > now.getTime() + skewMs ||
         endDate.getTime() > now.getTime() + skewMs ||
-        endDate.getTime() - startDate.getTime() + skewMs <
+        endDate.getTime() - startDate.getTime() + durationToleranceMs <
           cleanDurationSeconds * 1000
       ) {
         return res.status(400).json({
@@ -299,7 +300,7 @@ router.post(
             expiresAt: { $gt: now },
           },
           { $set: { claimId } },
-          { new: true }
+          { returnDocument: 'after' }
         );
         if (!verifiedRun) {
           return res.status(409).json({
