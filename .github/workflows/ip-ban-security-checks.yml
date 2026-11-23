@@ -28,6 +28,8 @@ jobs:
           cache-dependency-path: |
             server/package-lock.json
             client/package-lock.json
+      - name: Reject tracked credentials and common secret patterns
+        run: node server/scripts/auditTrackedSecrets.js
       - name: Install server dependencies exactly as locked
         run: npm ci --prefix server
       - name: Validate backend syntax
@@ -67,9 +69,14 @@ jobs:
           node --check server/socket/socketAuth.js
           node --check server/utils/firebaseSocketSessionGuard.js
           node --check server/tests/firebaseSessionRevocation.test.js
+          node --check server/middleware/apiRequestSafety.js
+          node --check server/scripts/auditTrackedSecrets.js
+          node --check server/tests/apiRequestSafety.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
+      - name: Verify malformed API payloads fail safely
+        run: node --test server/tests/apiRequestSafety.test.js
       - name: Test IP parsing and administrative API
         run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js server/tests/groupRoomAccess.test.js
       - name: Install frontend dependencies exactly as locked

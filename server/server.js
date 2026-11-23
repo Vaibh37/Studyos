@@ -147,6 +147,11 @@ const {
 } = require("./services/r2OrphanSweep");
 const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
 const {
+  validateApiRequest,
+  validateParsedJson,
+  safeApiErrorHandler,
+} = require("./middleware/apiRequestSafety");
+const {
   SOCKET_SESSION_CHECK_MS,
   disconnectInvalidFirebaseSockets,
 } = require("./utils/firebaseSocketSessionGuard");
@@ -229,9 +234,19 @@ app.use(
 
 app.use("/api", blockBannedApiIp);
 
-app.use(
-  express.json()
-);
+// Reject oversized/unsupported requests before JSON body parsing.
+app.use("/api", validateApiRequest);
+
+// Explicitly preserve Express's existing 100kb JSON parser budget.
+app.use(express.json({ limit: "100kb", strict: true }));
+app.use("/api", validateParsedJson);
+
+// Minimal API hardening that does not affect the frontend application.
+app.use("/api", (req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 // =========================================
 // ROOT
@@ -432,11 +447,9 @@ app.use(
 );
 
 
-// =========================================
-// GROUP ATTACHMENTS
-// =========================================
-
-
+// Sanitize body parsing, CORS and unexpected handler errors. Do not leak
+// invalid payloads, token values or backend stack traces to API clients.
+app.use("/api", safeApiErrorHandler);
 
 // =========================================
 // START SERVER
