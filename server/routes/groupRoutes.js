@@ -27,6 +27,11 @@ const GroupMessage = require(
 
 const { deleteStoredObject } = require("../services/r2Storage");
 
+const {
+  revokeMemberGroupAccess,
+  revokeDeletedGroupAccess,
+} = require("../utils/groupRoomAccess");
+
 const router = express.Router();
 
 
@@ -1448,6 +1453,9 @@ router.delete(
           target._id,
       });
 
+      // Removed members must stop receiving live group broadcasts immediately.
+      revokeMemberGroupAccess(req.app.get("io"), groupId, targetUserId);
+
       await LiveSession.deleteMany({
         groupId,
 
@@ -1663,6 +1671,9 @@ router.delete(
           membership._id,
       });
 
+      // Leaving members must stop receiving live group broadcasts immediately.
+      revokeMemberGroupAccess(req.app.get("io"), groupId, req.user.uid);
+
       await LiveSession.deleteMany({
         groupId,
 
@@ -1812,6 +1823,9 @@ router.delete(
         _id:
           groupId,
       });
+
+      // The deleted group must not have any subscribed live sockets.
+      revokeDeletedGroupAccess(req.app.get("io"), groupId);
 
       return res.json({
         message:
