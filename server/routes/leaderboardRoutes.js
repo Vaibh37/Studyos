@@ -437,13 +437,16 @@ router.get(
             completed:
               true,
 
-            completedAt: {
-              $gte:
-                startDate,
-
-              $lte:
-                now,
-            },
+            // First completion is the only completion that can earn
+            // ranking points. Legacy tasks without the field use their
+            // recorded completion time until subsequently updated.
+            $or: [
+              { firstCompletedAt: { $gte: startDate, $lte: now } },
+              {
+                firstCompletedAt: null,
+                completedAt: { $gte: startDate, $lte: now },
+              },
+            ],
           })
             .select({
               userId: 1,
@@ -454,7 +457,13 @@ router.get(
               completedAt:
                 1,
 
+              firstCompletedAt:
+                1,
+
               priority:
+                1,
+
+              scoredPriority:
                 1,
             })
             .lean(),
