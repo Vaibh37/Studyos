@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const Task = require("../models/Task");
+const { parseLiteralSearch } = require("../utils/literalSearch");
 const Subject = require("../models/Subject");
 
 const firebaseAuth = require(
@@ -148,16 +149,15 @@ router.get(
       // SEARCH
       // =====================================
 
-      if (
-        typeof search ===
-          "string" &&
-        search.trim()
-      ) {
-        filter.title = {
-          $regex:
-            search.trim(),
-          $options: "i",
-        };
+      const { pattern: searchPattern, error: searchError } =
+        parseLiteralSearch(search);
+
+      if (searchError) {
+        return res.status(400).json({ message: searchError });
+      }
+
+      if (searchPattern) {
+        filter.title = searchPattern;
       }
 
       const tasks =
