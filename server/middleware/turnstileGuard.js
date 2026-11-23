@@ -36,6 +36,11 @@ function createTurnstileGuard(action, {
       return next();
     }
 
+    const allowedHosts = (process.env.TURNSTILE_ALLOWED_HOSTNAMES || "")
+      .split(",").map(x => x.trim().toLowerCase()).filter(Boolean);
+    if (setting === "enforce" && allowedHosts.length === 0) {
+      return res.status(503).json({ message: "Bot protection unavailable" });
+    }
     const token = req.body?.turnstileToken;
     if (typeof token !== "string" || token.length < 1 || token.length > 2048) {
       if (setting === "enforce") {
@@ -45,8 +50,6 @@ function createTurnstileGuard(action, {
     }
     try {
       const response = await verify(token, getIp(req));
-      const allowedHosts = (process.env.TURNSTILE_ALLOWED_HOSTNAMES || "")
-        .split(",").map(x => x.trim().toLowerCase()).filter(Boolean);
       const valid = response?.success === true &&
         response.action === action &&
         (allowedHosts.length === 0 ||
