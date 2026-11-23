@@ -4,6 +4,9 @@ const express =
 const mongoose =
   require("mongoose");
 
+const crypto = require("crypto");
+const GroupAttachmentUpload = require("../models/social/GroupAttachmentUpload");
+
 const firebaseAuth =
   require(
     "../middleware/firebaseAuth"
@@ -300,6 +303,18 @@ router.post(
           mimeType,
         });
 
+
+      // An issued upload belongs only to the requesting Firebase UID.
+      // URL expiration is 5 minutes; allow 1 hour to finish processing.
+      await GroupAttachmentUpload.create({
+        groupId,
+        userId: req.user.uid,
+        storageKey,
+        fileName: safeFileName,
+        mimeType,
+        size: numericSize,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      });
 
       // -----------------------------------------
       // RESPONSE
@@ -768,17 +783,40 @@ router.post(
 
 
       // -----------------------------------------
-      // PREVENT REUSING R2 OBJECTS
+      // REQUIRE THE ORIGINAL USER'S UNEXPIRED UPLOAD AUTHORIZATION
       // -----------------------------------------
 
-      const attachmentKeys =
-        normalizedAttachments.map(
-          (
-            attachment
-          ) =>
-            attachment.storageKey
-        );
+      const attachmentKeys = normalizedAttachments.map((item) => item.storageKey);
+      const issuedUploads = await GroupAttachmentUpload.find({
+        groupId,
+        userId: req.user.uid,
+        storageKey: { $in: attachmentKeys },
+        expiresAt: { $gt: new Date() },
+        consumedAt: null,
+        claimId: null,
+      }).lean();
 
+      const issuedByStorageKey = new Map(
+        issuedUploads.map((item) => [item.storageKey, item])
+      );
+
+      for (const attachment of normalizedAttachments) {
+        const issued = issuedByStorageKey.get(attachment.storageKey);
+        if (
+          !issued ||
+          issued.fileName !== attachment.fileName ||
+          issued.mimeType !== attachment.mimeType ||
+          issued.size !== attachment.size
+        ) {
+          return res.status(403).json({
+            message: "Upload authorization missing, expired, or belongs to another account. Upload the file again.",
+          });
+        }
+      }
+
+      // -----------------------------------------
+      // PREVENT REUSING R2 OBJECTS
+      // -----------------------------------------
 
       const alreadyUsed =
         await GroupMessage.exists({
@@ -964,8 +1002,36 @@ router.post(
       // CREATE ONE GROUP MESSAGE
       // -----------------------------------------
 
-      const savedMessage =
-        await GroupMessage.create({
+      // Claim every issued object once before creating the group message.
+      // Concurrent finalize calls cannot reuse a claimed upload.
+      const claimId = crypto.randomUUID();
+      const claimQuery = {
+        groupId,
+        userId: req.user.uid,
+        storageKey: { $in: attachmentKeys },
+        expiresAt: { $gt: new Date() },
+        consumedAt: null,
+        claimId: null,
+      };
+      const claimResult = await GroupAttachmentUpload.updateMany(
+        claimQuery,
+        { $set: { claimId } }
+      );
+
+      if (claimResult.modifiedCount !== attachmentKeys.length) {
+        // Release any subset claimed by this request if another request won.
+        await GroupAttachmentUpload.updateMany(
+          { claimId },
+          { $set: { claimId: null } }
+        );
+        return res.status(409).json({
+          message: "One or more uploads have already been finalized or expired.",
+        });
+      }
+
+      let savedMessage;
+      try {
+        savedMessage = await GroupMessage.create({
           groupId,
 
           userId:
@@ -1002,6 +1068,18 @@ router.post(
           deletedFor:
             [],
         });
+      } catch (createError) {
+        await GroupAttachmentUpload.updateMany(
+          { claimId },
+          { $set: { claimId: null } }
+        );
+        throw createError;
+      }
+
+      await GroupAttachmentUpload.updateMany(
+        { claimId },
+        { $set: { consumedAt: new Date(), claimId: null } }
+      );
 
 
       const outgoingMessage =
@@ -1198,6 +1276,9 @@ router.get(
             messageId,
 
           groupId,
+
+          // Match the existing message-read authorization semantics.
+          deletedFor: { $ne: req.user.uid },
         }).lean();
 
 
