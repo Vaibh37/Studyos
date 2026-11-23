@@ -6,6 +6,7 @@ const {
   GetObjectCommand,
   DeleteObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
 } = require(
   "@aws-sdk/client-s3"
 );
@@ -263,6 +264,30 @@ async function createDownloadUrl({
 
 
 // =========================================================
+// BOUNDED INVENTORY OF GROUP-ATTACHMENT OBJECTS
+// R2 supports ListObjectsV2 with StartAfter for incremental scans.
+// Never list unrelated object prefixes.
+// =========================================================
+
+async function listGroupStoredObjects({ startAfter = "", maxKeys = 100 } = {}) {
+  const command = new ListObjectsV2Command({
+    Bucket: R2_BUCKET_NAME,
+    Prefix: "groups/",
+    StartAfter: startAfter || undefined,
+    MaxKeys: Math.max(1, Math.min(100, Number(maxKeys) || 100)),
+  });
+  const result = await r2Client.send(command);
+  return {
+    objects: (result.Contents || []).map((item) => ({
+      key: item.Key,
+      etag: item.ETag,
+      lastModified: item.LastModified,
+    })),
+    hasMore: Boolean(result.IsTruncated),
+  };
+}
+
+// =========================================================
 // DELETE OBJECT
 // =========================================================
 
@@ -298,5 +323,6 @@ module.exports = {
   createUploadUrl,
   getStoredObjectMetadata,
   createDownloadUrl,
+  listGroupStoredObjects,
   deleteStoredObject,
 };

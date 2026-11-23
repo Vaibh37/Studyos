@@ -141,6 +141,10 @@ const groupAttachmentRoutes =
 const securityAdminRoutes = require("./routes/securityAdminRoutes");
 
 const { getAuthenticatedUserRoom } = require("./utils/groupRoomAccess");
+const {
+  migrateUploadAuthorizationTtlIndex,
+  runGroupOrphanSweep,
+} = require("./services/r2OrphanSweep");
 const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
 
 const app =
@@ -441,6 +445,40 @@ const startServer =
         connectDB(),
         connectSocialDB(),
       ]);
+
+      // Remove the legacy TTL index that discarded upload records before
+      // their R2 objects could be reconciled.
+      try {
+        await migrateUploadAuthorizationTtlIndex();
+      } catch (migrationError) {
+        console.error("R2 upload authorization index migration failed:",
+          migrationError.message);
+      }
+
+      // Audit by default. An explicit server-side environment variable is
+      // required before the sweep can delete any actual R2 object.
+      // Cursor and confirmations are persisted in social MongoDB.
+      const orphanMode = process.env.STUDYOS_R2_ORPHAN_MODE || "audit";
+      let orphanSweepRunning = false;
+      const sweepOrphans = async () => {
+        if (orphanMode === "off" || orphanSweepRunning) return;
+        orphanSweepRunning = true;
+        try {
+          await runGroupOrphanSweep({
+            mode: orphanMode === "delete" ? "delete" : "audit",
+          });
+        } catch (error) {
+          console.error("R2 orphan audit failed:", error.message);
+        } finally {
+          orphanSweepRunning = false;
+        }
+      };
+      if (orphanMode !== "off") {
+        const firstSweep = setTimeout(sweepOrphans, 30 * 1000);
+        firstSweep.unref();
+        const orphanInterval = setInterval(sweepOrphans, 2 * 60 * 60 * 1000);
+        orphanInterval.unref();
+      }
 
       const banRecheck = setInterval(() => {
         disconnectBannedSockets(io).catch((error) => {

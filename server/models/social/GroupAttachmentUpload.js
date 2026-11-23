@@ -20,8 +20,9 @@ const schema = new mongoose.Schema({
   consumedAt: { type: Date, default: null },
 }, { timestamps: true });
 
-// Expiration is also checked in queries; TTL cleanup can run later.
-schema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// Do not TTL-delete upload grants: R2 objects may still exist after expiry.
+// Startup migration drops the legacy MongoDB expiresAt TTL index.
+// The orphan sweeper is responsible for storage reclamation.
 schema.index({ groupId: 1, userId: 1 });
 
 module.exports = socialDB.models.GroupAttachmentUpload ||
