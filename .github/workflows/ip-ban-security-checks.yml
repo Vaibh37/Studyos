@@ -41,6 +41,11 @@ jobs:
           node --check server/utils/groupRoomAccess.js
           node --check server/models/social/GroupAttachmentUpload.js
           node --check server/routes/groupAttachmentRoutes.js
+          node --check server/models/FocusRun.js
+          node --check server/models/StudySession.js
+          node --check server/routes/studySessionRoutes.js
+          node --check server/routes/leaderboardRoutes.js
+          node --check server/tests/leaderboardIntegrity.test.js
           node --check server/tests/groupAttachmentAuthorization.test.js
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
@@ -62,3 +67,7 @@ jobs:
         env:
           STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
         run: node --test server/tests/groupAttachmentAuthorization.test.js
+      - name: Verify leaderboard scoring rejects forged and replayed Focus sessions
+        env:
+          STUDYOS_TEST_MONGO_URI: mongodb://127.0.0.1:27017/studyos_security_ci
+        run: node --test server/tests/leaderboardIntegrity.test.js
