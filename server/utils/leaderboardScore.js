@@ -43,6 +43,11 @@ const CONFIG = {
   MAX_TASK_XP_PER_DAY:
     100,
 
+  // Self-reported tasks never outrank actual server-timed Focus work.
+  // Maximum task bonus: 25% of that day's earned Focus XP.
+  MAX_TASK_BONUS_RATIO:
+    0.25,
+
   PERIOD_DAYS:
     7,
 };
@@ -205,6 +210,7 @@ const getTaskXp = (
 
   const priority =
     normalizePriority(
+      task.scoredPriority ||
       task.priority
     );
 
@@ -345,6 +351,7 @@ const calculateLeaderboardScore =
 
         const date =
           new Date(
+            task.firstCompletedAt ||
             task.completedAt
           );
 
@@ -424,7 +431,13 @@ const calculateLeaderboardScore =
           day.focusXp;
 
         taskXp +=
-          day.taskXp;
+          Math.min(
+            day.taskXp,
+            Math.floor(
+              day.focusXp *
+              CONFIG.MAX_TASK_BONUS_RATIO
+            )
+          );
 
         focusMinutes +=
           day.focusMinutes;
