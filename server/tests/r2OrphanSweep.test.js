@@ -118,7 +118,7 @@ test("R2 orphan sweeps preserve referenced files, find expired-grant orphans, co
       });
     }
     await grant(linked, new Date(now.getTime() - 24 * 60 * 60 * 1000), now);
-    await grant(stillValid, new Date(now.getTime() + 5 * 60 * 60 * 1000));
+    await grant(stillValid, new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000));
     await grant(expired, new Date(now.getTime() - 24 * 60 * 60 * 1000));
     await grant(changing, new Date(now.getTime() - 24 * 60 * 60 * 1000));
 
