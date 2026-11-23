@@ -1,5 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const crypto = require("node:crypto");
+const { rateLimit } = require("express-rate-limit");
+const FocusRun = require("../models/FocusRun");
 
 const StudySession = require(
   "../models/StudySession"
@@ -49,6 +52,43 @@ const cleanSubjectId = (
 router.use(firebaseAuth);
 
 // =========================================================
+// SERVER-ISSUED FOCUS START
+// A client cannot mint a valid runId or move its server start time.
+// =========================================================
+
+const focusStartLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 12,
+  keyGenerator: (req) => "focus:" + req.user.uid,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many Focus starts. Try again shortly." },
+});
+
+router.post("/start", focusStartLimiter, async (req, res) => {
+  try {
+    const now = new Date();
+    // Only the newest active Focus run can accrue leaderboard credit.
+    await FocusRun.updateMany(
+      { userId: req.user.uid, consumedAt: null, revokedAt: null },
+      { $set: { revokedAt: now } }
+    );
+    const run = await FocusRun.create({
+      userId: req.user.uid,
+      startedAt: now,
+      expiresAt: new Date(now.getTime() + 72 * 60 * 60 * 1000),
+    });
+    return res.status(201).json({
+      runId: String(run._id),
+      startedAt: run.startedAt,
+    });
+  } catch (error) {
+    console.error("START FOCUS RUN ERROR:", error.message);
+    return res.status(500).json({ message: "Failed to start verified Focus session" });
+  }
+});
+
+// =========================================================
 // GET CURRENT USER'S STUDY SESSIONS
 // =========================================================
 
@@ -96,7 +136,8 @@ router.post(
         durationSeconds,
         startedAt,
         endedAt,
-      } = req.body;
+        runId,
+      } = req.body || {};
 
       // =====================================
       // PLANNED MINUTES
@@ -111,6 +152,7 @@ router.post(
         !Number.isFinite(
           cleanPlannedMinutes
         ) ||
+        !Number.isInteger(cleanPlannedMinutes) ||
         cleanPlannedMinutes < 1 ||
         cleanPlannedMinutes > 720
       ) {
@@ -135,13 +177,16 @@ router.post(
         !Number.isFinite(
           cleanDurationSeconds
         ) ||
-        cleanDurationSeconds < 1
+        !Number.isInteger(cleanDurationSeconds) ||
+        cleanDurationSeconds < 1 ||
+        cleanDurationSeconds > cleanPlannedMinutes * 60 ||
+        cleanDurationSeconds > 720 * 60
       ) {
         return res
           .status(400)
           .json({
             message:
-              "Study duration must be at least 1 second",
+              "Study duration must be a whole number of seconds within the planned Focus time",
           });
       }
 
@@ -217,11 +262,86 @@ router.post(
       }
 
       // =====================================
+      // REJECT IMPOSSIBLE OR FUTURE CLIENT TIMESTAMPS
+      // This also protects personal history from extreme fake durations.
+      // =====================================
+
+      const now = new Date();
+      const skewMs = 90 * 1000;
+      const durationToleranceMs = 5 * 1000;
+      if (
+        startDate.getTime() > now.getTime() + skewMs ||
+        endDate.getTime() > now.getTime() + skewMs ||
+        endDate.getTime() - startDate.getTime() + durationToleranceMs <
+          cleanDurationSeconds * 1000
+      ) {
+        return res.status(400).json({
+          message: "Focus duration exceeds elapsed time or session dates are in the future",
+        });
+      }
+
+      // Preserve existing personal history imports without awarding ranking
+      // credit unless a one-time server-issued Focus run is provided.
+      let verifiedRun = null;
+      let claimId = null;
+      if (runId !== undefined && runId !== null && runId !== "") {
+        if (typeof runId !== "string" || !mongoose.Types.ObjectId.isValid(runId)) {
+          return res.status(400).json({ message: "Invalid Focus run ID" });
+        }
+
+        claimId = crypto.randomUUID();
+        verifiedRun = await FocusRun.findOneAndUpdate(
+          {
+            _id: runId,
+            userId: req.user.uid,
+            consumedAt: null,
+            claimId: null,
+            revokedAt: null,
+            expiresAt: { $gt: now },
+          },
+          { $set: { claimId } },
+          { returnDocument: 'after' }
+        );
+        if (!verifiedRun) {
+          return res.status(409).json({
+            message: "Focus verification expired or was already used. Start a new Focus session.",
+          });
+        }
+
+        const wallSeconds = Math.floor(
+          (now.getTime() - verifiedRun.startedAt.getTime()) / 1000
+        );
+        if (cleanDurationSeconds > wallSeconds + 5 || wallSeconds < 0) {
+          await FocusRun.updateOne({ _id: verifiedRun._id, claimId },
+            { $set: { claimId: null } });
+          return res.status(400).json({
+            message: "Focus duration is longer than the server-measured session",
+          });
+        }
+
+        // Reject overlapping verified sessions, including multi-tab attempts.
+        const overlap = await StudySession.exists({
+          userId: req.user.uid,
+          verified: true,
+          startedAt: { $lt: now },
+          endedAt: { $gt: verifiedRun.startedAt },
+        });
+        if (overlap) {
+          await FocusRun.updateOne({ _id: verifiedRun._id, claimId },
+            { $set: { claimId: null } });
+          return res.status(409).json({
+            message: "Overlapping Focus sessions cannot earn leaderboard credit",
+          });
+        }
+      }
+
+      // =====================================
       // CREATE
       // =====================================
 
-      const session =
-        await StudySession.create({
+      let session;
+      try {
+        session = await StudySession.create({
           userId:
             req.user.uid,
 
@@ -246,11 +366,29 @@ router.post(
             ),
 
           startedAt:
-            startDate,
+            verifiedRun ? verifiedRun.startedAt : startDate,
 
           endedAt:
-            endDate,
+            verifiedRun ? now : endDate,
+
+          verified: Boolean(verifiedRun),
         });
+      } catch (saveError) {
+        if (verifiedRun) {
+          await FocusRun.updateOne(
+            { _id: verifiedRun._id, claimId },
+            { $set: { claimId: null } }
+          );
+        }
+        throw saveError;
+      }
+
+      if (verifiedRun) {
+        await FocusRun.updateOne(
+          { _id: verifiedRun._id, claimId },
+          { $set: { consumedAt: now, claimId: null } }
+        );
+      }
 
       res.status(201).json(
         session

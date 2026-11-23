@@ -228,6 +228,8 @@ function Focus() {
     setStartedAt,
   ] = useState(null);
 
+  const [activeRunId, setActiveRunId] = useState(null);
+
   const [
     activeSubjectId,
     setActiveSubjectId,
@@ -939,6 +941,8 @@ function Focus() {
             null
         );
 
+        setActiveRunId(typeof saved.runId === "string" ? saved.runId : null);
+
         const savedShareGroupId =
           !isGuest &&
           saved.shareGroupId
@@ -1066,6 +1070,8 @@ function Focus() {
 
                       endedAt:
                         end.toISOString(),
+
+                      runId: saved.runId || undefined,
                     }
                   );
 
@@ -1130,6 +1136,8 @@ function Focus() {
                 setStartedAt(
                   null
                 );
+
+                setActiveRunId(null);
 
                 setTargetEndAt(
                   null
@@ -1357,6 +1365,8 @@ function Focus() {
 
       startedAt,
 
+      runId: activeRunId,
+
       activeSubjectId,
 
       activeSubjectName,
@@ -1381,6 +1391,7 @@ function Focus() {
     remainingSeconds,
     targetEndAt,
     startedAt,
+    activeRunId,
     activeSubjectId,
     activeSubjectName,
     activeGroupId,
@@ -1685,6 +1696,26 @@ function Focus() {
 
         return;
       }
+
+      // A signed-in timer must start on the server before it can
+      // earn public leaderboard credit. Guests still use local storage.
+      let issuedRunId = null;
+      if (!isGuest) {
+        try {
+          const started = await apiRequest("/api/study-sessions/start", {
+            method: "POST",
+          });
+          if (!started?.runId) {
+            throw new Error("Server did not issue a Focus run");
+          }
+          issuedRunId = started.runId;
+        } catch (startError) {
+          showError(startError?.message || "Could not start verified Focus. Check your connection.");
+          return;
+        }
+      }
+
+      setActiveRunId(issuedRunId);
 
       const selectedSubject =
         subjects.find(
@@ -2026,6 +2057,8 @@ function Focus() {
 
               endedAt:
                 endedAt.toISOString(),
+
+              runId: activeRunId || undefined,
             }
           );
 
@@ -2075,6 +2108,8 @@ function Focus() {
         setStartedAt(
           null
         );
+
+        setActiveRunId(null);
 
         setSelectedSubjectId(
           ""

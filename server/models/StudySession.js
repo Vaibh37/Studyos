@@ -39,6 +39,9 @@ const studySessionSchema =
         min: 1,
       },
 
+      // Only a one-time server-issued run can earn public ranking credit.
+      verified: { type: Boolean, default: false, index: true },
+
       startedAt: {
         type: Date,
         required: true,

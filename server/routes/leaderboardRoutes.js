@@ -33,6 +33,11 @@ const {
   "../utils/leaderboardScore"
 );
 
+// Historical Focus sessions from before verified runs were introduced
+// remain eligible only while they naturally age out of the 7-day window.
+// All newer sessions must have server-verified Focus evidence.
+const LEGACY_FOCUS_CUTOFF = new Date("2026-11-23T06:00:00.000Z");
+
 const router =
   express.Router();
 
@@ -397,11 +402,19 @@ router.get(
               $lte:
                 now,
             },
+
+            $or: [
+              { verified: true },
+              { createdAt: { $lt: LEGACY_FOCUS_CUTOFF } },
+            ],
           })
             .select({
               userId: 1,
 
               durationSeconds:
+                1,
+
+              verified:
                 1,
 
               startedAt:
