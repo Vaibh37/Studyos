@@ -47,3 +47,31 @@ test("Render three-hop chain identifies the visitor with or without a forged pre
   assert.equal(getClientIp(spoofed, 3), client);
   assert.equal(getClientIp(spoofed, 4), "192.0.2.123");
 });
+
+test("real Express trust proxy setting of 3 ignores an extra forged prefix", async () => {
+  const express = require("express");
+  const app = express();
+  app.set("trust proxy", 3);
+  app.get("/ip", (req, res) => res.json({ clientIp: getClientIp(req) }));
+
+  const server = await new Promise(resolve => {
+    const listener = app.listen(0, "127.0.0.1", () => resolve(listener));
+  });
+
+  try {
+    const base = "http://127.0.0.1:" + server.address().port + "/ip";
+    const expected = "203.0.113.42";
+    for (const chain of [
+      "203.0.113.42, 198.51.100.17, 198.51.100.18",
+      "192.0.2.123, 203.0.113.42, 198.51.100.17, 198.51.100.18",
+    ]) {
+      const response = await fetch(base, { headers: { "X-Forwarded-For": chain } });
+      assert.equal(response.status, 200);
+      const result = await response.json();
+      assert.equal(result.clientIp, expected);
+    }
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
