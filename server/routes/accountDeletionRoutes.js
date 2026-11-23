@@ -70,10 +70,10 @@ router.delete("/", firebaseAuth, async (req, res) => {
 
     // Presigned uploads may have reached R2 without ever becoming messages.
     // These are owned by the deleting user and must be cleared as well.
-    // Consumed uploads are deleted through their message attachments above.
-    const pendingUploads = await GroupAttachmentUpload.find({
-      userId: uid,
-      consumedAt: null
+    // Revisit all grants while they exist, including consumed ones, to
+    // remove recently unlinked objects as well.
+    const issuedUploads = await GroupAttachmentUpload.find({
+      userId: uid
     }).select("storageKey").lean();
 
     const storageKeys = new Set();
@@ -89,7 +89,7 @@ router.delete("/", firebaseAuth, async (req, res) => {
       }
     }
 
-    for (const upload of pendingUploads) {
+    for (const upload of issuedUploads) {
       if (upload.storageKey) storageKeys.add(upload.storageKey);
     }
 
