@@ -141,6 +141,7 @@ const groupAttachmentRoutes =
 const securityAdminRoutes = require("./routes/securityAdminRoutes");
 
 const { getAuthenticatedUserRoom } = require("./utils/groupRoomAccess");
+const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
 
 const app =
   express();
@@ -337,6 +338,10 @@ io.on(
       socket.id,
       socket.user.uid
     );
+
+    // Fail early before any event handler can query MongoDB or broadcast.
+    // Limit by authenticated account across every open tab and device.
+    registerSocketInboundProtection(socket);
 
     // Every authenticated connection has a private revocation room.
     socket.join(getAuthenticatedUserRoom(socket.user.uid));
