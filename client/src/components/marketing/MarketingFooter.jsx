@@ -4,9 +4,12 @@ import GithubMark from "./GithubMark";
 
 const productLinks = [
   ["Overview", "/#overview"],
-  ["Features", "/#features"],
-  ["Focus", "/#features"],
-  ["Progress", "/#features"],
+  ["Study Planner", "/study-planner"],
+  ["Focus Timer", "/focus-timer"],
+  ["Study Groups", "/study-groups"],
+  ["Notes & Organization", "/notes"],
+  ["Progress Tracking", "/progress"],
+  ["Get Started", "/start"],
   ["Leaderboard", "/#leaderboard"],
 ];
 

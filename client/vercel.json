@@ -31,6 +31,30 @@
   ],
   "rewrites": [
     {
+      "source": "/study-planner",
+      "destination": "/seo/study-planner.html"
+    },
+    {
+      "source": "/focus-timer",
+      "destination": "/seo/focus-timer.html"
+    },
+    {
+      "source": "/study-groups",
+      "destination": "/seo/study-groups.html"
+    },
+    {
+      "source": "/notes",
+      "destination": "/seo/notes.html"
+    },
+    {
+      "source": "/progress",
+      "destination": "/seo/progress.html"
+    },
+    {
+      "source": "/start",
+      "destination": "/seo/start.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

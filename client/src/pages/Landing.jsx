@@ -22,10 +22,10 @@ const homeStructuredData = {
         "WebSite",
 
       "@id":
-        "https://studyos37.vercel.app/#website",
+        "https://studyos37.space/#website",
 
       url:
-        "https://studyos37.vercel.app/",
+        "https://studyos37.space/",
 
       name:
         "StudyOS",
@@ -42,10 +42,10 @@ const homeStructuredData = {
         "WebApplication",
 
       "@id":
-        "https://studyos37.vercel.app/#app",
+        "https://studyos37.space/#app",
 
       url:
-        "https://studyos37.vercel.app/",
+        "https://studyos37.space/",
 
       name:
         "StudyOS",
