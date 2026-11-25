@@ -2841,7 +2841,15 @@ function Focus() {
             aria-label="Enter Zen mode"
             aria-haspopup="dialog"
           >
-            Zen mode
+            <span className="v2f-zen-symbol" aria-hidden="true">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+                <path d="M20.5 15.1A8.9 8.9 0 0 1 8.9 3.5 9 9 0 1 0 20.5 15.1Z" fill="currentColor" />
+              </svg>
+            </span>
+            <span className="v2f-zen-copy">
+              <span className="v2f-zen-label">Zen mode</span>
+              <span className="v2f-zen-note">Distraction-free</span>
+            </span>
           </button>
         </div>
       </header>
