@@ -23,6 +23,7 @@ import {
 
 import StudySelect from "../components/StudySelect";
 import FocusZen from "../components/FocusZen";
+import FocusCompletion from "../components/FocusCompletion";
 
 import apiRequest from "../services/api";
 
@@ -285,6 +286,7 @@ function Focus() {
 
   const zenAnchorRef = useRef(null);
   const [zenOpen, setZenOpen] = useState(false);
+  const [completion, setCompletion] = useState(null);
 
   const autoFinishLockRef =
     useRef(false);
@@ -2149,6 +2151,10 @@ function Focus() {
           )
         );
 
+        // Only a successfully saved session can show a completion receipt.
+        setZenOpen(false);
+        setCompletion({ seconds: Number(savedSession?.durationSeconds ?? durationSeconds) });
+
         if (
           automatic
         ) {
@@ -3301,7 +3307,7 @@ function Focus() {
         </>
       )}
 
-      {zenOpen && (
+      {zenOpen && !completion && (
         <FocusZen
           anchor={zenAnchorRef.current}
           time={formatTimer(remainingSeconds)}
@@ -3311,6 +3317,13 @@ function Focus() {
           saving={savingSession || (status === "paused" && remainingSeconds <= 0)}
           onToggle={status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession}
           onClose={() => setZenOpen(false)}
+        />
+      )}
+
+      {completion && (
+        <FocusCompletion
+          seconds={completion.seconds}
+          onClose={() => setCompletion(null)}
         />
       )}
 
