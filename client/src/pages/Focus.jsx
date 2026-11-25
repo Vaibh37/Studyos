@@ -22,6 +22,7 @@ import {
 } from "../context/AuthContext";
 
 import StudySelect from "../components/StudySelect";
+import FocusZen from "../components/FocusZen";
 
 import apiRequest from "../services/api";
 
@@ -281,6 +282,19 @@ function Focus() {
   // =======================================================
   // REFS
   // =======================================================
+
+  const zenAnchorRef = useRef(null);
+  const [zenOpen, setZenOpen] = useState(false);
+  const [reduceZenMotion, setReduceZenMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [allowZenMotion, setAllowZenMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduceZenMotion(media.matches);
+    media.addEventListener("change", update);
+    update();
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   const autoFinishLockRef =
     useRef(false);
@@ -2977,6 +2991,7 @@ function Focus() {
                     </span>
 
                     <strong
+                      ref={zenAnchorRef}
                       className={`v2f-time${
                         remainingSeconds >= 3600 ? " is-long" : ""
                       }`}
@@ -3121,6 +3136,11 @@ function Focus() {
                   </>
                 )}
 
+              </div>
+
+              <div className="v2f-zen-entry">
+                <button type="button" className="v2f-secondary-action" disabled={!hydrated || savingSession} onClick={() => setZenOpen(true)}>Enter Zen mode</button>
+                {reduceZenMotion && <label><input type="checkbox" checked={allowZenMotion} onChange={event => setAllowZenMotion(event.target.checked)} /> Play animation</label>}
               </div>
 
               {status === "idle" ? (
@@ -3277,6 +3297,19 @@ function Focus() {
 
           </section>
         </>
+      )}
+
+      {zenOpen && (
+        <FocusZen
+          anchor={zenAnchorRef.current}
+          time={formatTimer(remainingSeconds)}
+          status={status}
+          animate={!reduceZenMotion || allowZenMotion}
+          error={error}
+          saving={savingSession || (status === "paused" && remainingSeconds <= 0)}
+          onToggle={status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession}
+          onClose={() => setZenOpen(false)}
+        />
       )}
 
       {/* DELETE MODAL */}

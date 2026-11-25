@@ -162,6 +162,7 @@ function StudyApp() {
   const {
     firebaseUser,
     isAuthenticated,
+    isGuest,
   } = useAuth();
 
   const location =
@@ -242,6 +243,55 @@ function StudyApp() {
   ] = useState(
     ""
   );
+
+  // Display the persisted, account-scoped timer even on other app pages.
+  useEffect(() => {
+    const key = isGuest
+      ? "studyos_active_focus_timer:guest"
+      : firebaseUser?.uid
+        ? "studyos_active_focus_timer:account:" + firebaseUser.uid
+        : null;
+    if (!key) return;
+    const originalTitle = document.title;
+    let ownedTitle = null;
+    const restore = () => {
+      if (ownedTitle !== null && document.title === ownedTitle) document.title = originalTitle;
+      ownedTitle = null;
+    };
+    const tick = () => {
+      try {
+        const timer = JSON.parse(localStorage.getItem(key) || "null");
+        if (!timer || !["running", "paused"].includes(timer.status)) {
+          restore();
+          return;
+        }
+        const seconds = timer.status === "running"
+          ? Math.ceil((Number(timer.targetEndAt) - Date.now()) / 1000)
+          : Number(timer.remainingSeconds);
+        if (!Number.isFinite(seconds)) { restore(); return; }
+        const safe = Math.max(0, Math.floor(seconds));
+        const hours = Math.floor(safe / 3600);
+        const minutes = String(Math.floor(safe % 3600 / 60)).padStart(2, "0");
+        const secs = String(safe % 60).padStart(2, "0");
+        const time = (hours ? hours + ":" : "") + minutes + ":" + secs;
+        ownedTitle = safe === 0 ? "Focus complete — StudyOS"
+          : time + (timer.status === "paused" ? " · Paused" : "") + " — StudyOS";
+        if (document.title !== ownedTitle) document.title = ownedTitle;
+      } catch {
+        restore();
+      }
+    };
+    tick();
+    const interval = window.setInterval(tick, 250);
+    window.addEventListener("storage", tick);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("storage", tick);
+      document.removeEventListener("visibilitychange", tick);
+      restore();
+    };
+  }, [isGuest, firebaseUser?.uid]);
 
   // =======================================================
   // THEME

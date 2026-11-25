@@ -1,0 +1,17 @@
+.studyos-zen-dialog{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:#eee;overflow:hidden;font-family:inherit;isolation:isolate}
+.studyos-zen-dialog::backdrop{background:transparent}
+.studyos-zen-dialog canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.studyos-zen-digits{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:64px;font-weight:300;letter-spacing:-.045em;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none;color:#eee}
+.studyos-zen-ui{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .2s}
+.studyos-zen-ui[data-ready=true]{opacity:1}
+.studyos-zen-ui button{pointer-events:none;position:absolute;border:1px solid #444;background:#171717;color:#eee;border-radius:7px;padding:11px 19px;font:inherit;cursor:pointer}
+.studyos-zen-ui[data-ready=true] button{pointer-events:auto}
+.studyos-zen-ui button:focus-visible{outline:2px solid #ddd;outline-offset:4px}
+.studyos-zen-exit{top:max(24px,env(safe-area-inset-top));right:24px}
+.studyos-zen-exit span{color:#aaa;margin-left:7px;font-size:11px}
+.studyos-zen-action{bottom:max(35px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%)}
+.v2f-zen-entry{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 0}
+.v2f-zen-entry label{font-size:12px;display:flex;align-items:center;gap:6px}
+@media(prefers-reduced-motion:reduce){.studyos-zen-ui{transition:none}}
+
+.studyos-zen-error{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);width:min(90%,480px);text-align:center;color:#ddd;font-size:13px}
