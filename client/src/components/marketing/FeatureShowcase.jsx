@@ -6,6 +6,7 @@ import Reveal from "./Reveal";
 const features = [
   {
     eyebrow: "Tasks",
+    href: "/study-planner",
     title: "Plan what matters.",
     copy: "Prioritize work, link tasks to subjects, and keep deadlines visible without turning planning into another project.",
     image: "/studyos-screenshots/tasks.png",
@@ -14,6 +15,7 @@ const features = [
   },
   {
     eyebrow: "Focus",
+    href: "/focus-timer",
     title: "Turn plans into real work.",
     copy: "Start subject-linked sessions with presets or custom durations. Pause, resume and keep the history of what you actually studied.",
     image: "/studyos-screenshots/focus.png",
@@ -22,6 +24,7 @@ const features = [
   },
   {
     eyebrow: "Progress",
+    href: "/progress",
     title: "Understand your consistency.",
     copy: "Review Focus time, streaks, weekly activity and subject distribution instead of guessing whether the week was productive.",
     image: "/studyos-screenshots/progress.png",
@@ -47,6 +50,7 @@ const supporting = [
   },
   {
     label: "Notes",
+    href: "/notes",
     copy: "Write, search, pin and organize notes inside the same workspace.",
     image: "/studyos-screenshots/notes.png",
   },
@@ -88,6 +92,7 @@ function FeatureShowcase() {
                 <span className="marketing-kicker">{feature.eyebrow}</span>
                 <h3>{feature.title}</h3>
                 <p>{feature.copy}</p>
+                {feature.href && <a className="marketing-text-link" href={feature.href}>Explore {feature.eyebrow.toLowerCase()} <ArrowUpRight size={14} /></a>}
               </div>
 
               <div className="marketing-feature-visual">
@@ -116,6 +121,7 @@ function FeatureShowcase() {
               <div>
                 <h3>{item.label}</h3>
                 <p>{item.copy}</p>
+                {item.href && <a className="marketing-text-link" href={item.href}>Explore {item.label.toLowerCase()} <ArrowUpRight size={14} /></a>}
               </div>
             </article>
           ))}

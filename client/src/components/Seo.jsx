@@ -3,10 +3,10 @@ import {
 } from "react";
 
 const SITE_URL =
-  "https://studyos37.vercel.app";
+  "https://studyos37.space";
 
 const DEFAULT_IMAGE =
-  "https://studyos37.vercel.app/studyos-screenshots/dashboard.png";
+  "https://studyos37.space/studyos-screenshots/dashboard.png";
 
 const ensureMeta =
   (
