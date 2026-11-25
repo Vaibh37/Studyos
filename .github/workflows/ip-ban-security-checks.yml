@@ -9,6 +9,7 @@ on:
       - ".github/workflows/ip-ban-security-checks.yml"
   push:
     branches:
+      - "main"
       - "security/ip-ban-protection"
 
 jobs:
