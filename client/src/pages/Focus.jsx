@@ -3305,6 +3305,7 @@ function Focus() {
           time={formatTimer(remainingSeconds)}
           status={status}
           animate={!reduceZenMotion || allowZenMotion}
+          error={error}
           saving={savingSession || (status === "paused" && remainingSeconds <= 0)}
           onToggle={status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession}
           onClose={() => setZenOpen(false)}
