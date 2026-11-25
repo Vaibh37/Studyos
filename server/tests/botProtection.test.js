@@ -20,6 +20,11 @@ test("App Check: audit safely, enforce on HTTP and real Socket.IO connections", 
   app.use(express.json());
   app.use("/api", guards.http);
   app.get("/api/ping", (req, res) => res.json({ ok: true }));
+  app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+  app.get("/api/health/db", (req, res) => res.json({ status: "ok" }));
+  app.get("/api/status", (req, res) => res.json({ status: "ok" }));
+  app.get("/api/health-private", (req, res) => res.json({ status: "ok" }));
+  app.post("/api/health", (req, res) => res.json({ status: "ok" }));
   const server = http.createServer(app);
   const io = new Server(server, { transports: ["websocket"] });
   io.use(guards.socket);
@@ -48,11 +53,21 @@ test("App Check: audit safely, enforce on HTTP and real Socket.IO connections", 
     assert.equal((await ping()).status, 200);
     assert.equal((await ping("forged")).status, 200);
     assert.equal((await ping("real-app-check")).status, 200);
+    assert.equal((await fetch(url + "/api/health")).status, 200);
+    assert.equal((await fetch(url + "/api/status")).status, 200);
     assert.ok(guards.counts.missing > 0);
     assert.ok(guards.counts.invalid > 0);
     assert.ok(guards.counts.valid > 0);
 
     mode = "enforce";
+    const beforePublic = { ...guards.counts };
+    assert.equal((await fetch(url + "/api/health")).status, 200);
+    assert.equal((await fetch(url + "/api/health/db")).status, 200);
+    assert.equal((await fetch(url + "/api/status")).status, 200);
+    assert.equal((await fetch(url + "/api/health", { method: "HEAD" })).status, 200);
+    assert.deepEqual(guards.counts, beforePublic);
+    assert.equal((await fetch(url + "/api/health-private")).status, 403);
+    assert.equal((await fetch(url + "/api/health", { method: "POST" })).status, 403);
     assert.equal((await ping()).status, 403);
     assert.equal((await ping("forged")).status, 403);
     assert.equal((await ping("real-app-check")).status, 200);
