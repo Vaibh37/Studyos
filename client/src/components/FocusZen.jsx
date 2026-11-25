@@ -9,11 +9,20 @@ const smooth = x => { x=clamp(x); return x*x*x*(x*(6*x-15)+10); };
 const envelope = x => Math.pow(Math.max(0,Math.sin(Math.PI*clamp(x))),1.5);
 
 // Visual layer only: the parent owns all session state and API calls.
-export default function FocusZen({anchor, time, status, onToggle, onClose, animate, saving}) {
+export default function FocusZen({anchor, time, status, onToggle, onClose, animate, saving, error}) {
   const dialog = useRef(null), canvas = useRef(null), digits = useRef(null);
   const exit = useRef(null), closeRef = useRef(onClose);
   const leaving = useRef(false), requestExit = useRef(null);
   const [ready,setReady] = useState(false);
+  const [pending,setPending] = useState(false);
+  const pendingRef = useRef(false);
+  const animateOnOpen = useRef(animate).current;
+  useEffect(() => { if(ready) exit.current?.focus({preventScroll:true}); },[ready]);
+  const toggle = async () => {
+    if(pendingRef.current || saving) return;
+    pendingRef.current=true;setPending(true);
+    try { await onToggle(); } finally { pendingRef.current=false;setPending(false); }
+  };
   useEffect(() => { closeRef.current=onClose; },[onClose]);
   useEffect(() => {
     const modal=dialog.current, c=canvas.current, timer=digits.current;
@@ -98,7 +107,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       // The shell camera zoom is paused at the same instant as the Canvas timeline.
       if(animation) animation.currentTime=t*2500;
     }
-    const doAnimate=animate && !!g;
+    const doAnimate=animateOnOpen && !!g;
     const tick=now=>{
       if(disposed)return;
       const dt=Math.max(0,now-last);last=now;
@@ -106,7 +115,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       progress=doAnimate?(out?Math.max(0,progress-dt/1150):Math.min(1,progress+dt/2500)):(out?0:1);
       render(progress);
       if(out&&progress===0){closeRef.current();return;}
-      if(!out&&progress===1){animation?.cancel();animation=null;setReady(true);exit.current?.focus();return;}
+      if(!out&&progress===1){animation?.cancel();animation=null;setReady(true);return;}
       frame=requestAnimationFrame(tick);
     };
     const beginExit=()=>{
@@ -138,14 +147,15 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       if(modal.open)modal.close();
       if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
     };
-  },[anchor,animate]);
+  },[anchor,animateOnOpen]);
   return createPortal(
     <dialog className="studyos-zen-dialog" ref={dialog} aria-label="Zen focus mode">
       <canvas ref={canvas} aria-hidden="true" />
       <div className="studyos-zen-digits" ref={digits} role="timer">{time}</div>
       <div className="studyos-zen-ui" data-ready={ready} inert={!ready}>
         <button ref={exit} type="button" className="studyos-zen-exit" onClick={()=>requestExit.current?.()}>Exit Zen <span>Esc</span></button>
-        <button type="button" className="studyos-zen-action" disabled={saving} onClick={onToggle}>{status==="running"?"Pause":status==="paused"?"Resume":"Start focus"}</button>
+        <button type="button" className="studyos-zen-action" disabled={saving || pending} onClick={toggle}>{status==="running"?"Pause":status==="paused"?"Resume":"Start focus"}</button>
+        {error && <p className="studyos-zen-error" role="alert">{error}</p>}
       </div>
     </dialog>,document.body
   );
