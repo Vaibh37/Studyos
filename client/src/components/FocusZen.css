@@ -13,3 +13,5 @@
 .v2f-zen-entry{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 0}
 .v2f-zen-entry label{font-size:12px;display:flex;align-items:center;gap:6px}
 @media(prefers-reduced-motion:reduce){.studyos-zen-ui{transition:none}}
+
+.studyos-zen-error{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);width:min(90%,480px);text-align:center;color:#ddd;font-size:13px}
