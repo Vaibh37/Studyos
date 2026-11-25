@@ -285,16 +285,6 @@ function Focus() {
 
   const zenAnchorRef = useRef(null);
   const [zenOpen, setZenOpen] = useState(false);
-  const [reduceZenMotion, setReduceZenMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const [allowZenMotion, setAllowZenMotion] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduceZenMotion(media.matches);
-    media.addEventListener("change", update);
-    update();
-    return () => media.removeEventListener("change", update);
-  }, []);
 
   const autoFinishLockRef =
     useRef(false);
@@ -2832,19 +2822,32 @@ function Focus() {
           <p>Make time for deep work.</p>
         </div>
 
-        <button
-          type="button"
-          className="v2f-refresh"
-          disabled={refreshing}
-          onClick={refreshData}
-          aria-label="Refresh study sessions"
-          title="Refresh study sessions"
-        >
-          <RefreshCw
-            size={16}
-            className={refreshing ? "v2f-spin" : ""}
-          />
-        </button>
+        <div className="v2f-header-actions">
+          <button
+            type="button"
+            className="v2f-refresh"
+            disabled={refreshing}
+            onClick={refreshData}
+            aria-label="Refresh study sessions"
+            title="Refresh study sessions"
+          >
+            <RefreshCw size={16} className={refreshing ? "v2f-spin" : ""} />
+          </button>
+          <button
+            type="button"
+            className="v2f-zen-trigger"
+            disabled={loading || !hydrated || savingSession}
+            onClick={() => setZenOpen(true)}
+            aria-label="Enter Zen mode"
+            aria-haspopup="dialog"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span>Zen mode</span>
+          </button>
+        </div>
       </header>
 
       {message && (
@@ -3138,11 +3141,6 @@ function Focus() {
 
               </div>
 
-              <div className="v2f-zen-entry">
-                <button type="button" className="v2f-secondary-action" disabled={!hydrated || savingSession} onClick={() => setZenOpen(true)}>Enter Zen mode</button>
-                {reduceZenMotion && <label><input type="checkbox" checked={allowZenMotion} onChange={event => setAllowZenMotion(event.target.checked)} /> Play animation</label>}
-              </div>
-
               {status === "idle" ? (
                 <p className="v2f-persistence-note">
                   Your timer stays active when you leave this page.
@@ -3304,7 +3302,7 @@ function Focus() {
           anchor={zenAnchorRef.current}
           time={formatTimer(remainingSeconds)}
           status={status}
-          animate={!reduceZenMotion || allowZenMotion}
+          animate={true}
           error={error}
           saving={savingSession || (status === "paused" && remainingSeconds <= 0)}
           onToggle={status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession}
