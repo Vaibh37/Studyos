@@ -10,8 +10,18 @@
 .studyos-zen-exit{top:max(24px,env(safe-area-inset-top));right:24px}
 .studyos-zen-exit span{color:#aaa;margin-left:7px;font-size:11px}
 .studyos-zen-action{bottom:max(35px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%)}
-.v2f-zen-entry{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 0}
-.v2f-zen-entry label{font-size:12px;display:flex;align-items:center;gap:6px}
 @media(prefers-reduced-motion:reduce){.studyos-zen-ui{transition:none}}
 
 .studyos-zen-error{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);width:min(90%,480px);text-align:center;color:#ddd;font-size:13px}
+
+/* Zen sits at the right edge of the Focus header. */
+.v2f-clean .v2f-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex:0 0 auto;margin-left:auto}
+.v2f-clean .v2f-zen-trigger{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:38px;padding:0 15px;border:1px solid #e7e7e7;border-radius:9px;background:linear-gradient(180deg,#fff 0%,#eaeaea 100%);color:#141414;font-size:13px;font-weight:650;letter-spacing:-.018em;white-space:nowrap;box-shadow:0 1px 2px #0002,inset 0 1px 0 #fff;transition:background .18s,box-shadow .18s,transform .18s}
+.v2f-clean .v2f-zen-trigger svg{flex-shrink:0}
+.v2f-clean .v2f-zen-trigger:hover:not(:disabled){background:#fff;box-shadow:0 3px 15px #ffffff20,inset 0 1px 0 #fff;transform:translateY(-1px)}
+.v2f-clean .v2f-zen-trigger:active:not(:disabled){transform:translateY(0)}
+.light-theme .v2f-clean .v2f-zen-trigger{border-color:#333;background:linear-gradient(180deg,#292929,#111);color:#fff;box-shadow:0 1px 3px #0002,inset 0 1px 0 #ffffff20}
+.light-theme .v2f-clean .v2f-zen-trigger:hover:not(:disabled){background:#303030}
+@media(max-width:700px){.v2f-clean .v2f-header-actions{gap:5px}.v2f-clean .v2f-zen-trigger{min-height:40px;padding:0 11px;gap:6px;font-size:12px}}
+@media(max-width:350px){.v2f-clean .v2f-header-actions{gap:2px}.v2f-clean .v2f-zen-trigger{padding:0 8px;gap:5px}}
+@media(prefers-reduced-motion:reduce){.v2f-clean .v2f-zen-trigger{transition:none}}
