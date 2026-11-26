@@ -2833,3 +2833,16 @@ ul[data-type="taskList"] {
 }
 
 /* STUDYOS TYPOGRAPHY END */
+
+.n3-recovered-draft {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 14px; padding: 12px; border: 1px solid var(--color-border-strong);
+  border-radius: 8px; margin: 0 0 12px; color: var(--color-text-secondary);
+  font-size: 13px; line-height: 1.5; background: var(--color-surface-subtle);
+}
+.n3-recovered-draft span { flex: 1 1 180px; }
+.n3-recovered-draft button {
+  min-height: 32px; padding: 0 10px; border-radius: 7px;
+  border: 1px solid var(--color-border-strong); color: var(--color-text); background: var(--color-control);
+}
+.n3-editor-recovery p { font-size: 13px; line-height: 1.5; color: var(--color-text-muted); margin-bottom: 12px; }

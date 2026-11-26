@@ -1,3 +1,4 @@
+import { loadModuleWithDeadline } from "./deadline.js";
 const loaders = {
   dashboard: () => import("../pages/Dashboard"),
   tasks: () => import("../pages/Tasks"),
@@ -13,9 +14,9 @@ const loaders = {
 };
 const flights = new Map();
 export function loadWorkspacePage(page) {
-  if (!loaders[page]) return Promise.reject(new Error("Unknown workspace route"));
+  if (!Object.hasOwn(loaders, page)) return Promise.reject(new Error("Unknown workspace route"));
   if (!flights.has(page)) {
-    flights.set(page, loaders[page]().catch(error => {
+    flights.set(page, loadModuleWithDeadline(loaders[page]).catch(error => {
       flights.delete(page);
       throw error;
     }));

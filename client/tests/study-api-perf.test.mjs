@@ -126,6 +126,6 @@ test("only safe private reads retry transient server/network failures; mutations
 test("errors and malformed data are never cached", async () => {
   const f=fixture({fetcher:(_u,_o,n)=>n===1?response({message:"bad"},400):n===2?response(null):response([{id:n}])});
   await assert.rejects(f.readStudyData(tasks),/bad/);
-  assert.equal(await f.readStudyData(tasks),null);
+  await assert.rejects(f.readStudyData(tasks),/incomplete study data/);
   assert.deepEqual(await f.readStudyData(tasks),[{id:3}]);
 });

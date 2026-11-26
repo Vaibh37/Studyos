@@ -77,9 +77,13 @@ export const createStudySession =
         new Date()
           .toISOString();
 
+      const id = sessionData.runId ? `focus:${sessionData.runId}` : createLocalId();
+      if (sessionData.runId) {
+        const existing = await localDb.getOne("studySessions", id);
+        if (existing) return existing;
+      }
       const newSession = {
-        _id:
-          createLocalId(),
+        _id: id,
 
         subjectId:
           sessionData.subjectId ||

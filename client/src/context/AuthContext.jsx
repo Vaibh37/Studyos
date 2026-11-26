@@ -1,3 +1,5 @@
+import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
+import { RecoveryPanel } from "../components/RecoveryBoundary";
 import {
   createContext,
   useContext,
@@ -34,8 +36,17 @@ const AuthContext =
     null
   );
 
-const GUEST_KEY =
-  "studyos_guest_mode";
+const GUEST_KEY = "studyos_guest_mode";
+function readGuestMode() {
+  try { return localStorage.getItem(GUEST_KEY) === "true"; }
+  catch { return false; }
+}
+function rememberGuestMode(enabled) {
+  try {
+    if (enabled) localStorage.setItem(GUEST_KEY, "true");
+    else localStorage.removeItem(GUEST_KEY);
+  } catch { /* Private browsing or disabled storage: retain in-memory state. */ }
+}
 
 // =========================================================
 // APP PRELOAD
@@ -80,18 +91,14 @@ export function AuthProvider({
     setGuestMode,
   ] = useState(
     () =>
-      localStorage.getItem(
-        GUEST_KEY
-      ) ===
-      "true"
+      readGuestMode()
   );
 
   const [
     loading,
     setLoading,
-  ] = useState(
-    true
-  );
+  ] = useState(true);
+  const [authError, setAuthError] = useState(false);
 
   // =======================================================
   // ACCEPT FIREBASE USER
@@ -101,9 +108,8 @@ export function AuthProvider({
     (
       user
     ) => {
-      localStorage.removeItem(
-        GUEST_KEY
-      );
+      noteDrafts.activate(user);
+      rememberGuestMode(false);
 
       setGuestMode(
         false
@@ -120,12 +126,15 @@ export function AuthProvider({
 
   useEffect(
     () => {
+      const timer = window.setTimeout(() => setAuthError(true), 25_000);
       const unsubscribe =
         onAuthStateChanged(
           auth,
           (
             user
           ) => {
+            window.clearTimeout(timer);
+            setAuthError(false);
             setStudyDataScope(user);
             if (
               user
@@ -136,6 +145,7 @@ export function AuthProvider({
 
               preloadStudyApp();
             } else {
+              noteDrafts.activate(readGuestMode() ? GUEST_DRAFT_SCOPE : null);
               disconnectSocket();
               setFirebaseUser(
                 null
@@ -145,10 +155,14 @@ export function AuthProvider({
             setLoading(
               false
             );
+          },
+          () => {
+            window.clearTimeout(timer);
+            setAuthError(true);
           }
         );
 
-      return unsubscribe;
+      return () => { window.clearTimeout(timer); unsubscribe(); };
     },
     []
   );
@@ -319,10 +333,8 @@ export function AuthProvider({
         );
       }
 
-      localStorage.setItem(
-        GUEST_KEY,
-        "true"
-      );
+      rememberGuestMode(true);
+      noteDrafts.activate(GUEST_DRAFT_SCOPE);
 
       setFirebaseUser(
         null
@@ -340,9 +352,7 @@ export function AuthProvider({
   const logout =
     async () => {
       disconnectSocket();
-      localStorage.removeItem(
-        GUEST_KEY
-      );
+      rememberGuestMode(false);
 
       setGuestMode(
         false
@@ -356,6 +366,7 @@ export function AuthProvider({
         );
       }
 
+      noteDrafts.activate(null);
       setFirebaseUser(
         null
       );
@@ -422,7 +433,7 @@ export function AuthProvider({
         preloadStudyApp,
       }}
     >
-      {children}
+      {authError ? <RecoveryPanel scope="app" authFailure /> : children}
     </AuthContext.Provider>
   );
 }
