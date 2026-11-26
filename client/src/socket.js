@@ -1,5 +1,3 @@
-import { io } from "socket.io-client";
-
 import { auth } from "./firebase";
 import { API_URL } from "./services/api";
 import { getAppCheckToken } from "./services/appCheck";
@@ -40,9 +38,10 @@ export const connectSocket = async () => {
   const user = auth.currentUser;
   if (!user) throw new Error("User is not logged in");
 
-  const token = await user.getIdToken();
-  const appCheckToken = await getAppCheckToken();
-  if (auth.currentUser?.uid !== user.uid) {
+  const [{ io }, token, appCheckToken] = await Promise.all([
+    import("socket.io-client"), user.getIdToken(), getAppCheckToken(),
+  ]);
+  if (auth.currentUser !== user) {
     throw new Error("Login changed while connecting");
   }
 

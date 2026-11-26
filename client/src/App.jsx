@@ -21,6 +21,7 @@ import {
 } from "./context/AuthContext";
 import { apiRequest } from "./services/api";
 import { WorkspaceRouteLoading } from "./components/WorkspaceStates";
+import { loadWorkspacePage } from "./services/routePreload";
 
 // =========================================================
 // PUBLIC PAGES
@@ -76,82 +77,27 @@ const StudyApp = lazy(
 // APPLICATION PAGES
 // =========================================================
 
-const Dashboard = lazy(
-  () =>
-    import(
-      "./pages/Dashboard"
-    )
-);
+const Dashboard = lazy(() => loadWorkspacePage("dashboard"));
 
-const Tasks = lazy(
-  () =>
-    import(
-      "./pages/Tasks"
-    )
-);
+const Tasks = lazy(() => loadWorkspacePage("tasks"));
 
-const Subjects = lazy(
-  () =>
-    import(
-      "./pages/Subjects"
-    )
-);
+const Subjects = lazy(() => loadWorkspacePage("subjects"));
 
-const Notes = lazy(
-  () =>
-    import(
-      "./pages/Notes"
-    )
-);
+const Notes = lazy(() => loadWorkspacePage("notes"));
 
-const Calendar = lazy(
-  () =>
-    import(
-      "./pages/Calendar"
-    )
-);
+const Calendar = lazy(() => loadWorkspacePage("calendar"));
 
-const Focus = lazy(
-  () =>
-    import(
-      "./pages/Focus"
-    )
-);
+const Focus = lazy(() => loadWorkspacePage("focus"));
 
-const Progress = lazy(
-  () =>
-    import(
-      "./pages/Progress"
-    )
-);
+const Progress = lazy(() => loadWorkspacePage("progress"));
 
-const Leaderboard = lazy(
-  () =>
-    import(
-      "./pages/Leaderboard"
-    )
-);
+const Leaderboard = lazy(() => loadWorkspacePage("leaderboard"));
 
-const Groups = lazy(
-  () =>
-    import(
-      "./pages/Groups"
-    )
-);
+const Groups = lazy(() => loadWorkspacePage("groups"));
 
-const Chats = lazy(
-  () =>
-    import(
-      "./pages/Chats"
-    )
-);
+const Chats = lazy(() => loadWorkspacePage("chats"));
 
-const Settings = lazy(
-  () =>
-    import(
-      "./pages/Settings"
-    )
-);
+const Settings = lazy(() => loadWorkspacePage("settings"));
 
 // Unlisted route; permissions are enforced by the backend, not the UI.
 const SecurityAdmin = lazy(() => import("./pages/SecurityAdmin"));

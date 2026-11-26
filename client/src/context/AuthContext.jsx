@@ -20,6 +20,8 @@ import {
 } from "../firebase";
 
 import { disconnectSocket } from "../socket";
+import { setStudyDataScope } from "../services/api";
+import { canSpeculate, loadWorkspacePage } from "../services/routePreload";
 
 import {
   loadGoogleIdentity,
@@ -44,6 +46,7 @@ let appPreloadPromise =
 
 const preloadStudyApp =
   () => {
+    if (!canSpeculate()) return Promise.resolve();
     if (
       appPreloadPromise
     ) {
@@ -56,13 +59,7 @@ const preloadStudyApp =
           "../pages/StudyApp"
         ),
 
-        import(
-          "../pages/Dashboard"
-        ),
-
-        import(
-          "../components/Sidebar"
-        ),
+        loadWorkspacePage("dashboard"),
       ]);
 
     return appPreloadPromise;
@@ -129,6 +126,7 @@ export function AuthProvider({
           (
             user
           ) => {
+            setStudyDataScope(user);
             if (
               user
             ) {
@@ -161,6 +159,7 @@ export function AuthProvider({
 
   useEffect(
     () => {
+      if (loading || firebaseUser || guestMode || !canSpeculate()) return;
       const start =
         () => {
           loadGoogleIdentity()
@@ -206,7 +205,7 @@ export function AuthProvider({
           timer
         );
     },
-    []
+    [loading, firebaseUser, guestMode]
   );
 
   // =======================================================

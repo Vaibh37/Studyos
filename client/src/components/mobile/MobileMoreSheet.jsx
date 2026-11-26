@@ -1,3 +1,4 @@
+import { preloadWorkspacePath } from "../../services/routePreload";
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router";
 import {
@@ -115,7 +116,7 @@ export default function MobileMoreSheet({ onClose }) {
       </header>
       <nav className="mobile-more-list" aria-label="Additional navigation">
         {moreItems.map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} className="mobile-more-item" onClick={onClose}>
+          <NavLink key={to} to={to} onPointerEnter={() => preloadWorkspacePath(to)} onFocus={() => preloadWorkspacePath(to)} onPointerDown={() => preloadWorkspacePath(to)} className="mobile-more-item" onClick={onClose}>
             {({ isActive }) => (
               <>
                 <Icon className="mobile-more-item-icon" size={23} aria-hidden="true" />

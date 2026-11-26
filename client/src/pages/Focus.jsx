@@ -26,7 +26,7 @@ import StudySelect from "../components/StudySelect";
 import FocusZen from "../components/FocusZen";
 import FocusCompletion from "../components/FocusCompletion";
 
-import apiRequest from "../services/api";
+import apiRequest, { readStudyData } from "../services/api";
 
 import {
   connectSocket,
@@ -334,7 +334,7 @@ function Focus() {
   // =======================================================
 
   const fetchSubjects =
-    async () => {
+    async (fresh = false) => {
       let data;
 
       if (
@@ -364,9 +364,7 @@ function Focus() {
           );
       } else {
         data =
-          await apiRequest(
-            "/api/subjects"
-          );
+          await readStudyData("/api/subjects", { fresh });
       }
 
       setSubjects(
@@ -384,11 +382,9 @@ function Focus() {
   // =======================================================
 
   const fetchSessions =
-    async () => {
+    async (fresh = false) => {
       const data =
-        await getStudySessions(
-          isGuest
-        );
+        await getStudySessions(isGuest, { cache: true, fresh });
 
       setSessions(
         Array.isArray(
@@ -452,8 +448,8 @@ function Focus() {
         setError("");
 
         await Promise.all([
-          fetchSubjects(),
-          fetchSessions(),
+          fetchSubjects(true),
+          fetchSessions(true),
           fetchGroups(),
         ]);
 

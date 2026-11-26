@@ -1,4 +1,4 @@
-import apiRequest from "./api";
+import apiRequest, { readStudyData } from "./api";
 
 import {
   createLocalId,
@@ -108,49 +108,12 @@ const taskToCalendarEvent =
 // =========================================================
 
 export const getCalendarEvents =
-  async (isGuest) => {
-    let events = [];
-    let tasks = [];
-
-    // =====================================================
-    // GUEST MODE
-    // =====================================================
-
-    if (isGuest) {
-      [
-        events,
-        tasks,
-      ] =
-        await Promise.all([
-          localDb.getAll(
-            "events"
-          ),
-
-          localDb.getAll(
-            "tasks"
-          ),
-        ]);
-    }
-
-    // =====================================================
-    // ACCOUNT MODE
-    // =====================================================
-
-    else {
-      [
-        events,
-        tasks,
-      ] =
-        await Promise.all([
-          apiRequest(
-            "/api/events"
-          ),
-
-          apiRequest(
-            "/api/tasks"
-          ),
-        ]);
-    }
+  async (isGuest, { cache = false, fresh = false, tasksPromise } = {}) => {
+    const read = path => cache ? readStudyData(path, { fresh }) : apiRequest(path);
+    const [events, tasks] = await Promise.all([
+      isGuest ? localDb.getAll("events") : read("/api/events"),
+      tasksPromise || (isGuest ? localDb.getAll("tasks") : read("/api/tasks")),
+    ]);
 
     const safeEvents =
       Array.isArray(
@@ -397,7 +360,7 @@ export const deleteCalendarEvent =
 // =========================================================
 
 export const getCalendarStudySessions =
-  async (isGuest) => {
+  async (isGuest, { cache = false, fresh = false } = {}) => {
     if (isGuest) {
       const sessions =
         await localDb.getAll(
@@ -409,10 +372,9 @@ export const getCalendarStudySessions =
       );
     }
 
-    const sessions =
-      await apiRequest(
-        "/api/study-sessions"
-      );
+    const sessions = await (cache
+      ? readStudyData("/api/study-sessions", { fresh })
+      : apiRequest("/api/study-sessions"));
 
     return Array.isArray(
       sessions

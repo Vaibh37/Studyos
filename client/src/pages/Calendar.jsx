@@ -609,13 +609,9 @@ function Calendar() {
           sessionData,
         ] =
           await Promise.all([
-            getCalendarEvents(
-              isGuest
-            ),
+            getCalendarEvents(isGuest, { cache: true, fresh: manual }),
 
-            getCalendarStudySessions(
-              isGuest
-            ),
+            getCalendarStudySessions(isGuest, { cache: true, fresh: manual }),
           ]);
 
         setEvents(

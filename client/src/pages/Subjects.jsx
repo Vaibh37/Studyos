@@ -22,7 +22,7 @@ import {
   X,
 } from "../components/icons";
 
-import apiRequest from "../services/api";
+import apiRequest, { readStudyData } from "../services/api";
 
 import {
   createLocalId,
@@ -448,27 +448,21 @@ function Subjects() {
             ? localDb.getAll(
                 "subjects"
               )
-            : apiRequest(
-                "/api/subjects"
-              );
+            : readStudyData("/api/subjects", { fresh: manual });
 
         const tasksPromise =
           isGuest
             ? localDb.getAll(
                 "tasks"
               )
-            : apiRequest(
-                "/api/tasks"
-              );
+            : readStudyData("/api/tasks", { fresh: manual });
 
         const notesPromise =
           isGuest
             ? localDb.getAll(
                 "notes"
               )
-            : apiRequest(
-                "/api/notes"
-              );
+            : readStudyData("/api/notes", { fresh: manual });
 
         const [
           subjectData,
@@ -479,9 +473,7 @@ function Subjects() {
           await Promise.all([
             subjectsPromise,
             tasksPromise,
-            getStudySessions(
-              isGuest
-            ),
+            getStudySessions(isGuest, { cache: true, fresh: manual }),
             notesPromise,
           ]);
 

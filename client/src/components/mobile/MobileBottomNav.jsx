@@ -1,3 +1,4 @@
+import { preloadWorkspacePath } from "../../services/routePreload";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import {
@@ -46,6 +47,9 @@ export default function MobileBottomNav() {
             <NavLink
               key={to}
               to={to}
+              onPointerEnter={() => preloadWorkspacePath(to)}
+              onFocus={() => preloadWorkspacePath(to)}
+              onPointerDown={() => preloadWorkspacePath(to)}
               className={({ isActive }) =>
                 `mobile-bottom-nav-item${isActive ? " is-active" : ""}`
               }

@@ -422,14 +422,13 @@ function TaskItem({
   task,
   subjects = [],
   onToggle,
+  togglePending: toggling = false,
   onUpdate,
   onDelete,
 }) {
   // =======================================================
   // STATE
   // =======================================================
-
-  const [toggling, setToggling] = useState(false);
 
   const [
     isEditing,
@@ -1200,12 +1199,7 @@ function TaskItem({
           className="task-complete-button" aria-pressed={Boolean(task.completed)}
           aria-busy={toggling}
           disabled={toggling || saving || deleting}
-          onClick={async () => {
-            if (toggling) return;
-            setToggling(true);
-            try { await onToggle(task._id); }
-            finally { setToggling(false); }
-          }}
+          onClick={() => onToggle(task._id)}
           aria-label={
             task.completed
               ? `Mark ${task.title} as incomplete`
@@ -1213,8 +1207,8 @@ function TaskItem({
           }
         >
 
-          {toggling ? <LoaderCircle size={15} className="ws-pending-icon" aria-hidden="true" /> :
-            task.completed && <Check size={15} aria-hidden="true" />}
+          {task.completed ? <Check size={15} aria-hidden="true" /> :
+            toggling && <LoaderCircle size={15} className="ws-pending-icon" aria-hidden="true" />}
 
         </button>
 
