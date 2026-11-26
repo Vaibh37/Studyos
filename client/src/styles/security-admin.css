@@ -19,7 +19,7 @@
 .security-admin__listHeading button, .security-admin__list button { background: transparent; color: #eee; }
 .security-admin__list { list-style: none; padding: 0; margin: 0; }
 .security-admin__list li { border-top: 1px solid #333; display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 14px 0; }
-.security-admin__list strong { display: block; font-size: 14px; font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
+.security-admin__list strong { display: block; font-size: 14px; font-family: var(--font-mono); overflow-wrap: anywhere; }
 .security-admin__list p { margin: 4px 0; font-size: 13px; }
 .security-admin__list small { font-size: 12px; color: #919191; }
 .security-admin__notice { border: 1px solid #555; border-radius: 6px; padding: 12px; font-size: 13px; }

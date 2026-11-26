@@ -25,7 +25,7 @@
   overflow-x: clip;
   background: var(--marketing-bg);
   color: var(--marketing-text);
-  font-family: var(--font-sans, "Inter", ui-sans-serif, system-ui, sans-serif);
+  font-family: var(--font-sans);
 }
 
 .marketing-page *,

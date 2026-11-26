@@ -1,5 +1,5 @@
 /* Approved completion motion study; all selectors are dialog-scoped. */
-dialog.studyos-completion{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#080808;color:#f1f1f1;overflow:hidden;isolation:isolate;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+dialog.studyos-completion{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#080808;color:#f1f1f1;overflow:hidden;isolation:isolate;font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
 .studyos-completion::backdrop{background:#080808}
 .studyos-completion,.studyos-completion *{box-sizing:border-box}
 .studyos-completion .sc-ambient{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 46%,#181818 0%,#0b0b0b 45%,#080808 78%);pointer-events:none}

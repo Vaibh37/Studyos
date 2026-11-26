@@ -1947,14 +1947,7 @@ span:nth-child(3) {
   color:
     var(--color-text-secondary) !important;
 
-  font-family:
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    Monaco,
-    Consolas,
-    "Liberation Mono",
-    monospace;
+  font-family: var(--font-mono);
 
   font-size: 12px !important;
 }
@@ -3616,7 +3609,7 @@ body:has(.settings-clean) .study-select-option-copy small {
    ========================================================= */
 
 .settings-v2-page.settings-clean .settings-v2-mono {
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 13px !important;
   overflow-wrap: anywhere;
 }

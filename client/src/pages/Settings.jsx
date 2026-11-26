@@ -2793,7 +2793,7 @@ function Settings() {
 
                   <button
                     type="button"
-                    className="settings-v2-danger-outline"
+                    className="settings-v2-secondary-button"
                     onClick={
                       handleLogout
                     }
