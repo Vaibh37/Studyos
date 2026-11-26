@@ -35,6 +35,7 @@ import {
 
 import {
   localDb,
+  createLocalId,
 } from "../services/localDb";
 
 import {
@@ -63,12 +64,9 @@ const PRESET_DURATIONS = [
 
 const getDefaultFocusMinutes =
   () => {
-    const saved =
-      Number(
-        localStorage.getItem(
-          "studyos_focus_duration"
-        )
-      );
+    let saved;
+    try { saved = Number(localStorage.getItem("studyos_focus_duration")); }
+    catch { saved = NaN; }
 
     if (
       Number.isFinite(
@@ -295,6 +293,7 @@ function Focus() {
 
   const finishSessionRef =
     useRef(null);
+  const finishInFlightRef = useRef(false);
 
 
   // =======================================================
@@ -945,7 +944,9 @@ function Focus() {
             null
         );
 
-        setActiveRunId(typeof saved.runId === "string" ? saved.runId : null);
+        const restoredRunId = typeof saved.runId === "string" ? saved.runId
+          : isGuest ? `guest-focus-${saved.startedAt || createLocalId()}` : null;
+        setActiveRunId(restoredRunId);
 
         const savedShareGroupId =
           !isGuest &&
@@ -1035,9 +1036,14 @@ function Focus() {
             if (
               remaining <= 0
             ) {
-              localStorage.removeItem(
-                timerStorageKey
-              );
+              // Persist a completed-but-unsaved timer before any network write.
+              // On reload, the paused state requires an explicit Finish instead
+              // of replaying a possibly committed request.
+              try {
+                localStorage.setItem(timerStorageKey, JSON.stringify({
+                  ...saved, runId: restoredRunId, status: "paused", remainingSeconds: 0, targetEndAt: null,
+                }));
+              } catch { /* The current timer remains available in memory. */ }
 
               const end =
                 new Date();
@@ -1075,7 +1081,7 @@ function Focus() {
                       endedAt:
                         end.toISOString(),
 
-                      runId: saved.runId || undefined,
+                      runId: restoredRunId || undefined,
                     }
                   );
 
@@ -1084,7 +1090,7 @@ function Focus() {
                     current
                   ) => [
                     restoredSession,
-                    ...current,
+                    ...current.filter(session => session._id !== restoredSession._id),
                   ]
                 );
 
@@ -1167,6 +1173,7 @@ function Focus() {
                   );
                 }
 
+                try { localStorage.removeItem(timerStorageKey); } catch {}
                 return;
               } catch (
                 restoreError
@@ -1188,9 +1195,9 @@ function Focus() {
                   null
                 );
 
-                showError(
-                  "Your timer finished, but StudyOS couldn't save it. Press Finish to retry."
-                );
+                showError(restoreError?.uncertain
+                  ? restoreError.message
+                  : "Your timer finished, but StudyOS couldn't save it. Press Finish to retry.");
 
                 return;
               }
@@ -1222,10 +1229,9 @@ function Focus() {
               0,
               Math.min(
                 plannedSeconds,
-                Number(
-                  saved.remainingSeconds
-                ) ||
-                  plannedSeconds
+                Number.isFinite(Number(saved.remainingSeconds))
+                  ? Number(saved.remainingSeconds)
+                  : plannedSeconds
               )
             );
 
@@ -1348,10 +1354,7 @@ function Focus() {
       status ===
       "idle"
     ) {
-      localStorage.removeItem(
-        timerStorageKey
-      );
-
+      try { localStorage.removeItem(timerStorageKey); } catch {}
       return;
     }
 
@@ -1382,12 +1385,9 @@ function Focus() {
         activeGroupName,
     };
 
-    localStorage.setItem(
-      timerStorageKey,
-      JSON.stringify(
-        snapshot
-      )
-    );
+    try { localStorage.setItem(timerStorageKey, JSON.stringify(snapshot)); } catch {
+      // Keep the running timer usable even when browser storage is unavailable.
+    }
   }, [
     hydrated,
     status,
@@ -1703,7 +1703,7 @@ function Focus() {
 
       // A signed-in timer must start on the server before it can
       // earn public leaderboard credit. Guests still use local storage.
-      let issuedRunId = null;
+      let issuedRunId = isGuest ? createLocalId() : null;
       if (!isGuest) {
         try {
           const started = await apiRequest("/api/study-sessions/start", {
@@ -1918,8 +1918,8 @@ function Focus() {
       }
 
       if (
-        remainingSeconds <=
-        0
+        savingSession || finishInFlightRef.current ||
+        remainingSeconds <= 0
       ) {
         return;
       }
@@ -1949,7 +1949,7 @@ function Focus() {
       forcedRemaining = null
     ) => {
       if (
-        savingSession ||
+        finishInFlightRef.current || savingSession ||
         status ===
           "idle"
       ) {
@@ -2035,6 +2035,18 @@ function Focus() {
       const completedSubjectName =
         activeSubjectName;
 
+      finishInFlightRef.current = true;
+      try {
+        localStorage.setItem(timerStorageKey, JSON.stringify({
+          version: 2, status: "paused", plannedMinutes, remainingSeconds: finalRemaining,
+          targetEndAt: null, startedAt: startDate.toISOString(), runId: activeRunId,
+          activeSubjectId, activeSubjectName, shareGroupId: activeGroupId, shareGroupName: activeGroupName,
+        }));
+      } catch {}
+      // Pause the timer while its save is being verified.
+      setRemainingSeconds(finalRemaining);
+      setTargetEndAt(null);
+      setStatus("paused");
       try {
         setSavingSession(
           true
@@ -2071,7 +2083,7 @@ function Focus() {
             current
           ) => [
             savedSession,
-            ...current,
+            ...current.filter(session => session._id !== savedSession._id),
           ]
         );
 
@@ -2139,9 +2151,7 @@ function Focus() {
           null
         );
 
-        localStorage.removeItem(
-          timerStorageKey
-        );
+        try { localStorage.removeItem(timerStorageKey); } catch { /* Storage unavailable; session is already saved. */ }
 
         window.dispatchEvent(
           new Event(
@@ -2181,9 +2191,15 @@ function Focus() {
             "Couldn't save your study session."
         );
 
-        autoFinishLockRef.current =
-          false;
+        // Keep the completed duration available for manual recovery. Never
+        // resubmit an uncertain write every time the zero-second timer ticks.
+        autoFinishLockRef.current = true;
+        setRemainingSeconds(finalRemaining);
+        setTargetEndAt(null);
+        setStatus("paused");
+        setZenOpen(false);
       } finally {
+        finishInFlightRef.current = false;
         setSavingSession(
           false
         );
@@ -3126,6 +3142,7 @@ function Focus() {
                         type="button"
                         className="v2f-primary-action"
                         onClick={resumeSession}
+                        disabled={savingSession}
                       >
                         <Play size={17} />
                         Resume

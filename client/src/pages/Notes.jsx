@@ -1,3 +1,6 @@
+import RecoveryBoundary from "../components/RecoveryBoundary";
+import { noteDrafts, noteFields, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
+import { loadModuleWithDeadline } from "../services/deadline";
 import DialogSurface from "../components/DialogSurface";
 import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 
@@ -25,7 +28,7 @@ import { useAuth } from "../context/AuthContext";
 import StudySelect from "../components/StudySelect";
 import "../styles/notes-phase2.css";
 
-const RichNoteEditor = lazy(() => import("../components/RichNoteEditor"));
+const RichNoteEditor = lazy(() => loadModuleWithDeadline(() => import("../components/RichNoteEditor")));
 
 const idOf = (value) =>
   value && typeof value === "object"
@@ -115,7 +118,8 @@ function NoteTile({ note, subject, active, onOpen }) {
 }
 
 export default function Notes() {
-  const { isGuest } = useAuth();
+  const { isGuest, firebaseUser } = useAuth();
+  const draftScope = isGuest ? GUEST_DRAFT_SCOPE : firebaseUser;
 
   const [notes, setNotes] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -142,6 +146,9 @@ export default function Notes() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState("");
   const [savedNotice, setSavedNotice] = useState("");
+  const [draftRecovery, setDraftRecovery] = useState(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const fieldsRef = useRef(noteFields(null));
 
   const selectedNoteRef = useRef(null);
   const savingRef = useRef(false);
@@ -149,10 +156,16 @@ export default function Notes() {
   const titleInputRef = useRef(null);
   const focusNewTitle = useRef(false);
 
-  const markEdited = () => {
+  const changeField = (field, value) => {
+    const next = { ...fieldsRef.current, [field]: value };
+    fieldsRef.current = next;
+    noteDrafts.remember(draftScope, selectedNoteRef.current, next, { pendingSave: savingRef.current });
     editVersion.current += 1;
     setSavedNotice("");
     setError("");
+    if (field === "title") setTitle(value);
+    else if (field === "content") setContent(value);
+    else setSubjectId(value);
   };
 
   const subjectsById = useMemo(
@@ -173,11 +186,15 @@ export default function Notes() {
     selectedNoteRef.current = note;
     setSelectedNote(note);
 
-    setTitle(note?.title || "");
-    setContent(note?.content || "");
-    setSubjectId(idOf(note?.subjectId));
-
+    const recovered = note ? noteDrafts.recover(draftScope, note) : null;
+    const fields = recovered?.fields || noteFields(note);
+    fieldsRef.current = fields;
+    setTitle(fields.title);
+    setContent(fields.content);
+    setSubjectId(fields.subjectId);
+    setDraftRecovery(recovered ? { conflict: recovered.conflict } : null);
     setSavedNotice("");
+    return Boolean(recovered);
   };
 
   const loadNotes = useCallback(
@@ -218,15 +235,13 @@ export default function Notes() {
           selectedNoteRef.current?._id
         );
 
+        const draftId = noteDrafts.latestId(draftScope);
         const next =
-          allNotes.find(
-            (note) =>
-              idOf(note._id) === currentId
-          ) ||
-          allNotes[0] ||
-          null;
-
-        selectNote(next);
+          allNotes.find(note => idOf(note._id) === (currentId || draftId)) ||
+          allNotes.find(note => idOf(note._id) === draftId) ||
+          allNotes[0] || null;
+        const recovered = selectNote(next);
+        if (recovered && window.matchMedia("(max-width: 900px)").matches) setEditorOpen(true);
       } catch (failure) {
         console.error("Loading notes failed", failure);
 
@@ -238,7 +253,7 @@ export default function Notes() {
         setRefreshing(false);
       }
     },
-    [isGuest]
+    [isGuest, draftScope]
   );
 
   useEffect(() => {
@@ -294,12 +309,19 @@ export default function Notes() {
       deleting
     ) return false;
 
+    if (draftRecovery && silent) {
+      setError("Review the recovered draft and save it, or discard the draft to use the saved note.");
+      return false;
+    }
+
     if (content.length > 200000) {
       setError("Note exceeds the 200,000 character limit.");
       return false;
     }
 
     const savedVersion = editVersion.current;
+    const submitted = { title, content, subjectId };
+    const originalNote = selectedNote;
 
     savingRef.current = true;
     setSaving(true);
@@ -338,6 +360,11 @@ export default function Notes() {
         );
       }
 
+      if (!updated || idOf(updated._id) !== idOf(originalNote._id)) {
+        throw new Error("The note save could not be verified. Your draft is still available.");
+      }
+      noteDrafts.commit(draftScope, originalNote, submitted, updated);
+      setDraftRecovery(null);
       setNotes((current) =>
         current.map((note) =>
           idOf(note._id) === idOf(updated._id)
@@ -353,6 +380,7 @@ export default function Notes() {
         editVersion.current === savedVersion;
 
       if (unchanged) {
+        fieldsRef.current = noteFields(updated);
         setTitle(updated.title || "");
         setContent(updated.content || "");
         setSubjectId(idOf(updated.subjectId));
@@ -369,6 +397,8 @@ export default function Notes() {
       return unchanged;
     } catch (failure) {
       console.error("Saving note failed", failure);
+      // Keep failed/uncertain writes visible for explicit recovery.
+      setDraftRecovery({ conflict: false });
 
       setError(
         failure?.message ||
@@ -557,6 +587,7 @@ export default function Notes() {
         );
       }
 
+      noteDrafts.remove(draftScope, target);
       const remaining = notes.filter(
         (note) =>
           idOf(note._id) !== idOf(target)
@@ -727,6 +758,8 @@ export default function Notes() {
       refreshing ||
       loading ||
       confirmDelete ||
+      confirmDiscard ||
+      draftRecovery ||
       error
     ) return;
 
@@ -750,22 +783,10 @@ export default function Notes() {
     refreshing,
     loading,
     confirmDelete,
+    draftRecovery,
+    confirmDiscard,
     error,
   ]);
-
-  useEffect(() => {
-    if (!dirty && !saving) return;
-
-    const warn = (event) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", warn);
-
-    return () =>
-      window.removeEventListener("beforeunload", warn);
-  }, [dirty, saving]);
 
   useEffect(() => {
     if (!focusNewTitle.current || creating) return;
@@ -1093,10 +1114,7 @@ export default function Notes() {
                   maxLength={160}
                   value={title}
                   placeholder="Untitled note"
-                  onChange={(event) => {
-                    setTitle(event.target.value);
-                    markEdited();
-                  }}
+                  onChange={event => changeField("title", event.target.value)}
                   aria-label="Note title"
                 />
 
@@ -1104,10 +1122,7 @@ export default function Notes() {
                   <StudySelect
                     className="n3-editor-select"
                     value={subjectId}
-                    onChange={(value) => {
-                      setSubjectId(String(value));
-                      markEdited();
-                    }}
+                    onChange={value => changeField("subjectId", String(value))}
                     options={editorSubjectOptions}
                     ariaLabel="Choose note subject"
                   />
@@ -1124,16 +1139,29 @@ export default function Notes() {
 
                 <div className="n3-editor-paper">
 
+                  {draftRecovery && (
+                    <div className="n3-recovered-draft" role="status">
+                      <span>{draftRecovery.conflict
+                        ? "This note changed since you last edited it. Saving will keep your recovered version."
+                        : "Your unsaved draft was recovered. Save when you’re ready."}</span>
+                      <button type="button" onClick={() => setConfirmDiscard(true)} disabled={saving}>Discard draft</button>
+                    </div>
+                  )}
+                  <RecoveryBoundary key={idOf(selectedNote._id)} fallback={() => (
+                    <div className="n3-editor-recovery">
+                      <p role="status">The visual editor couldn’t load. You can still edit and save this note in Markdown.</p>
+                      <textarea className="nr-markdown-source" aria-label="Markdown source" value={content}
+                        onChange={event => changeField("content", event.target.value)} />
+                    </div>
+                  )}>
                   <Suspense fallback={<WorkspaceSkeleton count={3} label="note editor" />}>
                     <RichNoteEditor
                       key={idOf(selectedNote._id)}
                       value={content}
-                      onChange={(value) => {
-                        setContent(value);
-                        markEdited();
-                      }}
+                      onChange={value => changeField("content", value)}
                     />
                   </Suspense>
+                  </RecoveryBoundary>
 
                 </div>
 
@@ -1156,7 +1184,7 @@ export default function Notes() {
                 >
                   {error && dirty
                     ? error
-                    : "Autosave enabled"}
+                    : draftRecovery ? "Save or discard recovered draft" : "Autosave enabled"}
                 </span>
 
                 <button
@@ -1177,6 +1205,25 @@ export default function Notes() {
         )}
       </div>
 
+      {confirmDiscard && selectedNote && (
+        <div className="n3-confirm-overlay" role="presentation">
+          <DialogSurface as="section" className="n3-confirm" role="alertdialog"
+            aria-labelledby="n3-discard-heading" aria-describedby="n3-discard-description"
+            onDismiss={() => setConfirmDiscard(false)}>
+            <h2 id="n3-discard-heading">Discard unsaved draft?</h2>
+            <p id="n3-discard-description">Your saved note will be restored. Unsaved changes in this draft will be lost.</p>
+            <div>
+              <button type="button" onClick={() => setConfirmDiscard(false)}>Cancel</button>
+              <button className="is-danger" type="button" onClick={() => {
+                noteDrafts.remove(draftScope, selectedNote._id);
+                selectNote(selectedNote);
+                setError("");
+                setConfirmDiscard(false);
+              }}>Discard draft</button>
+            </div>
+          </DialogSurface>
+        </div>
+      )}
       {confirmDelete && selectedNote && (
         <div
           className="n3-confirm-overlay"

@@ -1,3 +1,5 @@
+import RecoveryBoundary from "./components/RecoveryBoundary";
+import { loadModuleWithDeadline } from "./services/deadline";
 import {
   lazy,
   Suspense,
@@ -27,35 +29,37 @@ import { loadWorkspacePage } from "./services/routePreload";
 // PUBLIC PAGES
 // =========================================================
 
-const Landing = lazy(
+const lazyPage = loader => lazy(() => loadModuleWithDeadline(loader));
+
+const Landing = lazyPage(
   () =>
     import(
       "./pages/Landing"
     )
 );
 
-const GetStarted = lazy(
+const GetStarted = lazyPage(
   () =>
     import(
       "./pages/GetStarted"
     )
 );
 
-const Privacy = lazy(
+const Privacy = lazyPage(
   () =>
     import(
       "./pages/Privacy"
     )
 );
 
-const Terms = lazy(
+const Terms = lazyPage(
   () =>
     import(
       "./pages/Terms"
     )
 );
 
-const Contact = lazy(
+const Contact = lazyPage(
   () =>
     import(
       "./pages/Contact"
@@ -66,7 +70,7 @@ const Contact = lazy(
 // APPLICATION SHELL
 // =========================================================
 
-const StudyApp = lazy(
+const StudyApp = lazyPage(
   () =>
     import(
       "./pages/StudyApp"
@@ -100,7 +104,7 @@ const Chats = lazy(() => loadWorkspacePage("chats"));
 const Settings = lazy(() => loadWorkspacePage("settings"));
 
 // Unlisted route; permissions are enforced by the backend, not the UI.
-const SecurityAdmin = lazy(() => import("./pages/SecurityAdmin"));
+const SecurityAdmin = lazyPage(() => import("./pages/SecurityAdmin"));
 
 // =========================================================
 // APPLICATION ROUTES
@@ -122,10 +126,8 @@ const VALID_APP_PAGES = [
 
 const getStartupPage =
   () => {
-    const saved =
-      localStorage.getItem(
-        "studyos_startup_page"
-      );
+    let saved;
+    try { saved = localStorage.getItem("studyos_startup_page"); } catch { /* Storage may be disabled. */ }
 
     return VALID_APP_PAGES.includes(
       saved
@@ -249,6 +251,7 @@ function ProtectedStudyApp() {
   const {
     loading,
     mode,
+    firebaseUser,
   } = useAuth();
 
   const location = useLocation();
@@ -278,7 +281,7 @@ function ProtectedStudyApp() {
   }
 
   return (
-    <StudyApp />
+    <StudyApp key={mode === "guest" ? "guest" : `account:${firebaseUser?.uid}`} />
   );
 }
 
@@ -364,14 +367,9 @@ function RouteScrollManager() {
         if (
           location.hash
         ) {
-          const target =
-            document.getElementById(
-              decodeURIComponent(
-                location.hash.slice(
-                  1
-                )
-              )
-            );
+          let anchor = location.hash.slice(1);
+          try { anchor = decodeURIComponent(anchor); } catch { /* Invalid percent encoding. */ }
+          const target = document.getElementById(anchor);
 
           if (target) {
             target.scrollIntoView({
@@ -427,12 +425,14 @@ function RouteScrollManager() {
 // =========================================================
 
 function App() {
+  const { pathname } = useLocation();
   return (
     <>
       <RouteScrollManager />
 
       <Analytics />
 
+      <RecoveryBoundary key={pathname.startsWith("/app") ? "workspace" : pathname} scope="app">
       <Suspense
         fallback={
           <RouteLoader />
@@ -611,6 +611,7 @@ function App() {
 
         </Routes>
       </Suspense>
+      </RecoveryBoundary>
     </>
   );
 }

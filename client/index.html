@@ -186,7 +186,41 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main id="studyos-startup" style="min-height:100vh;display:grid;place-items:center;background:#101113;color:#f2f3f5;font-family:system-ui,sans-serif;padding:24px;box-sizing:border-box;">
+        <div style="max-width:400px;">
+          <h1 id="studyos-startup-heading" style="font-size:24px;margin:0 0 10px;font-weight:650;">Loading StudyOS…</h1>
+          <p id="studyos-startup-description" role="status" style="font-size:14px;line-height:1.6;color:#a3a6ad;margin:0 0 16px;">Preparing your workspace.</p>
+          <a id="studyos-startup-retry" hidden style="display:none;background:#eceef2;color:#16191e;font-size:14px;font-weight:600;text-decoration:none;padding:12px 16px;border-radius:8px;" href="">Reload StudyOS</a>
+          <noscript><p style="font-size:14px;line-height:1.6;">JavaScript is required to open StudyOS. Enable it and reload this page.</p></noscript>
+        </div>
+      </main>
+    </div>
+    <script>
+      // This fallback still works if the entry bundle fails before React starts.
+      (() => {
+        const panel = document.getElementById("studyos-startup");
+        const retry = document.getElementById("studyos-startup-retry");
+        retry.style.display = "none";
+        try {
+          if (localStorage.getItem("studyos_theme") === "light") {
+            panel.style.background = "#f7f8fa"; panel.style.color = "#1b1c1f";
+            document.getElementById("studyos-startup-description").style.color = "#62666e";
+          }
+        } catch {}
+        function revealRecovery() {
+          if (!panel.isConnected) return;
+          document.getElementById("studyos-startup-heading").textContent = "StudyOS is taking longer to load";
+          document.getElementById("studyos-startup-description").textContent = "Check your connection and reload to try again. Your saved study data will not be cleared.";
+          retry.hidden = false; retry.style.display = "inline-block";
+          retry.href = location.href;
+        }
+        window.addEventListener("error", event => {
+          if (event.target?.tagName === "SCRIPT" && event.target.type === "module") revealRecovery();
+        }, true);
+        setTimeout(revealRecovery, 15000);
+      })();
+    </script>
 
     <script
       type="module"

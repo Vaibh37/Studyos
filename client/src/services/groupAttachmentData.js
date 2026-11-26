@@ -1,3 +1,4 @@
+import { withDeadline } from "./deadline";
 import apiRequest from "./api";
 
 
@@ -228,7 +229,7 @@ const uploadFileToStorage =
     file,
   }) => {
     const response =
-      await fetch(
+      await withDeadline(signal => fetch(
         uploadUrl,
         {
           method:
@@ -241,8 +242,9 @@ const uploadFileToStorage =
 
           body:
             file,
+          signal,
         }
-      );
+      ), { timeoutMs: 120_000, timeoutError: () => new Error("Upload took too long. Check your connection and try again.") });
 
 
     if (

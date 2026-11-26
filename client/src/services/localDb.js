@@ -19,70 +19,46 @@ let dbPromise =
 // OPEN DATABASE
 // =========================================================
 
-const openDb =
-  () => {
-    if (
-      dbPromise
-    ) {
-      return dbPromise;
-    }
+const openDb = () => {
+  if (dbPromise) return dbPromise;
+  const flight = new Promise((resolve, reject) => {
+    let request, settled = false;
+    const fail = error => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(error || new Error("Could not open guest storage."));
+    };
+    const timer = setTimeout(() => fail(new Error("Guest storage took too long to open. Close other StudyOS tabs and retry.")), 15_000);
+    try { request = indexedDB.open(DB_NAME, DB_VERSION); }
+    catch (error) { fail(error); return; }
 
-    dbPromise =
-      new Promise(
-        (
-          resolve,
-          reject
-        ) => {
-          const request =
-            indexedDB.open(
-              DB_NAME,
-              DB_VERSION
-            );
-
-          request.onupgradeneeded =
-            () => {
-              const db =
-                request.result;
-
-              STORE_NAMES.forEach(
-                (
-                  storeName
-                ) => {
-                  if (
-                    !db.objectStoreNames.contains(
-                      storeName
-                    )
-                  ) {
-                    db.createObjectStore(
-                      storeName,
-                      {
-                        keyPath:
-                          "_id",
-                      }
-                    );
-                  }
-                }
-              );
-            };
-
-          request.onsuccess =
-            () => {
-              resolve(
-                request.result
-              );
-            };
-
-          request.onerror =
-            () => {
-              reject(
-                request.error
-              );
-            };
-        }
-      );
-
-    return dbPromise;
-  };
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      for (const name of STORE_NAMES) {
+        if (!db.objectStoreNames.contains(name)) db.createObjectStore(name, { keyPath: "_id" });
+      }
+    };
+    request.onblocked = () => fail(new Error("Guest storage is blocked by another tab. Close other StudyOS tabs and retry."));
+    request.onerror = () => fail(request.error);
+    request.onsuccess = () => {
+      const db = request.result;
+      if (settled) { db.close(); return; }
+      settled = true;
+      clearTimeout(timer);
+      db.onversionchange = () => {
+        if (dbPromise === flight) dbPromise = null;
+        db.close();
+      };
+      db.onclose = () => { if (dbPromise === flight) dbPromise = null; };
+      resolve(db);
+    };
+  });
+  dbPromise = flight;
+  // A failed open must not poison every future request in this tab.
+  flight.catch(() => { if (dbPromise === flight) dbPromise = null; });
+  return flight;
+};
 
 // =========================================================
 // CREATE LOCAL ID
@@ -236,49 +212,21 @@ const getOne =
 // PUT NORMAL RECORD
 // =========================================================
 
-const putNormalRecord =
-  async (
-    db,
-    storeName,
-    value
-  ) => {
-    return new Promise(
-      (
-        resolve,
-        reject
-      ) => {
-        const transaction =
-          db.transaction(
-            storeName,
-            "readwrite"
-          );
+const commitRecord = (db, storeName, operation, result) =>
+  new Promise((resolve, reject) => {
+    const transaction = db.transaction(storeName, "readwrite");
+    transaction.oncomplete = () => resolve(result);
+    transaction.onabort = () => reject(transaction.error || new Error("Guest storage transaction was cancelled. Try again."));
+    transaction.onerror = () => reject(transaction.error || new Error("Could not save guest data."));
+    try { operation(transaction.objectStore(storeName)); }
+    catch (error) {
+      try { transaction.abort(); } catch { /* already ended */ }
+      reject(error);
+    }
+  });
 
-        const store =
-          transaction.objectStore(
-            storeName
-          );
-
-        const request =
-          store.put(
-            value
-          );
-
-        request.onsuccess =
-          () => {
-            resolve(
-              value
-            );
-          };
-
-        request.onerror =
-          () => {
-            reject(
-              request.error
-            );
-          };
-      }
-    );
-  };
+const putNormalRecord = (db, storeName, value) =>
+  commitRecord(db, storeName, store => store.put(value), value);
 
 // =========================================================
 // UPDATE SUBJECT + PROPAGATE NAME
@@ -570,49 +518,8 @@ const put =
 // DELETE NORMAL RECORD
 // =========================================================
 
-const removeNormalRecord =
-  async (
-    db,
-    storeName,
-    id
-  ) => {
-    return new Promise(
-      (
-        resolve,
-        reject
-      ) => {
-        const transaction =
-          db.transaction(
-            storeName,
-            "readwrite"
-          );
-
-        const store =
-          transaction.objectStore(
-            storeName
-          );
-
-        const request =
-          store.delete(
-            id
-          );
-
-        request.onsuccess =
-          () => {
-            resolve(
-              true
-            );
-          };
-
-        request.onerror =
-          () => {
-            reject(
-              request.error
-            );
-          };
-      }
-    );
-  };
+const removeNormalRecord = (db, storeName, id) =>
+  commitRecord(db, storeName, store => store.delete(id), true);
 
 // =========================================================
 // DELETE SUBJECT + UNLINK REFERENCES
@@ -877,48 +784,8 @@ const remove =
 // CLEAR
 // =========================================================
 
-const clear =
-  async (
-    storeName
-  ) => {
-    const db =
-      await openDb();
-
-    return new Promise(
-      (
-        resolve,
-        reject
-      ) => {
-        const transaction =
-          db.transaction(
-            storeName,
-            "readwrite"
-          );
-
-        const store =
-          transaction.objectStore(
-            storeName
-          );
-
-        const request =
-          store.clear();
-
-        request.onsuccess =
-          () => {
-            resolve(
-              true
-            );
-          };
-
-        request.onerror =
-          () => {
-            reject(
-              request.error
-            );
-          };
-      }
-    );
-  };
+const clear = async storeName =>
+  commitRecord(await openDb(), storeName, store => store.clear(), true);
 
 // =========================================================
 // EXPORT

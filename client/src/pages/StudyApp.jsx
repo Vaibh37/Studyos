@@ -1,3 +1,4 @@
+import RecoveryBoundary from "../components/RecoveryBoundary";
 import DialogSurface from "../components/DialogSurface";
 import {
   Suspense,
@@ -806,9 +807,11 @@ function StudyApp() {
           <main id="workspace-main" ref={mainRef} className="main-content app-shell-v2-main" tabIndex={-1} aria-label={PAGE_LABELS[activePage]}>
 
             {!isGuest && <NetworkNotice />}
-            <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
-              <Outlet />
-            </Suspense>
+            <RecoveryBoundary key={location.pathname} scope="route">
+              <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
+                <Outlet />
+              </Suspense>
+            </RecoveryBoundary>
 
           </main>
 

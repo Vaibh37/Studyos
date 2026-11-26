@@ -1,3 +1,5 @@
+import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
+import { withDeadline } from "../services/deadline";
 import DialogSurface from "../components/DialogSurface";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
@@ -459,6 +461,11 @@ function Settings() {
         return;
       }
 
+      if (noteDrafts.hasUnsaved(isGuest ? GUEST_DRAFT_SCOPE : firebaseUser)) {
+        showErrorMessage("You have an unsaved note draft. Save or discard it in Notes before signing out.");
+        return;
+      }
+
       try {
         setLoggingOut(
           true
@@ -894,9 +901,7 @@ function Settings() {
         );
 
         const healthResponse =
-          await fetch(
-            `${API_URL}/api/health`
-          );
+          await withDeadline(signal => fetch(`${API_URL}/api/health`, { signal }), { timeoutMs: 30_000 });
 
         if (
           !healthResponse.ok
@@ -2085,7 +2090,7 @@ function Settings() {
           deleteCollection(
             "notes",
             "notes"
-          ),
+          ).then(() => noteDrafts.clear(isGuest ? GUEST_DRAFT_SCOPE : firebaseUser)),
 
           deleteCollection(
             "events",
