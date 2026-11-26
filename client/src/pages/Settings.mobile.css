@@ -3857,35 +3857,122 @@ body:has(.settings-clean) .study-select-option-copy small {
 }
 
 /* =========================================================
-   RESPONSIVE SECTION SELECTOR
+   NATIVE MOBILE SETTINGS NAVIGATION
    ========================================================= */
 
-@media (max-width: 900px) {
+/* Chevron is mobile-only so the existing desktop navigation is unchanged. */
+.settings-clean .settings-v2-nav-chevron {
+  display: none;
+}
 
-  .settings-v2-page.settings-clean .settings-v2-shell {
+@media (max-width: 900px) {
+  #root .settings-clean .settings-v2-shell {
     display: block !important;
   }
 
-  .settings-v2-page.settings-clean .settings-v2-nav {
-    margin-bottom: 20px !important;
+  #root .settings-clean .settings-v2-nav {
+    margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
+    overflow: visible;
   }
 
-  .settings-v2-page.settings-clean .settings-v2-nav-list {
+  #root .settings-clean .settings-v2-nav-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    border-top: 1px solid var(--color-border);
+  }
+
+  #root .settings-clean .settings-v2-nav-item {
+    display: grid !important;
+    grid-template-columns: 24px minmax(0, 1fr) 20px;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 56px !important;
+    width: 100%;
+    padding: var(--space-3) var(--space-2) !important;
+    margin: 0;
+    border: 0 !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--color-text) !important;
+    text-align: left;
+  }
+
+  #root .settings-clean .settings-v2-nav-item:active {
+    background: var(--color-surface-hover) !important;
+  }
+
+  #root .settings-clean .settings-v2-nav-icon {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    color: var(--color-text-muted);
+  }
+
+  #root .settings-clean .settings-v2-nav-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  #root .settings-clean .settings-v2-nav-copy strong {
+    font-size: 15px !important;
+    line-height: 1.4;
+  }
+
+  #root .settings-clean .settings-v2-nav-chevron {
+    display: block;
+    justify-self: end;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  #root .settings-clean .settings-v2-nav-item[data-section="danger"] {
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--color-border) !important;
+    color: var(--color-danger) !important;
+  }
+
+  #root .settings-clean .settings-v2-nav-item[data-section="danger"] .settings-v2-nav-icon {
+    color: var(--color-danger);
+  }
+
+  #root .settings-clean.settings-mobile-detail .settings-v2-nav,
+  #root .settings-clean.settings-mobile-detail .settings-v2-section-heading {
     display: none !important;
   }
 
-  .settings-v2-page.settings-clean .settings-v2-mobile-picker {
-    display: block !important;
-    width: 100%;
-    max-width: 440px;
+  #root .settings-clean.settings-mobile-detail .settings-v2-header {
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  .settings-v2-page.settings-clean
-  .settings-v2-section-select .study-select-trigger {
-    min-height: 44px !important;
-    font-size: 15px !important;
+  #root .settings-clean .settings-v2-header-copy {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #root .settings-clean .settings-v2-mobile-back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 44px;
+    margin: 0 0 var(--space-1);
+    padding: 0 var(--space-2) 0 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    background: transparent;
+    font-size: 14px !important;
+    font-weight: var(--type-label-weight);
+  }
+
+  #root .settings-clean .settings-v2-mobile-back:active {
+    background: var(--color-surface-hover);
   }
 }
 
