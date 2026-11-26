@@ -26,7 +26,7 @@ import {
   Link2,
   UserRound,
   UsersRound,
-} from "lucide-react";
+} from "../components/icons";
 
 import {
   NavLink,

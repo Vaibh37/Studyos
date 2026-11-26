@@ -15,7 +15,7 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
-} from "lucide-react";
+} from "./icons";
 
 import { NavLink } from "react-router";
 
@@ -89,7 +89,6 @@ function Sidebar({ isOpen = false, onClose }) {
       >
         <Icon
           size={19}
-          strokeWidth={1.8}
           aria-hidden="true"
         />
 
@@ -168,7 +167,7 @@ function Sidebar({ isOpen = false, onClose }) {
           aria-label="Close navigation"
           onClick={closeNavigation}
         >
-          <X size={18} strokeWidth={1.9} />
+          <X size={18} />
         </button>
 
       </div>

@@ -8,7 +8,7 @@ import {
   LockKeyhole,
   Plus,
   X,
-} from "lucide-react";
+} from "../icons";
 
 const CODE_LENGTH = 8;
 const CODE_PATTERN = /^[0-9A-F]{8}$/;

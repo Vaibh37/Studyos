@@ -19,7 +19,7 @@ import {
   Timer,
   Trash2,
   X,
-} from "lucide-react";
+} from "../components/icons";
 
 import apiRequest from "../services/api";
 

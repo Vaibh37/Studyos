@@ -16,7 +16,7 @@ import {
   X,
   AlertCircle,
   StickyNote,
-} from "lucide-react";
+} from "../components/icons";
 import apiRequest from "../services/api";
 import { createLocalId, localDb } from "../services/localDb";
 import { useAuth } from "../context/AuthContext";
@@ -41,7 +41,7 @@ import {
   Link2,
   Undo2,
   Redo2,
-} from "lucide-react";
+} from "../components/icons";
 
 import "../styles/notes-phase2.css";
 

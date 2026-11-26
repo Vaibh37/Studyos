@@ -6,7 +6,7 @@ import {
 import {
   LoaderCircle,
   Paperclip,
-} from "lucide-react";
+} from "../icons";
 
 import {
   uploadGroupAttachment,

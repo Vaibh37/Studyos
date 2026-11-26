@@ -23,7 +23,7 @@ import {
   Target,
   Timer,
   TrendingUp,
-} from "lucide-react";
+} from "../components/icons";
 
 import {
   useAuth,

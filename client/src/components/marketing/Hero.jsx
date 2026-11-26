@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight } from "../icons";
 import { Link } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";

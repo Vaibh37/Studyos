@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "../icons";
 import { Link } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";

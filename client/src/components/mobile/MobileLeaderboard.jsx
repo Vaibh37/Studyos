@@ -10,7 +10,7 @@ import {
   RefreshCw,
   UserRound,
   Zap,
-} from "lucide-react";
+} from "../icons";
 
 
 const PAGE_SIZE = 24;

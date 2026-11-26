@@ -1,4 +1,4 @@
-import { Bug, Lightbulb, Mail } from "lucide-react";
+import { Bug, Lightbulb, Mail } from "../components/icons";
 
 import "../styles/marketing.css";
 

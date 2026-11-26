@@ -13,7 +13,7 @@ import {
   Pencil,
   Trash2,
   X,
-} from "lucide-react";
+} from "./icons";
 
 import {
   createPortal,

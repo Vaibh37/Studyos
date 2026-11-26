@@ -14,7 +14,7 @@ import {
   FileText,
   LoaderCircle,
   X,
-} from "lucide-react";
+} from "../icons";
 
 import {
   formatAttachmentSize,
