@@ -50,7 +50,7 @@ const corsOptions = {
 
     return callback(
       new Error(
-        `CORS blocked origin: ${origin}`
+        "Origin not allowed"
       )
     );
   },

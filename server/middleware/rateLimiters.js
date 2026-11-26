@@ -159,7 +159,19 @@ const groupJoinLimiter = rateLimit({
   message: { message: "Too many group join attempts. Try again later." },
 });
 
+// A separate per-account budget also limits authenticated traffic coming
+// from multiple networks. The existing IP budget still protects pre-auth work.
+const authenticatedApiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 360,
+  keyGenerator: userOrIpKey,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many account requests. Please slow down." },
+});
+
 module.exports = {
+  authenticatedApiLimiter,
   globalApiLimiter,
   attachmentUploadLimiter,
   attachmentFinalizeLimiter,

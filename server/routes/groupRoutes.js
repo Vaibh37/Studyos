@@ -1,4 +1,5 @@
 ﻿const express = require("express");
+const { publicGroupMessage } = require("../utils/publicGroupMessage");
 const { createTurnstileGuard } = require("../middleware/turnstileGuard");
 const { groupCreateLimiter, groupJoinLimiter } = require("../middleware/rateLimiters");
 const crypto = require("crypto");
@@ -613,26 +614,7 @@ router.get(
       // -----------------------------------------------------
 
       const messages =
-        newestMessages
-          .reverse()
-          .map(
-            (
-              message
-            ) => {
-              if (
-                message.isUnsent
-              ) {
-                return {
-                  ...message,
-
-                  message:
-                    null,
-                };
-              }
-
-              return message;
-            }
-          );
+        newestMessages.reverse().map(publicGroupMessage);
 
 
       return res.json({
@@ -771,15 +753,7 @@ router.get(
       }
 
 
-      const safeMessage =
-        message.isUnsent
-          ? {
-              ...message,
-
-              message:
-                null,
-            }
-          : message;
+      const safeMessage = publicGroupMessage(message);
 
 
       return res.json({

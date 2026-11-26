@@ -21,7 +21,7 @@ import {
   auth,
 } from "../firebase";
 
-import { disconnectSocket } from "../socket";
+import { disconnectSocket, disconnectObsoleteSocket } from "../socket";
 import { setStudyDataScope } from "../services/api";
 import { canSpeculate, loadWorkspacePage } from "../services/routePreload";
 
@@ -108,6 +108,7 @@ export function AuthProvider({
     (
       user
     ) => {
+      disconnectObsoleteSocket(user);
       noteDrafts.activate(user);
       rememberGuestMode(false);
 

@@ -13,12 +13,7 @@ const GroupMessage =
 // ROOM NAME
 // =========================================
 
-const getGroupRoom =
-  (
-    groupId
-  ) => {
-    return `group:${groupId}`;
-  };
+const { getGroupRoom } = require("../utils/groupRoomAccess");
 
 
 // =========================================
@@ -153,6 +148,7 @@ const registerGroupReactionSocket =
                 messageId,
 
               groupId,
+              deletedFor: { $ne: socket.user.uid },
             });
 
 
