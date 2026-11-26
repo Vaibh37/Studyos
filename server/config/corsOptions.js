@@ -49,9 +49,7 @@ const corsOptions = {
     }
 
     return callback(
-      new Error(
-        "Origin not allowed"
-      )
+      Object.assign(new Error("Origin not allowed"), { code: "ORIGIN_DENIED" })
     );
   },
 

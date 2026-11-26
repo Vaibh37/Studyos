@@ -1,0 +1,53 @@
+name: StudyOS production monitor
+
+on:
+  schedule:
+    # One probe per hour allows free Render instances to sleep normally.
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "ops/**"
+      - ".github/workflows/production-monitor.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "server/**"
+      - "client/**"
+      - "ops/**"
+      - ".github/workflows/production-monitor.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  monitor-tests:
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Test production smoke checks using isolated HTTP fixtures
+        run: node --test ops/check-production.test.mjs
+
+  production-smoke:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    concurrency:
+      group: studyos-production-smoke
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Allow Vercel and Render deployments to finish
+        if: github.event_name == 'push'
+        run: sleep 90
+      - name: Probe public pages, assets, readiness and authorization
+        run: node ops/check-production.mjs
