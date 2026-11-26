@@ -59,14 +59,14 @@ select:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  border-color: var(--color-border-strong) !important;
+  border-color: var(--color-focus) !important;
 }
 
 /* Subtle focus styling for search containers */
 
 .n3-search:focus-within,
 .v2n-search:focus-within {
-  border-color: var(--color-border-strong) !important;
+  border-color: var(--color-focus) !important;
   box-shadow: none !important;
 }
 
@@ -77,7 +77,7 @@ a:focus-visible,
 [role="button"]:focus-visible,
 [role="tab"]:focus-visible,
 [tabindex]:not([tabindex="-1"]):focus-visible {
-  outline: 1px solid var(--color-text-muted) !important;
+  outline: 2px solid var(--color-focus) !important;
   outline-offset: 2px !important;
   box-shadow: none !important;
 }

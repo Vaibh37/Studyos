@@ -5,18 +5,18 @@
    ========================================================= */
 
 .marketing-page {
-  --marketing-bg: #080808;
-  --marketing-surface: #101010;
-  --marketing-surface-2: #151515;
-  --marketing-surface-3: #1b1b1b;
-  --marketing-text: #f5f5f5;
-  --marketing-text-soft: #c8c8c8;
-  --marketing-muted: #8b8b8b;
-  --marketing-faint: #626262;
-  --marketing-border: #242424;
-  --marketing-border-strong: #363636;
-  --marketing-white: #f5f5f5;
-  --marketing-black: #090909;
+  --marketing-bg: var(--color-bg);
+  --marketing-surface: var(--color-surface);
+  --marketing-surface-2: var(--color-surface-subtle);
+  --marketing-surface-3: var(--color-surface-hover);
+  --marketing-text: var(--color-text);
+  --marketing-text-soft: var(--color-text-secondary);
+  --marketing-muted: var(--color-text-muted);
+  --marketing-faint: var(--color-text-faint);
+  --marketing-border: var(--color-border);
+  --marketing-border-strong: var(--color-border-strong);
+  --marketing-white: var(--color-solid);
+  --marketing-black: var(--color-solid-text);
   --marketing-shell: 1240px;
   --marketing-nav-height: 72px;
 
@@ -1978,18 +1978,18 @@
    ========================================================= */
 
 .light-theme .marketing-page {
-  --marketing-bg: #f7f7f5;
-  --marketing-surface: #ffffff;
-  --marketing-surface-2: #f0f0ed;
-  --marketing-surface-3: #e8e8e4;
-  --marketing-text: #0a0a0a;
-  --marketing-text-soft: #3f3f3d;
-  --marketing-muted: #6d6d69;
-  --marketing-faint: #989893;
-  --marketing-border: #deded9;
-  --marketing-border-strong: #c9c9c2;
-  --marketing-white: #0a0a0a;
-  --marketing-black: #ffffff;
+  --marketing-bg: var(--color-bg);
+  --marketing-surface: var(--color-surface);
+  --marketing-surface-2: var(--color-surface-subtle);
+  --marketing-surface-3: var(--color-surface-hover);
+  --marketing-text: var(--color-text);
+  --marketing-text-soft: var(--color-text-secondary);
+  --marketing-muted: var(--color-text-muted);
+  --marketing-faint: var(--color-text-faint);
+  --marketing-border: var(--color-border);
+  --marketing-border-strong: var(--color-border-strong);
+  --marketing-white: var(--color-solid);
+  --marketing-black: var(--color-solid-text);
 }
 
 .light-theme .marketing-page button:focus-visible,
