@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import {
   BadgeCheck,
   Bell,
   BookOpen,
   CalendarDays,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Database,
   Download,
@@ -360,12 +363,23 @@ function Settings() {
   // SETTINGS SECTION
   // =======================================================
 
-  const [
-    activeSection,
-    setActiveSection,
-  ] = useState(
-    "account"
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isCompact, setIsCompact] = useState(
+    () => window.matchMedia("(max-width: 900px)").matches
   );
+  const headingRef = useRef(null);
+  const sectionListRef = useRef(null);
+  const previousMobileSection = useRef(null);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 900px)");
+    const sync = () => setIsCompact(query.matches);
+    query.addEventListener("change", sync);
+    sync();
+    return () => query.removeEventListener("change", sync);
+  }, []);
 
   // =======================================================
   // MESSAGE HELPERS
@@ -2291,34 +2305,60 @@ function Settings() {
     },
   ];
 
-  const settingsSectionOptions =
-    settingsSections.map(
-      (
-        section
-      ) => ({
-        value:
-          section.id,
+  const requestedSection = settingsSections.find(
+    section => section.id === searchParams.get("section")
+  );
+  const activeSectionMeta = requestedSection || settingsSections[0];
+  const activeSection = activeSectionMeta.id;
+  const ActiveSectionIcon = activeSectionMeta.icon;
+  const mobileDetail = isCompact && Boolean(requestedSection);
+  const mobileSectionId = mobileDetail ? activeSection : null;
 
-        label:
-          section.label,
+  function openSettingsSection(sectionId) {
+    if (!isCompact && sectionId === activeSection) return;
+    const next = new URLSearchParams(searchParams);
+    next.set("section", sectionId);
+    setSearchParams(next, {
+      // Desktop retains a single settings history entry; phones push a detail
+      // entry so the system/browser Back button returns to the menu.
+      replace: !isCompact,
+      state: isCompact
+        ? { ...location.state, settingsMenuEntry: true }
+        : location.state,
+    });
+  }
 
-        description:
-          section.description,
-      })
-    );
+  function returnToSettings() {
+    if (location.state?.settingsMenuEntry) {
+      navigate(-1);
+      return;
+    }
 
-  const activeSectionMeta =
-    settingsSections.find(
-      (
-        section
-      ) =>
-        section.id ===
-        activeSection
-    ) ||
-    settingsSections[0];
+    // A directly opened section URL has no guaranteed menu entry before it.
+    const next = new URLSearchParams(searchParams);
+    next.delete("section");
+    setSearchParams(next, { replace: true });
+  }
 
-  const ActiveSectionIcon =
-    activeSectionMeta.icon;
+  useEffect(() => {
+    const previous = previousMobileSection.current;
+    previousMobileSection.current = mobileSectionId;
+    if (!isCompact || previous === mobileSectionId) return;
+
+    // Move keyboard focus with the mobile navigation, including browser Back.
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      if (mobileSectionId) {
+        headingRef.current?.focus({ preventScroll: true });
+      } else if (previous) {
+        sectionListRef.current
+          ?.querySelector(`[data-section="${previous}"]`)
+          ?.focus({ preventScroll: true });
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [isCompact, mobileSectionId]);
 
   useEffect(() => {
     if (
@@ -2421,7 +2461,7 @@ function Settings() {
   // =======================================================
 
   return (
-    <div className="dashboard settings-page settings-v2-page settings-clean">
+    <div className={`dashboard settings-page settings-v2-page settings-clean${mobileDetail ? " settings-mobile-detail" : ""}`}>
 
       {/* ===================================================
           HEADER
@@ -2429,18 +2469,27 @@ function Settings() {
 
       <header className="dashboard-header settings-v2-header">
 
-        <div>
+        <div className="settings-v2-header-copy">
+          {mobileDetail && (
+            <button
+              type="button"
+              className="settings-v2-mobile-back"
+              aria-label="Back to Settings"
+              onClick={returnToSettings}
+            >
+              <ChevronLeft size={20} aria-hidden="true" />
+              Settings
+            </button>
+          )}
 
-          <p className="settings-v2-eyebrow">
-            STUDYOS CONTROL CENTER
-          </p>
-
-          <h1>
-            Settings
+          <h1 ref={headingRef} tabIndex={-1}>
+            {mobileDetail ? activeSectionMeta.label : "Settings"}
           </h1>
 
           <p>
-            Manage your account and preferences.
+            {mobileDetail
+              ? activeSectionMeta.description
+              : "Manage your account and preferences."}
           </p>
 
         </div>
@@ -2528,34 +2577,7 @@ function Settings() {
 
           </div>
 
-          {/* ===============================================
-              MOBILE SETTINGS DROPDOWN
-          ================================================ */}
-
-          <div className="settings-v2-mobile-picker">
-
-            <StudySelect
-              value={
-                activeSection
-              }
-              onChange={
-                setActiveSection
-              }
-              options={
-                settingsSectionOptions
-              }
-              placeholder="Choose settings section"
-              className="settings-v2-section-select"
-              ariaLabel="Choose settings section"
-            />
-
-          </div>
-
-          {/* ===============================================
-              DESKTOP NAV
-          ================================================ */}
-
-          <div className="settings-v2-nav-list">
+          <div className="settings-v2-nav-list" ref={sectionListRef}>
 
             {settingsSections.map(
               (
@@ -2565,8 +2587,7 @@ function Settings() {
                   section.icon;
 
                 const isActive =
-                  activeSection ===
-                  section.id;
+                  !isCompact && activeSection === section.id;
 
                 return (
                   <button
@@ -2580,11 +2601,7 @@ function Settings() {
                         ? "active"
                         : ""
                     }`}
-                    onClick={() =>
-                      setActiveSection(
-                        section.id
-                      )
-                    }
+                    onClick={() => openSettingsSection(section.id)}
                     aria-current={
                       isActive
                         ? "page"
@@ -2611,6 +2628,12 @@ function Settings() {
                       </small>
 
                     </span>
+
+                    <ChevronRight
+                      size={18}
+                      className="settings-v2-nav-chevron"
+                      aria-hidden="true"
+                    />
 
                   </button>
                 );
@@ -2645,7 +2668,8 @@ function Settings() {
             CONTENT
         ================================================= */}
 
-        <main className="settings-v2-content">
+        {(!isCompact || mobileDetail) && (
+        <section className="settings-v2-content" aria-label={activeSectionMeta.label}>
 
           <div className="settings-v2-section-heading">
 
@@ -3943,7 +3967,8 @@ function Settings() {
             </section>
           )}
 
-        </main>
+        </section>
+        )}
 
       </div>
 
