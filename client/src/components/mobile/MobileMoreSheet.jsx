@@ -1,12 +1,11 @@
-import {
-  useRef,
-  useState,
-} from "react";
-
+import { useEffect, useRef, useState } from "react";
+import { NavLink } from "react-router";
 import {
   BarChart3,
   BookOpen,
   CalendarDays,
+  Check,
+  ChevronRight,
   FileText,
   MessageCircle,
   Settings,
@@ -14,294 +13,121 @@ import {
   X,
 } from "../icons";
 
-import {
-  NavLink,
-} from "react-router";
-
-const moreItems = [
-  {
-    to: "/app/subjects",
-    label: "Subjects",
-    description: "Manage your courses",
-    icon: BookOpen,
-  },
-  {
-    to: "/app/notes",
-    label: "Notes",
-    description: "Study notes",
-    icon: FileText,
-  },
-  {
-    to: "/app/calendar",
-    label: "Calendar",
-    description: "Deadlines & events",
-    icon: CalendarDays,
-  },
-  {
-    to: "/app/progress",
-    label: "Progress",
-    description: "Stats & activity",
-    icon: BarChart3,
-  },
-  {
-    to: "/app/groups",
-    label: "Study Groups",
-    description: "Study together live",
-    icon: UsersRound,
-  },
-  {
-    to: "/app/chats",
-    label: "Chats",
-    description: "Group conversations",
-    icon: MessageCircle,
-  },
-  {
-    to: "/app/settings",
-    label: "Settings",
-    description: "Account & preferences",
-    icon: Settings,
-  },
+export const moreItems = [
+  { to: "/app/subjects", label: "Subjects", icon: BookOpen },
+  { to: "/app/notes", label: "Notes", icon: FileText },
+  { to: "/app/calendar", label: "Calendar", icon: CalendarDays },
+  { to: "/app/progress", label: "Progress", icon: BarChart3 },
+  { to: "/app/groups", label: "Study Groups", icon: UsersRound },
+  { to: "/app/chats", label: "Chats", icon: MessageCircle },
+  { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
-export default function MobileMoreSheet({
-  open,
-  onClose,
-}) {
-  const [
-    dragY,
-    setDragY,
-  ] = useState(0);
+export default function MobileMoreSheet({ onClose }) {
+  const dialogRef = useRef(null);
+  const drag = useRef(null);
+  const closeTimer = useRef(null);
+  const [closing, setClosing] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
 
-  const [
-    dragging,
-    setDragging,
-  ] = useState(false);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      clearTimeout(closeTimer.current);
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus({ preventScroll: true });
+      }
+    };
+  }, []);
 
-  const [
-    closing,
-    setClosing,
-  ] = useState(false);
-
-  const startY =
-    useRef(0);
-
-  const dragYRef =
-    useRef(0);
-
-  if (!open) {
-    return null;
+  function dismiss() {
+    if (closeTimer.current !== null) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onClose();
+      return;
+    }
+    setClosing(true);
+    closeTimer.current = window.setTimeout(onClose, 180);
   }
 
-  const closeSmoothly =
-    () => {
-      if (closing) {
-        return;
-      }
+  function startDrag(event) {
+    if (event.button !== 0 || drag.current || closing) return;
+    drag.current = { pointer: event.pointerId, start: event.clientY, distance: 0 };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging(true);
+  }
 
-      setClosing(true);
+  function moveDrag(event) {
+    if (drag.current?.pointer !== event.pointerId) return;
+    drag.current.distance = Math.max(0, event.clientY - drag.current.start);
+    setOffset(drag.current.distance);
+  }
 
-      window.setTimeout(
-        () => {
-          setClosing(false);
-          setDragY(0);
-          onClose();
-        },
-        240
-      );
-    };
-
-  const handlePointerDown =
-    (
-      event
-    ) => {
-      if (closing) {
-        return;
-      }
-
-      setDragging(true);
-
-      startY.current =
-        event.clientY;
-
-      dragYRef.current = 0;
-
-      event.currentTarget
-        .setPointerCapture?.(
-          event.pointerId
-        );
-    };
-
-  const handlePointerMove =
-    (
-      event
-    ) => {
-      if (!dragging) {
-        return;
-      }
-
-      const distance =
-        event.clientY -
-        startY.current;
-
-      const nextDrag =
-        Math.min(
-          Math.max(
-            distance,
-            0
-          ),
-          320
-        );
-
-      dragYRef.current =
-        nextDrag;
-
-      setDragY(
-        nextDrag
-      );
-    };
-
-  const finishDrag =
-    () => {
-      if (!dragging) {
-        return;
-      }
-
-      const shouldClose =
-        dragYRef.current >
-        80;
-
-      setDragging(false);
-
-      if (shouldClose) {
-        closeSmoothly();
-        return;
-      }
-
-      dragYRef.current = 0;
-      setDragY(0);
-    };
+  function finishDrag(event, cancelled = false) {
+    if (drag.current?.pointer !== event.pointerId) return;
+    const shouldDismiss = !cancelled && drag.current.distance > 85;
+    drag.current = null;
+    setDragging(false);
+    if (shouldDismiss) dismiss();
+    else setOffset(0);
+  }
 
   return (
-    <div
-      className={`mobile-more-overlay ${
-        closing
-          ? "is-closing"
-          : ""
-      }`}
-      role="presentation"
-      onMouseDown={(
-        event
-      ) => {
-        if (
-          event.target ===
-          event.currentTarget
-        ) {
-          closeSmoothly();
-        }
+    <dialog
+      ref={dialogRef}
+      id="mobile-more-sheet"
+      className={`mobile-more-sheet${dragging ? " is-dragging" : ""}${closing ? " is-closing" : ""}`}
+      aria-labelledby="mobile-more-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        dismiss();
       }}
+      onClick={(event) => {
+        if (event.target !== event.currentTarget) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right ||
+            event.clientY < rect.top || event.clientY > rect.bottom) dismiss();
+      }}
+      style={{ "--mobile-sheet-offset": `${offset}px` }}
     >
-      <section
-        id="mobile-more-sheet"
-        className={[
-          "mobile-more-sheet",
-          dragging
-            ? "is-dragging"
-            : "",
-          closing
-            ? "is-closing"
-            : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        role="dialog"
-        aria-modal="true"
-        aria-label="More navigation"
-        style={{
-          "--mobile-more-drag-y":
-            `${dragY}px`,
-        }}
+      <div className="mobile-more-drag-zone"
+        aria-hidden="true"
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={finishDrag}
+        onPointerCancel={(event) => finishDrag(event, true)}
+        onLostPointerCapture={(event) => finishDrag(event, true)}
       >
-        <div
-          className="mobile-more-drag-zone"
-          onPointerDown={
-            handlePointerDown
-          }
-          onPointerMove={
-            handlePointerMove
-          }
-          onPointerUp={
-            finishDrag
-          }
-          onPointerCancel={
-            finishDrag
-          }
-        >
-          <div className="mobile-more-handle" />
-        </div>
-
-        <div className="mobile-more-header">
-          <div>
-            <p className="mobile-more-eyebrow">
-              StudyOS
-            </p>
-
-            <h2>
-              More
-            </h2>
-          </div>
-
-          <button
-            type="button"
-            className="mobile-more-close"
-            onClick={
-              closeSmoothly
-            }
-            aria-label="Close more menu"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="mobile-more-grid">
-          {moreItems.map(
-            ({
-              to,
-              label,
-              description,
-              icon: Icon,
-            }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className="mobile-more-item"
-                onClick={
-                  onClose
-                }
-              >
-                <span className="mobile-more-item-icon">
-                  <Icon
-                    size={19}
-                  />
-                </span>
-
-                <span className="mobile-more-item-copy">
-                  <strong>
-                    {label}
-                  </strong>
-
-                  <small>
-                    {description}
-                  </small>
-                </span>
-              </NavLink>
-            )
-          )}
-        </div>
-
-        <p className="mobile-more-footer">
-          Everything else, without crowding your main navigation.
-        </p>
-      </section>
-    </div>
+        <span className="mobile-more-handle" />
+      </div>
+      <header className="mobile-more-header">
+        <h2 id="mobile-more-title">More</h2>
+        <button type="button" className="mobile-more-close" aria-label="Close more menu" onClick={dismiss} autoFocus>
+          <X size={20} aria-hidden="true" />
+        </button>
+      </header>
+      <nav className="mobile-more-list" aria-label="Additional navigation">
+        {moreItems.map(({ to, label, icon: Icon }) => (
+          <NavLink key={to} to={to} className="mobile-more-item" onClick={onClose}>
+            {({ isActive }) => (
+              <>
+                <Icon className="mobile-more-item-icon" size={23} aria-hidden="true" />
+                <span>{label}</span>
+                {isActive
+                  ? <Check className="mobile-more-item-end" size={19} weight="bold" aria-hidden="true" />
+                  : <ChevronRight className="mobile-more-item-end" size={18} aria-hidden="true" />}
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+    </dialog>
   );
 }

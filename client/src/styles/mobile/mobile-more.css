@@ -1,651 +1,145 @@
-/* =========================================================
-   STUDYOS — MOBILE MORE SHEET
-   ========================================================= */
-
-.mobile-more-overlay {
-  display:
-    none;
+/* The navigation sheet is a native modal, with platform focus containment. */
+.mobile-more-sheet:not([open]) {
+  display: none;
 }
-
 
 @media (max-width: 900px) {
-
-  /* =======================================================
-     OVERLAY
-     ======================================================= */
-
-  .mobile-more-overlay {
-    position:
-      fixed;
-
-    inset:
-      0;
-
-    z-index:
-      95;
-
-    display:
-      flex;
-
-    align-items:
-      flex-end;
-
-    justify-content:
-      center;
-
-    padding:
-      0;
-
-    background:
-      rgba(
-        0,
-        0,
-        0,
-        0.58
-      );
-
-    backdrop-filter:
-      blur(4px);
-
-    -webkit-backdrop-filter:
-      blur(4px);
-
-    animation:
-      mobile-more-fade
-      160ms
-      ease-out;
+  .mobile-more-sheet[open] {
+    position: fixed;
+    inset: auto 0 0;
+    width: min(100%, 560px);
+    max-width: 100%;
+    max-height: calc(100% - max(16px, env(safe-area-inset-top)));
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
+    margin: 0 auto;
+    padding: 0 20px calc(16px + env(safe-area-inset-bottom));
+    overflow: auto;
+    overscroll-behavior: contain;
+    border: 1px solid var(--color-border);
+    border-bottom: 0;
+    border-radius: 22px 22px 0 0;
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: 0 -12px 48px #0003;
+    transform: translateY(var(--mobile-sheet-offset, 0px));
+    animation: mobile-sheet-enter 240ms cubic-bezier(.2, .8, .2, 1);
+    transition: transform 180ms ease-out;
   }
 
-
-  /* =======================================================
-     SHEET
-     ======================================================= */
-
-  .mobile-more-sheet {
-    width:
-      100%;
-
-    max-width:
-      520px;
-
-    padding:
-      8px
-      16px
-      calc(
-        92px +
-        env(safe-area-inset-bottom)
-      );
-
-    border-top:
-      1px solid
-      var(--color-border);
-
-    border-radius:
-      22px
-      22px
-      0
-      0;
-
-    background:
-      var(--color-bg);
-
-    box-shadow:
-      0
-      -20px
-      60px
-      rgba(
-        0,
-        0,
-        0,
-        0.35
-      );
-
-    animation:
-      mobile-more-up
-      220ms
-      cubic-bezier(
-        0.22,
-        1,
-        0.36,
-        1
-      );
+  .mobile-more-sheet::backdrop {
+    background: rgb(0 0 0 / 52%);
+    animation: mobile-sheet-dim 160ms ease-out;
   }
 
-
-  /* =======================================================
-     HANDLE
-     ======================================================= */
-
-  .mobile-more-handle {
-    width:
-      38px;
-
-    height:
-      4px;
-
-    margin:
-      0
-      auto
-      15px;
-
-    border-radius:
-      999px;
-
-    background:
-      var(--color-border-strong);
+  .mobile-more-sheet.is-closing {
+    animation: mobile-more-exit 180ms ease-in forwards;
+    pointer-events: none;
   }
 
-
-  /* =======================================================
-     HEADER
-     ======================================================= */
-
-  .mobile-more-header {
-    display:
-      flex;
-
-    align-items:
-      center;
-
-    justify-content:
-      space-between;
-
-    gap:
-      12px;
-
-    margin-bottom:
-      16px;
+  .mobile-more-sheet.is-closing::backdrop {
+    animation: mobile-sheet-dim 180ms ease-in reverse both;
   }
 
-  .mobile-more-header
-  > div
-  > span {
-    display:
-      block;
-
-    margin-bottom:
-      2px;
-
-    color:
-      var(--color-text-faint);
-
-    font-size:
-      8px;
-
-    font-weight:
-      600;
-
-    letter-spacing:
-      0.12em;
-
-    text-transform:
-      uppercase;
-  }
-
-  .mobile-more-header h2 {
-    margin:
-      0;
-
-    color:
-      var(--color-text);
-
-    font-size:
-      22px;
-
-    font-weight:
-      var(--font-weight-bold);
-
-    letter-spacing:
-      -0.04em;
-  }
-
-
-  /* =======================================================
-     CLOSE
-     ======================================================= */
-
-  .mobile-more-close {
-    display:
-      inline-flex;
-
-    width:
-      38px;
-
-    height:
-      38px;
-
-    align-items:
-      center;
-
-    justify-content:
-      center;
-
-    padding:
-      0;
-
-    border:
-      1px solid
-      var(--color-border);
-
-    border-radius:
-      11px;
-
-    background:
-      var(--color-surface);
-
-    color:
-      var(--color-text-muted);
-  }
-
-  .mobile-more-close:hover {
-    border-color:
-      var(--color-border-strong);
-
-    background:
-      var(--color-surface-hover);
-
-    color:
-      var(--color-text);
-  }
-
-
-  /* =======================================================
-     GRID
-     ======================================================= */
-
-  .mobile-more-grid {
-    display:
-      grid;
-
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
-
-    gap:
-      9px;
-  }
-
-
-  /* =======================================================
-     ITEM
-     ======================================================= */
-
-  .mobile-more-item {
-    display:
-      flex;
-
-    min-width:
-      0;
-
-    min-height:
-      74px;
-
-    align-items:
-      center;
-
-    gap:
-      11px;
-
-    padding:
-      12px;
-
-    border:
-      1px solid
-      var(--color-border);
-
-    border-radius:
-      14px;
-
-    background:
-      var(--color-surface);
-
-    color:
-      var(--color-text);
-
-    text-decoration:
-      none;
-
-    transition:
-      transform
-      120ms
-      ease,
-      background
-      120ms
-      ease,
-      border-color
-      120ms
-      ease;
-  }
-
-  .mobile-more-item:active {
-    transform:
-      scale(
-        0.97
-      );
-  }
-
-  .mobile-more-item:hover {
-    border-color:
-      var(--color-border-strong);
-
-    background:
-      var(--color-surface-hover);
-  }
-
-  .mobile-more-item.is-active {
-    border-color:
-      var(--color-border-strong);
-
-    background:
-      var(--color-surface-subtle);
-  }
-
-
-  /* =======================================================
-     ICON
-     ======================================================= */
-
-  .mobile-more-item-icon {
-    display:
-      inline-flex;
-
-    width:
-      38px;
-
-    height:
-      38px;
-
-    flex:
-      0 0
-      38px;
-
-    align-items:
-      center;
-
-    justify-content:
-      center;
-
-    border:
-      1px solid
-      var(--color-border);
-
-    border-radius:
-      11px;
-
-    background:
-      var(--color-surface-subtle);
-
-    color:
-      var(--color-text-secondary);
-  }
-
-  .mobile-more-item.is-active
-  .mobile-more-item-icon {
-    background:
-      var(--color-solid);
-
-    color:
-      var(--color-solid-text);
-  }
-
-
-  /* =======================================================
-     COPY
-     ======================================================= */
-
-  .mobile-more-item > div {
-    min-width:
-      0;
-  }
-
-  .mobile-more-item strong {
-    display:
-      block;
-
-    overflow:
-      hidden;
-
-    color:
-      var(--color-text);
-
-    font-size:
-      11px;
-
-    font-weight:
-      600;
-
-    white-space:
-      nowrap;
-
-    text-overflow:
-      ellipsis;
-  }
-
-  .mobile-more-item
-  > div
-  > span {
-    display:
-      block;
-
-    margin-top:
-      3px;
-
-    overflow:
-      hidden;
-
-    color:
-      var(--color-text-faint);
-
-    font-size:
-      8px;
-
-    white-space:
-      nowrap;
-
-    text-overflow:
-      ellipsis;
-  }
-
-
-  /* =======================================================
-     SETTINGS FULL WIDTH
-     ======================================================= */
-
-  .mobile-more-item:last-child {
-    grid-column:
-      1 / -1;
-  }
-
-
-  /* =======================================================
-     FOOTER
-     ======================================================= */
-
-  .mobile-more-footer {
-    display:
-      flex;
-
-    align-items:
-      center;
-
-    gap:
-      9px;
-
-    margin-top:
-      16px;
-
-    padding-top:
-      14px;
-
-    border-top:
-      1px solid
-      var(--color-border);
-  }
-
-  .mobile-more-logo {
-    display:
-      inline-flex;
-
-    width:
-      30px;
-
-    height:
-      30px;
-
-    align-items:
-      center;
-
-    justify-content:
-      center;
-
-    border-radius:
-      9px;
-
-    background:
-      var(--color-solid);
-
-    color:
-      var(--color-solid-text);
-
-    font-size:
-      11px;
-
-    font-weight:
-      700;
-  }
-
-  .mobile-more-footer div {
-    display:
-      flex;
-
-    flex-direction:
-      column;
-  }
-
-  .mobile-more-footer strong {
-    color:
-      var(--color-text);
-
-    font-size:
-      10px;
-  }
-
-  .mobile-more-footer
-  div
-  span {
-    margin-top:
-      1px;
-
-    color:
-      var(--color-text-faint);
-
-    font-size:
-      8px;
-  }
-
-
-  /* =======================================================
-     ANIMATION
-     ======================================================= */
-
-  @keyframes mobile-more-fade {
-    from {
-      opacity:
-        0;
-    }
-
-    to {
-      opacity:
-        1;
-    }
-  }
-
-
-  @keyframes mobile-more-up {
-    from {
-      transform:
-        translateY(
-          35px
-        );
-
-      opacity:
-        0;
-    }
-
-    to {
-      transform:
-        translateY(
-          0
-        );
-
-      opacity:
-        1;
-    }
-  }
-}
-/* =========================================================
-   MORE SHEET — DRAG TO DISMISS
-   ========================================================= */
-
-@media (max-width: 700px) {
-
-  .mobile-more-sheet {
-    transform:
-      translate3d(
-        0,
-        var(--mobile-more-drag-y, 0px),
-        0
-      );
-
-    transition:
-      transform 260ms
-      cubic-bezier(.2, .8, .2, 1);
-
-    will-change: transform;
+  @keyframes mobile-more-exit {
+    from { transform: translateY(var(--mobile-sheet-offset, 0px)); }
+    to { transform: translateY(100%); }
   }
 
   .mobile-more-sheet.is-dragging {
-    transition: none !important;
+    transition: none;
+    animation: none;
   }
 
   .mobile-more-drag-zone {
-    width: 100%;
     height: 28px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+    display: grid;
+    place-items: center;
     cursor: grab;
-
     touch-action: none;
-
     user-select: none;
   }
 
-  .mobile-more-drag-zone:active {
-    cursor: grabbing;
-  }
-
   .mobile-more-handle {
-    width: 38px;
+    width: 34px;
     height: 4px;
-
-    border-radius: 999px;
-
-    transition:
-      width 180ms ease,
-      opacity 180ms ease;
+    border-radius: 4px;
+    background: var(--color-text-faint);
+    opacity: .65;
   }
 
-  .mobile-more-sheet.is-dragging
-  .mobile-more-handle {
-    width: 46px;
+  .mobile-more-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 0 10px;
   }
 
+  .mobile-more-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: var(--type-title-weight, 650);
+    letter-spacing: -.035em;
+  }
+
+  .mobile-more-close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface-subtle);
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .mobile-more-list {
+    display: grid;
+  }
+
+  .mobile-more-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 56px;
+    padding: 10px 4px;
+    border-top: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    font-size: 15px;
+    font-weight: var(--type-label-weight, 550);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 120ms ease;
+  }
+
+  .mobile-more-item-icon {
+    flex: 0 0 23px;
+    color: var(--color-text-muted);
+  }
+
+  .mobile-more-item-end {
+    margin-left: auto;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  .mobile-more-item[aria-current="page"] {
+    font-weight: var(--type-title-weight, 650);
+  }
+
+  .mobile-more-item[aria-current="page"] :is(.mobile-more-item-icon, .mobile-more-item-end) {
+    color: var(--color-text);
+  }
+
+  .mobile-more-item:active,
+  .mobile-more-close:active {
+    background: var(--color-surface-hover);
+  }
+
+  @media (hover: hover) {
+    .mobile-more-item:hover { background: var(--color-surface-hover); }
+    .mobile-more-close:hover { color: var(--color-text); }
+  }
 }

@@ -3988,7 +3988,7 @@ function Settings() {
         >
 
           <div
-            className="settings-v2-modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-reset-heading" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-import-heading"
+            className="settings-v2-modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-import-heading"
             onClick={(
               event
             ) =>
@@ -4077,7 +4077,7 @@ function Settings() {
         >
 
           <div
-            className="settings-v2-modal"
+            className="settings-v2-modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-reset-heading"
             onClick={(
               event
             ) =>
