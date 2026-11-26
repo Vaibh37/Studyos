@@ -1,3 +1,4 @@
+import DialogSurface from "./DialogSurface";
 import {
   useEffect,
   useMemo,
@@ -248,36 +249,6 @@ function DeleteTaskModal({
   onConfirm,
 }) {
   useEffect(() => {
-    const handleKeyDown =
-      (
-        event
-      ) => {
-        if (
-          event.key ===
-            "Escape" &&
-          !deleting
-        ) {
-          onCancel();
-        }
-      };
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-    };
-  }, [
-    deleting,
-    onCancel,
-  ]);
-
-  useEffect(() => {
     const previousOverflow =
       document.body.style
         .overflow;
@@ -306,7 +277,7 @@ function DeleteTaskModal({
         }
       }}
     >
-      <div
+      <DialogSurface onDismiss={() => { if (!deleting) onCancel(); }} initialFocus=".task-modal-cancel"
         className="studyos-modal task-delete-modal"
         role="dialog"
         aria-modal="true"
@@ -372,7 +343,7 @@ function DeleteTaskModal({
 
             <button
               type="button"
-              className="task-modal-cancel" autoFocus
+              className="task-modal-cancel"
               onClick={
                 onCancel
               }
@@ -408,7 +379,7 @@ function DeleteTaskModal({
 
         </div>
 
-      </div>
+      </DialogSurface>
     </div>,
     document.body
   );
@@ -1361,7 +1332,7 @@ function TaskItem({
         </div>
 
         {error && (
-          <div className="task-inline-error task-inline-error-bottom">
+          <div className="task-inline-error task-inline-error-bottom" role="alert">
 
             <AlertCircle
               size={14}

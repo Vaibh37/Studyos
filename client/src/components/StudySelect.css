@@ -605,3 +605,13 @@ small {
       none;
   }
 }
+
+/* Active descendant is keyboard highlight, independent of the saved value. */
+.study-select-option.is-highlighted:not(:disabled) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+  background: var(--color-surface-hover);
+}
+@media (pointer: coarse) {
+  .study-select-option { min-height: 44px; }
+}

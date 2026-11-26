@@ -1,3 +1,4 @@
+import DialogSurface from "../DialogSurface";
 ﻿import {
   useEffect,
   useState,
@@ -548,7 +549,7 @@ function ChatAttachmentCard({
     previewOpen &&
     previewUrl &&
     !failedPreview ? (
-      <div
+      <DialogSurface onDismiss={closePreview} initialFocus='button[aria-label="Close image preview"]'
         className="chats-image-lightbox"
         role="dialog"
         aria-modal="true"
@@ -645,7 +646,7 @@ function ChatAttachmentCard({
             }
           />
         </div>
-      </div>
+      </DialogSurface>
     ) : null;
 
 

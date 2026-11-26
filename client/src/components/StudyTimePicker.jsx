@@ -1,5 +1,7 @@
+import usePickerFocus from "../hooks/usePickerFocus";
 import {
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -222,6 +224,7 @@ function StudyTimePicker({
   placeholder = "No time",
   ariaLabel = "Choose time",
 }) {
+  const popupId = useId();
   const triggerRef =
     useRef(null);
 
@@ -460,22 +463,6 @@ function StudyTimePicker({
           );
         };
 
-      const handleKeyDown =
-        (
-          event
-        ) => {
-          if (
-            event.key ===
-            "Escape"
-          ) {
-            setOpen(
-              false
-            );
-
-            triggerRef.current?.focus();
-          }
-        };
-
       window.addEventListener(
         "resize",
         reposition
@@ -492,10 +479,7 @@ function StudyTimePicker({
         handleOutside
       );
 
-      document.addEventListener(
-        "keydown",
-        handleKeyDown
-      );
+
 
       return () => {
         window.removeEventListener(
@@ -514,10 +498,7 @@ function StudyTimePicker({
           handleOutside
         );
 
-        document.removeEventListener(
-          "keydown",
-          handleKeyDown
-        );
+
       };
     },
     [
@@ -643,6 +624,8 @@ function StudyTimePicker({
       );
     };
 
+  const pickerEvents = usePickerFocus({ open, positioned, triggerRef, popoverRef, setOpen });
+
   // =======================================================
   // POPOVER
   // =======================================================
@@ -656,6 +639,7 @@ function StudyTimePicker({
             ref={
               popoverRef
             }
+            id={popupId} data-study-popover tabIndex={-1} {...pickerEvents}
             className="study-time-popover"
             role="dialog"
             aria-label={
@@ -701,11 +685,10 @@ function StudyTimePicker({
               <button
                 type="button"
                 className="study-time-close"
-                onClick={() =>
-                  setOpen(
-                    false
-                  )
-                }
+                onClick={() => {
+                  setOpen(false);
+                  triggerRef.current?.focus({ preventScroll: true });
+                }}
                 aria-label="Close time picker"
               >
                 <X
@@ -821,6 +804,7 @@ function StudyTimePicker({
                       ? "active"
                       : ""
                   }
+                  aria-pressed={period === "AM"}
                   onClick={() =>
                     setPeriod(
                       "AM"
@@ -838,6 +822,7 @@ function StudyTimePicker({
                       ? "active"
                       : ""
                   }
+                  aria-pressed={period === "PM"}
                   onClick={() =>
                     setPeriod(
                       "PM"
@@ -925,7 +910,7 @@ function StudyTimePicker({
           disabled={
             disabled
           }
-          aria-haspopup="dialog"
+          aria-haspopup="dialog" aria-controls={open ? popupId : undefined} aria-describedby={`${popupId}-value`}
           aria-expanded={
             open
           }
@@ -939,7 +924,7 @@ function StudyTimePicker({
             aria-hidden="true"
           />
 
-          <span
+          <span id={`${popupId}-value`}
             className={
               value
                 ? "study-time-value"

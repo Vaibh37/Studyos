@@ -1,3 +1,4 @@
+import DialogSurface from "./DialogSurface";
 
 import {
   useCallback,
@@ -525,7 +526,7 @@ export default function StreakFlame() {
           }`}
           onClick={dismiss}
         >
-          <div
+          <DialogSurface onDismiss={dismiss} initialFocus=".sf2-close"
             ref={stageRef}
             className="sf2-stage"
             style={{
@@ -612,7 +613,7 @@ export default function StreakFlame() {
             <span className="sf2-hint">
               Tap to return to StudyOS
             </span>
-          </div>
+          </DialogSurface>
         </div>
       )}
     </>

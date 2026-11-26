@@ -1,3 +1,4 @@
+import DialogSurface from "../components/DialogSurface";
 import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -683,7 +684,7 @@ export default function Notes() {
   ).length;
 
   useEffect(() => {
-    if (!editorOpen) return;
+    if (!editorOpen || !mobileLayout) return;
 
     const previous =
       document.body.style.overflow;
@@ -693,7 +694,7 @@ export default function Notes() {
     return () => {
       document.body.style.overflow = previous;
     };
-  }, [editorOpen]);
+  }, [editorOpen, mobileLayout]);
 
   useEffect(() => {
     const onKey = (event) => {
@@ -706,20 +707,6 @@ export default function Notes() {
         event.preventDefault();
 
         if (!saving) saveNote();
-      }
-
-      if (
-        event.key === "Escape" &&
-        confirmDelete &&
-        !deleting
-      ) {
-        setConfirmDelete(false);
-      } else if (
-        event.key === "Escape" &&
-        editorOpen &&
-        !confirmDelete
-      ) {
-        closeEditor();
       }
     };
 
@@ -1017,19 +1004,13 @@ export default function Notes() {
             }`}
           >
             <div
-              className="n3-editor-backdrop"
+              className="n3-editor-backdrop" data-dialog-backdrop
               onClick={closeEditor}
               aria-hidden="true"
             />
 
-            <section
+            <DialogSurface onDismiss={closeEditor} as="section" initialFocus=".n3-back" active={editorOpen && mobileLayout}
               className="n3-editor"
-              role={
-                editorOpen ? "dialog" : undefined
-              }
-              aria-modal={
-                editorOpen ? "true" : undefined
-              }
               aria-label="Note editor"
             >
               <div
@@ -1191,7 +1172,7 @@ export default function Notes() {
                     : "Save note"}
                 </button>
               </div>
-            </section>
+            </DialogSurface>
           </div>
         )}
       </div>
@@ -1210,7 +1191,7 @@ export default function Notes() {
             }
           }}
         >
-          <section
+          <DialogSurface onDismiss={() => { if (!deleting) setConfirmDelete(false); }} as="section"
             className="n3-confirm"
             role="alertdialog"
             aria-modal="true"
@@ -1254,7 +1235,7 @@ export default function Notes() {
                   : "Delete note"}
               </button>
             </div>
-          </section>
+          </DialogSurface>
         </div>
       )}
     </div>
