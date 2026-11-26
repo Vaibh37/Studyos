@@ -1,0 +1,70 @@
+name: StudyOS browser journeys
+
+on:
+  pull_request:
+    paths:
+      - "client/**"
+      - "server/**"
+      - "ops/e2e/**"
+      - ".github/workflows/browser-e2e.yml"
+  push:
+    branches: [main]
+    paths:
+      - "client/**"
+      - "server/**"
+      - "ops/e2e/**"
+      - ".github/workflows/browser-e2e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studyos-browser-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-journeys:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    env:
+      STUDYOS_E2E: isolated-local-only
+      CI: "true"
+      FIREBASE_CLI_DISABLE_USAGE: "true"
+      PLAYWRIGHT_MODULE: ${{ runner.temp }}/studyos-e2e-tools/node_modules/playwright/index.mjs
+      E2E_ARTIFACT_DIR: ${{ runner.temp }}/studyos-e2e-failures
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
+      - name: Install locked application dependencies
+        run: |
+          npm ci --prefix client
+          npm ci --prefix server
+      - name: Install pinned test-only tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/studyos-e2e-tools" --no-audit --no-fund --save-exact playwright@1.57.0 firebase-tools@15.37.0
+          "$RUNNER_TEMP/studyos-e2e-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Prepare frontend fonts and screenshots
+        run: npm run prebuild --prefix client
+      - name: Run browser journeys with the local Firebase emulator
+        run: |
+          "$RUNNER_TEMP/studyos-e2e-tools/node_modules/.bin/firebase" emulators:exec --only auth --project demo-studyos-e2e --config ops/e2e/firebase.json --non-interactive "node ops/e2e/run.mjs"
+      - name: Keep screenshots from failed synthetic journeys
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studyos-e2e-failures
+          path: ${{ runner.temp }}/studyos-e2e-failures
+          retention-days: 7
+          if-no-files-found: ignore
