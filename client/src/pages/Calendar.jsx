@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -2188,7 +2189,7 @@ function Calendar() {
               />
 
               <span>
-                {selectedDateEvents.length} scheduled
+                {loading ? "—" : selectedDateEvents.length} scheduled
               </span>
 
             </div>
@@ -2222,37 +2223,18 @@ function Calendar() {
               </h3>
 
               <span>
-                {selectedDateEvents.length}
+                {loading ? "—" : selectedDateEvents.length}
               </span>
 
             </div>
 
 
             {loading ? (
-
-              <div className="v2c-empty-small">
-                Loading schedule...
-              </div>
-
+              <WorkspaceSkeleton label="schedule" count={2} />
             ) : selectedDateEvents.length ===
               0 ? (
 
-              <div className="v2c-empty-small">
-
-                <CalendarDays
-                  size={22}
-                />
-
-                <strong>
-                  Nothing scheduled
-                </strong>
-
-                <span>
-                  This day is clear.
-                </span>
-
-              </div>
-
+              <WorkspaceEmpty compact icon={<CalendarDays size={22} />} title="Nothing scheduled" description="This day is clear." />
             ) : (
 
               <div className="v2c-event-list">
@@ -2405,31 +2387,17 @@ function Calendar() {
               </h3>
 
               <span>
-                {selectedDateSessions.length}
+                {loading ? "—" : selectedDateSessions.length}
               </span>
 
             </div>
 
 
-            {selectedDateSessions.length ===
-            0 ? (
+            {loading ? (
+              <WorkspaceSkeleton label="focus sessions" count={2} />
+            ) : selectedDateSessions.length === 0 ? (
 
-              <div className="v2c-empty-small">
-
-                <Timer
-                  size={22}
-                />
-
-                <strong>
-                  No focus sessions
-                </strong>
-
-                <span>
-                  Nothing recorded for this day.
-                </span>
-
-              </div>
-
+              <WorkspaceEmpty compact icon={<Timer size={22} />} title="No focus sessions" description="Nothing recorded for this day." />
             ) : (
 
               <div className="v2c-session-list">

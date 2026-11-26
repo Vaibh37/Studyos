@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -1614,38 +1615,11 @@ function Groups() {
 
 
         {loading ? (
-
-          <div className="v2g-empty-card compact">
-
-            <RefreshCw
-              size={24}
-            />
-
-            <h3>
-              Loading groups...
-            </h3>
-
-          </div>
-
+          <WorkspaceSkeleton kind="groups" count={3} />
         ) : groups.length ===
         0 ? (
 
-          <div className="v2g-empty-card compact">
-
-            <UsersRound
-              size={26}
-            />
-
-            <h3>
-              No groups yet
-            </h3>
-
-            <p>
-              Create a group or join with an invite code.
-            </p>
-
-          </div>
-
+          <WorkspaceEmpty icon={<UsersRound size={24} />} title="No groups yet" description="Create a group or join with an invite code." />
         ) : (
 
           <div className="v2g-group-grid">
@@ -2102,19 +2076,7 @@ function Groups() {
 
 
               {loadingGroup ? (
-
-                <div className="v2g-panel-empty small">
-
-                  <RefreshCw
-                    size={20}
-                  />
-
-                  <span>
-                    Loading members...
-                  </span>
-
-                </div>
-
+                <WorkspaceSkeleton label="members" count={3} avatar />
               ) : (
 
                 <div className="v2g-member-list">
@@ -2268,38 +2230,12 @@ function Groups() {
 
 
             {loadingLeaderboard ? (
-
-              <div className="v2g-panel-empty small">
-
-                <RefreshCw
-                  size={20}
-                />
-
-                <span>
-                  Loading leaderboard...
-                </span>
-
-              </div>
-
+              <WorkspaceSkeleton label="group leaderboard" count={3} avatar />
             ) : leaderboard.length ===
             0 ? (
 
-              <div className="v2g-panel-empty small">
-
-                <Trophy
-                  size={22}
-                />
-
-                <strong>
-                  No leaderboard data yet
-                </strong>
-
-                <span>
-                  Finish a shared Focus session in {selectedGroup.name} to start the ranking.
-                </span>
-
-              </div>
-
+              <WorkspaceEmpty compact icon={<Trophy size={22} />} title="No leaderboard data yet"
+                description={`Finish a shared Focus session in ${selectedGroup.name} to start the ranking.`} />
             ) : (
 
               <div className="v2g-leaderboard-list">

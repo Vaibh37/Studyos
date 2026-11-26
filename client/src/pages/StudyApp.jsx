@@ -1,4 +1,5 @@
 import {
+  Suspense,
   useEffect,
   useState,
 } from "react";
@@ -19,6 +20,7 @@ import "../styles/typography-v2.css";
 import "../styles/mobile/mobile-shell.css";
 
 import Sidebar from "../components/Sidebar";
+import { WorkspaceRouteLoading } from "../components/WorkspaceStates";
 import MobileBottomNav from "../components/mobile/MobileBottomNav";
 
 import {
@@ -782,7 +784,9 @@ function StudyApp() {
 
           <main className="main-content app-shell-v2-main">
 
-            <Outlet />
+            <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
+              <Outlet />
+            </Suspense>
 
           </main>
 

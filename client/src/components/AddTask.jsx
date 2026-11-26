@@ -1,3 +1,4 @@
+import { WorkspaceDisclosure } from "./WorkspaceStates";
 import {
   useState,
 } from "react";
@@ -363,12 +364,7 @@ function AddTask({
 
       </div>
 
-      <div
-        id="tc-optional-details"
-        hidden={!expanded}
-      >
-
-        {expanded && (
+      <WorkspaceDisclosure id="tc-optional-details" open={expanded} unmountOnClose>
           <div className="add-task-details">
 
             <div className="add-task-field">
@@ -459,9 +455,7 @@ function AddTask({
             </div>
 
           </div>
-        )}
-
-      </div>
+      </WorkspaceDisclosure>
 
       {error && (
         <p className="tc-error" role="alert">

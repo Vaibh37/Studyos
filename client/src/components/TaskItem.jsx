@@ -9,6 +9,7 @@ import {
   BookOpen,
   CalendarDays,
   Check,
+  LoaderCircle,
   Clock3,
   Pencil,
   Trash2,
@@ -427,6 +428,8 @@ function TaskItem({
   // =======================================================
   // STATE
   // =======================================================
+
+  const [toggling, setToggling] = useState(false);
 
   const [
     isEditing,
@@ -1195,11 +1198,14 @@ function TaskItem({
         <button
           type="button"
           className="task-complete-button" aria-pressed={Boolean(task.completed)}
-          onClick={() =>
-            onToggle(
-              task._id
-            )
-          }
+          aria-busy={toggling}
+          disabled={toggling || saving || deleting}
+          onClick={async () => {
+            if (toggling) return;
+            setToggling(true);
+            try { await onToggle(task._id); }
+            finally { setToggling(false); }
+          }}
           aria-label={
             task.completed
               ? `Mark ${task.title} as incomplete`
@@ -1207,11 +1213,8 @@ function TaskItem({
           }
         >
 
-          {task.completed && (
-            <Check
-              size={15}
-            />
-          )}
+          {toggling ? <LoaderCircle size={15} className="ws-pending-icon" aria-hidden="true" /> :
+            task.completed && <Check size={15} aria-hidden="true" />}
 
         </button>
 
@@ -1330,7 +1333,7 @@ function TaskItem({
               startEditing
             }
             disabled={
-              deleting
+              deleting || toggling
             }
             aria-label={`Edit ${task.title}`}
             title="Edit task"
@@ -1349,7 +1352,7 @@ function TaskItem({
               openDeleteModal
             }
             disabled={
-              deleting
+              deleting || toggling
             }
             aria-label={`Delete ${task.title}`}
             title="Delete task"

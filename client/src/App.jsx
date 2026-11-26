@@ -20,6 +20,7 @@ import {
   useAuth,
 } from "./context/AuthContext";
 import { apiRequest } from "./services/api";
+import { WorkspaceRouteLoading } from "./components/WorkspaceStates";
 
 // =========================================================
 // PUBLIC PAGES
@@ -192,6 +193,8 @@ const getStartupPage =
 // =========================================================
 
 function RouteLoader() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/app")) return <WorkspaceRouteLoading pathname={pathname} shell />;
   return (
     <div
       className="route-loading"

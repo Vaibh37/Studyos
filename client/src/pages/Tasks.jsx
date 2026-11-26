@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty, SkeletonBlock } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -1314,6 +1315,7 @@ function Tasks() {
       <section className="v2t-stats">
 
         <TaskStat
+          loading={loading}
           icon={
             <ListTodo
               size={18}
@@ -1332,6 +1334,7 @@ function Tasks() {
         />
 
         <TaskStat
+          loading={loading}
           icon={
             <CalendarClock
               size={18}
@@ -1345,6 +1348,7 @@ function Tasks() {
         />
 
         <TaskStat
+          loading={loading}
           icon={
             <AlertTriangle
               size={18}
@@ -1362,6 +1366,7 @@ function Tasks() {
         />
 
         <TaskStat
+          loading={loading}
           icon={
             <CheckCircle2
               size={18}
@@ -1396,7 +1401,7 @@ function Tasks() {
           </div>
 
           <span className="v2t-result-count">
-            {filteredTasks.length}{" "}
+            {loading ? "—" : filteredTasks.length}{" "}
             {filteredTasks.length ===
             1
               ? "task"
@@ -1609,57 +1614,16 @@ function Tasks() {
           )}
 
           {loading ? (
-
-            <div className="v2t-empty">
-
-              <span className="v2t-loading-line" />
-              <span className="v2t-loading-line is-short" />
-
-              <p>
-                Loading tasks...
-              </p>
-
-            </div>
-
-          ) : filteredTasks.length ===
-            0 ? (
-
-            <div className="v2t-empty">
-
-              <ListTodo
-                size={26}
-              />
-
-              <h3>
-                {tasks.length ===
-                0
-                  ? "No tasks yet"
-                  : "Nothing matches this view"}
-              </h3>
-
-              <p>
-                {tasks.length ===
-                0
-                  ? "Create your first task and start planning your study work."
-                  : "Try another filter or clear the current search."}
-              </p>
-
-              {tasks.length >
-                0 &&
-                filtersActive && (
-                  <button
-                    type="button"
-                    className="v2t-clear"
-                    onClick={
-                      clearFilters
-                    }
-                  >
-                    Clear filters
-                  </button>
-                )}
-
-            </div>
-
+            <WorkspaceSkeleton kind="tasks" count={5} />
+          ) : filteredTasks.length === 0 ? (
+            <WorkspaceEmpty
+              icon={<ListTodo size={24} />}
+              title={tasks.length === 0 ? "No tasks yet" : "Nothing matches this view"}
+              description={tasks.length === 0 ? "Create your first task and start planning your study work." : "Try another filter or clear the current search."}
+              action={tasks.length > 0 && filtersActive && (
+                <button type="button" className="v2t-clear" onClick={clearFilters}>Clear filters</button>
+              )}
+            />
           ) : (
 
             filteredTasks.map(
@@ -1705,6 +1669,7 @@ function Tasks() {
 // =========================================================
 
 function TaskStat({
+  loading,
   icon,
   label,
   value,
@@ -1726,11 +1691,11 @@ function TaskStat({
       </div>
 
       <strong>
-        {value}
+        {loading ? <SkeletonBlock width={42} height={22} /> : value}
       </strong>
 
       <small>
-        {description}
+        {loading ? <SkeletonBlock width={85} height={10} /> : description}
       </small>
 
     </article>

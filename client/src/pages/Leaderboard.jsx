@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty, SkeletonBlock } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -457,7 +458,7 @@ function Leaderboard() {
 
           <strong>
             {loading
-              ? "—"
+              ? <SkeletonBlock width={55} height={23} />
               : !profile.isPublic
                 ? "Private"
                 : currentUserRank
@@ -472,7 +473,7 @@ function Leaderboard() {
           <span>Weekly score</span>
 
           <strong>
-            {currentUserEntry
+            {loading ? <SkeletonBlock width={55} height={23} /> : currentUserEntry
               ? `${currentUserEntry.score} XP`
               : "—"}
           </strong>
@@ -484,7 +485,7 @@ function Leaderboard() {
           <span>Focus</span>
 
           <strong>
-            {currentUserEntry
+            {loading ? <SkeletonBlock width={55} height={23} /> : currentUserEntry
               ? formatMinutes(currentUserEntry.focusMinutes)
               : "—"}
           </strong>
@@ -512,7 +513,7 @@ function Leaderboard() {
 
             <UserRound size={15} />
 
-            {leaderboard.length}{" "}
+            {loading ? "—" : leaderboard.length}{" "}
 
             {leaderboard.length === 1
               ? "student"
@@ -524,39 +525,13 @@ function Leaderboard() {
 
 
         {loading ? (
-
-          <div className="slb-empty" role="status">
-
-            <RefreshCw
-              size={23}
-              className="slb-spin"
-            />
-
-            <strong>Loading rankings...</strong>
-
-          </div>
-
+          <WorkspaceSkeleton label="rankings" count={6} avatar />
         ) : leaderboard.length === 0 ? (
 
-          <div className="slb-empty">
-
-            <Trophy size={26} />
-
-            <strong>
-              {error
-                ? "Rankings unavailable"
-                : "No ranked students yet"}
-            </strong>
-
-            {!error && (
-              <p>
-                Public StudyOS users with recent
-                activity will appear here.
-              </p>
-            )}
-
-          </div>
-
+          <WorkspaceEmpty icon={<Trophy size={24} />}
+            title={error ? "Rankings unavailable" : "No ranked students yet"}
+            description={!error ? "Public StudyOS users with recent activity will appear here." : undefined}
+          />
         ) : (
 
           <>
