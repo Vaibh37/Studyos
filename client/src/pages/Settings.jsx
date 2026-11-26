@@ -2445,27 +2445,6 @@ function Settings() {
 
         </div>
 
-        <div
-          className={`settings-v2-api-pill settings-v2-api-${backendStatus}`}
-          title={`API: ${API_URL}`}
-        >
-
-          <span className="settings-v2-status-dot" />
-
-          {backendStatus ===
-            "checking" &&
-            "Checking API"}
-
-          {backendStatus ===
-            "online" &&
-            "API Online"}
-
-          {backendStatus ===
-            "offline" &&
-            "API Offline"}
-
-        </div>
-
       </header>
 
       {/* ===================================================
