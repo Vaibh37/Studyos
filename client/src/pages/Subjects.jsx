@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty, SkeletonBlock, WorkspaceDisclosure } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -1368,6 +1369,7 @@ function Subjects() {
       <section className="v2s-stats">
 
         <SubjectStat
+          loading={loading}
           icon={
             <BookOpen size={19} />
           }
@@ -1379,6 +1381,7 @@ function Subjects() {
         />
 
         <SubjectStat
+          loading={loading}
           icon={
             <Timer size={19} />
           }
@@ -1392,6 +1395,7 @@ function Subjects() {
         />
 
         <SubjectStat
+          loading={loading}
           icon={
             <ListChecks size={19} />
           }
@@ -1403,6 +1407,7 @@ function Subjects() {
         />
 
         <SubjectStat
+          loading={loading}
           icon={
             <CheckCircle2 size={19} />
           }
@@ -1783,13 +1788,7 @@ function Subjects() {
 
 
       {loading ? (
-        <EmptyState
-          icon={
-            <BookOpen size={28} />
-          }
-          title="Loading subjects"
-          description="Building your study overview."
-        />
+        <WorkspaceSkeleton kind="subjects" count={5} />
       ) : subjects.length ===
         0 ? (
         <EmptyState
@@ -2008,11 +2007,8 @@ function Subjects() {
                   </div>
 
 
-                  <div
-                    className="sl-details"
-                    id={detailId}
-                    hidden={!expanded}
-                  >
+                  <WorkspaceDisclosure id={detailId} open={expanded}>
+                    <div className="sl-details">
 
                     <p>
                       {subject.description ||
@@ -2052,7 +2048,8 @@ function Subjects() {
 
                     </dl>
 
-                  </div>
+                    </div>
+                  </WorkspaceDisclosure>
 
                 </article>
               );
@@ -2160,6 +2157,7 @@ function Subjects() {
 // =========================================================
 
 function SubjectStat({
+  loading,
   icon,
   label,
   value,
@@ -2181,11 +2179,11 @@ function SubjectStat({
       </div>
 
       <strong>
-        {value}
+        {loading ? <SkeletonBlock width={42} height={22} /> : value}
       </strong>
 
       <small>
-        {description}
+        {loading ? <SkeletonBlock width={85} height={10} /> : description}
       </small>
 
     </article>
@@ -2197,35 +2195,8 @@ function SubjectStat({
 // EMPTY
 // =========================================================
 
-function EmptyState({
-  icon,
-  title,
-  description,
-  action,
-}) {
-  return (
-    <section className="v2s-empty">
-
-      <span className="v2s-empty-icon">
-        {icon}
-      </span>
-
-      <h2>
-        {title}
-      </h2>
-
-      <p>
-        {description}
-      </p>
-
-      {action && (
-        <div className="v2s-empty-action">
-          {action}
-        </div>
-      )}
-
-    </section>
-  );
+function EmptyState({ icon, title, description, action }) {
+  return <WorkspaceEmpty icon={icon} title={title} description={description} action={action} />;
 }
 
 

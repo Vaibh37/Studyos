@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -1996,11 +1997,7 @@ function Progress() {
       )}
 
       {loading ? (
-        <div className="sp-loading">
-          <RefreshCw size={22} className="sp-spin" />
-          <strong>Loading progress</strong>
-          <span>Reading your study activity.</span>
-        </div>
+        <WorkspaceSkeleton kind="progress" />
       ) : (
         <>
 
@@ -2580,13 +2577,7 @@ function StudyDetail({ label, value }) {
 
 
 function StudyEmpty({ icon, title, text }) {
-  return (
-    <div className="sp-empty">
-      {icon}
-      <strong>{title}</strong>
-      <span>{text}</span>
-    </div>
-  );
+  return <WorkspaceEmpty compact icon={icon} title={title} description={text} />;
 }
 
 

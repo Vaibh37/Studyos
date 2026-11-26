@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -241,9 +242,7 @@ function VisualNoteEditor({ value, onChange }) {
 
   if (!editor) {
     return (
-      <div className="nr-editor-loading">
-        Loading editor...
-      </div>
+      <WorkspaceSkeleton kind="rows" count={3} label="note editor" />
     );
   }
 
@@ -1471,12 +1470,12 @@ export default function Notes() {
       >
         <span>
           <StickyNote size={15} />
-          <strong>{notes.length}</strong> notes
+          <strong>{loading ? "—" : notes.length}</strong> notes
         </span>
 
         <span>
           <Pin size={15} />
-          <strong>{pinnedCount}</strong> pinned
+          <strong>{loading ? "—" : pinnedCount}</strong> pinned
         </span>
 
         <button
@@ -1546,52 +1545,23 @@ export default function Notes() {
             <h2>Your notes</h2>
 
             <span>
-              {visibleNotes.length}
+              {loading ? "—" : visibleNotes.length}
             </span>
           </div>
 
           {loading ? (
-            <div className="n3-empty">
-              <RefreshCw
-                className="n3-spin"
-                size={25}
-              />
-
-              <h3>Loading notes</h3>
-
-              <p>Preparing your library.</p>
-            </div>
+            <WorkspaceSkeleton kind="notes" />
           ) : visibleNotes.length === 0 ? (
-            <div className="n3-empty">
-              <span className="n3-empty-art">
-                <BookOpen size={28} />
-              </span>
-
-              <h3>
-                {notes.length
-                  ? "No matching notes"
-                  : "Your ideas start here"}
-              </h3>
-
-              <p>
-                {notes.length
-                  ? "Try another keyword or subject."
-                  : "Write something down and find it here anytime."}
-              </p>
-
-              {!notes.length && (
-                <button
-                  className="n3-empty-action"
-                  type="button"
-                  disabled={creating}
-                  onClick={createNote}
-                >
-                  <Plus size={17} />
-
-                  Create your first note
+            <WorkspaceEmpty
+              icon={<BookOpen size={24} />}
+              title={notes.length ? "No matching notes" : "Your ideas start here"}
+              description={notes.length ? "Try another keyword or subject." : "Write something down and find it here anytime."}
+              action={!notes.length && (
+                <button className="n3-empty-action" type="button" disabled={creating} onClick={createNote}>
+                  <Plus size={17} /> Create your first note
                 </button>
               )}
-            </div>
+            />
           ) : (
             <div className="n3-masonry">
 
@@ -1681,7 +1651,7 @@ export default function Notes() {
                 </button>
 
                 <span
-                  className={`n3-save-status${dirty && error ? " is-error" : ""}`}
+                  className={`n3-save-status${dirty && error ? " is-error" : saving || dirty ? " is-pending" : " is-saved"}`}
                   role="status"
                 >
                   {saving ? (
@@ -1690,7 +1660,7 @@ export default function Notes() {
                       Saving...
                     </>
                   ) : dirty ? (
-                    error ? "Save failed" : "Saving shortly..."
+                    error ? "Save failed" : "Unsaved changes"
                   ) : (
                     <>
                       <Check size={15} />

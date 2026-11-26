@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -2884,10 +2885,7 @@ function Focus() {
       )}
 
       {loading ? (
-        <section className="v2f-loading">
-          <RefreshCw size={22} className="v2f-spin" />
-          <strong>Loading Focus</strong>
-        </section>
+        <WorkspaceSkeleton kind="focus" />
       ) : (
         <>
           <section className="v2f-stats" aria-label="Focus statistics">
@@ -3216,13 +3214,7 @@ function Focus() {
             </div>
 
             {sessions.length === 0 ? (
-              <div className="v2f-empty">
-                <Timer size={24} />
-                <strong>No study sessions yet</strong>
-                <span>
-                  Completed focus sessions will appear here.
-                </span>
-              </div>
+              <WorkspaceEmpty compact icon={<Timer size={24} />} title="No study sessions yet" description="Completed focus sessions will appear here." />
             ) : (
               <div
                 className="v2f-history-list"

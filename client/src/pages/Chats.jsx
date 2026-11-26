@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
   useMemo,
@@ -4857,45 +4858,13 @@ function Chats() {
           <div className="chats-room-list">
 
             {loadingGroups ? (
-
-              <div className="chats-rooms-empty">
-
-                <RefreshCw
-                  size={20}
-                />
-
-                <span>
-                  Loading rooms...
-                </span>
-
-              </div>
-
+              <WorkspaceSkeleton label="rooms" count={4} avatar />
             ) : groups.length ===
             0 ? (
 
-              <div className="chats-rooms-empty">
-
-                <UsersRound
-                  size={22}
-                />
-
-                <strong>
-                  No study groups yet
-                </strong>
-
-                <span>
-                  Create or join a group to start chatting.
-                </span>
-
-                <NavLink
-                  to="/app/groups"
-                  className="chats-inline-link"
-                >
-                  Open Study Groups
-                </NavLink>
-
-              </div>
-
+              <WorkspaceEmpty compact icon={<UsersRound size={22} />} title="No study groups yet"
+                description="Create or join a group to start chatting."
+                action={<NavLink to="/app/groups" className="chats-inline-link">Open Study Groups</NavLink>} />
             ) : filteredGroups.length ===
             0 ? (
 
@@ -5228,42 +5197,12 @@ function Chats() {
                 >
 
                   {loadingMessages ? (
-
-                    <div className="chats-loading-state">
-
-                      <RefreshCw
-                        size={22}
-                      />
-
-                      <strong>
-                        Loading messages
-                      </strong>
-
-                    </div>
-
+                    <WorkspaceSkeleton kind="messages" label="messages" count={5} />
                   ) : messages.length ===
                   0 ? (
 
-                    <div className="chats-first-message">
-
-                      <span className="chats-first-icon">
-
-                        <MessageCircle
-                          size={25}
-                        />
-
-                      </span>
-
-                      <h3>
-                        No messages yet
-                      </h3>
-
-                      <p>
-                        Start the conversation in {selectedGroup.name}.
-                      </p>
-
-                    </div>
-
+                    <WorkspaceEmpty compact icon={<MessageCircle size={24} />} title="No messages yet"
+                      description={`Start the conversation in ${selectedGroup.name}.`} />
                   ) : (
 
                     <div

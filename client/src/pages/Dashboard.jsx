@@ -1,3 +1,4 @@
+import { WorkspaceSkeleton, SkeletonBlock } from "../components/WorkspaceStates";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
@@ -417,7 +418,7 @@ function Dashboard() {
             <span>{item.label}</span>
 
             <strong>
-              {ready ? item.value : "—"}
+              {loading ? <SkeletonBlock width={56} height={26} /> : ready ? item.value : "—"}
             </strong>
 
           </Link>
@@ -636,11 +637,7 @@ function Dashboard() {
           </p>
 
           {loading ? (
-
-            <p className="ds-placeholder">
-              Loading tasks...
-            </p>
-
+            <WorkspaceSkeleton label="tasks" count={3} />
           ) : error ? (
 
             <p className="ds-placeholder">
@@ -798,11 +795,7 @@ function Dashboard() {
             </div>
 
             {loading ? (
-
-              <p className="ds-placeholder">
-                Loading calendar...
-              </p>
-
+              <WorkspaceSkeleton label="calendar events" count={2} />
             ) : error ? (
 
               <p className="ds-placeholder">
