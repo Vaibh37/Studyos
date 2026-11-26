@@ -1,8 +1,5 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router";
 import {
   CheckSquare,
   LayoutDashboard,
@@ -10,317 +7,77 @@ import {
   Timer,
   Trophy,
 } from "../icons";
-
-import {
-  NavLink,
-  useLocation,
-} from "react-router";
-
-import MobileMoreSheet from "./MobileMoreSheet";
-
+import MobileMoreSheet, { moreItems } from "./MobileMoreSheet";
 import "../../styles/mobile/mobile-more.css";
 
-
-// =========================================================
-// MAIN NAVIGATION
-// =========================================================
-
 const navItems = [
-  {
-    label: "Home",
-    to: "/app/dashboard",
-    icon: LayoutDashboard,
-  },
-
-  {
-    label: "Tasks",
-    to: "/app/tasks",
-    icon: CheckSquare,
-  },
-
-  {
-    label: "Focus",
-    to: "/app/focus",
-    icon: Timer,
-    primary: true,
-  },
-
-  {
-    label: "Rank",
-    to: "/app/leaderboard",
-    icon: Trophy,
-  },
+  { label: "Home", to: "/app/dashboard", icon: LayoutDashboard },
+  { label: "Tasks", to: "/app/tasks", icon: CheckSquare },
+  { label: "Focus", to: "/app/focus", icon: Timer },
+  { label: "Rank", to: "/app/leaderboard", icon: Trophy },
 ];
 
+export default function MobileBottomNav() {
+  const { pathname } = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
 
-// =========================================================
-// MOBILE BOTTOM NAV
-// =========================================================
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [pathname]);
 
-function MobileBottomNav() {
-  const location =
-    useLocation();
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 900px)");
+    const onChange = () => {
+      if (!media.matches) setMoreOpen(false);
+    };
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
 
-
-  const [
-    moreOpen,
-    setMoreOpen,
-  ] = useState(
-    false
+  const moreActive = moreItems.some(({ to }) =>
+    pathname === to || pathname.startsWith(to + "/")
   );
-
-
-  // =======================================================
-  // CLOSE AFTER NAVIGATION
-  // =======================================================
-
-  useEffect(
-    () => {
-      setMoreOpen(
-        false
-      );
-    },
-    [
-      location.pathname,
-    ]
-  );
-
-
-  // =======================================================
-  // BODY LOCK
-  // =======================================================
-
-  useEffect(
-    () => {
-      if (
-        moreOpen
-      ) {
-        document.body.style.overflow =
-          "hidden";
-      } else {
-        document.body.style.overflow =
-          "";
-      }
-
-      return () => {
-        document.body.style.overflow =
-          "";
-      };
-    },
-    [
-      moreOpen,
-    ]
-  );
-
-
-  // =======================================================
-  // ESCAPE
-  // =======================================================
-
-  useEffect(
-    () => {
-      if (
-        !moreOpen
-      ) {
-        return undefined;
-      }
-
-      const handleKeyDown =
-        (
-          event
-        ) => {
-          if (
-            event.key ===
-            "Escape"
-          ) {
-            setMoreOpen(
-              false
-            );
-          }
-        };
-
-      window.addEventListener(
-        "keydown",
-        handleKeyDown
-      );
-
-      return () => {
-        window.removeEventListener(
-          "keydown",
-          handleKeyDown
-        );
-      };
-    },
-    [
-      moreOpen,
-    ]
-  );
-
-
-  // =======================================================
-  // MORE ROUTE ACTIVE
-  // =======================================================
-
-  const moreActive =
-    [
-      "/app/subjects",
-      "/app/notes",
-      "/app/calendar",
-      "/app/progress",
-      "/app/groups",
-      "/app/settings",
-    ].some(
-      (
-        path
-      ) =>
-        location.pathname.startsWith(
-          path
-        )
-    );
-
-
-  // =======================================================
-  // UI
-  // =======================================================
 
   return (
     <>
-
-      <nav
-        className="mobile-bottom-nav"
-        aria-label="Mobile navigation"
-      >
-
+      <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
         <div className="mobile-bottom-nav-inner">
-
-          {navItems.map(
-            (
-              item
-            ) => {
-              const Icon =
-                item.icon;
-
-              return (
-                <NavLink
-                  key={
-                    item.to
-                  }
-                  to={
-                    item.to
-                  }
-                  className={({
-                    isActive,
-                  }) =>
-                    [
-                      "mobile-bottom-nav-item",
-
-                      item.primary
-                        ? "mobile-bottom-nav-focus"
-                        : "",
-
-                      isActive
-                        ? "is-active"
-                        : "",
-                    ]
-                      .filter(
-                        Boolean
-                      )
-                      .join(
-                        " "
-                      )
-                  }
-                >
-
+          {navItems.map(({ label, to, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `mobile-bottom-nav-item${isActive ? " is-active" : ""}`
+              }
+            >
+              {({ isActive }) => (
+                <>
                   <span className="mobile-bottom-nav-icon">
-
-                    <Icon
-                      size={
-                        item.primary
-                          ? 24
-                          : 21
-                      }
-
-                    />
-
+                    <Icon size={23} weight={isActive ? "fill" : "regular"} aria-hidden="true" />
                   </span>
-
-
-                  <span className="mobile-bottom-nav-label">
-                    {item.label}
-                  </span>
-
-                </NavLink>
-              );
-            }
-          )}
-
-
-          {/* MORE */}
-
+                  <span className="mobile-bottom-nav-label">{label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
           <button
             type="button"
-            className={[
-              "mobile-bottom-nav-item",
-
-              moreOpen ||
-              moreActive
-                ? "is-active"
-                : "",
-            ]
-              .filter(
-                Boolean
-              )
-              .join(
-                " "
-              )}
-            onClick={() =>
-              setMoreOpen(
-                (
-                  current
-                ) =>
-                  !current
-              )
-            }
-            aria-label="Open more navigation"
-            aria-expanded={
-              moreOpen
-            }
+            className={`mobile-bottom-nav-item${moreOpen || moreActive ? " is-active" : ""}`}
+            onClick={() => setMoreOpen(true)}
+            aria-label="More navigation"
+            aria-haspopup="dialog"
+            aria-controls={moreOpen ? "mobile-more-sheet" : undefined}
+            aria-expanded={moreOpen}
+            aria-current={moreActive ? "true" : undefined}
           >
-
             <span className="mobile-bottom-nav-icon">
-
-              <MoreHorizontal
-                size={21}
-              />
-
+              <MoreHorizontal size={24} weight="bold" aria-hidden="true" />
             </span>
-
-
-            <span className="mobile-bottom-nav-label">
-              More
-            </span>
-
+            <span className="mobile-bottom-nav-label">More</span>
           </button>
-
         </div>
-
       </nav>
-
-
-      <MobileMoreSheet
-        open={
-          moreOpen
-        }
-        onClose={() =>
-          setMoreOpen(
-            false
-          )
-        }
-      />
-
+      {moreOpen && <MobileMoreSheet onClose={() => setMoreOpen(false)} />}
     </>
   );
 }
-
-
-export default MobileBottomNav;

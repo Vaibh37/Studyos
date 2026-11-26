@@ -1,0 +1,147 @@
+/* Shared compact-layout modal geometry. Existing dialog contents, validation,
+   dismissal rules and desktop styling remain owned by the original components.
+   Full-screen editors, Zen mode and anchored pickers are intentionally excluded. */
+
+@keyframes mobile-sheet-enter {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes mobile-sheet-dim {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  /* Include the body-level portals used by Tasks and Chats. */
+  :is(#root, body) :is(
+    .task-clean-backdrop,
+    .v2s-delete-overlay,
+    .v2c-delete-overlay,
+    .v2f-delete-overlay,
+    .n3-confirm-overlay,
+    .settings-v2-page .delete-modal-overlay,
+    .app-shell-v2 .delete-modal-overlay,
+    .app-shell-v2 ~ .delete-modal-overlay,
+    .chats-confirm-backdrop
+  ) {
+    position: fixed;
+    inset: 0;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    background: rgb(0 0 0 / 52%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overscroll-behavior: contain;
+    animation: mobile-sheet-dim 160ms ease-out !important;
+  }
+
+  :is(#root, body) :is(
+    .task-clean-backdrop .task-delete-modal,
+    .v2s-delete-modal,
+    .v2c-delete-modal,
+    .v2f-delete-modal,
+    .n3-confirm,
+    .delete-modal-overlay .settings-v2-modal,
+    .chats-confirm-dialog,
+    .community-groups .cg-dialog[open],
+    .n3-clean .nr-link-dialog[open]
+  ) {
+    box-sizing: border-box;
+    width: min(100%, 560px) !important;
+    max-width: 100% !important;
+    min-width: 0;
+    max-height: calc(100% - max(16px, env(safe-area-inset-top))) !important;
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top))) !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    border: 1px solid var(--color-border) !important;
+    border-bottom: 0 !important;
+    border-radius: 22px 22px 0 0 !important;
+    background: var(--color-surface) !important;
+    color: var(--color-text);
+    box-shadow: 0 -12px 48px #0003 !important;
+    animation: mobile-sheet-enter 240ms cubic-bezier(.2, .8, .2, 1) !important;
+  }
+
+  :is(#root, body) :is(
+    .task-clean-backdrop .task-delete-modal,
+    .v2s-delete-modal,
+    .v2c-delete-modal,
+    .v2f-delete-modal,
+    .n3-confirm,
+    .delete-modal-overlay .settings-v2-modal,
+    .chats-confirm-dialog
+  ) {
+    padding: 24px max(20px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)) !important;
+  }
+
+  :is(#root, body) :is(.cg-dialog[open], .nr-link-dialog[open]) {
+    inset: auto 0 0 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+  }
+
+  :is(#root, body) :is(.cg-dialog, .nr-link-dialog)::backdrop {
+    background: rgb(0 0 0 / 52%) !important;
+    backdrop-filter: none !important;
+    animation: mobile-sheet-dim 160ms ease-out;
+  }
+
+  :is(#root, body) :is(.cg-dialog-form, .nr-link-form) {
+    padding: 24px max(20px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)) !important;
+  }
+
+  /* Avoid scrolling the page behind an open application sheet. */
+  html:has(:is(
+    .task-clean-backdrop, .v2s-delete-overlay, .v2c-delete-overlay,
+    .v2f-delete-overlay, .n3-confirm-overlay, .delete-modal-overlay,
+    .chats-confirm-backdrop, .cg-dialog[open], .nr-link-dialog[open],
+    .mobile-more-sheet[open]
+  )) { overflow: hidden; }
+
+  :is(#root, body) :is(
+    .task-delete-modal-actions, .v2s-delete-actions, .v2c-delete-actions,
+    .v2f-delete-actions, .n3-confirm > div, .settings-v2-modal-actions,
+    .chats-confirm-actions, .cg-dialog-footer, .nr-dialog-actions
+  ) button { min-height: 44px !important; }
+
+  /* Confirmations stack their actions on phones: primary action first,
+     followed by the safe Cancel action. Group and link forms keep their layouts. */
+  @media (max-width: 480px) {
+    :is(#root, body) :is(
+      .task-delete-modal-actions, .v2s-delete-actions, .v2c-delete-actions,
+      .v2f-delete-actions, .n3-confirm > div, .settings-v2-modal-actions,
+      .chats-confirm-actions
+    ) {
+      display: flex !important;
+      flex-direction: column-reverse !important;
+      align-items: stretch !important;
+      gap: 8px !important;
+    }
+
+    :is(#root, body) :is(
+      .task-delete-modal-actions, .v2s-delete-actions, .v2c-delete-actions,
+      .v2f-delete-actions, .n3-confirm > div, .settings-v2-modal-actions,
+      .chats-confirm-actions
+    ) > button { width: 100% !important; }
+
+    :is(#root, body) :is(.v2s-delete-modal, .v2c-delete-modal, .v2f-delete-modal) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .mobile-more-sheet, .mobile-more-sheet::backdrop, .mobile-bottom-nav-item,
+  .mobile-bottom-nav-icon { animation: none !important; transition: none !important; }
+  :is(#root, body) :is(
+    .task-clean-backdrop, .task-delete-modal, .v2s-delete-overlay, .v2s-delete-modal,
+    .v2c-delete-overlay, .v2c-delete-modal, .v2f-delete-overlay, .v2f-delete-modal,
+    .n3-confirm-overlay, .n3-confirm, .delete-modal-overlay, .settings-v2-modal,
+    .chats-confirm-backdrop, .chats-confirm-dialog, .cg-dialog, .nr-link-dialog
+  ) { animation: none !important; transition: none !important; }
+}
