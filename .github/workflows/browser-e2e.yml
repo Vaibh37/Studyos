@@ -36,8 +36,6 @@ jobs:
       STUDYOS_E2E: isolated-local-only
       CI: "true"
       FIREBASE_CLI_DISABLE_USAGE: "true"
-      PLAYWRIGHT_MODULE: ${{ runner.temp }}/studyos-e2e-tools/node_modules/playwright/index.mjs
-      E2E_ARTIFACT_DIR: ${{ runner.temp }}/studyos-e2e-failures
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,6 +56,9 @@ jobs:
       - name: Prepare frontend fonts and screenshots
         run: npm run prebuild --prefix client
       - name: Run browser journeys with the local Firebase emulator
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/studyos-e2e-tools/node_modules/playwright/index.mjs
+          E2E_ARTIFACT_DIR: ${{ runner.temp }}/studyos-e2e-failures
         run: |
           "$RUNNER_TEMP/studyos-e2e-tools/node_modules/.bin/firebase" emulators:exec --only auth --project demo-studyos-e2e --config ops/e2e/firebase.json --non-interactive "node ops/e2e/run.mjs"
       - name: Keep screenshots from failed synthetic journeys

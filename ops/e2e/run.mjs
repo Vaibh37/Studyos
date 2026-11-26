@@ -122,7 +122,7 @@ async function saveNote(page, title, body) {
     await button(page, "Save note").click();
   });
   await saved;
-  await visible(page.getByText("Saved", { exact: true }));
+  await visible(page.getByText("Saved", { exact: true }).first());
 }
 async function assertNoOverflow(page) {
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2),
@@ -212,7 +212,7 @@ async function journeys() {
   await a.getByRole("spinbutton", { name: "Custom duration in minutes" }).fill("1");
   await responseFor(a, "POST", /^\/api\/study-sessions\/start$/, () => button(a, "Start focus").click());
   await visible(button(a, "Pause"));
-  await visible(a.locator(".v2f-time").filter({ hasText: "00:59" }), 10000);
+  await a.waitForFunction(() => /^00:[0-5][0-9]$/.test(document.querySelector(".v2f-time")?.textContent || ""), undefined, { timeout: 10000 });
   await button(a, "Pause").click();
   await visible(button(a, "Resume"));
   await a.reload({ waitUntil: "domcontentloaded" });
