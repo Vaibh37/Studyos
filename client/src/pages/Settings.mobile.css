@@ -126,37 +126,6 @@
    API STATUS
    ========================================================= */
 
-.settings-v2-page
-.settings-v2-api-pill {
-  display: inline-flex;
-
-  min-height: 36px;
-
-  flex: 0 0 auto;
-
-  align-items: center;
-
-  gap: 7px;
-
-  padding:
-    0
-    11px;
-
-  border:
-    1px solid
-    var(--color-border);
-
-  border-radius: 999px;
-
-  background:
-    var(--color-surface);
-
-  color:
-    var(--color-text-secondary);
-
-  font-size: 12px;
-  font-weight: 500;
-}
 
 .settings-v2-page
 .settings-v2-status-dot {
@@ -172,9 +141,6 @@
 }
 
 .settings-v2-page
-.settings-v2-api-online
-.settings-v2-status-dot,
-.settings-v2-page
 .settings-v2-backend-online
 .settings-v2-status-dot {
   background:
@@ -182,18 +148,12 @@
 }
 
 .settings-v2-page
-.settings-v2-api-offline
-.settings-v2-status-dot,
-.settings-v2-page
 .settings-v2-backend-offline
 .settings-v2-status-dot {
   background:
     var(--color-danger);
 }
 
-.settings-v2-page
-.settings-v2-api-checking
-.settings-v2-status-dot,
 .settings-v2-page
 .settings-v2-backend-checking
 .settings-v2-status-dot {
@@ -2502,11 +2462,6 @@ span:nth-child(3) {
     font-size: 32px;
   }
 
-  .settings-v2-page
-  .settings-v2-api-pill {
-    align-self: flex-start;
-  }
-
 
   /* =======================================================
      SHELL
@@ -2828,16 +2783,6 @@ span:nth-child(3) {
   margin: 0;
   font-size: 15px !important;
   line-height: 1.5;
-}
-
-.settings-v2-page.settings-clean .settings-v2-api-pill {
-  min-height: 32px !important;
-  padding: 0 9px !important;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  font-size: 13px !important;
-  font-weight: 500;
 }
 
 /* =========================================================
@@ -3968,11 +3913,6 @@ body:has(.settings-clean) .study-select-option-copy small {
 
   .settings-v2-page.settings-clean .settings-v2-header h1 {
     font-size: 28px !important;
-  }
-
-  .settings-v2-page.settings-clean .settings-v2-api-pill {
-    font-size: 12px !important;
-    min-height: 30px !important;
   }
 
   .settings-v2-page.settings-clean .settings-v2-section-heading {

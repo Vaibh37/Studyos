@@ -62,22 +62,6 @@
      ======================================================= */
 
   .settings-v2-page
-  .settings-v2-api-pill {
-    min-height:
-      30px !important;
-
-    padding:
-      0
-      9px !important;
-
-    gap:
-      5px !important;
-
-    font-size:
-      8px !important;
-  }
-
-  .settings-v2-page
   .settings-v2-status-dot {
     width:
       6px !important;
@@ -1211,9 +1195,7 @@
 
   /* status badges */
   .settings-v2-page
-  .settings-v2-status-badge,
-  .settings-v2-page
-  .settings-v2-api-pill {
+  .settings-v2-status-badge {
     font-size: 10px !important;
   }
 
