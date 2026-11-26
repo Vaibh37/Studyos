@@ -148,6 +148,7 @@ const {
 const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
 const { createSocketAdmission } = require("./utils/socketAdmission");
 const appCheckGuard = require("./middleware/appCheckGuard");
+const { createProductionMetrics } = require("./utils/productionMetrics");
 const {
   validateApiRequest,
   validateParsedJson,
@@ -223,6 +224,10 @@ app.set(
 // =========================================
 // MIDDLEWARE
 // =========================================
+
+const productionMetrics = createProductionMetrics({ activeSocketCount: () => io.sockets.sockets.size });
+// Mount before CORS/auth so rejected requests and rate limits are counted.
+app.use("/api", productionMetrics.middleware);
 
 // Apply even to early rejections (CORS, rate limit, bans, malformed bodies).
 app.use((req, res, next) => {
@@ -363,7 +368,8 @@ io.on(
     socket
   ) => {
     if (!enforceSocketExpiry(socket)) return;
-    console.log("Authenticated socket connected");
+    productionMetrics.socketOpened();
+    socket.once("disconnect", productionMetrics.socketClosed);
 
     // Fail early before any event handler can query MongoDB or broadcast.
     // Limit by authenticated account across every open tab and device.
@@ -399,18 +405,6 @@ io.on(
       socket
     );
 
-    // =====================================
-    // DISCONNECT
-    // =====================================
-
-    socket.on(
-      "disconnect",
-      (
-        reason
-      ) => {
-        console.log("Socket disconnected:", reason);
-      }
-    );
   }
 );
 
@@ -522,6 +516,9 @@ const startServer =
         });
       }, 30 * 1000);
       banRecheck.unref();
+
+      const metricsInterval = setInterval(() => productionMetrics.flush(), 5 * 60 * 1000);
+      metricsInterval.unref();
 
       server.listen(
         PORT,

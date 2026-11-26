@@ -8,6 +8,7 @@ const PUBLIC_SYSTEM_ROUTES = new Set([
   "/",
   "/health",
   "/health/db",
+  "/health/ready",
   "/health/auth",
   "/status",
   "/uptime",

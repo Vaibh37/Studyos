@@ -78,6 +78,7 @@ function validateParsedJson(req, res, next) {
 
 function safeApiErrorHandler(err, req, res, next) {
   if (res.headersSent) return next(err);
+  if (err.code === "ORIGIN_DENIED") return res.status(403).json({ message: "Origin not allowed" });
   if (err.type === "entity.too.large") {
     return res.status(413).json({ message: "Request body is too large" });
   }

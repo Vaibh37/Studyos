@@ -20,8 +20,14 @@ const packageJson =
     "../package.json"
   );
 
-const router =
-  express.Router();
+const router = express.Router();
+const { socialDB } = require("../config/socialDb");
+const { pingMongo, createReadinessProbe } = require("../utils/readiness");
+const readiness = createReadinessProbe({
+  checkMain: () => pingMongo(mongoose.connection),
+  checkSocial: () => pingMongo(socialDB),
+  checkAuthConfiguration: () => isFirebaseReady(),
+});
 
 // =========================================================
 // CONSTANTS
@@ -125,6 +131,8 @@ router.get(
         health:
           "/api/health",
 
+        readiness: "/api/health/ready",
+
         databaseHealth:
           "/api/health/db",
 
@@ -169,6 +177,13 @@ router.get(
     });
   }
 );
+
+// Full dependency readiness. Public, read-only, bounded and coalesced.
+// Firebase readiness describes SDK configuration, not a live user lookup.
+router.get("/health/ready", async (req, res) => {
+  const result = await readiness();
+  return res.status(result.status === "ok" ? 200 : 503).json(result);
+});
 
 // =========================================================
 // DATABASE HEALTH
