@@ -1,0 +1,248 @@
+/* StudyOS workspace geometry.
+   One responsive rail and shared rhythm for the standard product pages.
+   Full-screen Chats, mobile room and note editor overlays keep their
+   own viewport-managed layouts. */
+#root .app-shell-v2 {
+  --workspace-max: 1200px;
+  --workspace-gutter: var(--space-8);
+  --workspace-top: var(--space-7);
+  --workspace-bottom: var(--space-9);
+  --workspace-header-gap: var(--space-6);
+  --workspace-section-gap: var(--space-6);
+  --workspace-row-gap: var(--space-4);
+  --workspace-control-gap: var(--space-2);
+  --workspace-header-action-height: var(--space-8);
+}
+
+@media (max-width: 1199px) {
+  #root .app-shell-v2 {
+    --workspace-gutter: var(--space-6);
+    --workspace-top: var(--space-6);
+  }
+}
+
+@media (max-width: 900px) {
+  #root .app-shell-v2 {
+    --workspace-gutter: var(--space-4);
+    --workspace-top: var(--space-6);
+    --workspace-bottom: calc(92px + env(safe-area-inset-bottom));
+    --workspace-header-gap: var(--space-4);
+    --workspace-section-gap: var(--space-5);
+    --workspace-row-gap: var(--space-3);
+    --workspace-header-action-height: 44px;
+  }
+}
+
+/* Use the shell, not each individual page, for outside spacing. */
+#root .app-shell-v2 .app-shell-v2-main:not(:has(> .chats-page, .v2g-room.is-mobile-open)) {
+  padding: var(--workspace-top) var(--workspace-gutter) var(--workspace-bottom) !important;
+}
+
+#root .app-shell-v2-main > :is(
+  .ds-clean, .v2t-page, .v2s-page, .n3-page, .v2c-page,
+  .v2f-page, .sp-page, .slb-page, .settings-v2-page,
+  .v2g-page:not(:has(.v2g-room.is-mobile-open))
+) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: var(--workspace-max) !important;
+  min-width: 0;
+  margin-inline: auto !important;
+  padding: 0 !important;
+}
+
+/* Normal app headers align to the same content rail and title baseline.
+   Keep the dashboard's date and its reserved streak space. */
+#root .app-shell-v2-main :is(
+  .ds-header, .v2t-header, .v2s-header, .n3-header, .v2c-header,
+  .v2f-header, .sp-header, .slb-header, .v2g-header, .settings-v2-header
+) {
+  margin: 0 0 var(--workspace-header-gap) !important;
+  gap: var(--workspace-row-gap) !important;
+  align-items: center;
+}
+
+#root .app-shell-v2-main :is(
+  .ds-header, .v2t-header, .v2s-header, .n3-header, .v2c-header,
+  .v2f-header, .sp-header, .slb-header, .v2g-header, .settings-v2-header
+) h1 {
+  margin: 0 !important;
+}
+
+#root .app-shell-v2-main :is(
+  .v2t-header, .v2s-header, .n3-header, .v2c-header,
+  .v2f-header, .sp-header, .slb-header, .v2g-header, .settings-v2-header
+) h1 + p {
+  margin: var(--space-1) 0 0 !important;
+}
+
+#root .app-shell-v2-main .ds-date {
+  margin-bottom: var(--space-1);
+}
+
+#root .app-shell-v2-main .community-groups > .v2g-header {
+  padding: 0 !important;
+}
+
+/* Desktop Groups uses a grid; its row gap supplies the header separation. */
+@media (min-width: 761px) {
+  #root .app-shell-v2-main .community-groups:has(> .sgm-desktop) {
+    gap: var(--workspace-section-gap) var(--workspace-section-gap);
+  }
+
+  #root .app-shell-v2-main .community-groups:has(> .sgm-desktop) > .v2g-header {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* Section rhythm, without replacing existing grids, table columns or
+   responsive reordering. */
+#root .app-shell-v2-main :is(.ds-overview, .ds-progress-grid) {
+  margin-bottom: var(--workspace-section-gap);
+}
+
+#root .app-shell-v2-main .ds-progress-grid {
+  align-items: stretch;
+}
+
+#root .app-shell-v2-main .ds-overview {
+  padding-bottom: var(--space-5);
+}
+
+#root .app-shell-v2-main :is(
+  .ds-progress-grid, .ds-workspace, .ds-right-column,
+  .v2c-layout, .settings-v2-shell, .sp-main-grid, .sp-secondary-grid
+) {
+  gap: var(--workspace-section-gap) !important;
+}
+
+#root .app-shell-v2-main :is(.v2t-stats, .v2s-stats, .v2c-summary) {
+  margin-bottom: var(--workspace-row-gap) !important;
+  padding-bottom: var(--space-4) !important;
+}
+
+#root .app-shell-v2-main .v2t-stats {
+  gap: var(--workspace-row-gap) !important;
+  padding-top: var(--space-2) !important;
+}
+
+#root .app-shell-v2-main .v2s-toolbar {
+  margin-bottom: var(--workspace-row-gap);
+}
+
+#root .app-shell-v2-main :is(
+  .ds-header-actions, .v2c-header-actions, .v2f-header-actions,
+  .v2s-toolbar, .td-toolbar, .v2t-filters, .add-task-main-row
+) {
+  gap: var(--workspace-control-gap) !important;
+}
+
+/* Match paired header controls on both axes. Keep icon buttons square
+   and text buttons on a single line on narrow phones. */
+#root .app-shell-v2-main :is(
+  .ds-header-actions .ds-button,
+  .v2c-header-actions .v2c-primary-button,
+  .v2c-header-actions .v2c-secondary-button
+) {
+  min-height: var(--workspace-header-action-height) !important;
+}
+
+#root .app-shell-v2-main :is(
+  .ds-header-actions .ds-refresh,
+  .v2c-header-actions .v2c-secondary-button
+) {
+  width: var(--workspace-header-action-height) !important;
+  min-width: var(--workspace-header-action-height) !important;
+  height: var(--workspace-header-action-height) !important;
+  flex: 0 0 var(--workspace-header-action-height) !important;
+}
+
+#root .app-shell-v2-main .v2c-header-actions .v2c-primary-button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  padding-inline: var(--space-3) !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 350px) {
+  #root .app-shell-v2 {
+    --workspace-header-action-height: var(--space-8);
+  }
+
+  #root .app-shell-v2-main .v2c-header-actions .v2c-primary-button {
+    padding-inline: var(--space-2) !important;
+  }
+}
+
+/* A conditional Clear button must not leave an empty grid track. */
+@media (min-width: 701px) {
+  #root .app-shell-v2-main .v2t-dense .v2t-filters:not(:has(> .v2t-clear)) {
+    grid-template-columns:
+      minmax(100px, 1fr)
+      minmax(106px, 135px)
+      minmax(115px, 155px) !important;
+  }
+}
+
+/* Progress sections share a vertical baseline independent of chart sizes. */
+#root .app-shell-v2-main .sp-page :is(
+  .sp-daily-goal, .sp-main-grid, .sp-consistency,
+  .sp-subjects, .sp-secondary-grid
+) {
+  padding-block: var(--workspace-section-gap);
+}
+
+#root .app-shell-v2-main .sp-page .sp-stats {
+  padding-block: var(--space-1) var(--workspace-row-gap);
+}
+
+/* Keep Settings' two-column structure and responsive picker. */
+#root .settings-clean .settings-v2-section-heading {
+  gap: var(--workspace-control-gap) !important;
+  margin-bottom: var(--workspace-section-gap) !important;
+  padding-bottom: var(--workspace-row-gap) !important;
+}
+
+#root .settings-clean .settings-v2-section-stack {
+  gap: var(--workspace-section-gap) !important;
+}
+
+#root .settings-clean .settings-v2-row {
+  gap: var(--workspace-row-gap) !important;
+  padding-block: var(--space-3) !important;
+}
+
+#root .settings-clean .settings-v2-form {
+  gap: var(--workspace-row-gap) !important;
+  padding-top: var(--space-2) !important;
+}
+
+/* Chat deliberately occupies the available viewport. Align its desktop
+   horizontal inset, but don't interfere with its internal scrolling,
+   mobile conversation mode or composer position. */
+@media (min-width: 901px) {
+  #root .app-shell-v2-main:has(> .chats-page:not(.is-fullscreen)) {
+    padding-inline: var(--workspace-gutter) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  /* The main owns nav clearance; the content column must not add it again. */
+  #root .app-shell-v2-content:not(:has(> .app-shell-v2-main > .chats-page, .v2g-room.is-mobile-open)) {
+    padding-bottom: 0 !important;
+  }
+
+  #root .settings-clean .settings-v2-nav {
+    margin-bottom: var(--workspace-section-gap) !important;
+  }
+}
+
+/* Match the sidebar's internal 8px rhythm without changing collapse size. */
+#root .app-shell-v2 .study-sidebar:not(.is-collapsed) .app-shell-v2-sidebar-header {
+  margin-bottom: var(--space-6);
+}
+
+#root .app-shell-v2 .study-sidebar:not(.is-collapsed) .nav-item {
+  gap: var(--space-2);
+  padding: var(--space-2) !important;
+}
