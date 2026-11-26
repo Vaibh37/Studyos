@@ -255,21 +255,26 @@ async function journeys() {
   await composer(a).fill(second);
   await button(a, "Send message").click();
   await visible(b.locator(".chats-message-viewport").getByText(second, { exact: true }));
-  await b.reload({ waitUntil: "domcontentloaded" });
-  await visible(b.locator(".chats-message-viewport").getByText(second, { exact: true }));
-  console.log("PASS two-user live Socket.IO chat and persisted history");
+  console.log("PASS two-user live Socket.IO chat in both directions");
 
   const bytes = Buffer.from(label("StudyOS local file bytes") + "\n");
   const file = "studyos-e2e.txt";
   await a.locator('input[type="file"]').setInputFiles({ name: file, mimeType: "text/plain", buffer: bytes });
-  await responseFor(a, "POST", /^\/api\/groups\/[^/]+\/attachments\/finalize$/, () => button(a, "Send message").click());
+  const finalized = await responseFor(a, "POST", /^\/api\/groups\/[^/]+\/attachments\/finalize$/, () => button(a, "Send message").click());
+  const storedAttachment = (await finalized.json()).message.attachments[0];
+  assert.equal(storedAttachment.fileName, file);
+  assert.equal(storedAttachment.size, bytes.length);
+  await visible(button(a, "Download " + file));
   await visible(button(b, "Download " + file));
   const downloadPromise = b.waitForEvent("download", { timeout: 25_000 });
   await button(b, "Download " + file).click();
   const download = await downloadPromise;
   assert.equal(download.suggestedFilename(), file);
   assert.deepEqual(await readFile(await download.path()), bytes);
-  console.log("PASS presigned upload, finalize, realtime attachment and downloaded bytes");
+  await b.reload({ waitUntil: "domcontentloaded" });
+  await visible(b.locator(".chats-message-viewport").getByText(second, { exact: true }));
+  await visible(button(b, "Download " + file));
+  console.log("PASS presigned upload, finalize, realtime attachment, downloaded bytes and persisted chat history");
 
   // Responsive app shell on a touch-sized Chromium device, using a third
   // authenticated account and the actual mobile settings navigation.
