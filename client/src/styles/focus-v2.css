@@ -504,7 +504,7 @@
 .v2f-clean .v2f-header h1 {
   margin: 0 0 3px;
   font-size: 28px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
   color: var(--color-text);
@@ -560,7 +560,7 @@
 .v2f-clean .v2f-stat strong {
   color: var(--color-text);
   font-size: 24px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
@@ -720,7 +720,7 @@
   color: var(--color-text);
   font-family: var(--font-sans, inherit);
   font-size: 64px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   letter-spacing: -0.065em;
   font-variant-numeric: tabular-nums;
@@ -784,7 +784,7 @@
   background: var(--color-surface-hover);
   border-color: var(--color-border-strong);
   color: var(--color-text);
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .v2f-clean .v2f-custom {
@@ -913,7 +913,7 @@
 .v2f-clean .v2f-history-header h2 {
   margin: 0;
   font-size: 16px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
   color: var(--color-text);
 }
@@ -1254,7 +1254,7 @@
 
 .v2f-clean .v2f-stat strong {
   font-size: 26px !important;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .v2f-clean .v2f-config-label {

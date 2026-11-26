@@ -52,7 +52,7 @@
 .sp-header h1 {
   margin-bottom: 4px;
   font-size: 28px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -95,7 +95,7 @@
 .sp-section-heading h2 {
   color: var(--color-text);
   font-size: 15px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.4;
   letter-spacing: -0.015em;
 }
@@ -182,7 +182,7 @@
   color: var(--color-text);
   font-size: 25px;
   line-height: 1.2;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.035em;
   overflow-wrap: anywhere;
 }
@@ -216,7 +216,7 @@
 
 .sp-goal-percent {
   font-size: 22px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
 }
 
@@ -361,7 +361,7 @@
 
 .sp-chart-column.is-today > strong {
   color: var(--color-text);
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .sp-chart-column > small {
@@ -387,7 +387,7 @@
 .sp-total > strong {
   font-size: 30px;
   line-height: 1.2;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.04em;
 }
 
@@ -1021,7 +1021,7 @@
 
 .sp-page .sp-section-heading h2 {
   font-size: 18px !important;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .sp-page .sp-section-heading p,

@@ -1264,7 +1264,7 @@
       12px;
 
     font-weight:
-      550;
+      var(--font-weight-semibold);
 
     letter-spacing:
       -0.01em;
@@ -1599,7 +1599,7 @@
       10px;
 
     font-weight:
-      550;
+      var(--font-weight-semibold);
 
     letter-spacing:
       0.01em;
@@ -2041,7 +2041,7 @@
       11px;
 
     font-weight:
-      550;
+      var(--font-weight-semibold);
   }
 
 
@@ -2082,7 +2082,7 @@
       12px;
 
     font-weight:
-      550;
+      var(--font-weight-semibold);
 
     letter-spacing:
       0.07em;
@@ -2887,7 +2887,7 @@
     9.5px;
 
   font-weight:
-    450;
+    var(--font-weight-medium);
 
   line-height:
     1.35;
@@ -3140,7 +3140,7 @@
     9.5px;
 
   font-weight:
-    450;
+    var(--font-weight-medium);
 
   line-height:
     1.35;

@@ -171,7 +171,7 @@
   display: block;
   color: var(--color-text);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.4;
 }
 
@@ -577,7 +577,7 @@
 .v2g-empty-card.compact h3 {
   margin-top: 6px;
   font-size: 15px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .v2g-empty-card.compact p {

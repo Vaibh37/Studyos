@@ -566,7 +566,7 @@ select:focus-visible,
     18px;
 
   font-weight:
-    650;
+    var(--font-weight-bold);
 
   line-height:
     1.2;
@@ -1493,7 +1493,7 @@ svg {
       15px;
 
     font-weight:
-      650;
+      var(--font-weight-bold);
 
     letter-spacing:
       -0.025em;

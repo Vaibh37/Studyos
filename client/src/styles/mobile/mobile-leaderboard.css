@@ -233,7 +233,7 @@
       16px;
 
     font-weight:
-      650;
+      var(--font-weight-bold);
 
     letter-spacing:
       -0.035em;

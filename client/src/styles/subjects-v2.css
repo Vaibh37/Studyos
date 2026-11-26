@@ -1711,7 +1711,7 @@ div {
 .v2s-clean .v2s-header h1 {
   margin: 0 0 4px;
   font-size: 28px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -1776,7 +1776,7 @@ div {
 .v2s-clean .v2s-stat > strong {
   margin: 0;
   font-size: 24px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;

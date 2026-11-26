@@ -49,7 +49,7 @@
 .community-chats .chats-rooms-header h2,
 .community-chats .chats-active-title h2 {
   font-size: 18px !important;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   margin: 0 !important;
 }
 
@@ -174,7 +174,7 @@
 
   font: inherit;
   font-size: 14px;
-  font-weight: 550;
+  font-weight: var(--font-weight-semibold);
 
   min-height: 38px;
 
@@ -276,7 +276,7 @@
   margin: 0;
 
   font-size: 21px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.02em;
 }
 
@@ -299,7 +299,7 @@
   gap: 6px;
 
   font-size: 14px;
-  font-weight: 550;
+  font-weight: var(--font-weight-semibold);
 }
 
 .community-groups .cg-fields :is(input, textarea) {
@@ -349,7 +349,7 @@
   margin-bottom: 7px;
 
   font-size: 14px;
-  font-weight: 550;
+  font-weight: var(--font-weight-semibold);
 }
 
 .community-groups .cg-visibility button[aria-pressed="true"] {

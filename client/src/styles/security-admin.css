@@ -2,7 +2,7 @@
 .security-admin__heading { margin-bottom: 28px; }
 .security-admin__eyebrow { font-size: 11px; letter-spacing: .16em; font-weight: 700; text-transform: uppercase; color: #9b9b9b; margin-bottom: 10px; }
 .security-admin h1 { font-size: 28px; font-weight: 700; letter-spacing: -.035em; margin: 0 0 8px; }
-.security-admin h2 { font-size: 17px; font-weight: 650; margin: 0 0 16px; }
+.security-admin h2 { font-size: 17px; font-weight: var(--font-weight-bold); margin: 0 0 16px; }
 .security-admin p { line-height: 1.55; }
 .security-admin__heading > p:last-child { font-size: 14px; color: #9c9c9c; max-width: 690px; }
 .security-admin__panel { border: 1px solid #333; border-radius: 10px; background: #141414; padding: 24px; margin-bottom: 20px; font-size: 14px; }
@@ -12,7 +12,7 @@
 .security-admin__form > label:not(.security-admin__checkbox) { display: flex; flex-direction: column; gap: 7px; font-size: 13px; color: #ccc; }
 .security-admin__form input:not([type=checkbox]) { background: #0c0c0c; color: #f3f3f3; padding: 12px; font-size: 14px; width: 100%; border: 1px solid #393939; border-radius: 6px; }
 .security-admin__checkbox { display: flex; align-items: center; gap: 10px; font-size: 13px; align-self: center; }
-.security-admin__form button, .security-admin__list button, .security-admin__listHeading button { border-radius: 6px; border: 1px solid #555; background: #f1f1f1; color: #111; padding: 10px 14px; font-weight: 650; cursor: pointer; }
+.security-admin__form button, .security-admin__list button, .security-admin__listHeading button { border-radius: 6px; border: 1px solid #555; background: #f1f1f1; color: #111; padding: 10px 14px; font-weight: var(--font-weight-bold); cursor: pointer; }
 .security-admin button:disabled { opacity: .5; cursor: not-allowed; }
 .security-admin__hint { font-size: 12px; margin: 17px 0 0; }
 .security-admin__listHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

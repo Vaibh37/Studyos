@@ -7,7 +7,7 @@
   --ui-action-size: 38px;
   --ui-action-compact: 30px;
   --ui-action-label: 14px;
-  --ui-action-weight: 550;
+  --ui-action-weight: var(--type-label-weight);
   --ui-action-shadow: 0 1px 2px var(--color-control-shadow),
     inset 0 1px 0 var(--color-control-highlight);
   --ui-action-pressed-shadow: inset 0 1px 2px var(--color-control-shadow);
@@ -26,7 +26,7 @@
 ) h1 {
   font-family: var(--font-display) !important;
   font-size: 28px !important;
-  font-weight: 630 !important;
+  font-weight: var(--type-title-weight) !important;
   letter-spacing: -0.035em !important;
   line-height: 1.2 !important;
   overflow-wrap: anywhere;
@@ -38,35 +38,55 @@
   .chats-page-header, .settings-v2-header
 ) p {
   font-size: 14px !important;
-  font-weight: 400 !important;
+  font-weight: var(--type-body-weight) !important;
   line-height: 1.5 !important;
   letter-spacing: -0.008em;
 }
 
 #root .app-shell-v2 .study-sidebar .nav-item {
   font-size: 14px !important;
-  font-weight: 500;
+  font-weight: var(--type-label-weight) !important;
   letter-spacing: -0.008em;
 }
 
 #root .app-shell-v2 .study-sidebar .nav-item.active {
-  font-weight: 600;
+  font-weight: var(--type-title-weight) !important;
 }
 
 #root .settings-clean .settings-v2-section-heading h2 {
   font-size: 23px !important;
-  font-weight: 620 !important;
+  font-weight: var(--type-title-weight) !important;
   letter-spacing: -0.027em !important;
 }
 
 #root .settings-clean .settings-v2-panel-header h3 {
   font-size: 18px !important;
-  font-weight: 600 !important;
+  font-weight: var(--type-section-weight) !important;
   letter-spacing: -0.018em !important;
 }
 
 #root .settings-clean .settings-v2-row-copy strong {
-  font-weight: 580 !important;
+  font-weight: var(--type-label-weight) !important;
+}
+
+/* Use a single weight hierarchy on repeated app navigation and section labels. */
+#root .settings-clean .settings-v2-nav-copy strong {
+  font-weight: var(--type-label-weight) !important;
+}
+
+#root .settings-clean .settings-v2-nav-item.active strong {
+  font-weight: var(--type-title-weight) !important;
+}
+
+#root .app-shell-v2 .mobile-bottom-nav-label {
+  font-weight: var(--type-label-weight) !important;
+}
+
+/* Preserve the user-authored writing surface and conversation readability.
+   Bold text and headings inside the editor continue to have their own emphasis. */
+#root .n3-clean :is(.nr-document, .nr-markdown-source),
+#root .chats-message-content {
+  font-weight: var(--type-prose-weight);
 }
 
 /* Semantic actions share a state machine; pages keep their own spacing and

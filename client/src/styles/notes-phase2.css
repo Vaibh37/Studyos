@@ -58,7 +58,7 @@
 .n3-header h1 {
   margin: 4px 0 3px;
   font-size: clamp(29px, 3vw, 38px);
-  font-weight: 750;
+  font-weight: var(--font-weight-bold);
   line-height: 1.15;
   letter-spacing: -0.04em;
 }
@@ -567,7 +567,7 @@
   background: transparent;
   color: var(--color-text);
   font-size: 28px;
-  font-weight: 750;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -1044,7 +1044,7 @@
 .n3-clean .n3-header h1 {
   margin: 0 0 4px;
   font-size: 28px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -1163,7 +1163,7 @@
 
 .n3-clean .n3-library-heading h2 {
   font-size: 14px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .n3-clean .n3-library-heading > span {
@@ -1502,7 +1502,7 @@
 .nr-document h2 {
   margin: 20px 0 10px;
   font-size: 22px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.4;
   letter-spacing: -0.02em;
 }
@@ -1510,7 +1510,7 @@
 .nr-document h3 {
   margin: 16px 0 8px;
   font-size: 18px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.4;
 }
 
@@ -2432,7 +2432,7 @@ ul[data-type="taskList"] {
 .nr-link-form h2 {
   margin: 0;
   font-size: 19px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.025em;
 }
 
@@ -2602,7 +2602,7 @@ ul[data-type="taskList"] {
 
 .n3-clean .n3-confirm h2 {
   font-size: 19px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.025em;
 }
 
