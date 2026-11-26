@@ -392,7 +392,7 @@ span {
     10px;
 
   font-weight:
-    550;
+    var(--font-weight-semibold);
 }
 
 
@@ -601,7 +601,7 @@ button.active {
     11px;
 
   font-weight:
-    550;
+    var(--font-weight-semibold);
 }
 
 

@@ -90,6 +90,13 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
+  /* Product type hierarchy; keep authored prose at regular weight. */
+  --type-body-weight: var(--font-weight-medium);
+  --type-label-weight: var(--font-weight-semibold);
+  --type-title-weight: var(--font-weight-bold);
+  --type-section-weight: var(--font-weight-semibold);
+  --type-prose-weight: var(--font-weight-normal);
+
 
   /* =======================================================
      LINE HEIGHT

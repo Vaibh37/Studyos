@@ -54,7 +54,7 @@
   color: var(--color-text);
   font: inherit;
   font-size: 12px;
-  font-weight: 550;
+  font-weight: var(--font-weight-semibold);
   text-align: left;
   cursor: pointer;
 }
@@ -331,7 +331,7 @@
   .sg-invite-card .v2g-panel-heading h3 {
     margin: 0 !important;
     font-size: 14px !important;
-    font-weight: 650 !important;
+    font-weight: var(--font-weight-bold) !important;
     letter-spacing: -0.02em;
   }
 

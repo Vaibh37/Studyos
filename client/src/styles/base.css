@@ -61,7 +61,7 @@ body {
     var(--font-size-base);
 
   font-weight:
-    var(--font-weight-normal);
+    var(--type-body-weight);
 
   line-height:
     var(--line-height-base);
@@ -115,6 +115,8 @@ h6 {
 
 
 h1 {
+  font-weight: var(--type-title-weight);
+
   font-size:
     var(--font-size-3xl);
 
@@ -250,7 +252,7 @@ button {
     var(--font-size-sm);
 
   font-weight:
-    var(--font-weight-medium);
+    var(--type-label-weight);
 
   line-height:
     1.2;
@@ -288,7 +290,7 @@ select {
     var(--font-size-sm);
 
   font-weight:
-    var(--font-weight-normal);
+    var(--type-body-weight);
 
   line-height:
     1.4;

@@ -71,7 +71,7 @@
   gap: 8px;
   color: var(--color-text-muted);
   font-size: 13px;
-  font-weight: 550;
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   transition:
     color var(--transition-fast),
@@ -171,7 +171,7 @@
   margin-bottom: 18px;
   color: var(--color-text-muted);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -181,7 +181,7 @@
   margin: 0;
   color: var(--color-text);
   font-size: clamp(54px, 5.7vw, 86px);
-  font-weight: 590;
+  font-weight: var(--font-weight-semibold);
   line-height: 0.94;
   letter-spacing: -0.068em;
 }
@@ -209,7 +209,7 @@
   margin-top: 42px;
   color: var(--color-text-faint);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
@@ -319,7 +319,7 @@ body.light-theme
   margin-bottom: 11px;
   color: var(--color-text-faint);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.13em;
 }
 
@@ -328,7 +328,7 @@ body.light-theme
   margin: 0;
   color: var(--color-text);
   font-size: clamp(27px, 2.2vw, 34px);
-  font-weight: 610;
+  font-weight: var(--font-weight-semibold);
   line-height: 1.08;
   letter-spacing: -0.045em;
 }
@@ -374,7 +374,7 @@ body.light-theme
   background: var(--color-surface-subtle);
   color: var(--color-text-secondary);
   font-size: 13px;
-  font-weight: 540;
+  font-weight: var(--font-weight-semibold);
   text-align: left;
   transition:
     background var(--transition-fast),
@@ -422,7 +422,7 @@ body.light-theme
 .auth-v1-provider small {
   color: var(--color-text-faint);
   font-size: 10px;
-  font-weight: 550;
+  font-weight: var(--font-weight-semibold);
 }
 
 .auth-v1-provider-disabled {
@@ -481,7 +481,7 @@ body.light-theme
   background: var(--color-solid);
   color: var(--color-solid-text);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   text-align: left;
   transition:
     background var(--transition-fast),
@@ -546,7 +546,7 @@ body.light-theme
   background: transparent;
   color: var(--color-text-muted);
   font-size: 12px;
-  font-weight: 540;
+  font-weight: var(--font-weight-semibold);
 }
 
 .auth-v1-back:hover:not(:disabled) {
@@ -648,7 +648,7 @@ body.light-theme
   background: var(--color-solid);
   color: var(--color-solid-text);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   transition:
     background var(--transition-fast),
     transform var(--transition-fast);
@@ -675,7 +675,7 @@ body.light-theme
   background: transparent;
   color: var(--color-text);
   font-size: 11.5px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .auth-v1-switch button:hover:not(:disabled) {

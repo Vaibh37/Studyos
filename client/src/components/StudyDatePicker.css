@@ -535,7 +535,7 @@ button {
     11px;
 
   font-weight:
-    550;
+    var(--font-weight-semibold);
 }
 
 

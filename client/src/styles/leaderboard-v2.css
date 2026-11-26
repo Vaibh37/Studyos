@@ -1699,7 +1699,7 @@
 
 .slb-page .slb-stat > strong {
   font-size: 26px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
@@ -1725,7 +1725,7 @@
 
 .slb-page .slb-board-heading h2 {
   font-size: 18px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.02em;
 }
 
@@ -1879,7 +1879,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font-size: 12px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .slb-page .slb-name {
@@ -1910,7 +1910,7 @@
 
 .slb-page .slb-table tbody td.slb-score {
   color: var(--color-text);
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 /* =========================================================
@@ -2040,7 +2040,7 @@
 
 .slb-page .slb-empty h2 {
   font-size: 18px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   color: var(--color-text);
 }
 

@@ -2180,7 +2180,7 @@ button.is-danger:hover {
 .v2c-clean .v2c-header h1 {
   margin: 0 0 4px;
   font-size: 28px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -2269,7 +2269,7 @@ button.is-danger:hover {
 .v2c-clean .v2c-summary article strong {
   margin: 0;
   font-size: 24px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
@@ -2315,7 +2315,7 @@ button.is-danger:hover {
   margin: 0;
   color: var(--color-text);
   font-size: 19px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.025em;
 }
 
@@ -2553,7 +2553,7 @@ button.is-danger:hover {
 .v2c-clean .v2c-selected-header h2 {
   margin: 0;
   font-size: 22px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
   line-height: 1.2;
   letter-spacing: -0.035em;
 }
@@ -2630,7 +2630,7 @@ button.is-danger:hover {
 .v2c-clean .v2c-section-header h3 {
   margin: 0;
   font-size: 14px;
-  font-weight: 650;
+  font-weight: var(--font-weight-bold);
 }
 
 .v2c-clean .v2c-section-header > span {

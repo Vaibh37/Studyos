@@ -458,7 +458,7 @@ strong {
     13px;
 
   font-weight:
-    550;
+    var(--font-weight-semibold);
 
   line-height:
     1.3;
