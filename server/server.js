@@ -146,6 +146,7 @@ const {
   runGroupOrphanSweep,
 } = require("./services/r2OrphanSweep");
 const { registerSocketInboundProtection } = require("./utils/socketInboundProtection");
+const { createSocketAdmission } = require("./utils/socketAdmission");
 const appCheckGuard = require("./middleware/appCheckGuard");
 const {
   validateApiRequest,
@@ -154,11 +155,13 @@ const {
 } = require("./middleware/apiRequestSafety");
 const {
   SOCKET_SESSION_CHECK_MS,
+  enforceSocketExpiry,
   disconnectInvalidFirebaseSockets,
 } = require("./utils/firebaseSocketSessionGuard");
 
 const app =
   express();
+app.disable("x-powered-by");
 
 // =========================================
 // TRUST RENDER REVERSE PROXY
@@ -190,8 +193,10 @@ const io =
   new Server(
     server,
     {
-      cors:
-        corsOptions,
+      cors: corsOptions,
+      allowRequest: createSocketAdmission(),
+      maxHttpBufferSize: 32 * 1024,
+      connectTimeout: 30_000,
     }
   );
 
@@ -219,11 +224,14 @@ app.set(
 // MIDDLEWARE
 // =========================================
 
-app.use(
-  cors(
-    corsOptions
-  )
-);
+// Apply even to early rejections (CORS, rate limit, bans, malformed bodies).
+app.use((req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("Cache-Control", "no-store");
+  res.set("Referrer-Policy", "no-referrer");
+  next();
+});
+app.use(cors(corsOptions));
 
 // =========================================
 // GLOBAL API RATE LIMIT
@@ -245,12 +253,6 @@ app.use("/api", validateParsedJson);
 // Audit mode or explicit enforcement; disabled by default until rollout.
 app.use("/api", appCheckGuard.http);
 
-// Minimal API hardening that does not affect the frontend application.
-app.use("/api", (req, res, next) => {
-  res.set("X-Content-Type-Options", "nosniff");
-  res.set("Cache-Control", "no-store");
-  next();
-});
 
 // =========================================
 // ROOT
@@ -360,11 +362,8 @@ io.on(
   (
     socket
   ) => {
-    console.log(
-      "Authenticated socket connected:",
-      socket.id,
-      socket.user.uid
-    );
+    if (!enforceSocketExpiry(socket)) return;
+    console.log("Authenticated socket connected");
 
     // Fail early before any event handler can query MongoDB or broadcast.
     // Limit by authenticated account across every open tab and device.
@@ -409,12 +408,7 @@ io.on(
       (
         reason
       ) => {
-        console.log(
-          "Socket disconnected:",
-          socket.id,
-          socket.user.uid,
-          reason
-        );
+        console.log("Socket disconnected:", reason);
       }
     );
   }

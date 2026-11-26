@@ -8,12 +8,7 @@ const GroupMember =
 // ROOM NAME
 // =========================================
 
-const getGroupRoom =
-  (
-    groupId
-  ) => {
-    return `group:${groupId}`;
-  };
+const { getGroupRoom } = require("../utils/groupRoomAccess");
 
 
 // =========================================

@@ -1,3 +1,5 @@
+const { validAuthToken } = require("../utils/authToken");
+const { authenticatedApiLimiter } = require("./rateLimiters");
 const firebaseAdminAuth =
   require(
     "../config/firebaseAdmin"
@@ -18,7 +20,7 @@ const firebaseAuth =
       // =====================================
 
       if (
-        !authHeader ||
+        typeof authHeader !== "string" ||
         !authHeader.startsWith(
           "Bearer "
         )
@@ -40,7 +42,7 @@ const firebaseAuth =
           .slice(7)
           .trim();
 
-      if (!token) {
+      if (!validAuthToken(token)) {
         return res
           .status(401)
           .json({
@@ -87,11 +89,11 @@ const firebaseAuth =
           "unknown",
       };
 
-      next();
+      return authenticatedApiLimiter(req, res, next);
     } catch (error) {
       console.error(
         "FIREBASE AUTH ERROR:",
-        error.message
+        error?.code || "verification_failed"
       );
 
       return res

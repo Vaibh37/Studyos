@@ -7,7 +7,10 @@
 // an appropriate shared adapter is configured.
 
 const getAuthenticatedUserRoom = (uid) => `user:${String(uid)}`;
-const getGroupRoom = (groupId) => `group:${String(groupId)}`;
+const getGroupRoom = (groupId) => {
+  const id = String(groupId);
+  return `group:${/^[a-f\d]{24}$/i.test(id) ? id.toLowerCase() : id}`;
+};
 
 function revokeMemberGroupAccess(io, groupId, uid) {
   if (!io || !groupId || !uid) return;
@@ -28,6 +31,7 @@ function disconnectAccountSockets(io, uid) {
 }
 
 module.exports = {
+  getGroupRoom,
   getAuthenticatedUserRoom,
   revokeMemberGroupAccess,
   revokeDeletedGroupAccess,

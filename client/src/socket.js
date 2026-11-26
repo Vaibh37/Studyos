@@ -4,25 +4,26 @@ import { getAppCheckToken } from "./services/appCheck";
 
 // All StudyOS pages share one socket and one token-refresh schedule.
 let socket = null;
-let socketUserId = null;
+let socketUser = null;
 let tokenRefreshInterval = null;
-let refreshing = false;
+let refreshingTarget = null;
 
 const refreshAndReconnect = async (target, forceRefresh = true) => {
-  if (target !== socket || refreshing) return;
+  if (target !== socket || refreshingTarget === target) return;
   const user = auth.currentUser;
-  if (!user || user.uid !== socketUserId) {
+  if (!user || user !== socketUser) {
     disconnectSocket();
     return;
   }
 
-  refreshing = true;
+  refreshingTarget = target;
   try {
     // Firebase refresh fails if the user's refresh credentials are revoked,
     // disabled, or no longer valid. Never reuse the previous access token.
     const token = await user.getIdToken(forceRefresh);
-    if (target !== socket || auth.currentUser?.uid !== socketUserId) return;
+    if (target !== socket || auth.currentUser !== user || socketUser !== user) return;
     const appCheckToken = await getAppCheckToken();
+    if (target !== socket || auth.currentUser !== user || socketUser !== user) return;
     target.auth = { token, appCheckToken };
     if (target.connected) target.disconnect();
     target.connect();
@@ -30,7 +31,7 @@ const refreshAndReconnect = async (target, forceRefresh = true) => {
     console.warn("Socket session refresh failed:", error?.message || error);
     if (target === socket) target.disconnect();
   } finally {
-    refreshing = false;
+    if (refreshingTarget === target) refreshingTarget = null;
   }
 };
 
@@ -46,7 +47,7 @@ export const connectSocket = async () => {
   }
 
   // Never reuse a previous user's socket after switching accounts.
-  if (socket && socketUserId !== user.uid) disconnectSocket();
+  if (socket && socketUser !== user) disconnectSocket();
   if (socket) {
     socket.auth = { token, appCheckToken };
     if (!socket.connected) socket.connect();
@@ -55,7 +56,7 @@ export const connectSocket = async () => {
 
   const connectedSocket = io(API_URL, { auth: { token, appCheckToken } });
   socket = connectedSocket;
-  socketUserId = user.uid;
+  socketUser = user;
 
   connectedSocket.on("connect", () => {
     console.log("Socket connected:", connectedSocket.id);
@@ -84,14 +85,17 @@ export const connectSocket = async () => {
 };
 
 export const getSocket = () => socket;
+export const disconnectObsoleteSocket = user => {
+  if (socket && socketUser !== user) disconnectSocket();
+};
 
 export const disconnectSocket = () => {
   if (tokenRefreshInterval) {
     clearInterval(tokenRefreshInterval);
     tokenRefreshInterval = null;
   }
-  refreshing = false;
-  socketUserId = null;
+  refreshingTarget = null;
+  socketUser = null;
   if (!socket) return;
   const previous = socket;
   socket = null;

@@ -162,6 +162,17 @@ test("inbound event limits block database floods across tabs, not other accounts
       "group:typing:stop", { groupId }
     )).ok, true);
     assert.equal(heartbeatWrites, 6);
+
+    // A malicious selector must never reach the membership or live-session
+    // query, even for an authenticated user with a valid membership.
+    const beforeMalformed = memberQueries;
+    const invalid = await other.timeout(3000).emitWithAck("group:join", { groupId: { $ne: null } });
+    assert.equal(invalid.ok, false);
+    assert.match(invalid.message, /Invalid event arguments/);
+    const malformedAck = await other.timeout(3000).emitWithAck("group:join", { groupId }, "not-a-callback");
+    assert.equal(malformedAck.ok, false);
+    assert.equal(memberQueries, beforeMalformed);
+    assert.equal((await join(other)).ok, true, "legitimate group traffic still works");
   } finally {
     GroupMember.findOne = originalMemberLookup;
     LiveSession.findOneAndUpdate = originalHeartbeatUpdate;

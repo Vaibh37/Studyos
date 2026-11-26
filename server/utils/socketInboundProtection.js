@@ -1,4 +1,5 @@
 const { createSocketRateLimiter } = require("./socketRateLimiter");
+const { validateSocketPacket } = require("./socketEventValidation");
 
 // All limits are shared between sockets for a Firebase UID, not per tab.
 // They protect MongoDB and room broadcasts from authenticated event floods.
@@ -12,7 +13,7 @@ const eventPolicies = {
   "group:message:reaction-toggle": [[10_000, 8], [60_000, 40]],
   "group:message:read": [[10_000, 12], [60_000, 80]],
   "group:message:unsend": [[10_000, 8], [60_000, 40]],
-  "group:message:delete": [[10_000, 12], [60_000, 60]],
+  "group:message:delete-for-me": [[10_000, 12], [60_000, 60]],
   "focus:start": [[10_000, 6], [60_000, 30]],
   "focus:stop": [[10_000, 6], [60_000, 30]],
   "focus:heartbeat": [[10_000, 5], [60_000, 20]],
@@ -66,6 +67,11 @@ function registerSocketInboundProtection(socket) {
       return; // Drop, not merely warn: no handler, DB call or broadcast.
     }
 
+    if (!validateSocketPacket(packet)) {
+      const ack = packet.at(-1);
+      if (typeof ack === "function") ack({ ok: false, message: "Invalid event arguments" });
+      return;
+    }
     next();
   });
 }

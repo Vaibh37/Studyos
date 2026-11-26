@@ -1,3 +1,4 @@
+const { publicGroupMessage } = require("../utils/publicGroupMessage");
 const express =
   require("express");
 
@@ -96,11 +97,7 @@ const ALLOWED_MIME_TYPES =
 // GROUP ROOM
 // =========================================================
 
-function getGroupRoom(
-  groupId
-) {
-  return `group:${groupId}`;
-}
+const { getGroupRoom } = require("../utils/groupRoomAccess");
 
 
 // =========================================================
@@ -246,7 +243,7 @@ router.post(
 
 
       if (
-        !Number.isFinite(
+        !Number.isSafeInteger(
           numericSize
         ) ||
         numericSize <= 0
@@ -301,6 +298,7 @@ router.post(
         await createUploadUrl({
           storageKey,
           mimeType,
+          size: numericSize,
         });
 
 
@@ -1083,7 +1081,7 @@ router.post(
 
 
       const outgoingMessage =
-        savedMessage.toObject();
+        publicGroupMessage(savedMessage);
 
 
       // -----------------------------------------

@@ -1,3 +1,4 @@
+const { publicGroupMessage } = require("../utils/publicGroupMessage");
 const GroupMember =
   require(
     "../models/social/GroupMember"
@@ -68,12 +69,7 @@ const groupMessageSendLimiter =
 // ROOM NAME
 // =========================================
 
-const getGroupRoom =
-  (
-    groupId
-  ) => {
-    return `group:${groupId}`;
-  };
+const { getGroupRoom } = require("../utils/groupRoomAccess");
 
 
 // =========================================
@@ -350,7 +346,7 @@ const registerLiveStudySocket =
           );
 
           const outgoingMessage =
-            savedMessage.toObject();
+            publicGroupMessage(savedMessage);
 
           io
             .to(
@@ -618,15 +614,7 @@ const registerLiveStudySocket =
             await scrubReplySnapshots();
 
 
-            const existingMessage = {
-              ...groupMessage.toObject(),
-
-              attachments:
-                [],
-
-              reactions:
-                [],
-            };
+            const existingMessage = publicGroupMessage(groupMessage);
 
 
             return callback?.({
@@ -677,15 +665,7 @@ const registerLiveStudySocket =
           // ATTACHMENTS FROM AN UNSENT MESSAGE
           // ---------------------------------
 
-          const outgoingMessage = {
-            ...groupMessage.toObject(),
-
-            attachments:
-              [],
-
-            reactions:
-              [],
-          };
+          const outgoingMessage = publicGroupMessage(groupMessage);
 
 
           // ---------------------------------

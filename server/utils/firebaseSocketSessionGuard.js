@@ -64,7 +64,21 @@ async function disconnectInvalidFirebaseSockets(
   return { checkedSockets: sockets.length, checkedUsers: userIds.length, disconnected };
 }
 
+// Token expiry must not depend on the provider responding to the periodic
+// revocation check. Schedule an independent disconnect for every verified
+// socket, including passive recipients of private group broadcasts.
+function enforceSocketExpiry(socket, { clock = Date.now, schedule = setTimeout, cancel = clearTimeout } = {}) {
+  const expiry = socket.data.firebaseSession?.expiresAt;
+  const delay = Number.isFinite(expiry) ? expiry * 1000 - clock() : 0;
+  if (delay <= 0) { socket.disconnect(true); return false; }
+  const timer = schedule(() => socket.disconnect(true), Math.min(delay, 2_147_483_647));
+  timer?.unref?.();
+  socket.once("disconnect", () => cancel(timer));
+  return true;
+}
+
 module.exports = {
+  enforceSocketExpiry,
   SOCKET_SESSION_CHECK_MS,
   isSessionInvalid,
   disconnectInvalidFirebaseSockets,

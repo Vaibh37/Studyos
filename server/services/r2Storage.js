@@ -115,6 +115,7 @@ function createGroupStorageKey(
 async function createUploadUrl({
   storageKey,
   mimeType,
+  size,
 }) {
   if (!storageKey) {
     throw new Error(
@@ -128,6 +129,10 @@ async function createUploadUrl({
     );
   }
 
+  if (!Number.isSafeInteger(size) || size < 1 || size > 25 * 1024 * 1024) {
+    throw new Error("Valid upload size is required.");
+  }
+
   const command =
     new PutObjectCommand({
       Bucket:
@@ -136,8 +141,8 @@ async function createUploadUrl({
       Key:
         storageKey,
 
-      ContentType:
-        mimeType,
+      ContentType: mimeType,
+      ContentLength: size,
     });
 
   const uploadUrl =
@@ -145,8 +150,11 @@ async function createUploadUrl({
       r2Client,
       command,
       {
-        expiresIn:
-          UPLOAD_URL_EXPIRES_IN,
+        expiresIn: UPLOAD_URL_EXPIRES_IN,
+        // AWS's S3 signer excludes Content-Type by default. Sign both the
+        // approved type and exact length at the storage boundary, not only
+        // in the later chat-message finalization.
+        signableHeaders: new Set(["content-type", "content-length"]),
       }
     );
 

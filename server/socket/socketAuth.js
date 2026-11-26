@@ -1,3 +1,4 @@
+const { validAuthToken } = require("../utils/authToken");
 const firebaseAdminAuth =
   require(
     "../config/firebaseAdmin"
@@ -17,7 +18,7 @@ const socketAuth =
         socket.handshake.auth
           ?.token;
 
-      if (!token) {
+      if (!validAuthToken(token)) {
         return next(
           new Error(
             "Authentication required"
@@ -72,7 +73,7 @@ const socketAuth =
     } catch (error) {
       console.error(
         "SOCKET AUTH ERROR:",
-        error.message
+        error?.code || "verification_failed"
       );
 
       next(
