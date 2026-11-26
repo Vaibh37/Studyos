@@ -1,3 +1,4 @@
+import DialogSurface from "../components/DialogSurface";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import {
@@ -2360,102 +2361,6 @@ function Settings() {
     return () => cancelAnimationFrame(frame);
   }, [isCompact, mobileSectionId]);
 
-  useEffect(() => {
-    if (
-      !showImportModal &&
-      !showResetModal &&
-      !showDeleteAllModal
-    ) return;
-
-    const modal = document.querySelector(
-      ".settings-clean .settings-v2-modal"
-    );
-
-    if (!modal) return;
-
-    const previousFocus = document.activeElement;
-
-    const cancelButton = modal.querySelector(
-      ".settings-v2-modal-actions .settings-v2-secondary-button"
-    );
-
-    const getFocusable = () =>
-      Array.from(
-        modal.querySelectorAll(
-          'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex="0"]'
-        )
-      ).filter(
-        (element) => element.getClientRects().length > 0
-      );
-
-    const frame = requestAnimationFrame(() => {
-      if (cancelButton && !cancelButton.disabled) {
-        cancelButton.focus();
-      } else {
-        modal.focus();
-      }
-    });
-
-    const handleKey = (event) => {
-      if (event.key === "Escape") {
-        if (cancelButton && !cancelButton.disabled) {
-          event.preventDefault();
-          cancelButton.click();
-        }
-        return;
-      }
-
-      if (event.key !== "Tab") return;
-
-      const elements = getFocusable();
-
-      if (!elements.length) {
-        event.preventDefault();
-        modal.focus();
-        return;
-      }
-
-      const first = elements[0];
-      const last = elements[elements.length - 1];
-
-      if (!elements.includes(document.activeElement)) {
-        event.preventDefault();
-        (event.shiftKey ? last : first).focus();
-      } else if (
-        event.shiftKey &&
-        document.activeElement === first
-      ) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        document.activeElement === last
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKey);
-
-    return () => {
-      cancelAnimationFrame(frame);
-
-      document.removeEventListener(
-        "keydown",
-        handleKey
-      );
-
-      if (previousFocus?.isConnected) {
-        previousFocus.focus();
-      }
-    };
-  }, [
-    showImportModal,
-    showResetModal,
-    showDeleteAllModal,
-  ]);
-
   // =======================================================
   // UI
   // =======================================================
@@ -2501,7 +2406,7 @@ function Settings() {
       =================================================== */}
 
       {message && (
-        <div className="settings-v2-notice settings-v2-notice-success">
+        <div className="settings-v2-notice settings-v2-notice-success" role="status">
 
           <CheckCircle2
             size={19}
@@ -2519,7 +2424,7 @@ function Settings() {
       =================================================== */}
 
       {error && (
-        <div className="settings-v2-notice settings-v2-notice-error">
+        <div className="settings-v2-notice settings-v2-notice-error" role="alert">
 
           <XCircle
             size={19}
@@ -3987,7 +3892,7 @@ function Settings() {
           }
         >
 
-          <div
+          <DialogSurface onDismiss={() => { if (!importing) setShowImportModal(false); }} initialFocus=".settings-v2-secondary-button"
             className="settings-v2-modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-import-heading"
             onClick={(
               event
@@ -4057,7 +3962,7 @@ function Settings() {
 
             </div>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}
@@ -4076,7 +3981,7 @@ function Settings() {
           }
         >
 
-          <div
+          <DialogSurface onDismiss={() => setShowResetModal(false)} initialFocus=".settings-v2-secondary-button"
             className="settings-v2-modal" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-reset-heading"
             onClick={(
               event
@@ -4131,7 +4036,7 @@ function Settings() {
 
             </div>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}
@@ -4151,7 +4056,7 @@ function Settings() {
           }
         >
 
-          <div
+          <DialogSurface onDismiss={() => { if (!deletingAll) setShowDeleteAllModal(false); }} initialFocus=".settings-v2-secondary-button"
             className="settings-v2-modal settings-v2-modal-danger" role="dialog" tabIndex={-1} aria-modal="true" aria-labelledby="settings-delete-heading"
             onClick={(
               event
@@ -4253,7 +4158,7 @@ function Settings() {
 
             </div>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}

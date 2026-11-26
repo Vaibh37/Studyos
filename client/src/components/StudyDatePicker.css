@@ -605,3 +605,16 @@ button:hover {
       none;
   }
 }
+
+.study-date-picker.has-value .study-date-trigger { padding-right: 38px !important; }
+.study-date-picker > .study-date-clear {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  min-width: 28px;
+  min-height: 28px;
+}
+.study-date-picker > .study-date-clear:disabled { opacity: .5; }

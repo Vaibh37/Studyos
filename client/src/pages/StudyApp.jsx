@@ -1,6 +1,8 @@
+import DialogSurface from "../components/DialogSurface";
 import {
   Suspense,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -173,6 +175,17 @@ function StudyApp() {
     useLocation();
 
   useEffect(() => scheduleWorkspaceWarmup(location.pathname), [location.pathname]);
+  const mainRef = useRef(null);
+  const lastPath = useRef(location.pathname);
+  useEffect(() => {
+    if (lastPath.current === location.pathname) return;
+    lastPath.current = location.pathname;
+    const frame = requestAnimationFrame(() => {
+      const main = mainRef.current;
+      if (main && !main.contains(document.activeElement)) main.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [location.pathname]);
 
   const navigate =
     useNavigate();
@@ -712,6 +725,10 @@ function StudyApp() {
   return (
     <>
       <div className="app app-shell-v2">
+        <a className="workspace-skip-link" href="#workspace-main"
+          onClick={event => { event.preventDefault(); mainRef.current?.focus(); }}>
+          Skip to main content
+        </a>
 
         <button
           type="button"
@@ -786,7 +803,7 @@ function StudyApp() {
 
           </header>
 
-          <main className="main-content app-shell-v2-main">
+          <main id="workspace-main" ref={mainRef} className="main-content app-shell-v2-main" tabIndex={-1} aria-label={PAGE_LABELS[activePage]}>
 
             {!isGuest && <NetworkNotice />}
             <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
@@ -810,7 +827,7 @@ function StudyApp() {
       {showGuestMigration && (
         <div className="delete-modal-overlay">
 
-          <div
+          <DialogSurface onDismiss={undefined} initialFocus=".settings-v2-secondary-button" aria-labelledby="guest-migration-heading"
             className="settings-v2-modal"
             onClick={(
               event
@@ -827,7 +844,7 @@ function StudyApp() {
 
             </div>
 
-            <h2>
+            <h2 id="guest-migration-heading">
               Move your guest data?
             </h2>
 
@@ -917,7 +934,7 @@ function StudyApp() {
               It stays in this browser.
             </p>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}

@@ -1,3 +1,4 @@
+import DialogSurface from "../components/DialogSurface";
 import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
@@ -436,6 +437,7 @@ const isTaskEvent = (
 // =========================================================
 
 function Calendar() {
+  const [keyboardDate, setKeyboardDate] = useState("");
   const {
     isGuest,
   } = useAuth();
@@ -932,6 +934,22 @@ function Calendar() {
         );
     };
 
+
+  const focusDate = (
+    calendarDays.find(({ date }) => getDateKey(date) === keyboardDate) ||
+    calendarDays.find(({ date }) => isSameDay(date, selectedDate)) ||
+    calendarDays.find(({ date }) => isSameDay(date, new Date())) ||
+    calendarDays.find(({ currentMonth }) => currentMonth)
+  )?.date;
+  function moveCalendarFocus(event) {
+    const directions = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+    if (!(event.key in directions) && event.key !== "Home" && event.key !== "End") return;
+    const days = [...event.currentTarget.parentElement.querySelectorAll(".v2c-day")];
+    const index = days.indexOf(event.currentTarget);
+    const next = event.key === "Home" ? index - index % 7 : event.key === "End" ? index + 6 - index % 7 : index + directions[event.key];
+    event.preventDefault();
+    days[Math.max(0, Math.min(days.length - 1, next))]?.focus();
+  }
 
   const selectedDateEvents =
     getEventsForDate(
@@ -1628,7 +1646,7 @@ function Calendar() {
 
 
       {error && (
-        <div className="v2c-message is-error">
+        <div className="v2c-message is-error" role="alert">
 
           <span>
             {error}
@@ -1744,7 +1762,7 @@ function Calendar() {
                 Date
               </span>
 
-              <StudyDatePicker
+              <StudyDatePicker ariaLabel="Event date"
                 value={
                   formDate
                 }
@@ -2011,6 +2029,9 @@ function Calendar() {
                     key={`${getDateKey(
                       date
                     )}-${index}`}
+                    tabIndex={focusDate && isSameDay(date, focusDate) ? 0 : -1}
+                    onFocus={() => setKeyboardDate(getDateKey(date))}
+                    onKeyDown={moveCalendarFocus}
                     aria-pressed={selected}
                     aria-current={today ? "date" : undefined}
                     aria-label={`${formatSelectedDate(date)}, ${dayEvents.length} scheduled, ${formatStudyTime(dayStudySeconds)} focused`}
@@ -2474,7 +2495,7 @@ function Calendar() {
           }}
         >
 
-          <div
+          <DialogSurface onDismiss={() => { if (!deleting) closeDeleteModal(); }} initialFocus=".v2c-secondary-button"
             className="v2c-delete-modal"
             role="dialog"
             aria-modal="true"
@@ -2551,7 +2572,7 @@ function Calendar() {
 
             </div>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}

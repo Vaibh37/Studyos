@@ -67,7 +67,7 @@ export default function FocusCompletion({seconds,onClose}) {
     const cancel=e=>{e.preventDefault();if(completed)closeRef.current();else{cancelAnimationFrame(raf);finish();}};
     dialog.showModal();document.body.style.overflow="hidden";
     dialog.addEventListener("cancel",cancel);window.addEventListener("resize",resize);
-    resize();raf=requestAnimationFrame(tick);
+    resize();if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)finish();else raf=requestAnimationFrame(tick);
     return()=>{disposed=true;cancelAnimationFrame(raf);window.removeEventListener("resize",resize);dialog.removeEventListener("cancel",cancel);if(dialog.open)dialog.close();document.body.style.overflow=overflow;if(prior?.isConnected)prior.focus({preventScroll:true});};
   },[]);
   return createPortal(

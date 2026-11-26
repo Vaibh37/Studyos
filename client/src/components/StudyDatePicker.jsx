@@ -1,5 +1,7 @@
+import usePickerFocus from "../hooks/usePickerFocus";
 import {
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -119,7 +121,10 @@ function StudyDatePicker({
   onChange,
   placeholder = "Choose date",
   disabled = false,
+  ariaLabel = "Due date",
 }) {
+  const popupId = useId();
+  const [activeDay, setActiveDay] = useState("");
   const [
     open,
     setOpen,
@@ -406,49 +411,6 @@ function StudyDatePicker({
   );
 
   // =======================================================
-  // ESCAPE
-  // =======================================================
-
-  useEffect(
-    () => {
-      if (!open) {
-        return undefined;
-      }
-
-      const handleKeyDown =
-        (
-          event
-        ) => {
-          if (
-            event.key ===
-            "Escape"
-          ) {
-            setOpen(
-              false
-            );
-
-            triggerRef.current?.focus();
-          }
-        };
-
-      window.addEventListener(
-        "keydown",
-        handleKeyDown
-      );
-
-      return () => {
-        window.removeEventListener(
-          "keydown",
-          handleKeyDown
-        );
-      };
-    },
-    [
-      open,
-    ]
-  );
-
-  // =======================================================
   // CALENDAR CELLS
   // =======================================================
 
@@ -654,6 +616,24 @@ function StudyDatePicker({
       triggerRef.current?.focus();
     };
 
+  const defaultDay = calendarDays.find(({ date }) => getDateKey(date) === activeDay)
+    || calendarDays.find(({ date }) => getDateKey(date) === value)
+    || calendarDays.find(({ date }) => getDateKey(date) === getDateKey(new Date()))
+    || calendarDays.find(({ currentMonth }) => currentMonth);
+  const focusDay = defaultDay ? getDateKey(defaultDay.date) : "";
+  const pickerEvents = usePickerFocus({
+    open, positioned, triggerRef, popoverRef, setOpen, initialSelector: ".study-date-day[tabindex='0']",
+  });
+  function moveDay(event) {
+    const directions = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+    if (!(event.key in directions) && event.key !== "Home" && event.key !== "End") return;
+    const days = [...popoverRef.current.querySelectorAll(".study-date-day")];
+    const index = days.indexOf(event.currentTarget);
+    const next = event.key === "Home" ? index - index % 7 : event.key === "End" ? index + 6 - index % 7 : index + directions[event.key];
+    event.preventDefault();
+    days[Math.max(0, Math.min(days.length - 1, next))]?.focus();
+  }
+
   // =======================================================
   // POPOVER
   // =======================================================
@@ -667,6 +647,8 @@ function StudyDatePicker({
             ref={
               popoverRef
             }
+            id={popupId} data-study-popover role="dialog" tabIndex={-1}
+            aria-label={ariaLabel} {...pickerEvents}
             className="study-date-popover study-date-popover-portal"
             style={{
               top:
@@ -699,7 +681,7 @@ function StudyDatePicker({
                 />
               </button>
 
-              <strong>
+              <strong aria-live="polite">
                 {viewDate.toLocaleDateString(
                   "en-IN",
                   {
@@ -787,6 +769,10 @@ function StudyDatePicker({
                         .join(
                           " "
                         )}
+                      aria-label={date.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+                      aria-pressed={selected} aria-current={today ? "date" : undefined}
+                      tabIndex={dateKey === focusDay ? 0 : -1}
+                      onFocus={() => setActiveDay(dateKey)} onKeyDown={moveDay}
                       onClick={() =>
                         selectDate(
                           date
@@ -841,7 +827,7 @@ function StudyDatePicker({
 
   return (
     <>
-      <div className="study-date-picker">
+      <div className={`study-date-picker${value ? " has-value" : ""}`}>
 
         <button
           ref={
@@ -863,14 +849,11 @@ function StudyDatePicker({
               return;
             }
 
-            setOpen(
-              (
-                current
-              ) =>
-                !current
-            );
+            setActiveDay("");
+            setOpen(current => !current);
           }}
-          aria-haspopup="dialog"
+          aria-label={`${ariaLabel}: ${value ? formatDisplayDate(value) : placeholder}`}
+          aria-haspopup="dialog" aria-controls={open ? popupId : undefined}
           aria-expanded={
             open
           }
@@ -895,23 +878,13 @@ function StudyDatePicker({
               : placeholder}
           </span>
 
-          {value && (
-            <span
-              className="study-date-clear"
-              onClick={
-                clearDate
-              }
-              role="button"
-              tabIndex={0}
-              aria-label="Clear date"
-            >
-              <X
-                size={13}
-              />
-            </span>
-          )}
-
         </button>
+        {value && (
+          <button type="button" className="study-date-clear" disabled={disabled}
+            aria-label={`Clear ${ariaLabel.toLowerCase()}`} onClick={clearDate}>
+            <X size={13} aria-hidden="true" />
+          </button>
+        )}
 
       </div>
 

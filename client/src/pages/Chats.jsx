@@ -1,3 +1,4 @@
+import DialogSurface from "../components/DialogSurface";
 import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
@@ -4770,7 +4771,7 @@ function Chats() {
 
 
       {error && (
-        <div className="chats-error">
+        <div className="chats-error" role="alert">
           {error}
         </div>
       )}
@@ -6216,7 +6217,7 @@ function Chats() {
             }}
           >
 
-            <div
+            <DialogSurface onDismiss={() => { if (!actioningMessageId) setConfirmAction(null); }} initialFocus=".chats-confirm-cancel"
               className="chats-confirm-dialog"
               role="dialog"
               aria-modal="true"
@@ -6351,7 +6352,7 @@ function Chats() {
 
               </div>
 
-            </div>
+            </DialogSurface>
 
           </div>,
 

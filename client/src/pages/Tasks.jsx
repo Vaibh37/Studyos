@@ -1517,7 +1517,7 @@ function Tasks() {
 
         {error && (
           <div
-            className="v2t-error"
+            className="v2t-error" role="alert"
             role="alert"
           >
             <AlertTriangle

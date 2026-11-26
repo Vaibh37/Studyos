@@ -1,3 +1,4 @@
+import DialogSurface from "./DialogSurface";
 import { useState } from "react";
 import { Trash2, ShieldAlert } from "./icons";
 import {
@@ -131,7 +132,7 @@ export default function DeleteAccountSettings() {
 
       {open && (
         <div className="delete-modal-overlay" onClick={close}>
-          <div
+          <DialogSurface onDismiss={close} initialFocus=".settings-v2-secondary-button"
             className="settings-v2-modal settings-v2-modal-danger"
             role="dialog"
             aria-modal="true"
@@ -214,7 +215,7 @@ export default function DeleteAccountSettings() {
                 {busy ? "Deleting..." : "Delete account"}
               </button>
             </div>
-          </div>
+          </DialogSurface>
         </div>
       )}
     </>

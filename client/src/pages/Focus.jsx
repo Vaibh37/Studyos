@@ -1,3 +1,4 @@
+import DialogSurface from "../components/DialogSurface";
 import { WorkspaceSkeleton, WorkspaceEmpty } from "../components/WorkspaceStates";
 import {
   useEffect,
@@ -3335,7 +3336,7 @@ function Focus() {
           }}
         >
 
-          <div
+          <DialogSurface onDismiss={() => { if (!deletingSession) setSessionToDelete(null); }} initialFocus=".v2f-secondary-button"
             className="v2f-delete-modal"
             role="dialog"
             aria-modal="true" aria-labelledby="v2f-delete-title"
@@ -3413,7 +3414,7 @@ function Focus() {
 
             </div>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}

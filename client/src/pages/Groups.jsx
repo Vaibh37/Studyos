@@ -1537,14 +1537,14 @@ function Groups() {
 
 
       {message && (
-        <div className="v2g-message is-success">
+        <div className="v2g-message is-success" role="status">
           {message}
         </div>
       )}
 
 
       {error && (
-        <div className="v2g-message is-error">
+        <div className="v2g-message is-error" role="alert">
           {error}
         </div>
       )}

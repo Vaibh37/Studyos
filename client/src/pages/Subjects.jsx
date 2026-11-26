@@ -1,3 +1,4 @@
+import DialogSurface from "../components/DialogSurface";
 import { WorkspaceSkeleton, WorkspaceEmpty, SkeletonBlock, WorkspaceDisclosure } from "../components/WorkspaceStates";
 import {
   useEffect,
@@ -1334,7 +1335,7 @@ function Subjects() {
 
 
       {error && (
-        <div className="v2s-error">
+        <div className="v2s-error" role="alert">
 
           <AlertTriangle
             size={17}
@@ -2068,7 +2069,7 @@ function Subjects() {
           }}
         >
 
-          <div
+          <DialogSurface onDismiss={() => { if (!deleting) closeDeleteConfirmation(); }} initialFocus=".v2s-secondary-button" aria-labelledby="v2s-delete-title"
             className="v2s-delete-modal"
             role="dialog"
             aria-modal="true"
@@ -2080,7 +2081,7 @@ function Subjects() {
 
             <div className="v2s-delete-copy">
 
-              <h2>
+              <h2 id="v2s-delete-title">
                 Delete subject?
               </h2>
 
@@ -2134,7 +2135,7 @@ function Subjects() {
 
             </div>
 
-          </div>
+          </DialogSurface>
 
         </div>
       )}
