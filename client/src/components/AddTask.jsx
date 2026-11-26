@@ -9,7 +9,7 @@ import {
   Flag,
   Plus,
   RotateCcw,
-} from "lucide-react";
+} from "./icons";
 
 import StudyDatePicker from "./StudyDatePicker";
 import StudySelect from "./StudySelect";

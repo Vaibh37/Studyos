@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Check, Cloud, HardDrive } from "lucide-react";
+import { ArrowRight, Check, Cloud, HardDrive } from "../icons";
 import { Link, useNavigate } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";

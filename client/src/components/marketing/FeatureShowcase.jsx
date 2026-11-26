@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "../icons";
 import { Link } from "react-router";
 
 import Reveal from "./Reveal";

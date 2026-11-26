@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   ListTodo,
   Search,
-} from "lucide-react";
+} from "../components/icons";
 
 import AddTask from "../components/AddTask";
 import TaskItem from "../components/TaskItem";

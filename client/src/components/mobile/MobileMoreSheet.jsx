@@ -12,7 +12,7 @@ import {
   Settings,
   UsersRound,
   X,
-} from "lucide-react";
+} from "../icons";
 
 import {
   NavLink,
@@ -281,7 +281,6 @@ export default function MobileMoreSheet({
                 <span className="mobile-more-item-icon">
                   <Icon
                     size={19}
-                    strokeWidth={2}
                   />
                 </span>
 

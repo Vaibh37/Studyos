@@ -8,7 +8,7 @@ import {
 import {
   Check,
   ChevronDown,
-} from "lucide-react";
+} from "./icons";
 
 import {
   createPortal,

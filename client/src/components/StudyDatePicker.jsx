@@ -11,7 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-} from "lucide-react";
+} from "./icons";
 
 import {
   createPortal,

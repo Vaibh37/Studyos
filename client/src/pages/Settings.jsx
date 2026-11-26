@@ -27,7 +27,7 @@ import {
   Upload,
   UserRound,
   XCircle,
-} from "lucide-react";
+} from "../components/icons";
 
 import { useAuth } from "../context/AuthContext";
 import apiRequest, { API_URL } from "../services/api";
@@ -2596,7 +2596,6 @@ function Settings() {
 
                       <Icon
                         size={18}
-                        strokeWidth={1.9}
                       />
 
                     </span>
@@ -2654,7 +2653,6 @@ function Settings() {
 
               <ActiveSectionIcon
                 size={21}
-                strokeWidth={1.9}
               />
 
             </div>

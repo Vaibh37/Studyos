@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trash2, ShieldAlert } from "lucide-react";
+import { Trash2, ShieldAlert } from "./icons";
 import {
   EmailAuthProvider,
   GoogleAuthProvider,

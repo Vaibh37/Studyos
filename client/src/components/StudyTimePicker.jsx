@@ -10,7 +10,7 @@ import {
   ChevronDown,
   Clock3,
   X,
-} from "lucide-react";
+} from "./icons";
 
 import {
   createPortal,

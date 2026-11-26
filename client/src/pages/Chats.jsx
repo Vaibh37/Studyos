@@ -20,7 +20,7 @@ import {
   Undo2,
   UsersRound,
   X,
-} from "lucide-react";
+} from "../components/icons";
 
 import {
   createPortal,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, Moon, Sun, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "../icons";
 import { Link, useLocation } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";

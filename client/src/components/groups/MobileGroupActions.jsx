@@ -8,7 +8,7 @@ import {
   KeyRound,
   LockKeyhole,
   Plus,
-} from "lucide-react";
+} from "../icons";
 
 import "../../styles/groups-mobile.css";
 

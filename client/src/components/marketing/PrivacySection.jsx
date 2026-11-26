@@ -1,4 +1,4 @@
-import { EyeOff, Trophy } from "lucide-react";
+import { EyeOff, Trophy } from "../icons";
 import { Link } from "react-router";
 
 import Reveal from "./Reveal";

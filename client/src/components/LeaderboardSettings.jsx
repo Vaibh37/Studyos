@@ -11,7 +11,7 @@ import {
   LockKeyhole,
   Trophy,
   XCircle,
-} from "lucide-react";
+} from "./icons";
 
 import {
   useAuth,

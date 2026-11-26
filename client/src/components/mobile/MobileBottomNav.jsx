@@ -9,7 +9,7 @@ import {
   MoreHorizontal,
   Timer,
   Trophy,
-} from "lucide-react";
+} from "../icons";
 
 import {
   NavLink,
@@ -239,7 +239,7 @@ function MobileBottomNav() {
                           ? 24
                           : 21
                       }
-                      strokeWidth={1.9}
+
                     />
 
                   </span>
@@ -291,7 +291,6 @@ function MobileBottomNav() {
 
               <MoreHorizontal
                 size={21}
-                strokeWidth={1.9}
               />
 
             </span>

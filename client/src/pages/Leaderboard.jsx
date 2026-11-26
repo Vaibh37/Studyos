@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   Trophy,
   UserRound,
-} from "lucide-react";
+} from "../components/icons";
 
 import {
   useAuth,

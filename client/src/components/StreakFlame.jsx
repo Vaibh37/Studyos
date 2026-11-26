@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X } from "./icons";
 import { useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import apiRequest from "../services/api";

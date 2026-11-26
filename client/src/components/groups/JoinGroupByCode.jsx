@@ -5,7 +5,7 @@ import {
   Check,
   ClipboardPaste,
   LockKeyhole,
-} from "lucide-react";
+} from "../icons";
 
 const CODE_LENGTH = 8;
 

@@ -6,7 +6,7 @@ import {
   FileText,
   Timer,
   Trophy,
-} from "lucide-react";
+} from "../icons";
 
 import Reveal from "./Reveal";
 
@@ -56,7 +56,7 @@ function ConnectedSystem() {
           {nodes.map(({ label, icon: Icon, className }) => (
             <div key={label} className={`marketing-system-node ${className}`}>
               <span>
-                <Icon size={18} strokeWidth={1.8} />
+                <Icon size={18} />
               </span>
               <strong>{label}</strong>
             </div>

@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Target,
   Zap,
-} from "lucide-react";
+} from "../components/icons";
 
 import { useAuth } from "../context/AuthContext";
 import apiRequest from "../services/api";
@@ -381,7 +381,7 @@ function Dashboard() {
             to="/app/focus"
             className="ds-button ds-primary"
           >
-            <Play size={15} fill="currentColor" />
+            <Play size={15} weight="fill" />
             Start focus
           </Link>
 
