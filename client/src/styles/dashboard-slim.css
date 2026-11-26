@@ -21,7 +21,7 @@
 
   color: var(--color-text);
 
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.5;

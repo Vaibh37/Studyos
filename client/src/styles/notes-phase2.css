@@ -1462,7 +1462,7 @@
 }
 
 .nr-code-symbol {
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;
 }
@@ -1569,7 +1569,7 @@
   padding: 2px 5px;
   border-radius: 4px;
   background: var(--color-surface-hover);
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.88em;
 }
 
@@ -1588,7 +1588,7 @@
   padding: 0;
   background: transparent;
   color: var(--color-text);
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.65;
   white-space: pre;
@@ -1660,7 +1660,7 @@ ul[data-type="taskList"] {
   border-radius: 7px;
   background: var(--color-surface);
   color: var(--color-text);
-  font-family: "Cascadia Code", Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.75;
   tab-size: 4;

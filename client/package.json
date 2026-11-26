@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/sync-marketing-screenshots.mjs",
+    "predev": "node scripts/sync-marketing-screenshots.mjs && node scripts/sync-fonts.mjs",
     "dev": "node ./node_modules/vite/bin/vite.js",
-    "prebuild": "node scripts/sync-marketing-screenshots.mjs",
+    "prebuild": "node scripts/sync-marketing-screenshots.mjs && node scripts/sync-fonts.mjs",
     "build": "node ./node_modules/vite/bin/vite.js build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/geist": "5.3.0",
+    "@fontsource-variable/geist-mono": "5.3.0",
     "@phosphor-icons/react": "2.1.10",
     "@tiptap/core": "3.34.0",
     "@tiptap/extension-list": "3.34.0",
