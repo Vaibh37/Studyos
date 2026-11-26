@@ -8,15 +8,9 @@
   --ui-action-compact: 30px;
   --ui-action-label: 14px;
   --ui-action-weight: 550;
-  --ui-action-primary-bg: var(--color-solid);
-  --ui-action-primary-fg: var(--color-solid-text);
-  --ui-action-primary-hover: color-mix(in srgb, var(--color-solid) 91%, var(--color-bg));
-  --ui-action-secondary-bg: var(--color-surface);
-  --ui-action-secondary-border: var(--color-border-strong);
-  --ui-action-secondary-hover: var(--color-surface-hover);
-  --ui-action-danger-bg: color-mix(in srgb, var(--color-danger) 4%, var(--color-bg));
-  --ui-action-danger-border: color-mix(in srgb, var(--color-danger) 30%, var(--color-border));
-  --ui-action-danger-hover: color-mix(in srgb, var(--color-danger) 10%, var(--color-bg));
+  --ui-action-shadow: 0 1px 2px var(--color-control-shadow),
+    inset 0 1px 0 var(--color-control-highlight);
+  --ui-action-pressed-shadow: inset 0 1px 2px var(--color-control-shadow);
 }
 
 /* Use the same typeface across native controls and page-local CSS. The note
@@ -75,8 +69,9 @@
   font-weight: 580 !important;
 }
 
-/* Full-size and compact action families share a common surface and type.
-   Do not set width: the page owns its responsive arrangement. */
+/* Semantic actions share a state machine; pages keep their own spacing and
+   responsive widths. Secondary is the default, with explicit primary and
+   destructive variants below. */
 :is(#root, body) :is(
   .ds-button, .add-task-submit, .task-action-button, .task-modal-cancel,
   .task-modal-delete, .v2s-primary-button, .v2s-secondary-button,
@@ -84,20 +79,34 @@
   .v2c-danger-button, .v2f-primary-action, .v2f-secondary-action,
   .v2f-secondary-button, .v2f-danger-button, .v2g-primary-button,
   .v2g-secondary-button, .cg-button, .sgm-primary, .sg-join-submit,
-  .sg-invite-share-button, .n3-new, .n3-empty-action, .n3-save,
-  .nr-apply, .nr-cancel, .chats-primary-link, .chats-secondary-link,
-  .chats-confirm-cancel, .chats-confirm-submit, .chats-send-button,
-  .settings-v2-primary-button, .settings-v2-secondary-button,
-  .settings-v2-danger-outline, .settings-v2-danger-solid,
-  .auth-v1-provider, .auth-v1-guest, .auth-v1-submit,
-  .marketing-button, .slb-more, .mobile-rank-load-more, .study-time-apply
+  .sg-invite-share-button, .n3-new, .n3-empty-action, .n3-save, .nr-apply,
+  .nr-cancel, .chats-primary-link, .chats-secondary-link, .chats-confirm-cancel,
+  .chats-confirm-submit, .chats-send-button, .settings-v2-primary-button,
+  .settings-v2-secondary-button, .settings-v2-danger-outline,
+  .settings-v2-danger-solid, .auth-v1-provider, .auth-v1-guest, .auth-v1-submit,
+  .marketing-button, .slb-more, .mobile-rank-load-more, .study-time-apply,
+  .ds-refresh, .task-cancel-button, .cg-button:not(.cg-primary),
+  .marketing-button-secondary, .ds-primary, .task-save-button, .cg-primary,
+  .chats-confirm-submit:not(.is-danger), .marketing-button-primary,
+  .chats-confirm-submit.is-danger
 ) {
+  --action-bg: var(--color-control);
+  --action-fg: var(--color-text);
+  --action-border: var(--color-border-strong);
+  --action-hover-bg: var(--color-control-hover);
+  --action-hover-border: color-mix(in srgb, var(--color-text-muted) 25%, var(--color-border-strong));
+  --action-pressed-bg: var(--color-control-pressed);
+
+  background: var(--action-bg) !important;
+  border: 1px solid var(--action-border) !important;
+  color: var(--action-fg) !important;
   border-radius: var(--ui-action-radius) !important;
   font-family: var(--font-sans) !important;
   font-weight: var(--ui-action-weight) !important;
   letter-spacing: -0.012em !important;
+  box-shadow: var(--ui-action-shadow) !important;
   transition: background-color 140ms ease, border-color 140ms ease,
-    color 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+    color 140ms ease, box-shadow 140ms ease;
 }
 
 :is(#root, body) :is(
@@ -115,96 +124,122 @@
   font-size: var(--ui-action-label) !important;
 }
 
-/* Secondary and subtle actions. */
+/* Primary — one clear, high-contrast action per decision. */
 :is(#root, body) :is(
-  .ds-refresh, .task-cancel-button, .task-modal-cancel,
-  .v2s-secondary-button, .v2c-secondary-button, .v2f-secondary-action,
-  .v2f-secondary-button, .v2g-secondary-button, .cg-button:not(.cg-primary),
-  .sg-invite-share-button, .n3-save, .nr-cancel,
-  .chats-secondary-link, .chats-confirm-cancel,
-  .settings-v2-secondary-button, .auth-v1-provider,
-  .marketing-button-secondary, .slb-more, .mobile-rank-load-more
-) {
-  background: var(--ui-action-secondary-bg) !important;
-  border: 1px solid var(--ui-action-secondary-border) !important;
-  color: var(--color-text) !important;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
-}
-
-:is(#root, body) :is(
-  .ds-refresh, .task-cancel-button, .task-modal-cancel,
-  .v2s-secondary-button, .v2c-secondary-button, .v2f-secondary-action,
-  .v2f-secondary-button, .v2g-secondary-button, .cg-button:not(.cg-primary),
-  .sg-invite-share-button, .n3-save, .nr-cancel,
-  .chats-secondary-link, .chats-confirm-cancel,
-  .settings-v2-secondary-button, .auth-v1-provider,
-  .marketing-button-secondary, .slb-more, .mobile-rank-load-more
-):hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--ui-action-secondary-hover) !important;
-  border-color: color-mix(in srgb, var(--color-text-muted) 45%, var(--color-border-strong)) !important;
-}
-
-/* Primary actions. */
-:is(#root, body) :is(
-  .ds-primary, .add-task-submit, .task-save-button,
-  .v2s-primary-button, .v2c-primary-button, .v2f-primary-action,
-  .v2g-primary-button, .cg-primary, .sgm-primary, .sg-join-submit,
-  .n3-new, .n3-empty-action, .nr-apply, .chats-primary-link,
-  .chats-confirm-submit:not(.is-danger), .chats-send-button,
+  .ds-primary, .add-task-submit, .task-save-button, .v2s-primary-button,
+  .v2c-primary-button, .v2f-primary-action, .v2g-primary-button, .cg-primary,
+  .sgm-primary, .sg-join-submit, .n3-new, .n3-empty-action, .nr-apply,
+  .chats-primary-link, .chats-confirm-submit:not(.is-danger), .chats-send-button,
   .settings-v2-primary-button, .auth-v1-guest, .auth-v1-submit,
   .marketing-button-primary, .study-time-apply
 ) {
-  background: var(--ui-action-primary-bg) !important;
-  border: 1px solid var(--ui-action-primary-bg) !important;
-  color: var(--ui-action-primary-fg) !important;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 12%), inset 0 1px 0 rgb(255 255 255 / 8%);
+  --action-bg: var(--color-solid);
+  --action-fg: var(--color-solid-text);
+  --action-border: var(--color-solid);
+  --action-hover-bg: var(--color-solid-hover);
+  --action-hover-border: var(--color-solid-hover);
+  --action-pressed-bg: var(--color-solid-pressed);
 }
 
+/* Destructive — quiet in the settings page, solid when confirming deletion. */
 :is(#root, body) :is(
-  .ds-primary, .add-task-submit, .task-save-button,
-  .v2s-primary-button, .v2c-primary-button, .v2f-primary-action,
-  .v2g-primary-button, .cg-primary, .sgm-primary, .sg-join-submit,
-  .n3-new, .n3-empty-action, .nr-apply, .chats-primary-link,
-  .chats-confirm-submit:not(.is-danger), .chats-send-button,
-  .settings-v2-primary-button, .auth-v1-guest, .auth-v1-submit,
-  .marketing-button-primary, .study-time-apply
-):hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--ui-action-primary-hover) !important;
-  border-color: var(--ui-action-primary-hover) !important;
-  opacity: 1;
-}
-
-/* Destructive actions keep an explicit, accessible semantic distinction.
-   Signing out is a secondary action rather than a destructive operation. */
-:is(#root, body) .settings-v2-danger-outline {
-  background: var(--ui-action-danger-bg) !important;
-  border: 1px solid var(--ui-action-danger-border) !important;
-  color: var(--color-danger) !important;
-}
-
-:is(#root, body) .settings-v2-danger-outline:hover:not(:disabled) {
-  background: var(--ui-action-danger-hover) !important;
-  border-color: var(--color-danger) !important;
-}
-
-:is(#root, body) :is(
-  .task-modal-delete, .v2s-danger-button, .v2c-danger-button,
-  .v2f-danger-button, .settings-v2-danger-solid, .chats-confirm-submit.is-danger
+  .settings-v2-danger-outline.settings-v2-danger-outline
 ) {
-  background: #b91c1c !important;
-  border: 1px solid #b91c1c !important;
-  color: #fff !important;
+  --action-bg: color-mix(in srgb, var(--color-danger-bg) 35%, var(--color-surface));
+  --action-fg: var(--color-danger);
+  --action-border: color-mix(in srgb, var(--color-danger) 36%, var(--color-border));
+  --action-hover-bg: var(--color-danger-bg);
+  --action-hover-border: var(--color-danger);
+  --action-pressed-bg: color-mix(in srgb, var(--color-danger-bg) 90%, var(--color-danger));
 }
 
 :is(#root, body) :is(
-  .task-modal-delete, .v2s-danger-button, .v2c-danger-button,
-  .v2f-danger-button, .settings-v2-danger-solid, .chats-confirm-submit.is-danger
-):hover:not(:disabled) {
-  background: #991b1b !important;
-  border-color: #991b1b !important;
+  .task-modal-delete, .v2s-danger-button, .v2c-danger-button, .v2f-danger-button,
+  .settings-v2-danger-solid, .chats-confirm-submit.is-danger
+) {
+  --action-bg: var(--color-danger-action);
+  --action-fg: #ffffff;
+  --action-border: var(--color-danger-action);
+  --action-hover-bg: var(--color-danger-action-hover);
+  --action-hover-border: var(--color-danger-action-hover);
+  --action-pressed-bg: var(--color-danger-action-pressed);
 }
 
-/* Icon-only tool controls retain their dimensions and active states. */
+:is(#root, body) :is(
+  .ds-button, .add-task-submit, .task-action-button, .task-modal-cancel,
+  .task-modal-delete, .v2s-primary-button, .v2s-secondary-button,
+  .v2s-danger-button, .v2c-primary-button, .v2c-secondary-button,
+  .v2c-danger-button, .v2f-primary-action, .v2f-secondary-action,
+  .v2f-secondary-button, .v2f-danger-button, .v2g-primary-button,
+  .v2g-secondary-button, .cg-button, .sgm-primary, .sg-join-submit,
+  .sg-invite-share-button, .n3-new, .n3-empty-action, .n3-save, .nr-apply,
+  .nr-cancel, .chats-primary-link, .chats-secondary-link, .chats-confirm-cancel,
+  .chats-confirm-submit, .chats-send-button, .settings-v2-primary-button,
+  .settings-v2-secondary-button, .settings-v2-danger-outline,
+  .settings-v2-danger-solid, .auth-v1-provider, .auth-v1-guest, .auth-v1-submit,
+  .marketing-button, .slb-more, .mobile-rank-load-more, .study-time-apply,
+  .ds-refresh, .task-cancel-button, .cg-button:not(.cg-primary),
+  .marketing-button-secondary, .ds-primary, .task-save-button, .cg-primary,
+  .chats-confirm-submit:not(.is-danger), .marketing-button-primary,
+  .chats-confirm-submit.is-danger
+):hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--action-hover-bg) !important;
+  border-color: var(--action-hover-border) !important;
+  color: var(--action-fg) !important;
+  opacity: 1 !important;
+}
+
+:is(#root, body) :is(
+  .ds-button, .add-task-submit, .task-action-button, .task-modal-cancel,
+  .task-modal-delete, .v2s-primary-button, .v2s-secondary-button,
+  .v2s-danger-button, .v2c-primary-button, .v2c-secondary-button,
+  .v2c-danger-button, .v2f-primary-action, .v2f-secondary-action,
+  .v2f-secondary-button, .v2f-danger-button, .v2g-primary-button,
+  .v2g-secondary-button, .cg-button, .sgm-primary, .sg-join-submit,
+  .sg-invite-share-button, .n3-new, .n3-empty-action, .n3-save, .nr-apply,
+  .nr-cancel, .chats-primary-link, .chats-secondary-link, .chats-confirm-cancel,
+  .chats-confirm-submit, .chats-send-button, .settings-v2-primary-button,
+  .settings-v2-secondary-button, .settings-v2-danger-outline,
+  .settings-v2-danger-solid, .auth-v1-provider, .auth-v1-guest, .auth-v1-submit,
+  .marketing-button, .slb-more, .mobile-rank-load-more, .study-time-apply,
+  .ds-refresh, .task-cancel-button, .cg-button:not(.cg-primary),
+  .marketing-button-secondary, .ds-primary, .task-save-button, .cg-primary,
+  .chats-confirm-submit:not(.is-danger), .marketing-button-primary,
+  .chats-confirm-submit.is-danger
+):active:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--action-pressed-bg) !important;
+  border-color: var(--action-border) !important;
+  box-shadow: var(--ui-action-pressed-shadow) !important;
+}
+
+:is(#root, body) :is(
+  .ds-button, .add-task-submit, .task-action-button, .task-modal-cancel,
+  .task-modal-delete, .v2s-primary-button, .v2s-secondary-button,
+  .v2s-danger-button, .v2c-primary-button, .v2c-secondary-button,
+  .v2c-danger-button, .v2f-primary-action, .v2f-secondary-action,
+  .v2f-secondary-button, .v2f-danger-button, .v2g-primary-button,
+  .v2g-secondary-button, .cg-button, .sgm-primary, .sg-join-submit,
+  .sg-invite-share-button, .n3-new, .n3-empty-action, .n3-save, .nr-apply,
+  .nr-cancel, .chats-primary-link, .chats-secondary-link, .chats-confirm-cancel,
+  .chats-confirm-submit, .chats-send-button, .settings-v2-primary-button,
+  .settings-v2-secondary-button, .settings-v2-danger-outline,
+  .settings-v2-danger-solid, .auth-v1-provider, .auth-v1-guest, .auth-v1-submit,
+  .marketing-button, .slb-more, .mobile-rank-load-more, .study-time-apply,
+  .ds-refresh, .task-cancel-button, .cg-button:not(.cg-primary),
+  .marketing-button-secondary, .ds-primary, .task-save-button, .cg-primary,
+  .chats-confirm-submit:not(.is-danger), .marketing-button-primary,
+  .chats-confirm-submit.is-danger
+):is(:disabled, [aria-disabled="true"]) {
+  background: var(--color-disabled-bg) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-disabled-text) !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+}
+
+/* Icon-only tool controls retain their dimensions and selection semantics.
+   Dedicated toggle/toolbar/menu styles still own their active states. */
 :is(#root, body) :is(
   .ss-collapse, .v2s-icon-button, .v2s-refresh, .v2c-icon-button,
   .v2f-refresh, .v2g-refresh, .sp-icon-button, .slb-refresh,
@@ -215,33 +250,42 @@
   border-radius: 7px !important;
 }
 
+:is(#root, body) :is(
+  .ss-collapse, .v2s-refresh, .v2f-refresh, .v2g-refresh,
+  .sp-icon-button, .slb-refresh, .mobile-rank-refresh,
+  .n3-back, .marketing-theme-toggle
+):not(:disabled):hover {
+  background: var(--color-surface-hover) !important;
+  color: var(--color-text) !important;
+}
+
+/* Navigation shows location with a quiet, color-consistent selected surface. */
+#root .app-shell-v2 .study-sidebar .nav-item.active,
+#root .settings-clean .settings-v2-nav-item.active {
+  background: var(--color-selected) !important;
+  border-color: var(--color-selected-border) !important;
+}
+
+#root .app-shell-v2 .study-sidebar .nav-item.active::before,
+#root .settings-clean .settings-v2-nav-item.active::before {
+  background: var(--color-focus) !important;
+}
+
+#root .settings-clean .settings-v2-nav-item[data-section="danger"].active::before {
+  background: var(--color-danger) !important;
+}
+
+/* Identity is not a success/error state. */
+#root .settings-clean .settings-v2-provider-badge {
+  background: var(--color-surface-subtle) !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid var(--color-border-strong) !important;
+}
+
 /* Keep the notes toolbar compact and avoid resizing specialized controls. */
 :is(#root, body) .n3-save {
   min-height: var(--ui-action-compact) !important;
   font-size: 12px !important;
-}
-
-:is(#root, body) :is(
-  .settings-v2-primary-button, .settings-v2-secondary-button,
-  .settings-v2-danger-outline, .settings-v2-danger-solid,
-  .v2s-primary-button, .v2c-primary-button, .n3-new,
-  .v2f-primary-action, .ds-primary, .cg-button
-):active:not(:disabled) {
-  box-shadow: inset 0 1px 3px rgb(0 0 0 / 16%);
-}
-
-:is(#root, body) :is(
-  .ds-button, .add-task-submit, .v2s-primary-button,
-  .v2c-primary-button, .v2f-primary-action, .v2f-secondary-action,
-  .v2g-primary-button, .v2g-secondary-button, .cg-button, .sgm-primary,
-  .sg-join-submit, .n3-new, .n3-save, .n3-empty-action, .nr-apply,
-  .settings-v2-primary-button, .settings-v2-secondary-button,
-  .settings-v2-danger-outline, .settings-v2-danger-solid,
-  .auth-v1-provider, .auth-v1-guest, .auth-v1-submit, .marketing-button
-):disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed;
-  box-shadow: none;
 }
 
 @media (max-width: 700px) {
@@ -262,10 +306,22 @@
 
 @media (prefers-reduced-motion: reduce) {
   :is(#root, body) :is(
-    .ds-button, .add-task-submit, .v2s-primary-button, .v2c-primary-button,
-    .v2f-primary-action, .settings-v2-primary-button, .settings-v2-secondary-button,
-    .settings-v2-danger-outline, .settings-v2-danger-solid,
-    .n3-new, .marketing-button
+    .ds-button, .add-task-submit, .task-action-button, .task-modal-cancel,
+    .task-modal-delete, .v2s-primary-button, .v2s-secondary-button,
+    .v2s-danger-button, .v2c-primary-button, .v2c-secondary-button,
+    .v2c-danger-button, .v2f-primary-action, .v2f-secondary-action,
+    .v2f-secondary-button, .v2f-danger-button, .v2g-primary-button,
+    .v2g-secondary-button, .cg-button, .sgm-primary, .sg-join-submit,
+    .sg-invite-share-button, .n3-new, .n3-empty-action, .n3-save, .nr-apply,
+    .nr-cancel, .chats-primary-link, .chats-secondary-link, .chats-confirm-cancel,
+    .chats-confirm-submit, .chats-send-button, .settings-v2-primary-button,
+    .settings-v2-secondary-button, .settings-v2-danger-outline,
+    .settings-v2-danger-solid, .auth-v1-provider, .auth-v1-guest, .auth-v1-submit,
+    .marketing-button, .slb-more, .mobile-rank-load-more, .study-time-apply,
+    .ds-refresh, .task-cancel-button, .cg-button:not(.cg-primary),
+    .marketing-button-secondary, .ds-primary, .task-save-button, .cg-primary,
+    .chats-confirm-submit:not(.is-danger), .marketing-button-primary,
+    .chats-confirm-submit.is-danger
   ) {
     transition: none !important;
   }

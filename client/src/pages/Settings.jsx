@@ -2735,7 +2735,7 @@ function Settings() {
 
                   <div className="settings-v2-row-actions">
 
-                    <span className="settings-v2-status-badge settings-v2-notification-granted">
+                    <span className="settings-v2-status-badge settings-v2-provider-badge">
 
                       {isAuthenticated
                         ? getAuthProviderLabel()
