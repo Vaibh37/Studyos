@@ -197,7 +197,7 @@ async function journeys() {
   await go(a, "/app/notes", "Notes");
   await a.getByRole("button", { name: new RegExp(changedNote) }).click();
   await button(a, "Delete note").click();
-  await responseFor(a, "DELETE", /^\/api\/notes\/[^/]+$/, () => button(a.getByRole("dialog"), "Delete note").click());
+  await responseFor(a, "DELETE", /^\/api\/notes\/[^/]+$/, () => button(a.getByRole("alertdialog", { name: "Delete this note?" }), "Delete note").click());
   await a.reload({ waitUntil: "domcontentloaded" });
   await visible(a.getByText("Your ideas start here", { exact: true }));
   console.log("PASS sign-out, sign-in, account isolation and persisted deletions");
@@ -250,13 +250,13 @@ async function journeys() {
   const first = label("Bob live message");
   await composer(b).fill(first);
   await button(b, "Send message").click();
-  await visible(a.getByText(first, { exact: true }));
+  await visible(a.locator(".chats-message-viewport").getByText(first, { exact: true }));
   const second = label("Alice live reply");
   await composer(a).fill(second);
   await button(a, "Send message").click();
-  await visible(b.getByText(second, { exact: true }));
+  await visible(b.locator(".chats-message-viewport").getByText(second, { exact: true }));
   await b.reload({ waitUntil: "domcontentloaded" });
-  await visible(b.getByText(second, { exact: true }));
+  await visible(b.locator(".chats-message-viewport").getByText(second, { exact: true }));
   console.log("PASS two-user live Socket.IO chat and persisted history");
 
   const bytes = Buffer.from(label("StudyOS local file bytes") + "\n");
