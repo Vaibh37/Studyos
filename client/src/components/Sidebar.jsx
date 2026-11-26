@@ -1,3 +1,4 @@
+import { preloadWorkspacePath } from "../services/routePreload";
 import { useEffect, useState } from "react";
 
 import {
@@ -79,6 +80,9 @@ function Sidebar({ isOpen = false, onClose }) {
       <NavLink
         key={to}
         to={to}
+        onPointerEnter={() => preloadWorkspacePath(to)}
+        onFocus={() => preloadWorkspacePath(to)}
+        onPointerDown={() => preloadWorkspacePath(to)}
         end
         onClick={closeNavigation}
         aria-label={label}

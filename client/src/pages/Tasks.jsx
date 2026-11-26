@@ -2,6 +2,7 @@ import { WorkspaceSkeleton, WorkspaceEmpty, SkeletonBlock } from "../components/
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -17,7 +18,7 @@ import AddTask from "../components/AddTask";
 import TaskItem from "../components/TaskItem";
 import StudySelect from "../components/StudySelect";
 
-import apiRequest from "../services/api";
+import apiRequest, { readStudyData } from "../services/api";
 
 import {
   createLocalId,
@@ -213,6 +214,8 @@ function Tasks() {
     tasks,
     setTasks,
   ] = useState([]);
+  const toggleLocks = useRef(new Set());
+  const [pendingToggles, setPendingToggles] = useState(() => new Set());
 
 
   const [
@@ -268,7 +271,7 @@ function Tasks() {
   // =======================================================
 
   const fetchPageData =
-    async () => {
+    async (fresh = false) => {
       try {
         setLoading(true);
 
@@ -299,13 +302,9 @@ function Tasks() {
             subjectData,
           ] =
             await Promise.all([
-              apiRequest(
-                "/api/tasks"
-              ),
+              readStudyData("/api/tasks", { fresh }),
 
-              apiRequest(
-                "/api/subjects"
-              ),
+              readStudyData("/api/subjects", { fresh }),
             ]);
         }
 
@@ -566,112 +565,45 @@ function Tasks() {
   // TOGGLE
   // =======================================================
 
-  const toggleTask =
-    async (
-      id
-    ) => {
-      const task =
-        tasks.find(
-          (
-            item
-          ) =>
-            String(
-              item._id
-            ) ===
-            String(id)
-        );
+  const toggleTask = async id => {
+    const key = String(id);
+    if (toggleLocks.current.has(key)) return;
+    const task = tasks.find(item => String(item._id) === key);
+    if (!task) return;
+    toggleLocks.current.add(key);
+    setPendingToggles(prev => new Set(prev).add(key));
+    setError("");
 
-      if (!task) {
-        return;
-      }
-
-      try {
-        setError("");
-
-        let updatedTask;
-
-        const nextCompleted =
-          !task.completed;
-
-        if (
-          isGuest
-        ) {
-          updatedTask = {
-            ...task,
-
-            completed:
-              nextCompleted,
-
-            completedAt:
-              nextCompleted
-                ? new Date()
-                    .toISOString()
-                : null,
-
-            updatedAt:
-              new Date()
-                .toISOString(),
-          };
-
-          await localDb.put(
-            "tasks",
-            updatedTask
-          );
-        } else {
-          updatedTask =
-            await apiRequest(
-              `/api/tasks/${id}`,
-              {
-                method:
-                  "PATCH",
-
-                body:
-                  JSON.stringify({
-                    completed:
-                      nextCompleted,
-                  }),
-              }
-            );
-        }
-
-        setTasks(
-          (
-            current
-          ) =>
-            current.map(
-              (
-                item
-              ) =>
-                String(
-                  item._id
-                ) ===
-                String(
-                  updatedTask._id
-                )
-                  ? updatedTask
-                  : item
-            )
-        );
-
-        window.dispatchEvent(
-          new Event(
-            "studyos-tasks-updated"
-          )
-        );
-      } catch (
-        toggleError
-      ) {
-        console.error(
-          "Failed to toggle task:",
-          toggleError
-        );
-
-        setError(
-          toggleError?.message ||
-            "Could not update task."
-        );
-      }
+    const nextCompleted = !task.completed;
+    const optimistic = {
+      ...task,
+      completed: nextCompleted,
+      completedAt: nextCompleted ? new Date().toISOString() : null,
+      updatedAt: new Date().toISOString(),
     };
+    const replaceTask = value => setTasks(current => current.map(
+      item => String(item._id) === key ? value : item
+    ));
+    replaceTask(optimistic);
+
+    try {
+      const updatedTask = isGuest
+        ? await localDb.put("tasks", optimistic)
+        : await apiRequest(`/api/tasks/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ completed: nextCompleted }),
+          });
+      if (!updatedTask || String(updatedTask._id) !== key) throw new Error("Could not verify the task update.");
+      replaceTask(updatedTask);
+      window.dispatchEvent(new Event("studyos-tasks-updated"));
+    } catch (error) {
+      replaceTask(task);
+      setError(error?.message || "Could not update task. The previous state was restored.");
+    } finally {
+      toggleLocks.current.delete(key);
+      setPendingToggles(prev => { const next = new Set(prev); next.delete(key); return next; });
+    }
+  };
 
 
   // =======================================================
@@ -1592,7 +1524,8 @@ function Tasks() {
               size={15}
             />
 
-            {error}
+            <span>{error}</span>
+            <button type="button" className="v2t-clear" disabled={loading || pendingToggles.size > 0} onClick={() => fetchPageData(true)}>Retry</button>
           </div>
         )}
 
@@ -1640,9 +1573,8 @@ function Tasks() {
                   subjects={
                     subjects
                   }
-                  onToggle={
-                    toggleTask
-                  }
+                  onToggle={toggleTask}
+                  togglePending={pendingToggles.has(String(task._id))}
                   onUpdate={
                     updateTask
                   }

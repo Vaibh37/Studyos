@@ -15,7 +15,7 @@ import {
 } from "../components/icons";
 
 import { useAuth } from "../context/AuthContext";
-import apiRequest from "../services/api";
+import { readStudyData } from "../services/api";
 import { localDb } from "../services/localDb";
 import { getCalendarEvents } from "../services/calendarData";
 import { getStudySessions } from "../services/studySessionData";
@@ -106,15 +106,14 @@ function Dashboard() {
       setError("");
 
       try {
-        const [taskData, sessionData, eventData] =
-          await Promise.all([
-            isGuest
-              ? localDb.getAll("tasks")
-              : apiRequest("/api/tasks"),
-
-            getStudySessions(isGuest),
-            getCalendarEvents(isGuest),
-          ]);
+        const tasksPromise = isGuest
+          ? localDb.getAll("tasks")
+          : readStudyData("/api/tasks", { fresh: manual });
+        const [taskData, sessionData, eventData] = await Promise.all([
+          tasksPromise,
+          getStudySessions(isGuest, { cache: true, fresh: manual }),
+          getCalendarEvents(isGuest, { cache: true, fresh: manual, tasksPromise }),
+        ]);
 
         setTasks(
           Array.isArray(taskData) ? taskData : []

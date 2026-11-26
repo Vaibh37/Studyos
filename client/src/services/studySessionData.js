@@ -1,4 +1,4 @@
-import apiRequest from "./api";
+import apiRequest, { readStudyData } from "./api";
 
 import {
   createLocalId,
@@ -36,7 +36,7 @@ const sortSessions = (
 // =========================================================
 
 export const getStudySessions =
-  async (isGuest) => {
+  async (isGuest, { cache = false, fresh = false } = {}) => {
     if (isGuest) {
       const sessions =
         await localDb.getAll(
@@ -48,10 +48,9 @@ export const getStudySessions =
       );
     }
 
-    const sessions =
-      await apiRequest(
-        "/api/study-sessions"
-      );
+    const sessions = await (cache
+      ? readStudyData("/api/study-sessions", { fresh })
+      : apiRequest("/api/study-sessions"));
 
     return Array.isArray(
       sessions

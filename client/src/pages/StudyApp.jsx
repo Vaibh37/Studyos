@@ -21,6 +21,8 @@ import "../styles/mobile/mobile-shell.css";
 
 import Sidebar from "../components/Sidebar";
 import { WorkspaceRouteLoading } from "../components/WorkspaceStates";
+import { scheduleWorkspaceWarmup } from "../services/routePreload";
+import NetworkNotice from "../components/NetworkNotice";
 import MobileBottomNav from "../components/mobile/MobileBottomNav";
 
 import {
@@ -169,6 +171,8 @@ function StudyApp() {
 
   const location =
     useLocation();
+
+  useEffect(() => scheduleWorkspaceWarmup(location.pathname), [location.pathname]);
 
   const navigate =
     useNavigate();
@@ -784,6 +788,7 @@ function StudyApp() {
 
           <main className="main-content app-shell-v2-main">
 
+            {!isGuest && <NetworkNotice />}
             <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
               <Outlet />
             </Suspense>

@@ -30,7 +30,7 @@ import {
   useAuth,
 } from "../context/AuthContext";
 
-import apiRequest from "../services/api";
+import { readStudyData } from "../services/api";
 
 import {
   localDb,
@@ -384,27 +384,21 @@ function Progress() {
             ? localDb.getAll(
                 "tasks"
               )
-            : apiRequest(
-                "/api/tasks"
-              );
+            : readStudyData("/api/tasks", { fresh: manual });
 
         const subjectsPromise =
           isGuest
             ? localDb.getAll(
                 "subjects"
               )
-            : apiRequest(
-                "/api/subjects"
-              );
+            : readStudyData("/api/subjects", { fresh: manual });
 
         const notesPromise =
           isGuest
             ? localDb.getAll(
                 "notes"
               )
-            : apiRequest(
-                "/api/notes"
-              );
+            : readStudyData("/api/notes", { fresh: manual });
 
         const [
           taskData,
@@ -415,9 +409,7 @@ function Progress() {
           await Promise.all([
             tasksPromise,
 
-            getStudySessions(
-              isGuest
-            ),
+            getStudySessions(isGuest, { cache: true, fresh: manual }),
 
             subjectsPromise,
 
