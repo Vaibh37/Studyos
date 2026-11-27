@@ -98,6 +98,7 @@ export { ShieldWarningIcon as ShieldAlert } from "@phosphor-icons/react/dist/csr
 export { ShieldCheckIcon as ShieldCheck } from "@phosphor-icons/react/dist/csr/ShieldCheck";
 export { NoteIcon as StickyNote } from "@phosphor-icons/react/dist/csr/Note";
 export { TextStrikethroughIcon as Strikethrough } from "@phosphor-icons/react/dist/csr/TextStrikethrough";
+export { StarIcon as Star } from "@phosphor-icons/react/dist/csr/Star";
 export { SunIcon as Sun } from "@phosphor-icons/react/dist/csr/Sun";
 export { TargetIcon as Target } from "@phosphor-icons/react/dist/csr/Target";
 export { TimerIcon as Timer } from "@phosphor-icons/react/dist/csr/Timer";

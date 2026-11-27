@@ -30,6 +30,7 @@ import {
   Server,
   ShieldAlert,
   Sun,
+  Star,
   Target,
   Timer,
   Trophy,
@@ -3031,6 +3032,15 @@ function Settings() {
                     label="Rain"
                     description="Rainy windows and city lights"
                     icon={CloudRain}
+                    onClick={changeTheme}
+                  />
+
+                  <ThemeButton
+                    theme="stargaze"
+                    activeTheme={theme}
+                    label="Stargaze"
+                    description="Quiet nights beneath the stars"
+                    icon={Star}
                     onClick={changeTheme}
                   />
 

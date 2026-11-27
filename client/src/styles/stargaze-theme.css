@@ -1,0 +1,71 @@
+/* Keep the original illustration intact. The desktop backdrop uses its
+   star field as the ambient fill and its entire portrait at the right. */
+.stargaze-theme #root .app-shell-v2 {
+  isolation: isolate;
+  background: linear-gradient(180deg, rgb(6 19 37 / 24%), rgb(6 19 37 / 48%)),
+    #0b2038 url("/themes/stargaze.webp") center top / cover no-repeat fixed !important;
+}
+.stargaze-theme #root .app-shell-v2::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("/themes/stargaze.webp") right bottom / auto 100% no-repeat;
+  mask-image: linear-gradient(to right, transparent calc(100% - 56.25vh), #000 calc(100% - 33vh));
+  opacity: .87;
+}
+.stargaze-theme #root .app-shell-v2 :is(.app-shell-v2-content, .app-shell-v2-main) {
+  background: transparent !important;
+}
+.stargaze-theme #root .app-shell-v2 :is(.study-sidebar, .mobile-bottom-nav) {
+  --color-bg: #0b1d32;
+  --color-surface: #0b1d32;
+  --color-surface-hover: #193652;
+  --color-border: #2e4968;
+  background: var(--color-bg) !important;
+  color: var(--color-text);
+}
+
+/* Translucent navy surfaces maintain legibility without multiple blurs. */
+.stargaze-theme #root .ds-clean .ds-focus-panel {
+  background: rgb(17 38 65 / 91%);
+}
+.stargaze-theme #root .ds-clean .ds-focus-header h2 {
+  color: var(--ds-focus-text) !important;
+}
+.stargaze-theme #root .ds-clean :is(.ds-task-panel, .ds-level-panel, .ds-upcoming) {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: rgb(11 30 52 / 87%);
+}
+.stargaze-theme #root .ds-clean :is(.ds-activity-panel, .ds-quick-access a),
+.stargaze-theme #root .settings-clean .settings-v2-theme-card {
+  background: rgb(11 30 52 / 89%);
+}
+.stargaze-theme #root .ds-clean .ds-quick-access a:hover,
+.stargaze-theme #root .settings-clean .settings-v2-theme-card:hover {
+  background: var(--color-surface-hover);
+}
+
+@media (max-width: 900px) {
+  .stargaze-theme #root .app-shell-v2 {
+    background: #0b2038 !important;
+  }
+  .stargaze-theme #root .app-shell-v2::before {
+    background: linear-gradient(180deg, rgb(6 19 37 / 15%), rgb(6 19 37 / 24%)),
+      url("/themes/stargaze.webp") center bottom / cover no-repeat;
+    mask-image: none;
+    opacity: 1;
+  }
+}
+
+@media (forced-colors: active) {
+  .stargaze-theme #root .app-shell-v2 {
+    background: Canvas !important;
+  }
+  .stargaze-theme #root .app-shell-v2::before {
+    display: none;
+  }
+}
