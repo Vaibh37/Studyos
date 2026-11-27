@@ -444,6 +444,10 @@ async function journeys() {
   await assertNoOverflow(m);
   await button(m, "Back to Settings").click();
   await visible(exact(m, "heading", "Settings"));
+  await button(m.getByLabel("Settings sections"), "Appearance").click();
+  await m.getByRole("button", { name: /^Coffee Warm cream and espresso tones/ }).click();
+  await m.waitForFunction(() => document.body.classList.contains("coffee-theme"));
+  await assertNoOverflow(m);
   await exact(nav, "link", "Focus").click();
   await visible(exact(m, "heading", "Focus"));
   const mobileUnit = m.getByRole("group", { name: "Custom duration unit" });

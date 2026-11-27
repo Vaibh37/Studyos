@@ -1,3 +1,4 @@
+import { readTheme, saveTheme } from "../services/theme";
 import { loadGoogleIdentity } from "../services/googleIdentity";
 import { canSpeculate } from "../services/routePreload";
 import { MAX_SIGNUP_NAME_LENGTH } from "../services/signupValidation";
@@ -90,36 +91,11 @@ function Welcome() {
   const [
     theme,
     setTheme,
-  ] = useState(() => {
-    return localStorage.getItem(
-      "studyos_theme"
-    ) === "light"
-      ? "light"
-      : "dark";
-  });
+  ] = useState(readTheme);
 
   useEffect(() => {
-    const isLight =
-      theme === "light";
-
-    document.body.classList.toggle(
-      "light-theme",
-      isLight
-    );
-
-    localStorage.setItem(
-      "studyos_theme",
-      theme
-    );
-
-    window.dispatchEvent(
-      new Event(
-        "studyos-theme-updated"
-      )
-    );
-  }, [
-    theme,
-  ]);
+    saveTheme(theme);
+  }, [theme]);
 
   const getFriendlyError = (
     firebaseError

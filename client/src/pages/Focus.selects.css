@@ -102,29 +102,29 @@
 .focus-v2-subject-select
 .study-select-trigger {
   border-color:
-    #dce0e8;
+    var(--coffee-border, #dce0e8);
 
   background:
-    #f7f8fb;
+    var(--coffee-bg, #f7f8fb);
 
   color:
-    #303541;
+    var(--coffee-secondary, #303541);
 }
 
 .light-theme
 .focus-v2-subject-select
 .study-select-trigger:hover:not(:disabled) {
   border-color:
-    #cdd3de;
+    var(--coffee-border, #cdd3de);
 
   background:
-    #f1f3f7;
+    var(--coffee-subtle, #f1f3f7);
 }
 
 .light-theme
 .focus-v2-select-wrap > svg {
   color:
-    #737c8d;
+    var(--coffee-muted, #737c8d);
 }
 
 /* =========================================================

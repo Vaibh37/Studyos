@@ -28,6 +28,7 @@ export { CaretLeftIcon as ChevronLeft } from "@phosphor-icons/react/dist/csr/Car
 export { CaretRightIcon as ChevronRight } from "@phosphor-icons/react/dist/csr/CaretRight";
 export { ClipboardTextIcon as ClipboardPaste } from "@phosphor-icons/react/dist/csr/ClipboardText";
 export { ClockIcon as Clock3 } from "@phosphor-icons/react/dist/csr/Clock";
+export { CoffeeIcon as Coffee } from "@phosphor-icons/react/dist/csr/Coffee";
 export { CloudIcon as Cloud } from "@phosphor-icons/react/dist/csr/Cloud";
 export { CodeIcon as Code } from "@phosphor-icons/react/dist/csr/Code";
 export { CopySimpleIcon as Copy } from "@phosphor-icons/react/dist/csr/CopySimple";

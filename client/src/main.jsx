@@ -11,6 +11,7 @@ import {
 } from "react-router";
 
 import "./index.css";
+import { applyTheme, readTheme } from "./services/theme";
 
 import App from "./App.jsx";
 
@@ -33,6 +34,8 @@ function WorkspaceStreak() {
 
 // StrictMode remains disabled to avoid duplicate
 // development data-loading effects.
+
+applyTheme(readTheme());
 
 createRoot(
   document.getElementById("root")
