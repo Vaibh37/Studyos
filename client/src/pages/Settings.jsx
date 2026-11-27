@@ -23,6 +23,7 @@ import {
   LogOut,
   Moon,
   Cloud,
+  CloudRain,
   Palette,
   RefreshCw,
   RotateCcw,
@@ -3021,6 +3022,15 @@ function Settings() {
                     label="Cloud"
                     description="Soft skies and sunlit clouds"
                     icon={Cloud}
+                    onClick={changeTheme}
+                  />
+
+                  <ThemeButton
+                    theme="rain"
+                    activeTheme={theme}
+                    label="Rain"
+                    description="Rainy windows and city lights"
+                    icon={CloudRain}
                     onClick={changeTheme}
                   />
 

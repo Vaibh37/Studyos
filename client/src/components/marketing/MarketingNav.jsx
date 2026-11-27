@@ -1,4 +1,4 @@
-import { readTheme, saveTheme } from "../../services/theme";
+import { isLightTheme, readTheme, saveTheme } from "../../services/theme";
 import { useEffect, useState } from "react";
 import { Menu, Moon, Sun, X } from "../icons";
 import { Link, useLocation } from "react-router";
@@ -98,13 +98,13 @@ function MarketingNav({ solid = false }) {
           <button
             type="button"
             className="marketing-theme-toggle"
-            aria-label={theme !== "dark" ? "Use dark theme" : "Use light theme"}
-            title={theme !== "dark" ? "Dark theme" : "Light theme"}
+            aria-label={isLightTheme(theme) ? "Use dark theme" : "Use light theme"}
+            title={isLightTheme(theme) ? "Dark theme" : "Light theme"}
             onClick={() =>
-              setTheme((current) => (current !== "dark" ? "dark" : "light"))
+              setTheme((current) => (isLightTheme(current) ? "dark" : "light"))
             }
           >
-            {theme !== "dark" ? <Moon size={18} /> : <Sun size={18} />}
+            {isLightTheme(theme) ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
           <a

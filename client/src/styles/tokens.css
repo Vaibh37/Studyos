@@ -335,3 +335,38 @@ body:is(.coffee-theme, .cloud-theme) {
   --coffee-solid-text: var(--color-solid-text);
   --coffee-accent: var(--color-focus);
 }
+
+/* Rain — midnight slate, cool mist, and warm city reflections. */
+:root.rain-theme,
+body.rain-theme {
+  color-scheme: dark;
+  --color-bg: #182935;
+  --color-surface: #1e303d;
+  --color-surface-subtle: #253b49;
+  --color-surface-hover: #304857;
+
+  --color-text: #f0f4f7;
+  --color-text-secondary: #dce6ec;
+  --color-text-muted: #c0d0dc;
+  --color-text-faint: #adbfcc;
+
+  --color-border: #425864;
+  --color-border-strong: #607985;
+  --color-solid: #dce6ec;
+  --color-solid-hover: #f1f5f7;
+  --color-solid-text: #182935;
+  --color-solid-pressed: #bacbd6;
+
+  --color-focus: #a8d5ed;
+  --color-selected: #304b5d;
+  --color-selected-border: #6b8999;
+  --color-control: #253b49;
+  --color-control-hover: #304857;
+  --color-control-pressed: #1c303d;
+  --color-disabled-bg: #253b49;
+  --color-disabled-text: #adbfcc;
+  --color-control-highlight: rgb(236 245 252 / 9%);
+  --color-control-shadow: rgb(7 17 25 / 25%);
+  --shadow-sm: 0 1px 2px rgb(7 17 25 / 18%);
+  --shadow-md: 0 10px 30px rgb(7 17 25 / 28%);
+}

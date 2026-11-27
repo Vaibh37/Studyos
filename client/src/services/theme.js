@@ -3,7 +3,11 @@ export const THEME_KEY = "studyos_theme";
 export const THEME_EVENT = "studyos-theme-updated";
 
 export function normalizeTheme(value) {
-  return ["dark", "light", "coffee", "cloud"].includes(value) ? value : "dark";
+  return ["dark", "light", "coffee", "cloud", "rain"].includes(value) ? value : "dark";
+}
+
+export function isLightTheme(value) {
+  return ["light", "coffee", "cloud"].includes(value);
 }
 
 export function readTheme() {
@@ -17,12 +21,13 @@ export function readTheme() {
 export function applyTheme(value) {
   const theme = normalizeTheme(value);
   for (const element of [document.documentElement, document.body]) {
-    element.classList.toggle("light-theme", theme !== "dark");
+    element.classList.toggle("light-theme", isLightTheme(theme));
     element.classList.toggle("coffee-theme", theme === "coffee");
     element.classList.toggle("cloud-theme", theme === "cloud");
+    element.classList.toggle("rain-theme", theme === "rain");
   }
   document.querySelector('meta[name="theme-color"]')?.setAttribute(
-    "content", { dark: "#0b0d12", light: "#f7f8fa", coffee: "#faf0df", cloud: "#a8bab9" }[theme]
+    "content", { dark: "#0b0d12", light: "#f7f8fa", coffee: "#faf0df", cloud: "#a8bab9", rain: "#182935" }[theme]
   );
 }
 

@@ -1,4 +1,4 @@
-import { readTheme, saveTheme } from "../services/theme";
+import { isLightTheme, readTheme, saveTheme } from "../services/theme";
 import { loadGoogleIdentity } from "../services/googleIdentity";
 import { canSpeculate } from "../services/routePreload";
 import { MAX_SIGNUP_NAME_LENGTH } from "../services/signupValidation";
@@ -270,20 +270,20 @@ function Welcome() {
           type="button"
           className="auth-v2-theme-toggle"
           aria-label={
-            theme === "dark"
+            !isLightTheme(theme)
               ? "Switch to light theme"
               : "Switch to dark theme"
           }
           onClick={() =>
             setTheme(
               (current) =>
-                current === "dark"
+                !isLightTheme(current)
                   ? "light"
                   : "dark"
             )
           }
         >
-          {theme === "dark" ? (
+          {!isLightTheme(theme) ? (
             <Sun
               size={17}
             />
