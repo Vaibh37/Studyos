@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { chaosJourneys } from "./chaos.mjs";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { randomUUID } from "node:crypto";
@@ -24,9 +25,9 @@ const children = [];
 const contexts = [];
 let browser;
 
-function start(script) {
+function start(script, ipc = false) {
   const child = spawn(process.execPath, [join(root, script)], {
-    cwd: root, env: process.env, stdio: "inherit",
+    cwd: root, env: process.env, stdio: ipc ? ["ignore", "inherit", "inherit", "ipc"] : "inherit",
   });
   children.push(child);
   return child;
@@ -71,10 +72,11 @@ async function go(page, path, heading) {
   await page.goto(WEB + path, { waitUntil: "domcontentloaded" });
   await visible(page.getByRole("heading", { name: heading, exact: true }));
 }
-async function newPage(mobile = false) {
+async function newPage(mobile = false, options = {}) {
   const context = await browser.newContext({
     ...(mobile ? devices["Pixel 7"] : { viewport: { width: 1440, height: 1000 } }),
     reducedMotion: "reduce", acceptDownloads: true, serviceWorkers: "block",
+    ...options,
   });
   contexts.push(context);
   // Enforced independently from the test bundle's hardcoded endpoint settings.
@@ -93,16 +95,22 @@ async function newPage(mobile = false) {
   return { context, page };
 }
 const credentials = name => ({ name: label(name), email: name.toLowerCase() + "." + runId + "@example.invalid", secret });
-async function emailForm(page, account, register) {
+async function openEmailForm(page, register) {
   await page.goto(WEB + "/get-started", { waitUntil: "domcontentloaded" });
   await visible(button(page, "Continue with Email"));
   await button(page, "Continue with Email").click();
   if (register) {
     await button(page, "Create account").click();
-    await page.getByPlaceholder("Your name").fill(account.name);
   }
+}
+async function fillEmailForm(page, account, register) {
+  if (register) await page.getByPlaceholder("Your name").fill(account.name);
   await page.getByPlaceholder("you@example.com").fill(account.email);
   await page.locator('input[type="password"]').fill(account.secret);
+}
+async function emailForm(page, account, register) {
+  await openEmailForm(page, register);
+  await fillEmailForm(page, account, register);
   await button(page, register ? "Create Account" : "Sign In").click();
   await page.waitForURL(/\/app\//, { timeout: 30_000 });
   await visible(page.getByRole("main"));
@@ -260,6 +268,25 @@ async function journeys() {
   const bytes = Buffer.from(label("StudyOS local file bytes") + "\n");
   const file = "studyos-e2e.txt";
   await a.locator('input[type="file"]').setInputFiles({ name: file, mimeType: "text/plain", buffer: bytes });
+  // Cut the exact real signed storage PUT after the API has issued its grant.
+  // Never fake success or send any traffic outside the loopback fixture.
+  let interruptedPuts = 0;
+  const storageRoute = STORE + "/**";
+  const interruptUpload = async route => {
+    if (route.request().method() !== "PUT") return route.fallback();
+    interruptedPuts++;
+    await route.abort("internetdisconnected");
+  };
+  await a.route(storageRoute, interruptUpload);
+  try {
+    await button(a, "Send message").click();
+    await visible(a.getByText("Upload failed", { exact: true }));
+    assert.equal(interruptedPuts, 1, "Expected one interrupted real storage PUT");
+    assert.equal(await button(b, "Download " + file).count(), 0, "Failed upload reached the receiver");
+  } finally {
+    await a.unroute(storageRoute, interruptUpload);
+  }
+  // The file stays staged. A manual retry uses a fresh grant and sends it once.
   const finalized = await responseFor(a, "POST", /^\/api\/groups\/[^/]+\/attachments\/finalize$/, () => button(a, "Send message").click());
   const storedAttachment = (await finalized.json()).message.attachments[0];
   assert.equal(storedAttachment.fileName, file);
@@ -274,7 +301,8 @@ async function journeys() {
   await b.reload({ waitUntil: "domcontentloaded" });
   await visible(b.locator(".chats-message-viewport").getByText(second, { exact: true }));
   await visible(button(b, "Download " + file));
-  console.log("PASS presigned upload, finalize, realtime attachment, downloaded bytes and persisted chat history");
+  assert.equal(await button(b, "Download " + file).count(), 1, "Retry created duplicate attachments");
+  console.log("PASS interrupted signed upload, retained file, manual retry, one delivery, byte-for-byte download and persisted chat history");
 
   // Responsive app shell on a touch-sized Chromium device, using a third
   // authenticated account and the actual mobile settings navigation.
@@ -310,7 +338,7 @@ async function journeys() {
 try {
   // Firebase CLI starts its Auth Emulator using the local demo project.
   await waitReady(AUTH + "/emulator/v1/projects/demo-studyos-e2e/config");
-  start("server/tests/e2e/start.cjs");
+  const backend = start("server/tests/e2e/start.cjs", true);
   start("client/e2e/frontend.mjs");
   await Promise.all([
     waitReady(API + "/api/health/ready", async response => (await response.json()).status === "ok"),
@@ -319,7 +347,14 @@ try {
   browser = await chromium.launch({ headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}) });
   await journeys();
-  console.log("All StudyOS browser journeys passed.");
+  // Release the happy-path clients and their sockets before running the
+  // adversarial cases (all clients share a loopback IP rate-limit bucket).
+  await Promise.all(contexts.map(context => context.close()));
+  await chaosJourneys({
+    API, WEB, AUTH, backend, newPage, openEmailForm, fillEmailForm, emailForm, signOut,
+    go, visible, button, exact, responseFor, assertNoOverflow, credentials, label
+  });
+  console.log("All StudyOS browser and chaos journeys passed.");
 } catch (error) {
   await screenshotFailures();
   throw error;

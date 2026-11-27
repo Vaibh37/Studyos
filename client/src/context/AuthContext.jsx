@@ -1,3 +1,4 @@
+import { validateSignup } from "../services/signupValidation";
 import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { RecoveryPanel } from "../components/RecoveryBoundary";
 import {
@@ -264,6 +265,7 @@ export function AuthProvider({
       email,
       password,
     }) => {
+      const cleanName = validateSignup({ name, password });
       preloadStudyApp();
 
       const result =
@@ -274,13 +276,13 @@ export function AuthProvider({
         );
 
       if (
-        name.trim()
+        cleanName
       ) {
         await updateProfile(
           result.user,
           {
             displayName:
-              name.trim(),
+              cleanName,
           }
         );
       }

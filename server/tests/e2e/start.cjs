@@ -11,6 +11,7 @@ Object.assign(process.env, safeEnv, {
   FIREBASE_PROJECT_ID: "demo-studyos-e2e", GCLOUD_PROJECT: "demo-studyos-e2e",
   FRONTEND_URL: "http://127.0.0.1:5174",
   STUDYOS_R2_ORPHAN_MODE: "off", STUDYOS_APP_CHECK_MODE: "off",
+  ENABLE_ACCOUNT_DELETION: "true",
   STUDYOS_TURNSTILE_MODE: "off", STUDYOS_TRUST_PROXY_HOPS: "0",
 });
 const namespace = "studyos_e2e_" + randomUUID().replaceAll("-", "");
@@ -61,5 +62,26 @@ async function run() {
   process.once("SIGTERM", () => cleanup().catch(() => process.exit(1)));
   process.once("SIGINT", () => cleanup().catch(() => process.exit(1)));
   require("../../server.js");
+  // Private parent-process control for a final, isolated IP-ban test.
+  // No test endpoint is added to Express, no arbitrary IPs or DB names accepted.
+  if (process.send) {
+    const BannedIp = require("../../models/BannedIp");
+    process.on("message", async message => {
+      if (!["ban-loopback", "unban-loopback"].includes(message?.action)) return;
+      try {
+        if (mongoose.connection.name !== namespace + "_study") throw Error("Unexpected database");
+        if (message.action === "ban-loopback") {
+          await BannedIp.updateOne({ ip: "127.0.0.1" }, {
+            $set: { reason: "Isolated E2E IP ban", expiresAt: null }
+          }, { upsert: true });
+        } else {
+          await BannedIp.deleteOne({ ip: "127.0.0.1" });
+        }
+        process.send?.({ id: message.id, ok: true });
+      } catch {
+        process.send?.({ id: message.id, ok: false });
+      }
+    });
+  }
 }
 run().catch(error => { console.error("Isolated server startup failed:", error.message); process.exit(1); });
