@@ -1,3 +1,4 @@
+import { applyTheme, readTheme, THEME_EVENT } from "../services/theme";
 import RecoveryBoundary from "../components/RecoveryBoundary";
 import DialogSurface from "../components/DialogSurface";
 import {
@@ -317,39 +318,16 @@ function StudyApp() {
   // THEME
   // =======================================================
 
-  useEffect(
-    () => {
-      const applyTheme =
-        () => {
-          const theme =
-            localStorage.getItem(
-              "studyos_theme"
-            ) ||
-            "dark";
-
-          document.body.classList.toggle(
-            "light-theme",
-            theme ===
-              "light"
-          );
-        };
-
-      applyTheme();
-
-      window.addEventListener(
-        "studyos-theme-updated",
-        applyTheme
-      );
-
-      return () => {
-        window.removeEventListener(
-          "studyos-theme-updated",
-          applyTheme
-        );
-      };
-    },
-    []
-  );
+  useEffect(() => {
+    const syncTheme = () => applyTheme(readTheme());
+    syncTheme();
+    window.addEventListener(THEME_EVENT, syncTheme);
+    window.addEventListener("storage", syncTheme);
+    return () => {
+      window.removeEventListener(THEME_EVENT, syncTheme);
+      window.removeEventListener("storage", syncTheme);
+    };
+  }, []);
 
   // =======================================================
   // CLOSE DRAWER AFTER ROUTE CHANGE

@@ -188,9 +188,20 @@
         const retry = document.getElementById("studyos-startup-retry");
         retry.style.display = "none";
         try {
-          if (localStorage.getItem("studyos_theme") === "light") {
-            panel.style.background = "#f7f8fa"; panel.style.color = "#1b1c1f";
-            document.getElementById("studyos-startup-description").style.color = "#62666e";
+          const theme = localStorage.getItem("studyos_theme");
+          const isCoffee = theme === "coffee";
+          const isLight = theme === "light" || isCoffee;
+          for (const element of [document.documentElement, document.body]) {
+            element.classList.toggle("light-theme", isLight);
+            element.classList.toggle("coffee-theme", isCoffee);
+          }
+          if (isLight) {
+            panel.style.background = isCoffee ? "#faf0df" : "#f7f8fa";
+            panel.style.color = isCoffee ? "#422c23" : "#1b1c1f";
+            document.getElementById("studyos-startup-description").style.color = isCoffee ? "#765749" : "#62666e";
+            retry.style.background = isCoffee ? "#795344" : "#24262b";
+            retry.style.color = "#fff";
+            document.querySelector('meta[name="theme-color"]').content = panel.style.background;
           }
         } catch {}
         function revealRecovery() {

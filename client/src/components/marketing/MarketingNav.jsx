@@ -1,3 +1,4 @@
+import { readTheme, saveTheme } from "../../services/theme";
 import { useEffect, useState } from "react";
 import { Menu, Moon, Sun, X } from "../icons";
 import { Link, useLocation } from "react-router";
@@ -17,19 +18,10 @@ function MarketingNav({ solid = false }) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(solid);
-  const [theme, setTheme] = useState(() =>
-    localStorage.getItem("studyos_theme") === "light" ? "light" : "dark"
-  );
-
+  const [theme, setTheme] = useState(readTheme);
 
   useEffect(() => {
-    const isLight = theme === "light";
-
-    document.body.classList.toggle("light-theme", isLight);
-    document.documentElement.classList.toggle("light-theme", isLight);
-    localStorage.setItem("studyos_theme", theme);
-
-    window.dispatchEvent(new Event("studyos-theme-updated"));
+    saveTheme(theme);
   }, [theme]);
 
   useEffect(() => {
@@ -106,13 +98,13 @@ function MarketingNav({ solid = false }) {
           <button
             type="button"
             className="marketing-theme-toggle"
-            aria-label={theme === "light" ? "Use dark theme" : "Use light theme"}
-            title={theme === "light" ? "Dark theme" : "Light theme"}
+            aria-label={theme !== "dark" ? "Use dark theme" : "Use light theme"}
+            title={theme !== "dark" ? "Dark theme" : "Light theme"}
             onClick={() =>
-              setTheme((current) => (current === "light" ? "dark" : "light"))
+              setTheme((current) => (current !== "dark" ? "dark" : "light"))
             }
           >
-            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+            {theme !== "dark" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
           <a

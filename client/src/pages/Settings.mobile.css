@@ -4136,3 +4136,33 @@ body:has(.settings-clean) .study-select-option-copy small {
     transition: none !important;
   }
 }
+
+
+/* Coffee preview shows its actual palette even when a different theme is active. */
+.settings-v2-page .settings-v2-theme-preview-coffee {
+  border-color: #e1cbb4;
+  background: #faf0df !important;
+}
+
+.settings-v2-page .settings-v2-theme-preview-coffee span:nth-child(1) {
+  background: #795344;
+}
+
+.settings-v2-page .settings-v2-theme-preview-coffee span:nth-child(2) {
+  background: #d9a777;
+}
+
+.settings-v2-page .settings-v2-theme-preview-coffee span:nth-child(3) {
+  background: #fffcf7;
+}
+
+.settings-v2-page.settings-clean .settings-v2-theme-card:has(.settings-v2-theme-preview-coffee) > svg {
+  color: #422c23;
+}
+
+@media (min-width: 761px) {
+  .settings-v2-page.settings-clean .settings-v2-theme-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    max-width: 820px;
+  }
+}

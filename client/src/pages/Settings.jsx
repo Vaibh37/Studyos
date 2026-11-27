@@ -1,3 +1,4 @@
+import { applyTheme, readTheme, saveTheme } from "../services/theme";
 import { readProfileName, writeProfileName, clearProfileName } from "../services/profileName";
 import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { withDeadline } from "../services/deadline";
@@ -9,6 +10,7 @@ import {
   Bell,
   BookOpen,
   CalendarDays,
+  Coffee,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -166,11 +168,7 @@ function Settings() {
   const [
     theme,
     setTheme,
-  ] = useState(
-    localStorage.getItem(
-      "studyos_theme"
-    ) || "dark"
-  );
+  ] = useState(readTheme);
 
   // =======================================================
   // STUDY PREFERENCES
@@ -503,21 +501,8 @@ function Settings() {
   // =======================================================
 
   useEffect(() => {
-    if (
-      theme ===
-      "light"
-    ) {
-      document.body.classList.add(
-        "light-theme"
-      );
-    } else {
-      document.body.classList.remove(
-        "light-theme"
-      );
-    }
-  }, [
-    theme,
-  ]);
+    applyTheme(theme);
+  }, [theme]);
 
   const changeTheme =
     (
@@ -527,16 +512,7 @@ function Settings() {
         newTheme
       );
 
-      localStorage.setItem(
-        "studyos_theme",
-        newTheme
-      );
-
-      window.dispatchEvent(
-        new Event(
-          "studyos-theme-updated"
-        )
-      );
+      saveTheme(newTheme);
 
       showSuccessMessage(
         `Switched to ${newTheme} theme`
@@ -1698,12 +1674,7 @@ function Settings() {
 
           setName(readProfileName(localStorage, firebaseUser, isGuest));
 
-          setTheme(
-            localStorage.getItem(
-              "studyos_theme"
-            ) ||
-              "dark"
-          );
+          setTheme(readTheme());
 
           const importedGoal =
             Number(
@@ -1919,9 +1890,7 @@ function Settings() {
         "dashboard"
       );
 
-      document.body.classList.remove(
-        "light-theme"
-      );
+      applyTheme("dark");
 
       window.dispatchEvent(
         new Event(
@@ -3035,6 +3004,15 @@ function Settings() {
                     onClick={
                       changeTheme
                     }
+                  />
+
+                  <ThemeButton
+                    theme="coffee"
+                    activeTheme={theme}
+                    label="Coffee"
+                    description="Warm cream and espresso tones"
+                    icon={Coffee}
+                    onClick={changeTheme}
                   />
 
                 </div>

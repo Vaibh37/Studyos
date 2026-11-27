@@ -207,6 +207,16 @@ export async function chaosJourneys({
     await b.reload({ waitUntil: "domcontentloaded" });
     await b.waitForFunction(() => document.body.classList.contains("light-theme"));
     await button(b.getByLabel("Settings sections"), "Appearance").click();
+    await b.getByRole("button", { name: /^Coffee Warm cream and espresso tones/ }).click();
+    await b.waitForFunction(() =>
+      document.body.classList.contains("coffee-theme") &&
+      localStorage.getItem("studyos_theme") === "coffee" &&
+      getComputedStyle(document.body).getPropertyValue("--color-solid").trim() === "#795344"
+    );
+    await b.reload({ waitUntil: "domcontentloaded" });
+    await b.waitForFunction(() => document.body.classList.contains("coffee-theme"));
+    await button(b.getByLabel("Settings sections"), "Appearance").click();
+    assert.equal(await b.getByRole("button", { name: /^Coffee Warm cream and espresso tones/ }).getAttribute("aria-pressed"), "true");
     await b.getByRole("button", { name: /^Dark Low-light StudyOS interface/ }).click();
     await b.waitForFunction(() => !document.body.classList.contains("light-theme"));
     await b.reload({ waitUntil: "domcontentloaded" });
@@ -214,7 +224,7 @@ export async function chaosJourneys({
   } finally {
     await cdp.detach();
   }
-  console.log("PASS denied notification permission and persistent dark/light theme switching");
+  console.log("PASS denied notification permission and persistent dark/light/coffee theme switching");
 
   // Approximate narrow folded and rotated layouts. Root-font scaling is a
   // stress test, not a claim of WCAG compliance or physical foldable coverage.

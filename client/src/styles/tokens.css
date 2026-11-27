@@ -184,7 +184,9 @@
    LIGHT THEME
    ========================================================= */
 
+:root.light-theme,
 body.light-theme {
+  color-scheme: light;
   --color-bg: #f7f8fa;
 
   --color-surface: #ffffff;
@@ -234,4 +236,60 @@ body.light-theme {
   --shadow-md:
     0 10px 30px
     rgba(0, 0, 0, 0.07);
+}
+
+
+/* Coffee — cream paper, ivory surfaces, roasted coffee and caramel. */
+:root.coffee-theme,
+body.coffee-theme {
+  color-scheme: light;
+
+  --color-bg: #faf0df;
+  --color-surface: #fffcf7;
+  --color-surface-subtle: #f5e6d1;
+  --color-surface-hover: #efdbc1;
+
+  --color-text: #422c23;
+  --color-text-secondary: #62483b;
+  --color-text-muted: #765749;
+  --color-text-faint: #795d50;
+
+  --color-border: #e1cbb4;
+  --color-border-strong: #c5a68b;
+
+  --color-solid: #795344;
+  --color-solid-hover: #684333;
+  --color-solid-text: #fffdf9;
+  --color-solid-pressed: #573627;
+
+  --color-focus: #956544;
+  --color-selected: #ecd0b0;
+  --color-selected-border: #bf8b61;
+  --color-control: #fffcf7;
+  --color-control-hover: #f5e6d1;
+  --color-control-pressed: #efdbc1;
+  --color-disabled-bg: #f5e6d1;
+  --color-disabled-text: #795d50;
+  --color-control-highlight: rgb(255 253 249 / 18%);
+  --color-control-shadow: rgb(91 56 37 / 12%);
+
+  --shadow-sm: 0 1px 2px rgb(91 56 37 / 6%);
+  --shadow-md: 0 10px 30px rgb(91 56 37 / 10%);
+
+  /* Overrides for legacy light-theme rules; normal Light keeps its original values. */
+  --coffee-bg: var(--color-bg);
+  --coffee-surface: var(--color-surface);
+  --coffee-subtle: var(--color-surface-subtle);
+  --coffee-hover: var(--color-surface-hover);
+  --coffee-selected: var(--color-selected);
+  --coffee-border: var(--color-border);
+  --coffee-strong: var(--color-border-strong);
+  --coffee-text: var(--color-text);
+  --coffee-secondary: var(--color-text-secondary);
+  --coffee-muted: var(--color-text-muted);
+  --coffee-solid: var(--color-solid);
+  --coffee-solid-hover: var(--color-solid-hover);
+  --coffee-solid-text: var(--color-solid-text);
+  --coffee-accent: var(--color-focus);
+  --coffee-overlay: rgb(255 252 247 / 98%);
 }
