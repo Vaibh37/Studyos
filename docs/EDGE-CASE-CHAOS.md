@@ -36,6 +36,18 @@ finally block and the disposable databases are dropped normally.
 | Delete, sign up again | Real emulator account + disposable MongoDB deletion; stale ID token rejected; same email creates a new UID with no prior tasks. |
 | Banned, sign up again | While loopback IP is banned, both the old and newly registered Firebase account are denied private API access; removal restores access. |
 
+## Account-switching privacy fix
+
+The old browser-wide `studyos_name` key could cause a custom dashboard greeting
+from one signed-in user to appear in another account or guest mode. Names are
+now scoped by Firebase UID (or guest), including backups, preference reset and
+account deletion. The browser regression saves a custom greeting in Alice's
+account, switches to Bob in the same browser, verifies Bob's name only, then
+switches back and verifies Alice's saved greeting. Legacy unscoped names have
+no reliable owner and are deliberately **not** migrated: existing users retain
+their Firebase display name but may need to re-enter a custom dashboard greeting
+once. Other device-wide preferences, such as theme, remain unchanged.
+
 **IP ban limitation:** this protects StudyOS HTTP/socket resources from a
 blocked IP. Firebase's independent registration endpoint is not controlled
 by StudyOS. It does not establish a persistent person/account ban across

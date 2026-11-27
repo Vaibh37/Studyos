@@ -155,6 +155,13 @@ async function journeys() {
   await a.reload({ waitUntil: "domcontentloaded" });
   await visible(a.getByText(alice.email, { exact: true }));
   console.log("PASS registration and Firebase session restoration");
+  const customGreeting = label("Alice private greeting");
+  await button(a.getByLabel("Settings sections"), "General").click();
+  await a.getByPlaceholder("Enter your name").fill(customGreeting);
+  await button(a, "Save profile").click();
+  await visible(a.getByText("Profile saved successfully", { exact: true }));
+  await a.goto(WEB + "/app/dashboard", { waitUntil: "domcontentloaded" });
+  await visible(a.locator(".ds-heading h1").filter({ hasText: customGreeting }));
 
   const task = label("E2E task"), changedTask = task + " edited";
   await go(a, "/app/tasks", "Tasks");
@@ -188,6 +195,10 @@ async function journeys() {
   await a.goto(WEB + "/app/tasks", { waitUntil: "domcontentloaded" });
   await visible(button(a, "Continue with Email"));
   await emailForm(a, bob, true);
+  await a.goto(WEB + "/app/dashboard", { waitUntil: "domcontentloaded" });
+  await visible(a.locator(".ds-heading h1").filter({ hasText: bob.name }));
+  assert.equal(await a.locator(".ds-heading h1").filter({ hasText: customGreeting }).count(), 0,
+    "Previous account's private greeting leaked across sign-in");
   await go(a, "/app/tasks", "Tasks");
   await visible(a.getByText("No tasks yet", { exact: true }));
   assert.equal(await button(a, "Edit " + changedTask).count(), 0);
@@ -196,6 +207,8 @@ async function journeys() {
   assert.equal(await a.getByRole("button", { name: new RegExp(changedNote) }).count(), 0);
   await signOut(a);
   await emailForm(a, alice, false);
+  await a.goto(WEB + "/app/dashboard", { waitUntil: "domcontentloaded" });
+  await visible(a.locator(".ds-heading h1").filter({ hasText: customGreeting }));
   await go(a, "/app/tasks", "Tasks");
   await visible(button(a, "Mark " + changedTask + " as incomplete"));
   await button(a, "Delete " + changedTask).click();
@@ -208,7 +221,7 @@ async function journeys() {
   await responseFor(a, "DELETE", /^\/api\/notes\/[^/]+$/, () => button(a.getByRole("alertdialog", { name: "Delete this note?" }), "Delete note").click());
   await a.reload({ waitUntil: "domcontentloaded" });
   await visible(a.getByText("Your ideas start here", { exact: true }));
-  console.log("PASS sign-out, sign-in, account isolation and persisted deletions");
+  console.log("PASS sign-out, sign-in, account-scoped greeting, private data isolation and persisted deletions");
 
   await go(a, "/app/settings", "Settings");
   await button(a.getByLabel("Settings sections"), "Leaderboard").click();
