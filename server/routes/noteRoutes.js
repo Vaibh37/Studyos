@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express =
   require("express");
 
@@ -143,10 +144,7 @@ const sendRouteError = (
   if (
     status >= 500
   ) {
-    console.error(
-      fallbackMessage,
-      error
-    );
+    logError(fallbackMessage, error);
   }
 
   return res

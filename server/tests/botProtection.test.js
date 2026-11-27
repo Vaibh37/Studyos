@@ -178,3 +178,28 @@ test("Turnstile: fail closed on wrong action, hostname, missing token and provid
     await new Promise(resolve => server.close(resolve));
   }
 });
+
+// Anonymous requests can dominate aggregate audit metrics; actual verified
+// users and socket handshakes must be measured separately before enforcement.
+test("App Check readiness distinguishes real authenticated traffic from anonymous probes", async () => {
+  const { EventEmitter } = require("node:events");
+  const entries = [];
+  const g = createAppCheckGuards({mode:()=>"audit",verify:async t => { if(t!=="valid-fixture") throw Error("invalid"); return {appId:"fixture"}; },write:entry=>entries.push(entry)});
+  for(let i=0;i<5;i++) {
+    const req={method:"GET",path:"/notes",get:()=>"valid-fixture"};
+    const res=new EventEmitter();
+    await g.http(req,res,()=>{req.user={uid:"must-not-appear-in-logs"}});
+    res.emit("finish");
+  }
+  const anonymous={method:"GET",path:"/notes",get:()=>undefined};
+  const response=new EventEmitter(); await g.http(anonymous,response,()=>{}); response.emit("finish");
+  const socket={handshake:{auth:{}},data:{}}; await g.socket(socket,()=>{});
+  socket.user={uid:"must-not-appear-in-logs"};g.recordAuthenticatedSocket(socket);g.recordAuthenticatedSocket(socket);
+  const snapshot=g.snapshot();
+  assert.deepEqual(snapshot.counts,{valid:5,missing:2,invalid:0});
+  assert.deepEqual(snapshot.authenticated.http,{valid:5,missing:0,invalid:0});
+  assert.deepEqual(snapshot.authenticated.socket,{valid:0,missing:1,invalid:0});
+  assert.equal(entries.length,1);
+  assert(!JSON.stringify(entries).includes("must-not-appear-in-logs"));
+  assert(!JSON.stringify(entries).includes("valid-fixture"));
+});

@@ -111,6 +111,25 @@ export async function chaosJourneys({
   assert.equal(proof.status, 200);
   assert.equal((await proof.json()).user.uid, original.localId);
 
+  // Store untrusted Markdown through the real authenticated API, then open it
+  // in the browser editor. A local marker reveals any unexpected execution.
+  const hostileTitle = label("XSS regression note");
+  const hostileBody = ["XSS regression text", "[unsafe](javascript:window.__studyosXss=1)",
+    '<img src="/missing-xss-regression-image" onerror="window.__studyosXss=1">',
+    '<script>window.__studyosXss=1</script>', '[safe](https://example.test/)'].join("\n\n");
+  const storedNote = await api(original.idToken, "/api/notes", {method:"POST",
+    headers:{"Content-Type":"application/json"}, body:JSON.stringify({title:hostileTitle,content:hostileBody})});
+  assert.equal(storedNote.status,201);
+  await a.addInitScript(() => {window.__studyosXss=0});
+  await go(a, "/app/notes", "Notes");
+  await a.getByRole("button", {name:new RegExp(hostileTitle)}).click();
+  const editor = a.locator('[contenteditable="true"][aria-label="Note content"]');
+  await visible(editor.getByText("XSS regression text",{exact:true}));
+  assert.equal(await editor.locator('script, [onerror], [onclick], [href^="javascript:" i], [href^="data:" i]').count(),0);
+  assert.equal(await a.evaluate(()=>window.__studyosXss||0),0);
+  assert.equal(await editor.locator('a[href="https://example.test/"]').count(),1);
+  console.log("PASS stored Markdown/HTML XSS regression and safe HTTPS link rendering");
+
   const task = label("مهمة دراسة 🧠");
   await go(a, "/app/tasks", "Tasks");
   await responseFor(a, "POST", /^\/api\/tasks$/, async () => {

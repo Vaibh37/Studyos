@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express = require("express");
 const mongoose = require("mongoose");
 const crypto = require("node:crypto");
@@ -83,7 +84,7 @@ router.post("/start", focusStartLimiter, async (req, res) => {
       startedAt: run.startedAt,
     });
   } catch (error) {
-    console.error("START FOCUS RUN ERROR:", error.message);
+    logError("START FOCUS RUN ERROR:", error);
     return res.status(500).json({ message: "Failed to start verified Focus session" });
   }
 });
@@ -108,10 +109,7 @@ router.get(
         sessions
       );
     } catch (error) {
-      console.error(
-        "GET STUDY SESSIONS ERROR:",
-        error
-      );
+      logError("GET STUDY SESSIONS ERROR:", error);
 
       res.status(500).json({
         message:
@@ -394,10 +392,7 @@ router.post(
         session
       );
     } catch (error) {
-      console.error(
-        "CREATE STUDY SESSION ERROR:",
-        error
-      );
+      logError("CREATE STUDY SESSION ERROR:", error);
 
       res.status(500).json({
         message:
@@ -429,10 +424,7 @@ router.delete(
           result.deletedCount,
       });
     } catch (error) {
-      console.error(
-        "DELETE ALL STUDY SESSIONS ERROR:",
-        error
-      );
+      logError("DELETE ALL STUDY SESSIONS ERROR:", error);
 
       res.status(500).json({
         message:
@@ -488,10 +480,7 @@ router.delete(
           "Study session deleted successfully",
       });
     } catch (error) {
-      console.error(
-        "DELETE STUDY SESSION ERROR:",
-        error
-      );
+      logError("DELETE STUDY SESSION ERROR:", error);
 
       res.status(500).json({
         message:

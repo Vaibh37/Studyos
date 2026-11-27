@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express = require("express");
 const mongoose = require("mongoose");
 
@@ -173,10 +174,7 @@ router.get(
         tasks
       );
     } catch (error) {
-      console.error(
-        "GET TASKS ERROR:",
-        error
-      );
+      logError("GET TASKS ERROR:", error);
 
       res.status(500).json({
         message:
@@ -374,10 +372,7 @@ router.post(
         task
       );
     } catch (error) {
-      console.error(
-        "CREATE TASK ERROR:",
-        error
-      );
+      logError("CREATE TASK ERROR:", error);
 
       res.status(500).json({
         message:
@@ -655,10 +650,7 @@ router.patch(
         task
       );
     } catch (error) {
-      console.error(
-        "UPDATE TASK ERROR:",
-        error
-      );
+      logError("UPDATE TASK ERROR:", error);
 
       res.status(500).json({
         message:
@@ -719,10 +711,7 @@ router.delete(
           task._id,
       });
     } catch (error) {
-      console.error(
-        "DELETE TASK ERROR:",
-        error
-      );
+      logError("DELETE TASK ERROR:", error);
 
       res.status(500).json({
         message:

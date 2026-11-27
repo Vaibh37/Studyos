@@ -1,3 +1,4 @@
+const { logError } = require("./utils/safeLogger");
 const express =
   require("express");
 
@@ -186,6 +187,12 @@ const server =
     app
   );
 
+// Bound slow HTTP headers/bodies. Attachments upload directly to R2, so
+// the application API does not need multi-minute request-body timeouts.
+server.headersTimeout = 15_000;
+server.requestTimeout = 30_000;
+server.keepAliveTimeout = 5_000;
+
 // =========================================
 // SOCKET.IO
 // =========================================
@@ -368,6 +375,7 @@ io.on(
     socket
   ) => {
     if (!enforceSocketExpiry(socket)) return;
+    appCheckGuard.recordAuthenticatedSocket(socket);
     productionMetrics.socketOpened();
     socket.once("disconnect", productionMetrics.socketClosed);
 
@@ -460,8 +468,7 @@ const startServer =
       try {
         await migrateUploadAuthorizationTtlIndex();
       } catch (migrationError) {
-        console.error("R2 upload authorization index migration failed:",
-          migrationError.message);
+        logError("R2 upload authorization index migration failed:", migrationError);
       }
 
       // Audit by default. An explicit server-side environment variable is
@@ -477,7 +484,7 @@ const startServer =
             mode: orphanMode === "delete" ? "delete" : "audit",
           });
         } catch (error) {
-          console.error("R2 orphan audit failed:", error.message);
+          logError("R2 orphan audit failed:", error);
         } finally {
           orphanSweepRunning = false;
         }
@@ -502,8 +509,7 @@ const startServer =
               result.disconnected);
           }
         } catch (error) {
-          console.error("Firebase socket session recheck failed:",
-            error.message);
+          logError("Firebase socket session recheck failed:", error);
         } finally {
           firebaseRecheckRunning = false;
         }
@@ -512,7 +518,7 @@ const startServer =
 
       const banRecheck = setInterval(() => {
         disconnectBannedSockets(io).catch((error) => {
-          console.error("IP ban socket recheck failed:", error.message);
+          logError("IP ban socket recheck failed:", error);
         });
       }, 30 * 1000);
       banRecheck.unref();
@@ -533,10 +539,7 @@ const startServer =
         }
       );
     } catch (error) {
-      console.error(
-        "SERVER STARTUP ERROR:",
-        error.message
-      );
+      logError("SERVER STARTUP ERROR:", error);
 
       process.exit(1);
     }

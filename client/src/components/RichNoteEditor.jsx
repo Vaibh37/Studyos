@@ -6,6 +6,7 @@ import { TaskList, TaskItem } from "@tiptap/extension-list";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Bold, Italic, Strikethrough, List, ListOrdered, ListChecks, Heading1, Heading2, Code, Quote, Link2, Undo2, Redo2, X } from "./icons";
 import { WorkspaceSkeleton } from "./WorkspaceStates";
+import { isSafeNoteLink } from "../services/noteLinkSafety";
 
 function EditorButton({
   children,
@@ -55,6 +56,7 @@ function VisualNoteEditor({ value, onChange }) {
           openOnClick: false,
           autolink: true,
           defaultProtocol: "https",
+          isAllowedUri: (url, context) => context.defaultValidate(url) && isSafeNoteLink(url),
         },
       }),
 

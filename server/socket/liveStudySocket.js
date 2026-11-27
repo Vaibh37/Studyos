@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const { publicGroupMessage } = require("../utils/publicGroupMessage");
 const GroupMember =
   require(
@@ -193,10 +194,7 @@ const registerLiveStudySocket =
             ok: true,
           });
         } catch (error) {
-          console.error(
-            "GROUP JOIN SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP JOIN SOCKET ERROR:", error);
 
           callback?.({
             ok: false,
@@ -378,10 +376,7 @@ const registerLiveStudySocket =
             });
           }
 
-          console.error(
-            "GROUP MESSAGE SEND SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP MESSAGE SEND SOCKET ERROR:", error);
 
           callback?.({
             ok: false,
@@ -538,10 +533,7 @@ const registerLiveStudySocket =
                 } catch (
                   deleteError
                 ) {
-                  console.error(
-                    "R2 ATTACHMENT DELETE ERROR:",
-                    deleteError.message
-                  );
+                  logError("R2 ATTACHMENT DELETE ERROR:", deleteError);
 
 
                   failedAttachments.push(
@@ -693,10 +685,7 @@ const registerLiveStudySocket =
         } catch (
           error
         ) {
-          console.error(
-            "GROUP MESSAGE UNSEND SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP MESSAGE UNSEND SOCKET ERROR:", error);
 
 
           if (
@@ -815,10 +804,7 @@ const registerLiveStudySocket =
               ),
           });
         } catch (error) {
-          console.error(
-            "GROUP MESSAGE DELETE FOR ME SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP MESSAGE DELETE FOR ME SOCKET ERROR:", error);
 
           if (
             error.name ===
@@ -1144,10 +1130,7 @@ const registerLiveStudySocket =
             receipt,
           });
         } catch (error) {
-          console.error(
-            "GROUP MESSAGE READ SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP MESSAGE READ SOCKET ERROR:", error);
 
           if (
             error.name ===
@@ -1301,10 +1284,7 @@ const registerLiveStudySocket =
             liveSession,
           });
         } catch (error) {
-          console.error(
-            "FOCUS START SOCKET ERROR:",
-            error.message
-          );
+          logError("FOCUS START SOCKET ERROR:", error);
 
           callback?.({
             ok: false,
@@ -1337,10 +1317,7 @@ const registerLiveStudySocket =
               }
             );
         } catch (error) {
-          console.error(
-            "FOCUS HEARTBEAT ERROR:",
-            error.message
-          );
+          logError("FOCUS HEARTBEAT ERROR:", error);
         }
       }
     );
@@ -1568,10 +1545,7 @@ const registerLiveStudySocket =
               0,
           });
         } catch (error) {
-          console.error(
-            "FOCUS STOP SOCKET ERROR:",
-            error.message
-          );
+          logError("FOCUS STOP SOCKET ERROR:", error);
 
           callback?.({
             ok: false,

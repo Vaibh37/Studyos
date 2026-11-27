@@ -66,6 +66,14 @@ test("API request limits reject malformed, oversized and dangerous payloads clea
     assert.equal((await call("/api/echo", {
       body: '{"note":{"prototype":{"admin":true}}}',
     })).status, 400);
+    for (const body of [
+      '{"id":{"$ne":null}}', '{"nested":[{"$where":"test"}]}',
+      '{"user.role":"admin"}', JSON.stringify({items:Array(5001).fill(1)}),
+    ]) assert.equal((await call("/api/echo", {body})).status, 400);
+    for (const query of ['%24where=test', 'q%5B%24ne%5D=test', 'user.role=admin', 'constructor=test', 'q=a?b&%24where=test', 'q=a&q=b']) {
+      assert.equal((await call("/api/health?" + query, {method:"GET"})).status, 400);
+    }
+    assert.equal((await call("/api/health?q=%24cost%2Einfo", {method:"GET"})).status,200);
     let nested = { safe: true };
     for (let n = 0; n < 40; n++) nested = { item: nested };
     assert.equal((await call("/api/echo", {
