@@ -190,16 +190,18 @@
         try {
           const theme = localStorage.getItem("studyos_theme");
           const isCoffee = theme === "coffee";
-          const isLight = theme === "light" || isCoffee;
+          const isCloud = theme === "cloud";
+          const isLight = theme === "light" || isCoffee || isCloud;
           for (const element of [document.documentElement, document.body]) {
             element.classList.toggle("light-theme", isLight);
             element.classList.toggle("coffee-theme", isCoffee);
+            element.classList.toggle("cloud-theme", isCloud);
           }
           if (isLight) {
-            panel.style.background = isCoffee ? "#faf0df" : "#f7f8fa";
-            panel.style.color = isCoffee ? "#422c23" : "#1b1c1f";
-            document.getElementById("studyos-startup-description").style.color = isCoffee ? "#765749" : "#62666e";
-            retry.style.background = isCoffee ? "#795344" : "#24262b";
+            panel.style.background = isCloud ? "#a8bab9" : isCoffee ? "#faf0df" : "#f7f8fa";
+            panel.style.color = isCloud ? "#172c2d" : isCoffee ? "#422c23" : "#1b1c1f";
+            document.getElementById("studyos-startup-description").style.color = isCloud ? "#2e4546" : isCoffee ? "#765749" : "#62666e";
+            retry.style.background = isCloud ? "#294346" : isCoffee ? "#795344" : "#24262b";
             retry.style.color = "#fff";
             document.querySelector('meta[name="theme-color"]').content = panel.style.background;
           }

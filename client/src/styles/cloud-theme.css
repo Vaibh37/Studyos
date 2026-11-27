@@ -1,0 +1,73 @@
+/* Cloud workspace: one static, local wallpaper, with legible surfaces.
+   Scope the artwork to the workspace and leave other themes untouched. */
+.cloud-theme #root .app-shell-v2 {
+  background: linear-gradient(rgb(236 242 232 / 29%), rgb(236 242 232 / 32%)),
+    #a8bab9 url("/themes/cloud.webp") center bottom / cover no-repeat fixed !important;
+  background-attachment: fixed !important;
+}
+.cloud-theme #root .app-shell-v2 .app-shell-v2-content,
+.cloud-theme #root .app-shell-v2 .app-shell-v2-main {
+  background: transparent !important;
+}
+
+/* Preserve the dark navigation rail of the visual reference without
+   changing navigation geometry or the global light-surface palette. */
+.cloud-theme #root .app-shell-v2 :is(.study-sidebar, .mobile-bottom-nav) {
+  --color-bg: #142426;
+  --color-surface: #142426;
+  --color-surface-subtle: #233536;
+  --color-surface-hover: #293f40;
+  --color-text: #f4f1e7;
+  --color-text-secondary: #d7e2dd;
+  --color-text-muted: #b3c6c1;
+  --color-text-faint: #a7bab8;
+  --color-border: #354a4b;
+  --color-border-strong: #527070;
+  --color-selected: #293f40;
+  --color-solid: #e5eee8;
+  --color-solid-text: #142426;
+  --color-focus: #b7e3e3;
+  background: var(--color-bg) !important;
+  color: var(--color-text);
+  color-scheme: dark;
+}
+.cloud-theme #root .study-sidebar .app-shell-v2-brand-name {
+  color: var(--color-text);
+}
+
+/* Content cards remain quiet and readable while the sky stays visible
+   in the gutters and empty workspace. */
+.cloud-theme #root .ds-clean :is(.ds-task-panel, .ds-level-panel, .ds-upcoming) {
+  padding: 16px;
+  border: 1px solid rgb(72 103 99 / 25%);
+  border-radius: 13px;
+  background: rgb(238 241 235 / 91%);
+}
+.cloud-theme #root .ds-clean .ds-activity-panel {
+  background: rgb(238 241 235 / 92%);
+}
+.cloud-theme #root .ds-clean .ds-quick-access a {
+  background: rgb(238 241 235 / 92%);
+}
+.cloud-theme #root .ds-clean .ds-quick-access a:hover {
+  background: var(--color-surface-hover);
+}
+.cloud-theme #root .settings-clean .settings-v2-theme-card {
+  background-color: rgb(238 241 235 / 88%);
+}
+.cloud-theme #root .settings-clean .settings-v2-theme-card:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* A static composition also works with tall mobile viewports. */
+@media (max-width: 900px) {
+  .cloud-theme #root .app-shell-v2 {
+    background-position: center bottom !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .cloud-theme #root .app-shell-v2 {
+    background: Canvas !important;
+  }
+}

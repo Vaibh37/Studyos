@@ -276,7 +276,50 @@ body.coffee-theme {
   --shadow-sm: 0 1px 2px rgb(91 56 37 / 6%);
   --shadow-md: 0 10px 30px rgb(91 56 37 / 10%);
 
-  /* Overrides for legacy light-theme rules; normal Light keeps its original values. */
+  --coffee-overlay: rgb(255 252 247 / 98%);
+}
+
+/* Cloud — cool mineral blue, warm ivory and dark teal ink. */
+:root.cloud-theme,
+body.cloud-theme {
+  color-scheme: light;
+  --color-bg: #a8bab9;
+  --color-surface: #eef1eb;
+  --color-surface-subtle: #dce7e1;
+  --color-surface-hover: #d0ded8;
+
+  --color-text: #172c2d;
+  --color-text-secondary: #253d3e;
+  --color-text-muted: #304748;
+  --color-text-faint: #395051;
+
+  --color-border: #a9bcb5;
+  --color-border-strong: #77918c;
+
+  --color-solid: #294346;
+  --color-solid-hover: #21383b;
+  --color-solid-text: #faf5df;
+  --color-solid-pressed: #172c2d;
+
+  --color-focus: #165d66;
+  --color-selected: #c4d7d0;
+  --color-selected-border: #77918c;
+  --color-control: #eef1eb;
+  --color-control-hover: #dce7e1;
+  --color-control-pressed: #cddbd6;
+  --color-disabled-bg: #dce7e1;
+  --color-disabled-text: #536663;
+  --color-control-highlight: rgb(255 255 255 / 20%);
+  --color-control-shadow: rgb(20 48 49 / 12%);
+
+  --shadow-sm: 0 1px 2px rgb(20 48 49 / 7%);
+  --shadow-md: 0 10px 30px rgb(20 48 49 / 12%);
+  --coffee-overlay: rgb(238 241 235 / 98%);
+}
+
+/* Shared aliases for legacy light-theme rules; normal Light stays unchanged. */
+:root:is(.coffee-theme, .cloud-theme),
+body:is(.coffee-theme, .cloud-theme) {
   --coffee-bg: var(--color-bg);
   --coffee-surface: var(--color-surface);
   --coffee-subtle: var(--color-surface-subtle);
@@ -291,5 +334,4 @@ body.coffee-theme {
   --coffee-solid-hover: var(--color-solid-hover);
   --coffee-solid-text: var(--color-solid-text);
   --coffee-accent: var(--color-focus);
-  --coffee-overlay: rgb(255 252 247 / 98%);
 }

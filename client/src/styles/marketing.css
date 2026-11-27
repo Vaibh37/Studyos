@@ -2158,36 +2158,36 @@
 }
 
 /* Preserve the dark product screenshots, but tint the surrounding public UI
-   when a workspace user has selected Coffee. */
-.coffee-theme .marketing-page :is(button, a):focus-visible {
+   when a workspace user has selected Coffee or Cloud. */
+:is(.coffee-theme, .cloud-theme) .marketing-page :is(button, a):focus-visible {
   outline-color: var(--color-focus);
 }
-.coffee-theme .marketing-page .marketing-button-primary {
+:is(.coffee-theme, .cloud-theme) .marketing-page .marketing-button-primary {
   border-color: var(--color-solid);
   background: var(--color-solid);
   color: var(--color-solid-text) !important;
 }
-.coffee-theme .marketing-page .marketing-button-primary:hover {
+:is(.coffee-theme, .cloud-theme) .marketing-page .marketing-button-primary:hover {
   border-color: var(--color-solid-hover);
   background: var(--color-solid-hover);
 }
-.coffee-theme .marketing-page .marketing-button-secondary:hover {
+:is(.coffee-theme, .cloud-theme) .marketing-page .marketing-button-secondary:hover {
   border-color: var(--color-border-strong);
   background: var(--color-surface-hover);
 }
-.coffee-theme .marketing-page :is(.marketing-footer, .marketing-nav) {
+:is(.coffee-theme, .cloud-theme) .marketing-page :is(.marketing-footer, .marketing-nav) {
   background: var(--color-bg);
 }
-.coffee-theme .marketing-page :is(.marketing-hero-orbit, .marketing-mobile-menu) {
+:is(.coffee-theme, .cloud-theme) .marketing-page :is(.marketing-hero-orbit, .marketing-mobile-menu) {
   background: var(--color-surface);
   border-color: var(--color-border);
 }
-.coffee-theme .marketing-page .marketing-hero-line:last-child {
+:is(.coffee-theme, .cloud-theme) .marketing-page .marketing-hero-line:last-child {
   color: var(--color-text-muted);
 }
-.coffee-theme .marketing-page .marketing-final {
+:is(.coffee-theme, .cloud-theme) .marketing-page .marketing-final {
   background: var(--color-surface-subtle);
 }
-.coffee-theme .marketing-page .marketing-final-bg::after {
+:is(.coffee-theme, .cloud-theme) .marketing-page .marketing-final-bg::after {
   background: linear-gradient(90deg, var(--color-surface-subtle), transparent 42%, var(--color-surface-subtle));
 }
