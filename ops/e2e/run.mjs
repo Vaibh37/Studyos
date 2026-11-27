@@ -315,6 +315,19 @@ async function journeys() {
   if (await toggle.getAttribute("aria-checked") !== "true") await toggle.click();
   await responseFor(a, "PATCH", /^\/api\/leaderboard\/me$/, () => button(a, "Save leaderboard settings").click());
   await go(a, "/app/focus", "Focus");
+  const durationUnit = a.getByRole("combobox", { name: "Custom duration unit" });
+  await durationUnit.selectOption("hr");
+  const hoursInput = a.getByRole("spinbutton", { name: "Custom duration in hours" });
+  await hoursInput.fill("1.5");
+  await visible(a.getByText("1:30:00", { exact: true }));
+  await visible(a.getByText("1 hr 30 min session", { exact: true }));
+  await durationUnit.selectOption("min");
+  assert.equal(await a.getByRole("spinbutton", { name: "Custom duration in minutes" }).inputValue(), "90");
+  await durationUnit.selectOption("hr");
+  await hoursInput.fill("13");
+  await button(a, "Start focus").click();
+  await visible(a.getByText("Choose a duration between 1 minute and 12 hours.", { exact: true }));
+  await button(a, "Reset timer").click();
   await a.getByRole("spinbutton", { name: "Custom duration in minutes" }).fill("1");
   await responseFor(a, "POST", /^\/api\/study-sessions\/start$/, () => button(a, "Start focus").click());
   await visible(button(a, "Pause"));
@@ -429,8 +442,13 @@ async function journeys() {
   await visible(exact(m, "heading", "Settings"));
   await exact(nav, "link", "Focus").click();
   await visible(exact(m, "heading", "Focus"));
+  await m.getByRole("combobox", { name: "Custom duration unit" }).selectOption("hr");
+  await m.getByRole("spinbutton", { name: "Custom duration in hours" }).fill("2");
+  await visible(m.getByText("2:00:00", { exact: true }));
+  await visible(m.getByText("2 hr session", { exact: true }));
   await assertNoOverflow(m);
-  console.log("PASS mobile task flow, native settings navigation and viewport checks");
+  await button(m, "Reset timer").click();
+  console.log("PASS mobile task flow, native settings navigation, custom Focus hours and viewport checks");
 }
 
 try {
