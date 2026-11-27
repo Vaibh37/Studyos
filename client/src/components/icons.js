@@ -30,6 +30,7 @@ export { ClipboardTextIcon as ClipboardPaste } from "@phosphor-icons/react/dist/
 export { ClockIcon as Clock3 } from "@phosphor-icons/react/dist/csr/Clock";
 export { CoffeeIcon as Coffee } from "@phosphor-icons/react/dist/csr/Coffee";
 export { CloudIcon as Cloud } from "@phosphor-icons/react/dist/csr/Cloud";
+export { CloudRainIcon as CloudRain } from "@phosphor-icons/react/dist/csr/CloudRain";
 export { CodeIcon as Code } from "@phosphor-icons/react/dist/csr/Code";
 export { CopySimpleIcon as Copy } from "@phosphor-icons/react/dist/csr/CopySimple";
 export { CrownSimpleIcon as Crown } from "@phosphor-icons/react/dist/csr/CrownSimple";

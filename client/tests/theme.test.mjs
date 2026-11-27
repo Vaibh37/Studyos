@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeTheme, readTheme, applyTheme, saveTheme } from "../src/services/theme.js";
+import { normalizeTheme, isLightTheme, readTheme, applyTheme, saveTheme } from "../src/services/theme.js";
 
 test("only supported themes are accepted", () => {
-  for (const theme of ["dark", "light", "coffee", "cloud"]) assert.equal(normalizeTheme(theme), theme);
+  for (const theme of ["dark", "light", "coffee", "cloud", "rain"]) assert.equal(normalizeTheme(theme), theme);
   for (const theme of [undefined, null, "", "unknown", "COFFEE"]) assert.equal(normalizeTheme(theme), "dark");
 });
 
-test("Coffee and Cloud persist across reloads, and switching clears old theme classes", () => {
+test("Theme selection persists, and switching between light and dark themes clears old classes", () => {
   const element = () => ({ classList: { values: new Set(), toggle(name, enabled) {
     enabled ? this.values.add(name) : this.values.delete(name);
   } } });
@@ -30,11 +30,17 @@ test("Coffee and Cloud persist across reloads, and switching clears old theme cl
     assert.equal(readTheme(), "cloud");
     assert.equal(color, "#a8bab9");
     for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["light-theme", "cloud-theme"]);
+    saveTheme("rain");
+    assert.equal(readTheme(), "rain");
+    assert.equal(color, "#182935");
+    assert.equal(isLightTheme("rain"), false);
+    assert.equal(isLightTheme("cloud"), true);
+    for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["rain-theme"]);
     saveTheme("light");
     for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["light-theme"]);
     applyTheme("dark");
     for (const node of [root, body]) assert.equal(node.classList.values.size, 0);
-    assert.deepEqual(events, ["studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated"]);
+    assert.deepEqual(events, ["studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated"]);
   } finally {
     delete globalThis.document;
     delete globalThis.localStorage;

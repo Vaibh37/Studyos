@@ -1,0 +1,62 @@
+/* Photographic Rain theme. Only the active workspace and its preview
+   request the artwork; no scripts, video, or animated rain are needed. */
+.rain-theme #root .app-shell-v2 {
+  background: linear-gradient(180deg, rgb(10 20 30 / 32%), rgb(10 20 30 / 44%)),
+    #182935 url("/themes/rain.webp") center bottom / cover no-repeat fixed !important;
+  background-attachment: fixed !important;
+}
+.rain-theme #root .app-shell-v2 .app-shell-v2-content,
+.rain-theme #root .app-shell-v2 .app-shell-v2-main {
+  background: transparent !important;
+}
+.rain-theme #root .app-shell-v2 :is(.study-sidebar, .mobile-bottom-nav) {
+  --color-bg: #14232e;
+  --color-surface: #14232e;
+  --color-surface-hover: #253b49;
+  --color-border: #314957;
+  background: var(--color-bg) !important;
+  color: var(--color-text);
+}
+
+/* Quiet dark slate glass with enough opacity to preserve readable text
+   across the photograph's highlights. No expensive per-card blur. */
+.rain-theme #root .ds-clean .ds-focus-panel {
+  background: rgb(31 49 63 / 94%);
+}
+.rain-theme #root .ds-clean .ds-focus-header h2 {
+  color: var(--ds-focus-text) !important;
+}
+.rain-theme #root .ds-clean :is(.ds-task-panel, .ds-level-panel, .ds-upcoming) {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: rgb(24 39 51 / 91%);
+}
+.rain-theme #root .ds-clean .ds-activity-panel {
+  background: rgb(24 39 51 / 92%);
+}
+.rain-theme #root .ds-clean .ds-quick-access a {
+  background: rgb(24 39 51 / 92%);
+}
+.rain-theme #root .ds-clean .ds-quick-access a:hover {
+  background: var(--color-surface-hover);
+}
+.rain-theme #root .settings-clean .settings-v2-theme-card {
+  background-color: rgb(24 39 51 / 92%);
+}
+.rain-theme #root .settings-clean .settings-v2-theme-card:hover {
+  background-color: var(--color-surface-hover);
+}
+
+/* Maintain a screen-height backdrop rather than enlarging the image to
+   the entire scroll height on mobile browsers. */
+@media (max-width: 900px) {
+  .rain-theme #root .app-shell-v2 {
+    background-position: center bottom !important;
+  }
+}
+@media (forced-colors: active) {
+  .rain-theme #root .app-shell-v2 {
+    background: Canvas !important;
+  }
+}

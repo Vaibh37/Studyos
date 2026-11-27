@@ -191,11 +191,13 @@
           const theme = localStorage.getItem("studyos_theme");
           const isCoffee = theme === "coffee";
           const isCloud = theme === "cloud";
+          const isRain = theme === "rain";
           const isLight = theme === "light" || isCoffee || isCloud;
           for (const element of [document.documentElement, document.body]) {
             element.classList.toggle("light-theme", isLight);
             element.classList.toggle("coffee-theme", isCoffee);
             element.classList.toggle("cloud-theme", isCloud);
+            element.classList.toggle("rain-theme", isRain);
           }
           if (isLight) {
             panel.style.background = isCloud ? "#a8bab9" : isCoffee ? "#faf0df" : "#f7f8fa";
@@ -204,6 +206,13 @@
             retry.style.background = isCloud ? "#294346" : isCoffee ? "#795344" : "#24262b";
             retry.style.color = "#fff";
             document.querySelector('meta[name="theme-color"]').content = panel.style.background;
+          } else if (isRain) {
+            panel.style.background = "#182935";
+            panel.style.color = "#f0f4f7";
+            document.getElementById("studyos-startup-description").style.color = "#c0d0dc";
+            retry.style.background = "#dce6ec";
+            retry.style.color = "#182935";
+            document.querySelector('meta[name="theme-color"]').content = "#182935";
           }
         } catch {}
         function revealRecovery() {
