@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 ﻿const express = require("express");
 const { publicGroupMessage } = require("../utils/publicGroupMessage");
 const { createTurnstileGuard } = require("../middleware/turnstileGuard");
@@ -229,10 +230,7 @@ router.post(
           group,
         });
     } catch (error) {
-      console.error(
-        "CREATE GROUP ERROR:",
-        error.message
-      );
+      logError("CREATE GROUP ERROR:", error);
 
       if (
         error.name ===
@@ -242,7 +240,7 @@ router.post(
           .status(400)
           .json({
             message:
-              error.message,
+              "Invalid group name or description",
           });
       }
 
@@ -343,10 +341,7 @@ router.get(
           result,
       });
     } catch (error) {
-      console.error(
-        "GET MY GROUPS ERROR:",
-        error.message
-      );
+      logError("GET MY GROUPS ERROR:", error);
 
       return res
         .status(500)
@@ -492,10 +487,7 @@ router.post(
           },
         });
     } catch (error) {
-      console.error(
-        "JOIN GROUP ERROR:",
-        error.message
-      );
+      logError("JOIN GROUP ERROR:", error);
 
       if (
         error.code ===
@@ -629,10 +621,7 @@ router.get(
         messages,
       });
     } catch (error) {
-      console.error(
-        "GET GROUP MESSAGES ERROR:",
-        error.message
-      );
+      logError("GET GROUP MESSAGES ERROR:", error);
 
       if (
         error.name ===
@@ -761,10 +750,7 @@ router.get(
           safeMessage,
       });
     } catch (error) {
-      console.error(
-        "GET GROUP MESSAGE ERROR:",
-        error.message
-      );
+      logError("GET GROUP MESSAGE ERROR:", error);
 
 
       if (
@@ -850,6 +836,7 @@ router.get(
             joinedAt:
               1,
           })
+          .select("_id groupId userId role displayName picture joinedAt lastReadMessageId lastReadAt")
           .lean();
 
       const memberUserIds =
@@ -1060,10 +1047,7 @@ router.get(
         leaderboard,
       });
     } catch (error) {
-      console.error(
-        "GROUP LEADERBOARD ERROR:",
-        error.message
-      );
+      logError("GROUP LEADERBOARD ERROR:", error);
 
       if (
         error.name ===
@@ -1146,6 +1130,7 @@ router.get(
             joinedAt:
               1,
           })
+          .select("_id groupId userId role displayName picture joinedAt lastReadMessageId lastReadAt")
           .lean();
 
       return res.json({
@@ -1163,10 +1148,7 @@ router.get(
         members,
       });
     } catch (error) {
-      console.error(
-        "GET GROUP MEMBERS ERROR:",
-        error.message
-      );
+      logError("GET GROUP MEMBERS ERROR:", error);
 
       if (
         error.name ===
@@ -1293,10 +1275,7 @@ router.patch(
           target,
       });
     } catch (error) {
-      console.error(
-        "CHANGE MEMBER ROLE ERROR:",
-        error.message
-      );
+      logError("CHANGE MEMBER ROLE ERROR:", error);
 
       if (
         error.name ===
@@ -1463,10 +1442,7 @@ router.delete(
           "Member removed successfully",
       });
     } catch (error) {
-      console.error(
-        "REMOVE MEMBER ERROR:",
-        error.message
-      );
+      logError("REMOVE MEMBER ERROR:", error);
 
       if (
         error.name ===
@@ -1563,10 +1539,7 @@ router.post(
         inviteCode,
       });
     } catch (error) {
-      console.error(
-        "REGENERATE INVITE CODE ERROR:",
-        error.message
-      );
+      logError("REGENERATE INVITE CODE ERROR:", error);
 
       if (
         error.name ===
@@ -1681,10 +1654,7 @@ router.delete(
           "Left group successfully",
       });
     } catch (error) {
-      console.error(
-        "LEAVE GROUP ERROR:",
-        error.message
-      );
+      logError("LEAVE GROUP ERROR:", error);
 
       if (
         error.name ===
@@ -1831,10 +1801,7 @@ router.delete(
           "Group deleted successfully",
       });
     } catch (error) {
-      console.error(
-        "DELETE GROUP ERROR:",
-        error.message
-      );
+      logError("DELETE GROUP ERROR:", error);
 
       if (
         error.name ===

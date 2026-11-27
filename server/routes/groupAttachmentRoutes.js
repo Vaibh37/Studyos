@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const { publicGroupMessage } = require("../utils/publicGroupMessage");
 const express =
   require("express");
@@ -336,10 +337,7 @@ router.post(
         },
       });
     } catch (error) {
-      console.error(
-        "CREATE ATTACHMENT UPLOAD URL ERROR:",
-        error
-      );
+      logError("CREATE ATTACHMENT UPLOAD URL ERROR:", error);
 
 
       return res
@@ -1134,10 +1132,7 @@ router.post(
           });
       }
 
-      console.error(
-        "FINALIZE ATTACHMENT ERROR:",
-        error
-      );
+      logError("FINALIZE ATTACHMENT ERROR:", error);
 
 
       if (
@@ -1148,7 +1143,7 @@ router.post(
           .status(400)
           .json({
             message:
-              error.message,
+              "Invalid attachment metadata",
           });
       }
 
@@ -1370,10 +1365,7 @@ router.get(
         },
       });
     } catch (error) {
-      console.error(
-        "CREATE ATTACHMENT DOWNLOAD URL ERROR:",
-        error
-      );
+      logError("CREATE ATTACHMENT DOWNLOAD URL ERROR:", error);
 
 
       return res

@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express =
   require("express");
 
@@ -234,10 +235,7 @@ router.get(
     } catch (
       error
     ) {
-      console.error(
-        "DATABASE HEALTH ERROR:",
-        error.message
-      );
+      logError("DATABASE HEALTH ERROR:", error);
 
       return res
         .status(

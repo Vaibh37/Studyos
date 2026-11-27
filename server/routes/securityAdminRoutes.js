@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express = require("express");
 const { rateLimit } = require("express-rate-limit");
 const firebaseAuth = require("../middleware/firebaseAuth");
@@ -87,7 +88,7 @@ router.get("/bans", async (req, res) => {
       .lean();
     res.json({ bans });
   } catch (error) {
-    console.error("Security ban list failed:", error.message);
+    logError("Security ban list failed:", error);
     res.status(503).json({ message: "Security bans unavailable" });
   }
 });
@@ -136,13 +137,13 @@ router.post("/bans", requireRecentAdminSignIn, async (req, res) => {
         const { disconnectBannedSockets } = require("../middleware/ipBans");
         await disconnectBannedSockets(io);
       } catch (error) {
-        console.error("Immediate banned socket disconnect failed:", error.message);
+        logError("Immediate banned socket disconnect failed:", error);
       }
     }
 
     return res.status(201).json({ ban });
   } catch (error) {
-    console.error("Create security IP ban failed:", error.message);
+    logError("Create security IP ban failed:", error);
     return res.status(503).json({ message: "Unable to save ban" });
   }
 });
@@ -154,7 +155,7 @@ router.delete("/bans/:ip", requireRecentAdminSignIn, async (req, res) => {
     const result = await BannedIp.deleteOne({ ip });
     return res.json({ removed: result.deletedCount === 1 });
   } catch (error) {
-    console.error("Remove security IP ban failed:", error.message);
+    logError("Remove security IP ban failed:", error);
     return res.status(503).json({ message: "Unable to remove ban" });
   }
 });

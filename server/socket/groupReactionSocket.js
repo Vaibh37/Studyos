@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const GroupMember =
   require(
     "../models/social/GroupMember"
@@ -359,10 +360,7 @@ const registerGroupReactionSocket =
             update,
           });
         } catch (error) {
-          console.error(
-            "GROUP MESSAGE REACTION SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP MESSAGE REACTION SOCKET ERROR:", error);
 
 
           if (

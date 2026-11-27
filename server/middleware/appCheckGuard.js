@@ -30,9 +30,18 @@ async function verifyAppCheckToken(token) {
   return getAppCheck().verifyToken(token);
 }
 
-function createAppCheckGuards({ verify = verifyAppCheckToken, mode = currentMode } = {}) {
+function createAppCheckGuards({ verify = verifyAppCheckToken, mode = currentMode, write = entry => console.info(JSON.stringify(entry)) } = {}) {
   const counts = { missing: 0, invalid: 0, valid: 0 };
   const byArea = {};
+  const authenticated = { http: { missing: 0, invalid: 0, valid: 0 }, socket: { missing: 0, invalid: 0, valid: 0 } };
+  const snapshot = () => ({ event: "studyos_app_check_audit", mode: mode(), counts: { ...counts }, byArea: structuredClone(byArea), authenticated: structuredClone(authenticated) });
+  const recordAuthenticated = (transport, outcome) => {
+    if (!outcome || !Object.hasOwn(authenticated[transport], outcome)) return;
+    const bucket = authenticated[transport];
+    bucket[outcome]++;
+    const total = bucket.missing + bucket.invalid + bucket.valid;
+    if (total === 5 || total === 20 || total % 100 === 0) write(snapshot());
+  };
   const audit = (kind, area) => {
     counts[kind]++;
     if (!byArea[area]) byArea[area] = { missing: 0, invalid: 0, valid: 0 };
@@ -40,7 +49,7 @@ function createAppCheckGuards({ verify = verifyAppCheckToken, mode = currentMode
     const total = counts.missing + counts.invalid + counts.valid;
     // Aggregate only: never record tokens, URLs, IPs, user IDs or request bodies.
     if (total === 20 || total % 100 === 0) {
-      console.info("App Check audit counts", { ...counts, byArea });
+      write(snapshot());
     }
   };
   async function validate(token) {
@@ -60,7 +69,13 @@ function createAppCheckGuards({ verify = verifyAppCheckToken, mode = currentMode
     }
     const token = req.get("X-Firebase-AppCheck");
     const ok = await validate(token);
-    audit(ok ? "valid" : token ? "invalid" : "missing", auditArea(req.path));
+    const outcome = ok ? "valid" : token ? "invalid" : "missing";
+    audit(outcome, auditArea(req.path));
+    // Only a successfully verified Firebase user contributes to rollout
+    // readiness; anonymous probes and unauthenticated bots are separate.
+    if (setting === "audit" || ok) res.once("finish", () => {
+      if (req.user?.uid) recordAuthenticated("http", outcome);
+    });
     if (!ok && setting === "enforce") {
       return res.status(403).json({ message: "App verification required" });
     }
@@ -71,11 +86,19 @@ function createAppCheckGuards({ verify = verifyAppCheckToken, mode = currentMode
     if (setting === "off") return next();
     const token = socket.handshake.auth?.appCheckToken;
     const ok = await validate(token);
-    audit(ok ? "valid" : token ? "invalid" : "missing", "socket");
+    const outcome = ok ? "valid" : token ? "invalid" : "missing";
+    audit(outcome, "socket");
+    if (setting === "audit" || ok) socket.data.appCheckOutcome = outcome;
     if (!ok && setting === "enforce") return next(new Error("App verification required"));
     return next();
   }
-  return { http, socket, counts };
+  function recordAuthenticatedSocket(socket) {
+    if (!socket.user?.uid) return;
+    const outcome = socket.data.appCheckOutcome;
+    delete socket.data.appCheckOutcome;
+    recordAuthenticated("socket", outcome);
+  }
+  return { http, socket, counts, recordAuthenticatedSocket, snapshot };
 }
 
 const guards = createAppCheckGuards();

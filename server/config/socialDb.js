@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const mongoose =
   require("mongoose");
 
@@ -15,10 +16,7 @@ const connectSocialDB =
         "Social MongoDB connected successfully ?"
       );
     } catch (error) {
-      console.error(
-        "Social MongoDB connection failed:",
-        error.message
-      );
+      logError("Social MongoDB connection failed:", error);
 
       process.exit(1);
     }

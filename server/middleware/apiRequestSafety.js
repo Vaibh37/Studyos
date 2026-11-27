@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 // Cross-route safety checks. Express's default JSON limit is 100kb;
 // keep that behavior explicit, add predictable 4xx errors and reject
 // dangerous object keys before route handlers touch user input.
@@ -7,6 +8,7 @@ const MAX_QUERY_PARAMS = 48;
 const MAX_BODY_DEPTH = 32;
 const MAX_BODY_NODES = 5000;
 const BLOCKED_KEYS = new Set(["__proto__", "prototype", "constructor"]);
+const forbiddenKey = key => BLOCKED_KEYS.has(key) || key.startsWith("$") || key.includes(".");
 
 function checkJsonShape(value) {
   if (value === undefined) return null;
@@ -25,12 +27,10 @@ function checkJsonShape(value) {
 
     if (entry.value === null || typeof entry.value !== "object") continue;
     for (const [key, child] of Object.entries(entry.value)) {
-      if (BLOCKED_KEYS.has(key)) {
+      if (forbiddenKey(key)) {
         return "JSON request body contains a forbidden field name";
       }
-      if (child && typeof child === "object") {
-        stack.push({ value: child, depth: entry.depth + 1 });
-      }
+      stack.push({ value: child, depth: entry.depth + 1 });
     }
   }
   return null;
@@ -44,9 +44,21 @@ function validateApiRequest(req, res, next) {
     return res.status(414).json({ message: "Request URL is too long" });
   }
 
-  const query = rawUrl.split("?")[1] || "";
+  const queryStart = rawUrl.indexOf("?");
+  const query = queryStart === -1 ? "" : rawUrl.slice(queryStart + 1);
   if (query && query.split("&").length > MAX_QUERY_PARAMS) {
     return res.status(400).json({ message: "Too many query parameters" });
+  }
+
+  // No public StudyOS endpoint accepts database operators or nested query keys.
+  // URLSearchParams decodes percent-encoded bracket/operator spellings. Values
+  // are untouched (users may legitimately search for "$" or ".").
+  const seenQueryKeys = new Set();
+  for (const key of new URLSearchParams(query).keys()) {
+    if (forbiddenKey(key) || /[\[\]]/.test(key) || seenQueryKeys.has(key)) {
+      return res.status(400).json({ message: "Query contains a forbidden or repeated field name" });
+    }
+    seenQueryKeys.add(key);
   }
 
   const contentLength = Number(req.headers["content-length"]);
@@ -90,7 +102,7 @@ function safeApiErrorHandler(err, req, res, next) {
     return res.status(415).json({ message: "Unsupported request encoding" });
   }
   // Do not echo malformed values, authorization tokens, or stack traces.
-  console.error("API request failed:", err?.name || "error");
+  logError("API request failed:", err);
   return res.status(500).json({ message: "Internal server error" });
 }
 

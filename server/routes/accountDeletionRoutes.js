@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express = require("express");
 const firebaseAuth = require("../middleware/firebaseAuth");
 const adminAuth = require("../config/firebaseAdmin");
@@ -163,14 +164,14 @@ router.delete("/", firebaseAuth, async (req, res) => {
     try {
       disconnectAccountSockets(req.app.get("io"), uid);
     } catch (socketError) {
-      console.error("ACCOUNT SOCKET DISCONNECT FAILED:", socketError);
+      logError("ACCOUNT SOCKET DISCONNECT FAILED:", socketError);
       // Authentication and account data were deleted successfully.
     }
 
     return res.json({ deleted: true });
 
   } catch (error) {
-    console.error("ACCOUNT DELETION FAILED:", error);
+    logError("ACCOUNT DELETION FAILED:", error);
     return res.status(500).json({
       message: "Account deletion failed. Please retry or contact support."
     });

@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const { validAuthToken } = require("../utils/authToken");
 const firebaseAdminAuth =
   require(
@@ -71,10 +72,7 @@ const socketAuth =
 
       next();
     } catch (error) {
-      console.error(
-        "SOCKET AUTH ERROR:",
-        error?.code || "verification_failed"
-      );
+      logError("SOCKET AUTH ERROR:", error);
 
       next(
         new Error(

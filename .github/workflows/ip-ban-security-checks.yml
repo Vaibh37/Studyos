@@ -10,6 +10,7 @@ on:
       - "server/**"
       - "client/**"
       - "docs/IP-BANS.md"
+      - "ops/verify-backup-restore.sh"
       - ".github/workflows/ip-ban-security-checks.yml"
   push:
     branches:
@@ -30,6 +31,8 @@ jobs:
           - 27017:27017
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -38,7 +41,11 @@ jobs:
             server/package-lock.json
             client/package-lock.json
       - name: Reject tracked credentials and common secret patterns
-        run: node server/scripts/auditTrackedSecrets.js
+        run: |
+          node server/scripts/auditTrackedSecrets.js
+          node server/scripts/auditHistorySecrets.js
+      - name: Test backup and recovery on disposable MongoDB
+        run: docker exec -i -e STUDYOS_BACKUP_DRILL=isolated-ci-only "${{ job.services.mongo.id }}" bash -s < ops/verify-backup-restore.sh
       - name: Install server dependencies exactly as locked
         run: npm ci --prefix server
       - name: Validate backend syntax
@@ -88,7 +95,7 @@ jobs:
       - name: Check production dependency advisories
         run: npm audit --prefix server --omit=dev --audit-level=moderate
       - name: Verify malformed API payloads fail safely
-        run: node --test server/tests/apiRequestSafety.test.js
+        run: node --test server/tests/apiRequestSafety.test.js server/tests/privacyHardening.test.js
       - name: Test IP parsing and administrative API
         run: node --test server/tests/clientIp.test.js server/tests/securityAdmin.test.js server/tests/groupRoomAccess.test.js
       - name: Install frontend dependencies exactly as locked

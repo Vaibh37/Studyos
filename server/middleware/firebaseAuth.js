@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const { validAuthToken } = require("../utils/authToken");
 const { authenticatedApiLimiter } = require("./rateLimiters");
 const firebaseAdminAuth =
@@ -91,10 +92,7 @@ const firebaseAuth =
 
       return authenticatedApiLimiter(req, res, next);
     } catch (error) {
-      console.error(
-        "FIREBASE AUTH ERROR:",
-        error?.code || "verification_failed"
-      );
+      logError("FIREBASE AUTH ERROR:", error);
 
       return res
         .status(401)

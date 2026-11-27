@@ -1,3 +1,4 @@
+const { logError } = require("./safeLogger");
 const firebaseAdminAuth = require("../config/firebaseAdmin");
 
 // A socket keeps receiving group broadcasts without making more HTTP requests.
@@ -35,8 +36,7 @@ async function disconnectInvalidFirebaseSockets(
       } else {
         // Transient provider failures should not sign everyone out.
         // Token expiry is still checked below; retry account state next pass.
-        logger.error("Firebase socket revocation recheck unavailable:",
-          error?.code || "provider_error");
+        logError("Firebase socket revocation recheck unavailable:", error, logger.error.bind(logger));
         accounts.set(uid, undefined);
       }
     }

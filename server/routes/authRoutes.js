@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 
 const express = require("express");
 
@@ -208,10 +209,7 @@ router.post(
           "Streak is updating. Please retry.",
       });
     } catch (error) {
-      console.error(
-        "DAILY STREAK ERROR:",
-        error
-      );
+      logError("DAILY STREAK ERROR:", error);
 
       return res.status(500).json({
         message:

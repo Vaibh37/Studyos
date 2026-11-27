@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express = require("express");
 const mongoose = require("mongoose");
 
@@ -87,10 +88,7 @@ router.get(
         events
       );
     } catch (error) {
-      console.error(
-        "GET EVENTS ERROR:",
-        error
-      );
+      logError("GET EVENTS ERROR:", error);
 
       res.status(500).json({
         message:
@@ -160,10 +158,7 @@ router.post(
         event
       );
     } catch (error) {
-      console.error(
-        "CREATE EVENT ERROR:",
-        error
-      );
+      logError("CREATE EVENT ERROR:", error);
 
       res.status(500).json({
         message:
@@ -287,10 +282,7 @@ router.put(
         event
       );
     } catch (error) {
-      console.error(
-        "UPDATE EVENT ERROR:",
-        error
-      );
+      logError("UPDATE EVENT ERROR:", error);
 
       res.status(500).json({
         message:
@@ -346,10 +338,7 @@ router.delete(
           "Event deleted successfully",
       });
     } catch (error) {
-      console.error(
-        "DELETE EVENT ERROR:",
-        error
-      );
+      logError("DELETE EVENT ERROR:", error);
 
       res.status(500).json({
         message:

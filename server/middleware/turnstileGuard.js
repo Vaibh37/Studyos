@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const currentMode = () =>
   ["off", "audit", "enforce"].includes(process.env.STUDYOS_TURNSTILE_MODE)
@@ -59,7 +60,7 @@ function createTurnstileGuard(action, {
       }
       return next();
     } catch (error) {
-      console.error("Turnstile verification error:", error?.name || "error");
+      logError("Turnstile verification error:", error);
       if (setting === "enforce") {
         return res.status(503).json({ message: "Security verification unavailable" });
       }
