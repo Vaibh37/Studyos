@@ -1,0 +1,317 @@
+/* Homepage-specific layout. Keep the shared document and workspace styles intact. */
+.marketing-home .marketing-nav,
+.light-theme .marketing-home .marketing-nav {
+  background: var(--marketing-bg);
+  border-bottom-color: var(--marketing-border);
+  backdrop-filter: none;
+}
+
+.marketing-home .marketing-hero {
+  min-height: auto;
+}
+
+.marketing-home .marketing-hero::before,
+.marketing-home .marketing-hero::after,
+.marketing-home .marketing-final::before {
+  content: none;
+}
+
+.marketing-home .marketing-hero-inner {
+  min-height: clamp(620px, 79svh, 820px);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(40px, 5vw, 76px);
+  padding-top: 124px;
+  padding-bottom: 90px;
+}
+
+.marketing-home .marketing-hero-copy {
+  padding-bottom: 0;
+}
+
+.marketing-home .marketing-hero-title {
+  max-width: 600px;
+  font-size: clamp(54px, 5.5vw, 80px);
+  line-height: 1.01;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.marketing-home .marketing-hero-subtitle {
+  max-width: 430px;
+  margin-top: 24px;
+}
+
+.marketing-home .marketing-hero-visual {
+  width: 100%;
+  max-width: 820px;
+  perspective: none;
+  transform-style: flat;
+}
+
+.marketing-home .marketing-product-frame,
+.marketing-home .marketing-system-node,
+.marketing-home .marketing-feature-visual,
+.light-theme .marketing-home .marketing-product-frame,
+.light-theme .marketing-home .marketing-system-node,
+.light-theme .marketing-home .marketing-feature-visual {
+  box-shadow: none;
+}
+
+.marketing-home .marketing-product-frame,
+.marketing-home .marketing-feature-visual {
+  border-radius: 8px;
+}
+
+.marketing-home .marketing-button {
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.marketing-home .marketing-button:hover,
+.marketing-home .marketing-button:active,
+.marketing-home .marketing-feature-row:hover .marketing-feature-visual {
+  transform: none;
+}
+
+.marketing-home .marketing-text-link {
+  text-decoration: underline;
+  text-decoration-color: var(--marketing-border-strong);
+  text-underline-offset: 4px;
+  transition: color 150ms ease, text-decoration-color 150ms ease;
+}
+
+.marketing-home .marketing-text-link:hover {
+  gap: 7px;
+  text-decoration-color: currentColor;
+}
+
+.marketing-home .marketing-section {
+  padding-block: 104px;
+}
+
+.marketing-home .marketing-section-heading {
+  margin-bottom: 48px;
+}
+
+.marketing-home .marketing-section-heading h2,
+.marketing-home .marketing-connected-copy h2,
+.marketing-home .marketing-guest-copy h2,
+.marketing-home .marketing-privacy-copy h2 {
+  margin-top: 0;
+  font-size: clamp(36px, 4.3vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+/* Direct controls replace the long scroll-dependent product story. */
+.marketing-walkthrough {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.32fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 76px);
+  align-items: start;
+}
+
+.marketing-walkthrough-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.marketing-walkthrough-button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--marketing-text-soft);
+  font: inherit;
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  cursor: pointer;
+}
+
+.marketing-walkthrough-button:hover {
+  background: var(--marketing-surface-2);
+  color: var(--marketing-text);
+}
+
+.marketing-walkthrough-button[aria-pressed="true"] {
+  border-color: var(--marketing-border-strong);
+  background: var(--marketing-surface);
+  color: var(--marketing-text);
+}
+
+.marketing-walkthrough-number {
+  color: var(--marketing-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.marketing-walkthrough-preview {
+  min-width: 0;
+}
+
+.marketing-walkthrough-frame {
+  display: grid;
+  aspect-ratio: 16 / 9;
+}
+
+.marketing-home .marketing-walkthrough-frame img {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.marketing-home .marketing-walkthrough-frame img.is-active {
+  visibility: visible;
+  opacity: 1;
+}
+
+.marketing-walkthrough-caption {
+  max-width: 720px;
+  min-height: 52px;
+  margin: 16px 0 0;
+  color: var(--marketing-text-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.marketing-home .marketing-feature-row {
+  min-height: 0;
+  padding-block: 54px;
+}
+
+.marketing-home .marketing-feature-copy h3 {
+  margin-top: 0;
+  font-size: clamp(32px, 3.6vw, 46px);
+  line-height: 1.08;
+}
+
+.marketing-home .marketing-feature-copy .marketing-text-link,
+.marketing-home .marketing-supporting-feature .marketing-text-link {
+  margin-top: 16px;
+}
+
+.marketing-home .marketing-how-step {
+  min-height: 0;
+  padding-bottom: 0;
+}
+
+.marketing-home .marketing-mode-compare li {
+  display: list-item;
+  list-style: disc;
+  margin-left: 15px;
+  padding-left: 2px;
+}
+
+.marketing-home .marketing-final,
+.light-theme .marketing-home .marketing-final {
+  background: var(--marketing-surface-2);
+  border-top: 0;
+}
+
+.marketing-home .marketing-final-content {
+  padding-block: 88px;
+}
+
+.marketing-home .marketing-final h2 {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 66px);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+
+@media (max-width: 1080px) and (min-width: 821px) {
+  .marketing-home .marketing-hero-inner {
+    gap: 32px;
+  }
+
+  .marketing-home .marketing-hero-title {
+    font-size: clamp(46px, 5.6vw, 62px);
+  }
+}
+
+@media (max-width: 820px) {
+  .marketing-home .marketing-hero-inner {
+    min-height: 0;
+    gap: 38px;
+    padding-top: 120px;
+    padding-bottom: 58px;
+  }
+
+  .marketing-home .marketing-hero-title {
+    font-size: clamp(48px, 9.5vw, 72px);
+  }
+
+  .marketing-home .marketing-section {
+    padding-block: 72px;
+  }
+
+  .marketing-home .marketing-section-heading {
+    margin-bottom: 32px;
+  }
+
+  .marketing-walkthrough {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .marketing-walkthrough-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .marketing-home .marketing-feature-row {
+    padding-block: 42px;
+  }
+
+  .marketing-home .marketing-final-content {
+    padding-block: 72px;
+  }
+}
+
+@media (max-width: 560px) {
+  .marketing-home .marketing-hero-inner {
+    padding-top: 106px;
+    padding-bottom: 48px;
+  }
+
+  .marketing-home .marketing-hero-title {
+    font-size: clamp(39px, 11vw, 58px);
+  }
+
+  .marketing-home .marketing-hero-actions {
+    margin-top: 26px;
+  }
+
+  .marketing-home .marketing-hero-actions .marketing-button {
+    padding-inline: 12px;
+    flex-basis: auto;
+  }
+
+  .marketing-walkthrough-button {
+    min-height: 48px;
+    gap: 9px;
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+
+  .marketing-walkthrough-caption {
+    min-height: 0;
+  }
+
+  .marketing-home .marketing-section {
+    padding-block: 56px;
+  }
+
+  .marketing-home .marketing-final-content {
+    padding-block: 56px;
+  }
+}

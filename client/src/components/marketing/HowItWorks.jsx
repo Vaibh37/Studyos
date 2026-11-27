@@ -1,10 +1,10 @@
 import Reveal from "./Reveal";
 
 const steps = [
-  ["01", "Organize", "Create subjects, tasks, notes and deadlines."],
-  ["02", "Focus", "Start a timed study session linked to what you are working on."],
-  ["03", "Track", "StudyOS records completed work and Focus activity as you use it."],
-  ["04", "Improve", "Review Focus trends, consistency, XP and progress."],
+  ["01", "Create a subject", "Add the course or topic you want to study."],
+  ["02", "Add a task", "Choose the next piece of work and give it a deadline if needed."],
+  ["03", "Start a session", "Set a focus duration and work on your subject."],
+  ["04", "Review your day", "Check completed tasks and recorded focus time."],
 ];
 
 function HowItWorks() {
@@ -12,8 +12,7 @@ function HowItWorks() {
     <section id="how-it-works" className="marketing-how marketing-section" aria-labelledby="how-title">
       <div className="marketing-shell">
         <Reveal className="marketing-section-heading">
-          <span className="marketing-kicker">How it works</span>
-          <h2 id="how-title">Less setup. More studying.</h2>
+          <h2 id="how-title">Start your first study session.</h2>
         </Reveal>
 
         <Reveal className="marketing-how-grid">
