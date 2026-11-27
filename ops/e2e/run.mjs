@@ -146,7 +146,33 @@ async function screenshotFailures() {
   }
 }
 
+async function privacyJourney() {
+  const { context, page } = await newPage(true);
+  await go(page, "/privacy", "Privacy Policy");
+  const measurement = page.locator("script[data-sdkn]");
+  assert.equal(await measurement.count(), 0, "Analytics loaded before consent");
+  await visible(page.getByText("Optional public-site analytics are disabled in this browser."));
+  await button(page, "Enable analytics").click();
+  await visible(page.getByText("Optional public-site analytics are enabled in this browser."));
+  await measurement.waitFor({ state: "attached" });
+  assert.equal(await page.evaluate(() => localStorage.getItem("studyos_optional_analytics_v1")), "allow");
+  await button(page, "Disable analytics").click();
+  await visible(page.getByText("Optional public-site analytics are disabled in this browser."));
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await visible(page.getByText("Optional public-site analytics are disabled in this browser."));
+  assert.equal(await measurement.count(), 0, "Analytics loaded after withdrawal");
+  await assertNoOverflow(page);
+  await go(page, "/nonexistent-privacy-test-page", "Page not found");
+  assert.equal(await page.locator('meta[name="robots"]').getAttribute("content"), "noindex, follow");
+  await assertNoOverflow(page);
+  await page.getByRole("link", { name: "Return to StudyOS" }).click();
+  await page.waitForURL(WEB + "/");
+  await context.close();
+  console.log("PASS mobile privacy controls, preference persistence and page-not-found recovery");
+}
+
 async function journeys() {
+  await privacyJourney();
   const alice = credentials("Alice"), bob = credentials("Bob");
   const { page: a } = await newPage();
   await emailForm(a, alice, true);

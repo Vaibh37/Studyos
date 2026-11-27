@@ -2146,3 +2146,13 @@
 /* Public editorial copy stays regular; major headings use the same title weight as the app. */
 .marketing-page h1 { font-weight: var(--type-title-weight); }
 .marketing-page p { font-weight: var(--type-prose-weight); }
+
+.analytics-preference-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.analytics-preference [role="status"]:empty {
+  display: none;
+}

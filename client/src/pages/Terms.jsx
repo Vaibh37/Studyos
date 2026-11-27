@@ -9,7 +9,7 @@ function Terms() {
       title="Terms & Conditions"
       intro="Readable terms for StudyOS as an independent productivity software project."
     >
-      <p className="marketing-document-updated">Last updated: September 30, 2026</p>
+      <p className="marketing-document-updated">Last updated: November 27, 2026</p>
 
       <section>
         <h2>1. About StudyOS</h2>
@@ -49,6 +49,8 @@ function Terms() {
           <li>interfere with or overload StudyOS or its infrastructure;</li>
           <li>attempt to access another person’s account or private data;</li>
           <li>use automated or deceptive activity to manipulate XP or leaderboard results;</li>
+          <li>use groups or messages to harass, threaten, impersonate or exploit others;</li>
+          <li>upload malicious files, distribute private information without authorization, or share unlawful content;</li>
           <li>use the service in a way that violates applicable law or third-party rights.</li>
         </ul>
       </section>
@@ -66,6 +68,12 @@ function Terms() {
 
       <section>
         <h2>6. Your content and backups</h2>
+        <p>
+          Group messages and files may be shared with other authorized members.
+          Do not share content you lack permission to distribute. To report
+          abusive or unlawful content privately, email{" "}
+          <a href="mailto:devvaibhav37@gmail.com?subject=StudyOS%20Abuse%20Report">the StudyOS operator</a>.
+        </p>
         <p>
           You remain responsible for the study content and information you enter.
           StudyOS includes backup/export functionality as a convenience, but you
