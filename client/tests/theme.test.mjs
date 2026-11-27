@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeTheme, isLightTheme, readTheme, applyTheme, saveTheme } from "../src/services/theme.js";
+import { ILLUSTRATED_THEMES, normalizeTheme, isLightTheme, readTheme, applyTheme, saveTheme } from "../src/services/theme.js";
 
 test("only supported themes are accepted", () => {
   for (const theme of ["dark", "light", "coffee", "cloud", "rain", "stargaze"]) assert.equal(normalizeTheme(theme), theme);
+  for (const { id } of ILLUSTRATED_THEMES) assert.equal(normalizeTheme(id), id);
   for (const theme of [undefined, null, "", "unknown", "COFFEE"]) assert.equal(normalizeTheme(theme), "dark");
 });
 
@@ -44,11 +45,21 @@ test("Theme selection persists, and switching between light and dark themes clea
     // Reloading from the stored preference restores the same class.
     applyTheme(readTheme());
     for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["stargaze-theme"]);
+    for (const { id, color: themeColor, light } of ILLUSTRATED_THEMES) {
+      saveTheme(id);
+      assert.equal(readTheme(), id);
+      assert.equal(isLightTheme(id), light);
+      assert.equal(color, themeColor);
+      const expected = light ? ["light-theme", "illustrated-theme", `${id}-theme`] : ["illustrated-theme", `${id}-theme`];
+      for (const node of [root, body]) assert.deepEqual([...node.classList.values].sort(), expected.sort());
+      applyTheme(readTheme());
+      for (const node of [root, body]) assert.deepEqual([...node.classList.values].sort(), expected.sort());
+    }
     saveTheme("light");
     for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["light-theme"]);
     applyTheme("dark");
     for (const node of [root, body]) assert.equal(node.classList.values.size, 0);
-    assert.deepEqual(events, ["studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated"]);
+    assert.deepEqual(events, Array(5 + ILLUSTRATED_THEMES.length).fill("studyos-theme-updated"));
   } finally {
     delete globalThis.document;
     delete globalThis.localStorage;

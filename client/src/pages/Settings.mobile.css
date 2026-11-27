@@ -4230,3 +4230,44 @@ body:has(.settings-clean) .study-select-option-copy small {
 .settings-v2-page.settings-clean .settings-v2-theme-card:has(.settings-v2-theme-preview-stargaze) > svg {
   color: #f0f5fc;
 }
+
+
+/* Poster thumbnails use lazy-loaded originals instead of downloading all full-size backgrounds at startup. */
+.settings-v2-theme-preview-ronin { --poster-preview-bg: #202b27; --poster-preview-surface: #2b3833; --poster-preview-accent: #b8c9ae; --poster-preview-text: #f1f4ef; }
+.settings-v2-theme-preview-identity { --poster-preview-bg: #e4e1da; --poster-preview-surface: #f5f3ef; --poster-preview-accent: #56534b; --poster-preview-text: #20201f; }
+.settings-v2-theme-preview-ego { --poster-preview-bg: #e6dcc8; --poster-preview-surface: #f7f1e4; --poster-preview-accent: #987649; --poster-preview-text: #222c30; }
+.settings-v2-theme-preview-solitude { --poster-preview-bg: #153b4d; --poster-preview-surface: #1b4658; --poster-preview-accent: #c2d7a0; --poster-preview-text: #f0f7f9; }
+.settings-v2-theme-preview-victory { --poster-preview-bg: #263c43; --poster-preview-surface: #314b53; --poster-preview-accent: #dfc28b; --poster-preview-text: #f1f5f5; }
+.settings-v2-theme-preview-resolve { --poster-preview-bg: #262936; --poster-preview-surface: #373747; --poster-preview-accent: #edba83; --poster-preview-text: #f5f0ed; }
+.settings-v2-theme-preview-silence { --poster-preview-bg: #321a16; --poster-preview-surface: #43231d; --poster-preview-accent: #ffbf66; --poster-preview-text: #fff2dd; }
+.settings-v2-theme-preview-patience { --poster-preview-bg: #dbeaf0; --poster-preview-surface: #f3f9fa; --poster-preview-accent: #4686ab; --poster-preview-text: #1b3448; }
+.settings-v2-page.settings-clean .settings-v2-poster-preview {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  height: 118px !important;
+  gap: 0;
+  padding: 0 !important;
+  background: var(--poster-preview-bg) !important;
+  border-color: var(--poster-preview-accent);
+}
+.settings-v2-page.settings-clean .settings-v2-poster-preview::before {
+  content: "";
+  flex: 1;
+  min-width: 22px;
+  margin: 10px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, var(--poster-preview-surface) 0 41%, transparent 41% 49%, var(--poster-preview-accent) 49% 56%, transparent 56% 64%, var(--poster-preview-surface) 64%);
+}
+.settings-v2-page.settings-clean .settings-v2-poster-preview img {
+  display: block;
+  width: auto;
+  max-width: 68%;
+  height: 100%;
+  object-fit: contain;
+}
+.settings-v2-page.settings-clean .settings-v2-theme-card:has(.settings-v2-poster-preview) > svg {
+  color: #fff;
+  background: #111;
+  border-radius: 50%;
+}

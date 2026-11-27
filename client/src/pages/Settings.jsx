@@ -1,4 +1,4 @@
-import { applyTheme, readTheme, saveTheme } from "../services/theme";
+import { applyTheme, readTheme, saveTheme, ILLUSTRATED_THEMES } from "../services/theme";
 import { readProfileName, writeProfileName, clearProfileName } from "../services/profileName";
 import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { withDeadline } from "../services/deadline";
@@ -3044,6 +3044,19 @@ function Settings() {
                     onClick={changeTheme}
                   />
 
+                  {ILLUSTRATED_THEMES.map(({ id, label, description }) => (
+                    <ThemeButton
+                      key={id}
+                      theme={id}
+                      activeTheme={theme}
+                      label={label}
+                      description={description}
+                      icon={Palette}
+                      wallpaper
+                      onClick={changeTheme}
+                    />
+                  ))}
+
                 </div>
 
               </div>
@@ -4220,6 +4233,7 @@ function ThemeButton({
   icon:
     Icon,
   onClick,
+  wallpaper = false,
 }) {
   const active =
     activeTheme ===
@@ -4244,12 +4258,18 @@ function ThemeButton({
     >
 
       <div
-        className={`settings-v2-theme-preview settings-v2-theme-preview-${theme}`}
+        className={`settings-v2-theme-preview settings-v2-theme-preview-${theme}${wallpaper ? " settings-v2-poster-preview" : ""}`}
+        aria-hidden="true"
       >
-
-        <span />
-        <span />
-        <span />
+        {wallpaper ? (
+          <img src={`/themes/${theme}.webp`} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <>
+            <span />
+            <span />
+            <span />
+          </>
+        )}
 
       </div>
 
