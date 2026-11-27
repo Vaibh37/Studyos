@@ -829,8 +829,11 @@
   box-shadow: none;
 }
 
-.v2f-clean .v2f-custom:has(input:focus-visible) {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-text) 16%, transparent);
+/* Keep the shared accessibility ring inside this compact control so the
+   workspace edge cannot clip it on phones. */
+#root .v2f-clean .v2f-custom:has(input:focus-visible) {
+  outline-offset: -2px !important;
+  box-shadow: none;
 }
 
 .v2f-clean .v2f-unit-toggle {
@@ -871,9 +874,8 @@
   font-weight: 600;
 }
 
-.v2f-clean .v2f-unit-toggle button:focus-visible {
-  outline: 2px solid var(--color-text-muted);
-  outline-offset: -2px;
+#root .v2f-clean .v2f-unit-toggle button:focus-visible {
+  outline-offset: -2px !important;
   box-shadow: none;
 }
 
@@ -1269,7 +1271,6 @@
   .v2f-clean .v2f-history-icon {
     display: none;
   }
-
 }
 
 @media (max-width: 375px) {
