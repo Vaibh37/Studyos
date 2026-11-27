@@ -4166,3 +4166,30 @@ body:has(.settings-clean) .study-select-option-copy small {
     max-width: 820px;
   }
 }
+
+/* Cloud preview uses the actual wallpaper, independent of the active theme. */
+.settings-v2-page .settings-v2-theme-preview-cloud {
+  border-color: #90a7a4;
+  background: #a8bab9 url("/themes/cloud.webp") center bottom / cover no-repeat !important;
+}
+.settings-v2-page .settings-v2-theme-preview-cloud span:nth-child(1) {
+  background: #142426;
+}
+.settings-v2-page .settings-v2-theme-preview-cloud span:nth-child(2) {
+  background: #294346;
+}
+.settings-v2-page .settings-v2-theme-preview-cloud span:nth-child(3) {
+  background: rgb(238 241 235 / 86%);
+}
+/* Four choices, without squeezing the labels on smaller screens. */
+@media (min-width: 761px) {
+  .settings-v2-page.settings-clean .settings-v2-theme-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1200px) {
+  .settings-v2-page.settings-clean .settings-v2-theme-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    max-width: 920px;
+  }
+}

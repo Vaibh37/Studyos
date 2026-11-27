@@ -3015,6 +3015,15 @@ function Settings() {
                     onClick={changeTheme}
                   />
 
+                  <ThemeButton
+                    theme="cloud"
+                    activeTheme={theme}
+                    label="Cloud"
+                    description="Soft skies and sunlit clouds"
+                    icon={Cloud}
+                    onClick={changeTheme}
+                  />
+
                 </div>
 
               </div>
