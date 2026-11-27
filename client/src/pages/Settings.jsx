@@ -3,7 +3,7 @@ import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { withDeadline } from "../services/deadline";
 import DialogSurface from "../components/DialogSurface";
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import {
   BadgeCheck,
   Bell,
@@ -2707,6 +2707,16 @@ function Settings() {
 
                   </button>
 
+                </div>
+
+                <div className="settings-v2-row">
+                  <div className="settings-v2-row-copy">
+                    <strong>Privacy and optional analytics</strong>
+                    <span>Review how StudyOS handles your information and change your browser's analytics preference.</span>
+                  </div>
+                  <Link className="settings-v2-secondary-button" to="/privacy">
+                    Privacy settings
+                  </Link>
                 </div>
 
                 {isAuthenticated && <DeleteAccountSettings />}

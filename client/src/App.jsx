@@ -14,9 +14,7 @@ import {
   useLocation,
 } from "react-router";
 
-import {
-  Analytics,
-} from "@vercel/analytics/react";
+import OptionalAnalytics from "./components/OptionalAnalytics";
 
 import {
   useAuth,
@@ -58,6 +56,8 @@ const Terms = lazyPage(
       "./pages/Terms"
     )
 );
+
+const NotFound = lazyPage(() => import("./pages/NotFound"));
 
 const Contact = lazyPage(
   () =>
@@ -430,7 +430,7 @@ function App() {
     <>
       <RouteScrollManager />
 
-      <Analytics />
+      <OptionalAnalytics />
 
       <RecoveryBoundary key={pathname.startsWith("/app") ? "workspace" : pathname} scope="app">
       <Suspense
@@ -561,10 +561,7 @@ function App() {
             <Route
               path="*"
               element={
-                <Navigate
-                  to="/app/dashboard"
-                  replace
-                />
+                <NotFound workspace />
               }
             />
 
@@ -602,10 +599,7 @@ function App() {
           <Route
             path="*"
             element={
-              <Navigate
-                to="/"
-                replace
-              />
+              <NotFound />
             }
           />
 

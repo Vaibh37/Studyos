@@ -83,6 +83,7 @@ function Seo({
   path = "/",
   image = DEFAULT_IMAGE,
   structuredData = null,
+  noindex = false,
 }) {
   useEffect(
     () => {
@@ -119,7 +120,7 @@ function Seo({
             "robots",
 
           content:
-            "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+            noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
         }
       );
 
@@ -284,6 +285,7 @@ function Seo({
       path,
       image,
       structuredData,
+      noindex,
     ]
   );
 
