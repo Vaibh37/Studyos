@@ -9,6 +9,7 @@ function PublicPageShell({
   title,
   intro,
   children,
+  noindex = false,
 }) {
   const location =
     useLocation();
@@ -25,7 +26,8 @@ function PublicPageShell({
       <Seo
         title={pageTitle}
         description={description}
-        path={location.pathname}
+        path={noindex ? "/" : location.pathname}
+        noindex={noindex}
       />
 
       <MarketingNav solid />
@@ -33,7 +35,7 @@ function PublicPageShell({
       <main className="marketing-document-main">
         <div className="marketing-shell marketing-document-shell">
           <header className="marketing-document-header">
-            <span className="marketing-kicker">{eyebrow}</span>
+            {eyebrow && <span className="marketing-kicker">{eyebrow}</span>}
             <h1>{title}</h1>
             {intro && <p>{intro}</p>}
           </header>

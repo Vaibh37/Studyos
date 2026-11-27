@@ -2,6 +2,8 @@ import { Link } from "react-router";
 
 import GithubMark from "./GithubMark";
 
+const copyrightYear = new Date().getFullYear();
+
 const productLinks = [
   ["Overview", "/#overview"],
   ["Study Planner", "/study-planner"],
@@ -52,7 +54,7 @@ function MarketingFooter() {
         </div>
 
         <div className="marketing-footer-bottom">
-          <span>© 2026 StudyOS</span>
+          <span>© {copyrightYear} StudyOS</span>
           <span>Built by Vaibh37</span>
           <a href="https://github.com/Vaibh37/Studyos" target="_blank" rel="noreferrer" aria-label="StudyOS GitHub repository">
             <GithubMark size={17} />
