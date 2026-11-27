@@ -1,4 +1,5 @@
 import "../styles/marketing.css";
+import "../styles/landing-polish.css";
 
 import Seo from "../components/Seo";
 import MarketingNav from "../components/marketing/MarketingNav";
@@ -64,7 +65,7 @@ const homeStructuredData = {
 
 function Landing() {
   return (
-    <div className="marketing-page">
+    <div className="marketing-page marketing-home">
       <Seo
         title="StudyOS — Study Planner, Focus Timer & Productivity Workspace"
         description="Plan tasks, organize subjects and notes, run focus sessions, track progress, and use an optional leaderboard in one student productivity workspace."

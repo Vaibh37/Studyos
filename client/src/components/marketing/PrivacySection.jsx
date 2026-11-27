@@ -9,13 +9,12 @@ function PrivacySection() {
       <div className="marketing-shell">
         <Reveal className="marketing-privacy-grid">
           <div className="marketing-privacy-copy">
-            <span className="marketing-kicker">Opt-in competition</span>
-            <h2 id="privacy-title">Competition without exposing your work.</h2>
+            <h2 id="privacy-title">Your study content stays private.</h2>
             <p>
               StudyOS keeps the leaderboard separate from the private content
               you use to study. Participation is optional.
             </p>
-            <Link className="marketing-text-link" to="/privacy">Read the privacy policy →</Link>
+            <Link className="marketing-text-link" to="/privacy">Read the privacy policy</Link>
           </div>
 
           <div className="marketing-privacy-cards">

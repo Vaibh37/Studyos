@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Check, Cloud, HardDrive } from "../icons";
+import { Cloud, HardDrive } from "../icons";
 import { Link, useNavigate } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";
@@ -39,11 +39,10 @@ function GuestModeSection() {
       <div className="marketing-shell">
         <Reveal className="marketing-guest-panel">
           <div className="marketing-guest-copy">
-            <span className="marketing-kicker">No account required</span>
-            <h2 id="guest-title">Start studying before creating an account.</h2>
+            <h2 id="guest-title">Study without an account.</h2>
             <p>
-              Guest Mode opens the real StudyOS app immediately and keeps your
-              study data in this browser using IndexedDB.
+              Try the workspace immediately. In Guest Mode, your study data
+              stays in this browser.
             </p>
 
             <div className="marketing-guest-actions">
@@ -54,7 +53,6 @@ function GuestModeSection() {
                 disabled={working}
               >
                 {working ? "Opening StudyOS…" : mode === "none" ? "Try as guest" : "Open StudyOS"}
-                <ArrowRight size={17} />
               </button>
 
               {mode === "none" && (
@@ -72,10 +70,10 @@ function GuestModeSection() {
               <span className="marketing-mode-icon"><HardDrive size={19} /></span>
               <h3>Guest Mode</h3>
               <ul>
-                <li><Check size={15} /> No signup</li>
-                <li><Check size={15} /> IndexedDB persistence</li>
-                <li><Check size={15} /> Data stays on this device</li>
-                <li><Check size={15} /> Immediate access</li>
+                <li>No signup</li>
+                <li>Saved in this browser</li>
+                <li>No cloud account</li>
+                <li>Immediate access</li>
               </ul>
             </article>
 
@@ -83,10 +81,10 @@ function GuestModeSection() {
               <span className="marketing-mode-icon"><Cloud size={19} /></span>
               <h3>Account Mode</h3>
               <ul>
-                <li><Check size={15} /> Firebase authentication</li>
-                <li><Check size={15} /> Cloud-backed app data</li>
-                <li><Check size={15} /> Long-term account history</li>
-                <li><Check size={15} /> Leaderboard access</li>
+                <li>Account sign-in</li>
+                <li>Cloud-backed study data</li>
+                <li>Long-term account history</li>
+                <li>Leaderboard access</li>
               </ul>
             </article>
           </div>

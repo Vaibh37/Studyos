@@ -146,6 +146,50 @@ async function screenshotFailures() {
   }
 }
 
+async function landingJourney() {
+  for (const mobile of [false, true]) {
+    const { context, page } = await newPage(mobile);
+    await go(page, "/", "Your study workspace.");
+    const controls = page.getByRole("group", { name: "Choose a study workflow step" });
+    const preview = page.locator("#study-workflow-preview");
+    const steps = [
+      ["Plan", "StudyOS Tasks page with priorities, subjects and deadlines"],
+      ["Focus", "StudyOS Focus page with the study timer and session controls"],
+      ["Review", "StudyOS Progress page with focus trends and study analytics"],
+      ["Compete", "StudyOS Leaderboard showing weekly student rankings"],
+    ];
+    assert.equal(await button(controls, "Plan").getAttribute("aria-pressed"), "true");
+    for (const [name, alt] of steps) {
+      const control = button(controls, name);
+      if (mobile) await control.tap();
+      else {
+        await control.focus();
+        await control.press("Enter");
+      }
+      assert.equal(await control.getAttribute("aria-pressed"), "true");
+      assert.equal(await controls.locator('[aria-pressed="true"]').count(), 1);
+      const image = preview.getByRole("img", { name: alt, exact: true });
+      await visible(image);
+      await image.evaluate(img => img.decode());
+      assert(await image.evaluate(img => img.naturalWidth > 0), "Workflow screenshot failed to load");
+      await assertNoOverflow(page);
+    }
+    assert.equal(await page.locator(".marketing-home .marketing-kicker, .marketing-home .marketing-eyebrow, .marketing-hero-orbit").count(), 0);
+    await button(page, "Use light theme").click();
+    assert(await page.locator("html").evaluate(node => node.classList.contains("light-theme")));
+    await assertNoOverflow(page);
+    await button(page, "Use dark theme").click();
+    assert(!(await page.locator("html").evaluate(node => node.classList.contains("light-theme"))));
+    assert.equal(await page.getByRole("link", { name: "Privacy Policy", exact: true }).getAttribute("href"), "/privacy");
+    assert.equal(await page.getByRole("link", { name: "Terms & Conditions", exact: true }).getAttribute("href"), "/terms");
+    await exact(page, "link", "Explore features").click();
+    await page.waitForURL(/#features$/);
+    await visible(exact(page, "heading", "Tools for everyday study."));
+    await context.close();
+  }
+  console.log("PASS public landing walkthrough, screenshot loading, theme, links and responsive layout");
+}
+
 async function journeys() {
   const alice = credentials("Alice"), bob = credentials("Bob");
   const { page: a } = await newPage();
@@ -359,6 +403,7 @@ try {
   ]);
   browser = await chromium.launch({ headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}) });
+  await landingJourney();
   await journeys();
   // Release the happy-path clients and their sockets before running the
   // adversarial cases (all clients share a loopback IP rate-limit bucket).

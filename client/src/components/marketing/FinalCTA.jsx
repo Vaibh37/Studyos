@@ -1,4 +1,3 @@
-import { ArrowRight } from "../icons";
 import { Link } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";
@@ -11,28 +10,17 @@ function FinalCTA() {
 
   return (
     <section className="marketing-final" aria-labelledby="final-title">
-      <div className="marketing-final-bg" aria-hidden="true">
-        <img src="/studyos-screenshots/dashboard.png" alt="" loading="lazy" decoding="async" />
-      </div>
-
       <div className="marketing-shell">
         <Reveal className="marketing-final-content">
-          <span className="marketing-kicker">StudyOS</span>
-          <h2 id="final-title">Ready to study with less chaos?</h2>
-          <p>Build a system you can actually stick with.</p>
+          <h2 id="final-title">Start studying with StudyOS.</h2>
+          <p>Free to use, with or without an account.</p>
 
           <div className="marketing-final-actions">
             <Link className="marketing-button marketing-button-primary marketing-button-large" to={ctaTo}>
               {ctaLabel}
-              <ArrowRight size={17} />
             </Link>
-
-            {mode === "none" && (
-              <Link className="marketing-final-secondary" to="/get-started">Guest Mode available</Link>
-            )}
           </div>
 
-          <span className="marketing-final-note">Free to use · Guest Mode available</span>
         </Reveal>
       </div>
     </section>

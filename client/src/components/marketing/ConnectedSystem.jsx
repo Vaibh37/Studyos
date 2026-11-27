@@ -25,21 +25,13 @@ function ConnectedSystem() {
     <section className="marketing-connected marketing-section" aria-labelledby="connected-title">
       <div className="marketing-shell marketing-connected-grid">
         <Reveal className="marketing-connected-copy">
-          <span className="marketing-kicker">One connected workspace</span>
-          <h2 id="connected-title">Everything works together.</h2>
+          <h2 id="connected-title">Keep your work connected.</h2>
           <p>
-            A task belongs to a subject. Its deadline can appear in your
-            calendar. Focus sessions record the work. Progress turns that
-            activity into insight.
+            Tasks, notes and focus sessions can belong to the same subject.
+            Deadlines appear in your calendar, and your recorded study sessions
+            contribute to your progress history.
           </p>
 
-          <div className="marketing-connected-sequence" aria-label="StudyOS connection sequence">
-            <span>Organize</span>
-            <i />
-            <span>Work</span>
-            <i />
-            <span>Understand</span>
-          </div>
         </Reveal>
 
         <Reveal className="marketing-system-map" aria-label="Diagram showing connected StudyOS features">
