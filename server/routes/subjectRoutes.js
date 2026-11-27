@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express = require("express");
 const mongoose = require("mongoose");
 
@@ -40,10 +41,7 @@ router.get("/", async (req, res) => {
       subjects
     );
   } catch (error) {
-    console.error(
-      "GET SUBJECTS ERROR:",
-      error
-    );
+    logError("GET SUBJECTS ERROR:", error);
 
     res.status(500).json({
       message:
@@ -108,10 +106,7 @@ router.post("/", async (req, res) => {
       subject
     );
   } catch (error) {
-    console.error(
-      "CREATE SUBJECT ERROR:",
-      error
-    );
+    logError("CREATE SUBJECT ERROR:", error);
 
     res.status(500).json({
       message:
@@ -381,28 +376,10 @@ router.put(
       if (
         nameChanged
       ) {
-        console.log(
-          "SUBJECT NAME PROPAGATED:",
-          {
-            subjectId:
-              String(
-                subject._id
-              ),
-
-            oldName,
-
-            newName:
-              subject.name,
-
-            ...renamedReferences,
-          }
-        );
+        console.info("Subject references updated", renamedReferences);
       }
     } catch (error) {
-      console.error(
-        "UPDATE SUBJECT ERROR:",
-        error
-      );
+      logError("UPDATE SUBJECT ERROR:", error);
 
       res.status(500).json({
         message:
@@ -578,10 +555,7 @@ router.delete(
         },
       });
     } catch (error) {
-      console.error(
-        "DELETE SUBJECT ERROR:",
-        error
-      );
+      logError("DELETE SUBJECT ERROR:", error);
 
       res.status(500).json({
         message:

@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const GroupMember =
   require(
     "../models/social/GroupMember"
@@ -188,10 +189,7 @@ const registerGroupTypingSocket =
             ok: true,
           });
         } catch (error) {
-          console.error(
-            "GROUP TYPING START SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP TYPING START SOCKET ERROR:", error);
 
 
           if (
@@ -338,10 +336,7 @@ const registerGroupTypingSocket =
             ok: true,
           });
         } catch (error) {
-          console.error(
-            "GROUP TYPING STOP SOCKET ERROR:",
-            error.message
-          );
+          logError("GROUP TYPING STOP SOCKET ERROR:", error);
 
 
           if (

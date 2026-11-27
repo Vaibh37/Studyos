@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const BannedIp = require("../models/BannedIp");
 const { getClientIp, trustedProxyHops } = require("../utils/clientIp");
 
@@ -29,7 +30,7 @@ async function blockBannedApiIp(req, res, next) {
     }
     return res.status(403).json({ message: "Access denied" });
   } catch (error) {
-    console.error("IP ban HTTP check failed:", error.message);
+    logError("IP ban HTTP check failed:", error);
     return res.status(503).json({ message: "Service temporarily unavailable" });
   }
 }
@@ -45,7 +46,7 @@ async function blockBannedSocketIp(socket, next) {
     socket.data.clientIp = ip;
     return next();
   } catch (error) {
-    console.error("IP ban socket check failed:", error.message);
+    logError("IP ban socket check failed:", error);
     return next(new Error("Service temporarily unavailable"));
   }
 }

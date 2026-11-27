@@ -1,3 +1,4 @@
+const { logError } = require("../utils/safeLogger");
 const express =
   require("express");
 
@@ -203,10 +204,7 @@ router.get(
           },
         });
     } catch (error) {
-      console.error(
-        "GET LEADERBOARD PROFILE ERROR:",
-        error
-      );
+      logError("GET LEADERBOARD PROFILE ERROR:", error);
 
       return res
         .status(500)
@@ -303,10 +301,7 @@ router.patch(
           },
         });
     } catch (error) {
-      console.error(
-        "UPDATE LEADERBOARD PROFILE ERROR:",
-        error
-      );
+      logError("UPDATE LEADERBOARD PROFILE ERROR:", error);
 
       return res
         .status(500)
@@ -651,10 +646,7 @@ router.get(
             null,
         });
     } catch (error) {
-      console.error(
-        "GET LEADERBOARD ERROR:",
-        error
-      );
+      logError("GET LEADERBOARD ERROR:", error);
 
       return res
         .status(500)
