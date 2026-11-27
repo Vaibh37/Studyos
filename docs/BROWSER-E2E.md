@@ -27,3 +27,11 @@ firebase emulators:exec --only auth --project demo-studyos-e2e --config ops/e2e/
 ```
 
 The test runner launches and cleans up the loopback backend, object fixture and production-style frontend preview. Use the job logs and any failure screenshots to diagnose regressions. Keep the real user journeys intact when updating selectors; avoid replacing failures with mocked happy-path responses.
+
+## Adversarial regression journeys
+
+The same workflow now also includes the [edge-case and chaos checklist](EDGE-CASE-CHAOS.md):
+auth validation and duplicate registration, dropped reads and interrupted
+signed uploads, simultaneous sessions and streak check-ins across time zones,
+notification denial, theme persistence, narrow/landscape and large-root-font
+layout checks, account deletion/re-registration and an isolated loopback IP ban.

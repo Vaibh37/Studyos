@@ -1,3 +1,4 @@
+import { readProfileName, writeProfileName, clearProfileName } from "../services/profileName";
 import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { withDeadline } from "../services/deadline";
 import DialogSurface from "../components/DialogSurface";
@@ -156,11 +157,7 @@ function Settings() {
   const [
     name,
     setName,
-  ] = useState(
-    localStorage.getItem(
-      "studyos_name"
-    ) || ""
-  );
+  ] = useState(() => readProfileName(localStorage, firebaseUser, isGuest));
 
   // =======================================================
   // APPEARANCE
@@ -498,38 +495,8 @@ function Settings() {
   // =======================================================
 
   useEffect(() => {
-    const accountName =
-      firebaseUser
-        ?.displayName
-        ?.trim();
-
-    const existingName =
-      localStorage.getItem(
-        "studyos_name"
-      );
-
-    if (
-      accountName &&
-      !existingName
-    ) {
-      localStorage.setItem(
-        "studyos_name",
-        accountName
-      );
-
-      setName(
-        accountName
-      );
-
-      window.dispatchEvent(
-        new Event(
-          "studyos-name-updated"
-        )
-      );
-    }
-  }, [
-    firebaseUser,
-  ]);
+    setName(readProfileName(localStorage, firebaseUser, isGuest));
+  }, [firebaseUser?.uid, firebaseUser?.displayName, isGuest]);
 
   // =======================================================
   // THEME
@@ -589,10 +556,7 @@ function Settings() {
       const cleanName =
         name.trim();
 
-      localStorage.setItem(
-        "studyos_name",
-        cleanName
-      );
+      writeProfileName(localStorage, firebaseUser, isGuest, cleanName);
 
       setName(
         cleanName
@@ -1117,10 +1081,9 @@ function Settings() {
           (
             key
           ) => {
-            const value =
-              localStorage.getItem(
-                key
-              );
+            const value = key === "studyos_name"
+              ? readProfileName(localStorage, firebaseUser, isGuest)
+              : localStorage.getItem(key);
 
             if (
               value !==
@@ -1724,22 +1687,16 @@ function Settings() {
                   key
                 )
               ) {
-                localStorage.setItem(
-                  key,
-                  String(
-                    value
-                  )
-                );
+                if (key === "studyos_name") {
+                  writeProfileName(localStorage, firebaseUser, isGuest, value);
+                } else {
+                  localStorage.setItem(key, String(value));
+                }
               }
             }
           );
 
-          setName(
-            localStorage.getItem(
-              "studyos_name"
-            ) ||
-              ""
-          );
+          setName(readProfileName(localStorage, firebaseUser, isGuest));
 
           setTheme(
             localStorage.getItem(
@@ -1939,13 +1896,15 @@ function Settings() {
         (
           key
         ) => {
-          localStorage.removeItem(
-            key
-          );
+          if (key === "studyos_name") {
+            clearProfileName(localStorage, firebaseUser, isGuest);
+          } else {
+            localStorage.removeItem(key);
+          }
         }
       );
 
-      setName("");
+      setName(readProfileName(localStorage, firebaseUser, isGuest));
       setTheme("dark");
 
       setDailyGoalHours(

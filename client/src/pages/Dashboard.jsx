@@ -1,3 +1,4 @@
+import { readProfileName } from "../services/profileName";
 import { WorkspaceSkeleton, SkeletonBlock } from "../components/WorkspaceStates";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -87,9 +88,7 @@ function Dashboard() {
 
   const [name, setName] = useState(
     () =>
-      localStorage.getItem("studyos_name") ||
-      firebaseUser?.displayName ||
-      ""
+      readProfileName(localStorage, firebaseUser, isGuest)
   );
 
   const [loading, setLoading] = useState(true);
@@ -152,9 +151,7 @@ function Dashboard() {
   useEffect(() => {
     const updateName = () => {
       setName(
-        localStorage.getItem("studyos_name") ||
-          firebaseUser?.displayName ||
-          ""
+        readProfileName(localStorage, firebaseUser, isGuest)
       );
     };
 
@@ -165,13 +162,15 @@ function Dashboard() {
       updateName
     );
 
+    window.addEventListener("storage", updateName);
     return () => {
       window.removeEventListener(
         "studyos-name-updated",
         updateName
       );
+      window.removeEventListener("storage", updateName);
     };
-  }, [firebaseUser?.displayName]);
+  }, [firebaseUser?.uid, firebaseUser?.displayName, isGuest]);
 
   // DATA REFRESH EVENTS
 

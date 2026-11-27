@@ -1,3 +1,4 @@
+import { clearProfileName } from "../services/profileName";
 import DialogSurface from "./DialogSurface";
 import { useState } from "react";
 import { Trash2, ShieldAlert } from "./icons";
@@ -81,13 +82,16 @@ export default function DeleteAccountSettings() {
       });
 
       try {
+        clearProfileName(localStorage, firebaseUser);
+      } catch { /* Account deletion already succeeded on the server. */ }
+      try {
         await logout();
       } catch (e) {
         console.warn("Sign out after deletion:", e);
       }
 
       for (const key of [
-        "studyos_name", "studyos_theme", "studyos_study_goal",
+        "studyos_theme", "studyos_study_goal",
         "studyos_priority", "studyos_study_reminders",
         "studyos_deadline_reminders", "studyos_focus_duration",
         "studyos_startup_page"

@@ -1,6 +1,8 @@
+import { MAX_SIGNUP_NAME_LENGTH } from "../services/signupValidation";
 import {
   useEffect,
   useState,
+  useRef,
 } from "react";
 
 import {
@@ -60,6 +62,10 @@ function Welcome() {
     working,
     setWorking,
   ] = useState(false);
+
+  // React state disables the button; the ref also closes the gap before
+  // the next render if two submit events arrive back-to-back.
+  const emailSubmitInFlight = useRef(false);
 
   const [
     error,
@@ -123,8 +129,8 @@ function Welcome() {
     }
 
     if (
-      code.includes(
-        "invalid-credential"
+      ["invalid-credential", "wrong-password", "user-not-found", "invalid-login-credentials"].some(
+        value => code.includes(value)
       )
     ) {
       return "Email or password is incorrect.";
@@ -144,6 +150,13 @@ function Welcome() {
       )
     ) {
       return "Choose a stronger password.";
+    }
+
+    if (code.includes("network-request-failed")) {
+      return "Could not reach the sign-in service. Check your connection and try again.";
+    }
+    if (code.includes("too-many-requests")) {
+      return "Too many attempts. Please wait and try again.";
     }
 
     return (
@@ -179,9 +192,10 @@ function Welcome() {
     async (event) => {
       event.preventDefault();
 
-      if (working) {
+      if (working || emailSubmitInFlight.current) {
         return;
       }
+      emailSubmitInFlight.current = true;
 
       try {
         setWorking(true);
@@ -191,20 +205,6 @@ function Welcome() {
           emailMode ===
           "register"
         ) {
-          if (!name.trim()) {
-            throw new Error(
-              "Enter your name."
-            );
-          }
-
-          if (
-            password.length < 6
-          ) {
-            throw new Error(
-              "Password must be at least 6 characters."
-            );
-          }
-
           await registerWithEmail({
             name,
             email,
@@ -228,6 +228,7 @@ function Welcome() {
           )
         );
       } finally {
+        emailSubmitInFlight.current = false;
         setWorking(false);
       }
     };
@@ -409,7 +410,7 @@ function Welcome() {
                 </div>
 
                 {error && (
-                  <div className="auth-v1-error">
+                  <div className="auth-v1-error" role="alert">
                     {error}
                   </div>
                 )}
@@ -585,7 +586,7 @@ function Welcome() {
                 </div>
 
                 {error && (
-                  <div className="auth-v1-error">
+                  <div className="auth-v1-error" role="alert">
                     {error}
                   </div>
                 )}
@@ -612,6 +613,7 @@ function Welcome() {
                           working
                         }
                         placeholder="Your name"
+                        maxLength={MAX_SIGNUP_NAME_LENGTH}
                         autoComplete="name"
                         onChange={(
                           event
