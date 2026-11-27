@@ -193,15 +193,26 @@
           const isCloud = theme === "cloud";
           const isRain = theme === "rain";
           const isStargaze = theme === "stargaze";
-          const isLight = theme === "light" || isCoffee || isCloud;
+          const illustratedThemes = {"ronin":{"light":false,"bg":"#202b27","text":"#f1f4ef","muted":"#bacac0","solid":"#dce7db","solidText":"#202b27"},"identity":{"light":true,"bg":"#e4e1da","text":"#20201f","muted":"#575651","solid":"#242422","solidText":"#ffffff"},"ego":{"light":true,"bg":"#e6dcc8","text":"#222c30","muted":"#4b5a5c","solid":"#26373e","solidText":"#fffaf1"},"solitude":{"light":false,"bg":"#153b4d","text":"#f0f7f9","muted":"#b8d4dd","solid":"#ddedf0","solidText":"#153b4d"},"victory":{"light":false,"bg":"#263c43","text":"#f1f5f5","muted":"#c3d4d6","solid":"#e1ecec","solidText":"#263c43"},"resolve":{"light":false,"bg":"#262936","text":"#f5f0ed","muted":"#ccc3d0","solid":"#f1e0ca","solidText":"#302b35"},"silence":{"light":false,"bg":"#321a16","text":"#fff2dd","muted":"#dfbb9f","solid":"#ffd493","solidText":"#382016"},"patience":{"light":true,"bg":"#dbeaf0","text":"#1b3448","muted":"#486578","solid":"#215879","solidText":"#ffffff"}};
+          const illustrated = Object.hasOwn(illustratedThemes, theme) ? illustratedThemes[theme] : null;
+          const isLight = theme === "light" || isCoffee || isCloud || Boolean(illustrated?.light);
           for (const element of [document.documentElement, document.body]) {
             element.classList.toggle("light-theme", isLight);
             element.classList.toggle("coffee-theme", isCoffee);
             element.classList.toggle("cloud-theme", isCloud);
             element.classList.toggle("rain-theme", isRain);
             element.classList.toggle("stargaze-theme", isStargaze);
+            element.classList.toggle("illustrated-theme", Boolean(illustrated));
+            for (const id of Object.keys(illustratedThemes)) element.classList.toggle(`${id}-theme`, theme === id);
           }
-          if (isLight) {
+          if (illustrated) {
+            panel.style.background = illustrated.bg;
+            panel.style.color = illustrated.text;
+            document.getElementById("studyos-startup-description").style.color = illustrated.muted;
+            retry.style.background = illustrated.solid;
+            retry.style.color = illustrated.solidText;
+            document.querySelector('meta[name="theme-color"]').content = illustrated.bg;
+          } else if (isLight) {
             panel.style.background = isCloud ? "#a8bab9" : isCoffee ? "#faf0df" : "#f7f8fa";
             panel.style.color = isCloud ? "#172c2d" : isCoffee ? "#422c23" : "#1b1c1f";
             document.getElementById("studyos-startup-description").style.color = isCloud ? "#2e4546" : isCoffee ? "#765749" : "#62666e";

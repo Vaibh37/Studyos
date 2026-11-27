@@ -1,0 +1,305 @@
+/* Ronin */
+:root.ronin-theme,
+body.ronin-theme {
+  --wallpaper: url("/themes/ronin.webp");
+  --wallpaper-width: 56.25vh;
+  --wallpaper-fade: 40.5vh;
+  --color-bg: #202b27;
+  --color-surface: #2b3833;
+  --color-surface-subtle: #35443c;
+  --color-surface-hover: #435449;
+  --color-text: #f1f4ef;
+  --color-text-secondary: #dbe4dc;
+  --color-text-muted: #bacac0;
+  --color-text-faint: #aebfb4;
+  --color-border: #53665b;
+  --color-border-strong: #76867b;
+  --color-solid: #dce7db;
+  --color-solid-hover: #f1f5ef;
+  --color-solid-text: #202b27;
+  --color-focus: #b8c9ae;
+  --color-selected: #35443c;
+  --color-selected-border: #76867b;
+  --color-control: #2b3833;
+  --color-control-hover: #435449;
+  --color-control-pressed: #35443c;
+  --color-disabled-bg: #35443c;
+  --color-disabled-text: #aebfb4;
+  --color-solid-pressed: #f1f5ef;
+  --poster-tint: #202b27;
+}
+
+/* Identity */
+:root.identity-theme,
+body.identity-theme {
+  --wallpaper: url("/themes/identity.webp");
+  --wallpaper-width: 56.25vh;
+  --wallpaper-fade: 40.5vh;
+  --color-bg: #e4e1da;
+  --color-surface: #f5f3ef;
+  --color-surface-subtle: #e9e6e0;
+  --color-surface-hover: #dedbd4;
+  --color-text: #20201f;
+  --color-text-secondary: #43423e;
+  --color-text-muted: #575651;
+  --color-text-faint: #5e5c55;
+  --color-border: #c0bcb3;
+  --color-border-strong: #aaa69d;
+  --color-solid: #242422;
+  --color-solid-hover: #393936;
+  --color-solid-text: #ffffff;
+  --color-focus: #57534a;
+  --color-selected: #e9e6e0;
+  --color-selected-border: #aaa69d;
+  --color-control: #f5f3ef;
+  --color-control-hover: #dedbd4;
+  --color-control-pressed: #e9e6e0;
+  --color-disabled-bg: #e9e6e0;
+  --color-disabled-text: #5e5c55;
+  --color-solid-pressed: #393936;
+  --poster-tint: #e4e1da;
+}
+
+/* Ego */
+:root.ego-theme,
+body.ego-theme {
+  --wallpaper: url("/themes/ego.webp");
+  --wallpaper-width: 56.25vh;
+  --wallpaper-fade: 40.5vh;
+  --color-bg: #e6dcc8;
+  --color-surface: #f7f1e4;
+  --color-surface-subtle: #ece3d1;
+  --color-surface-hover: #e3d8c3;
+  --color-text: #222c30;
+  --color-text-secondary: #405054;
+  --color-text-muted: #4b5a5c;
+  --color-text-faint: #566264;
+  --color-border: #c7baa4;
+  --color-border-strong: #ae9e86;
+  --color-solid: #26373e;
+  --color-solid-hover: #374b52;
+  --color-solid-text: #fffaf1;
+  --color-focus: #795f3a;
+  --color-selected: #ece3d1;
+  --color-selected-border: #ae9e86;
+  --color-control: #f7f1e4;
+  --color-control-hover: #e3d8c3;
+  --color-control-pressed: #ece3d1;
+  --color-disabled-bg: #ece3d1;
+  --color-disabled-text: #566264;
+  --color-solid-pressed: #374b52;
+  --poster-tint: #e6dcc8;
+}
+
+/* Solitude */
+:root.solitude-theme,
+body.solitude-theme {
+  --wallpaper: url("/themes/solitude.webp");
+  --wallpaper-width: 56.25vh;
+  --wallpaper-fade: 40.5vh;
+  --color-bg: #153b4d;
+  --color-surface: #1b4658;
+  --color-surface-subtle: #245466;
+  --color-surface-hover: #306477;
+  --color-text: #f0f7f9;
+  --color-text-secondary: #d5e9ee;
+  --color-text-muted: #b8d4dd;
+  --color-text-faint: #a8c6d1;
+  --color-border: #476c7c;
+  --color-border-strong: #7795a1;
+  --color-solid: #ddedf0;
+  --color-solid-hover: #f5fbfc;
+  --color-solid-text: #153b4d;
+  --color-focus: #c2d7a0;
+  --color-selected: #245466;
+  --color-selected-border: #7795a1;
+  --color-control: #1b4658;
+  --color-control-hover: #306477;
+  --color-control-pressed: #245466;
+  --color-disabled-bg: #245466;
+  --color-disabled-text: #a8c6d1;
+  --color-solid-pressed: #f5fbfc;
+  --poster-tint: #153b4d;
+}
+
+/* Victory */
+:root.victory-theme,
+body.victory-theme {
+  --wallpaper: url("/themes/victory.webp");
+  --wallpaper-width: 56.25vh;
+  --wallpaper-fade: 40.5vh;
+  --color-bg: #263c43;
+  --color-surface: #314b53;
+  --color-surface-subtle: #3b5760;
+  --color-surface-hover: #4a6871;
+  --color-text: #f1f5f5;
+  --color-text-secondary: #dbe7e8;
+  --color-text-muted: #c3d4d6;
+  --color-text-faint: #b3c7ca;
+  --color-border: #59757b;
+  --color-border-strong: #89a0a3;
+  --color-solid: #e1ecec;
+  --color-solid-hover: #f5f9f9;
+  --color-solid-text: #263c43;
+  --color-focus: #dfc28b;
+  --color-selected: #3b5760;
+  --color-selected-border: #89a0a3;
+  --color-control: #314b53;
+  --color-control-hover: #4a6871;
+  --color-control-pressed: #3b5760;
+  --color-disabled-bg: #3b5760;
+  --color-disabled-text: #b3c7ca;
+  --color-solid-pressed: #f5f9f9;
+  --poster-tint: #263c43;
+}
+
+/* Resolve */
+:root.resolve-theme,
+body.resolve-theme {
+  --wallpaper: url("/themes/resolve.webp");
+  --wallpaper-width: 56.25vh;
+  --wallpaper-fade: 40.5vh;
+  --color-bg: #262936;
+  --color-surface: #373747;
+  --color-surface-subtle: #424355;
+  --color-surface-hover: #505267;
+  --color-text: #f5f0ed;
+  --color-text-secondary: #e7dfe4;
+  --color-text-muted: #ccc3d0;
+  --color-text-faint: #bfb6c2;
+  --color-border: #646377;
+  --color-border-strong: #8b8798;
+  --color-solid: #f1e0ca;
+  --color-solid-hover: #fff4e4;
+  --color-solid-text: #302b35;
+  --color-focus: #edba83;
+  --color-selected: #424355;
+  --color-selected-border: #8b8798;
+  --color-control: #373747;
+  --color-control-hover: #505267;
+  --color-control-pressed: #424355;
+  --color-disabled-bg: #424355;
+  --color-disabled-text: #bfb6c2;
+  --color-solid-pressed: #fff4e4;
+  --poster-tint: #262936;
+}
+
+/* Silence */
+:root.silence-theme,
+body.silence-theme {
+  --wallpaper: url("/themes/silence.webp");
+  --wallpaper-width: 66.667vh;
+  --wallpaper-fade: 48.0vh;
+  --color-bg: #321a16;
+  --color-surface: #43231d;
+  --color-surface-subtle: #542d24;
+  --color-surface-hover: #66392c;
+  --color-text: #fff2dd;
+  --color-text-secondary: #f3d7bc;
+  --color-text-muted: #dfbb9f;
+  --color-text-faint: #d0ae93;
+  --color-border: #805345;
+  --color-border-strong: #b77d62;
+  --color-solid: #ffd493;
+  --color-solid-hover: #ffe9be;
+  --color-solid-text: #382016;
+  --color-focus: #ffbf66;
+  --color-selected: #542d24;
+  --color-selected-border: #b77d62;
+  --color-control: #43231d;
+  --color-control-hover: #66392c;
+  --color-control-pressed: #542d24;
+  --color-disabled-bg: #542d24;
+  --color-disabled-text: #d0ae93;
+  --color-solid-pressed: #ffe9be;
+  --poster-tint: #321a16;
+}
+
+/* Patience */
+:root.patience-theme,
+body.patience-theme {
+  --wallpaper: url("/themes/patience.webp");
+  --wallpaper-width: 80.339vh;
+  --wallpaper-fade: 57.844vh;
+  --color-bg: #dbeaf0;
+  --color-surface: #f3f9fa;
+  --color-surface-subtle: #e0edf1;
+  --color-surface-hover: #d0e2e9;
+  --color-text: #1b3448;
+  --color-text-secondary: #345568;
+  --color-text-muted: #486578;
+  --color-text-faint: #506d7e;
+  --color-border: #b0c9d6;
+  --color-border-strong: #94b2c3;
+  --color-solid: #215879;
+  --color-solid-hover: #2c6c90;
+  --color-solid-text: #ffffff;
+  --color-focus: #246486;
+  --color-selected: #e0edf1;
+  --color-selected-border: #94b2c3;
+  --color-control: #f3f9fa;
+  --color-control-hover: #d0e2e9;
+  --color-control-pressed: #e0edf1;
+  --color-disabled-bg: #e0edf1;
+  --color-disabled-text: #506d7e;
+  --color-solid-pressed: #2c6c90;
+  --poster-tint: #dbeaf0;
+}
+
+/* One fixed portrait layer; the surrounding desktop canvas follows the
+   wallpaper palette. No duplicated, stretched subjects or text. */
+.illustrated-theme #root .app-shell-v2 {
+  isolation: isolate;
+  background: radial-gradient(ellipse at right bottom, var(--color-surface-subtle), var(--color-bg) 70%) !important;
+}
+.illustrated-theme #root .app-shell-v2::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--poster-tint) 38%, transparent)), var(--wallpaper) right center / auto 100% no-repeat;
+  mask-image: linear-gradient(to right, transparent calc(100% - var(--wallpaper-width)), #000 calc(100% - var(--wallpaper-fade)));
+}
+.illustrated-theme #root .app-shell-v2 :is(.app-shell-v2-content, .app-shell-v2-main) {
+  background: transparent !important;
+}
+.illustrated-theme #root .app-shell-v2 :is(.study-sidebar, .mobile-bottom-nav) {
+  background: var(--color-bg) !important;
+}
+.illustrated-theme #root .ds-clean .ds-focus-header h2 {
+  color: var(--ds-focus-text) !important;
+}
+.illustrated-theme:not(.light-theme) #root .ds-clean .ds-focus-panel {
+  background: color-mix(in srgb, var(--color-surface) 91%, transparent);
+}
+.illustrated-theme #root .ds-clean :is(.ds-task-panel, .ds-level-panel, .ds-upcoming) {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+}
+.illustrated-theme #root .ds-clean :is(.ds-task-panel, .ds-level-panel, .ds-upcoming, .ds-activity-panel, .ds-quick-access a),
+.illustrated-theme #root .settings-clean .settings-v2-theme-card {
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+}
+.illustrated-theme #root .ds-clean .ds-quick-access a:hover,
+.illustrated-theme #root .settings-clean .settings-v2-theme-card:hover {
+  background: var(--color-surface-hover);
+}
+/* Keep loose headings legible even over printed text/bright artwork. */
+.illustrated-theme #root .app-shell-v2-main :is(.ds-header, .v2t-header, .v2s-header, .n3-header, .v2c-header, .v2f-header, .sp-header, .slb-header, .settings-v2-header, .v2g-header) {
+  text-shadow: 0 1px 5px var(--color-bg), 0 0 10px var(--color-bg);
+}
+@media (max-width: 900px) {
+  .illustrated-theme #root .app-shell-v2::before {
+    background: linear-gradient(color-mix(in srgb, var(--poster-tint) 58%, transparent), color-mix(in srgb, var(--poster-tint) 60%, transparent)), var(--wallpaper) center center / cover no-repeat;
+    mask-image: none;
+  }
+  .illustrated-theme.light-theme #root .app-shell-v2::before {
+    background: linear-gradient(color-mix(in srgb, var(--poster-tint) 71%, transparent), color-mix(in srgb, var(--poster-tint) 71%, transparent)), var(--wallpaper) center center / cover no-repeat;
+  }
+}
+@media (forced-colors: active) {
+  .illustrated-theme #root .app-shell-v2 { background: Canvas !important; }
+  .illustrated-theme #root .app-shell-v2::before { display: none; }
+}
