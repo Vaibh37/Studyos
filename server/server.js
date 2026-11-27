@@ -89,6 +89,8 @@ const systemRoutes =
     "./routes/systemRoutes"
   );
 
+const dashboardRoutes = require("./routes/dashboardRoutes");
+
 const taskRoutes =
   require(
     "./routes/taskRoutes"
@@ -321,6 +323,8 @@ app.use("/api/security", securityAdminRoutes);
 // =========================================
 // STUDYOS ROUTES
 // =========================================
+
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use(
   "/api/tasks",

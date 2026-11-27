@@ -39,6 +39,9 @@ const eventSchema =
     }
   );
 
+// Owner-scoped list order; avoids a blocking sort on large study histories.
+eventSchema.index({ userId: 1, date: 1 });
+
 module.exports =
   mongoose.model(
     "Event",

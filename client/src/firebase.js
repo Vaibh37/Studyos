@@ -2,8 +2,6 @@ import {
   initializeApp,
 } from "firebase/app";
 
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
-
 import {
   browserLocalPersistence,
   indexedDBLocalPersistence,
@@ -50,15 +48,6 @@ const app =
     firebaseConfig
   );
 
-// Optional web App Check. Configure a site key in Firebase App Check first.
-// This is independent of Firebase Auth and has no effect with an empty key.
-export const appCheck = import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY
-  ? initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider(import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY),
-      isTokenAutoRefreshEnabled: true,
-    })
-  : null;
-
 // =========================================================
 // AUTH
 //
@@ -77,11 +66,7 @@ export const auth =
     }
   );
 
-// =========================================================
-// X — RESERVED FOR FUTURE USE
-// =========================================================
-
-export const xProvider =
-  new TwitterAuthProvider();
+// Reserved for future use.
+export const xProvider = new TwitterAuthProvider();
 
 export default app;

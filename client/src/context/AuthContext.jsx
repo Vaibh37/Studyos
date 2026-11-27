@@ -23,11 +23,11 @@ import {
 } from "../firebase";
 
 import { disconnectSocket, disconnectObsoleteSocket } from "../socket";
+import { getAppCheckToken } from "../services/appCheck";
 import { setStudyDataScope } from "../services/api";
-import { canSpeculate, loadWorkspacePage } from "../services/routePreload";
+import { canSpeculate, getStartupPage, loadWorkspacePage } from "../services/routePreload";
 
 import {
-  loadGoogleIdentity,
   requestGoogleAccessToken,
 } from "../services/googleIdentity";
 
@@ -53,29 +53,18 @@ function rememberGuestMode(enabled) {
 // APP PRELOAD
 // =========================================================
 
-let appPreloadPromise =
-  null;
-
-const preloadStudyApp =
-  () => {
-    if (!canSpeculate()) return Promise.resolve();
-    if (
-      appPreloadPromise
-    ) {
-      return appPreloadPromise;
-    }
-
-    appPreloadPromise =
-      Promise.allSettled([
-        import(
-          "../pages/StudyApp"
-        ),
-
-        loadWorkspacePage("dashboard"),
-      ]);
-
-    return appPreloadPromise;
-  };
+const preloadStudyApp = () => {
+  if (!canSpeculate()) return Promise.resolve();
+  const pathname = window.location.pathname;
+  const requested = pathname.split("/").filter(Boolean);
+  const page = requested[0] === "app" && requested[1] ? requested[1] : getStartupPage();
+  // Start shell and the actual destination together, rather than always
+  // requesting Dashboard even if the user's startup page is different.
+  return Promise.allSettled([
+    import("../pages/StudyApp"),
+    loadWorkspacePage(page),
+  ]);
+};
 
 export function AuthProvider({
   children,
@@ -110,6 +99,10 @@ export function AuthProvider({
       user
     ) => {
       disconnectObsoleteSocket(user);
+      // Authenticated workspaces need App Check; warm it alongside the route
+      // chunks, not on the public homepage or in a local-only guest session.
+      if (window.location.pathname === "/" || window.location.pathname === "/get-started" ||
+          /^\/app(?:\/|$)/.test(window.location.pathname)) void getAppCheckToken();
       noteDrafts.activate(user);
       rememberGuestMode(false);
 
@@ -145,9 +138,11 @@ export function AuthProvider({
                 user
               );
 
-              preloadStudyApp();
+              if (window.location.pathname === "/" || /^\/app(?:\/|$)/.test(window.location.pathname)) preloadStudyApp();
             } else {
-              noteDrafts.activate(readGuestMode() ? GUEST_DRAFT_SCOPE : null);
+              const guest = readGuestMode();
+              noteDrafts.activate(guest ? GUEST_DRAFT_SCOPE : null);
+              if (guest && (window.location.pathname === "/" || /^\/app(?:\/|$)/.test(window.location.pathname))) preloadStudyApp();
               disconnectSocket();
               setFirebaseUser(
                 null
@@ -167,61 +162,6 @@ export function AuthProvider({
       return () => { window.clearTimeout(timer); unsubscribe(); };
     },
     []
-  );
-
-  // =======================================================
-  // PRELOAD GOOGLE GIS WHILE LOGIN PAGE IS IDLE
-  // =======================================================
-
-  useEffect(
-    () => {
-      if (loading || firebaseUser || guestMode || !canSpeculate()) return;
-      const start =
-        () => {
-          loadGoogleIdentity()
-            .catch(
-              (
-                error
-              ) => {
-                console.warn(
-                  "Google Identity Services preload failed:",
-                  error
-                );
-              }
-            );
-        };
-
-      if (
-        "requestIdleCallback" in
-        window
-      ) {
-        const idleId =
-          window.requestIdleCallback(
-            start,
-            {
-              timeout:
-                1500,
-            }
-          );
-
-        return () =>
-          window.cancelIdleCallback(
-            idleId
-          );
-      }
-
-      const timer =
-        window.setTimeout(
-          start,
-          250
-        );
-
-      return () =>
-        window.clearTimeout(
-          timer
-        );
-    },
-    [loading, firebaseUser, guestMode]
   );
 
   // =======================================================

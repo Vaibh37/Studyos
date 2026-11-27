@@ -11,6 +11,6 @@ const client = createStudyApiClient({
   isOnline: () => typeof navigator === "undefined" || navigator.onLine !== false,
 });
 
-export const { apiRequest, readStudyData, setStudyDataScope, invalidateStudyData } = client;
+export const { apiRequest, readStudyData, readDashboardData, setStudyDataScope, invalidateStudyData } = client;
 if (typeof window !== "undefined") window.addEventListener("online", invalidateStudyData);
 export default apiRequest;

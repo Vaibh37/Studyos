@@ -15,7 +15,7 @@ const PUBLIC_SYSTEM_ROUTES = new Set([
   "/version",
 ]);
 const AUDIT_AREAS = new Set([
-  "auth", "account", "security", "tasks", "subjects", "notes", "events",
+  "auth", "account", "security", "dashboard", "tasks", "subjects", "notes", "events",
   "study-sessions", "groups", "leaderboard",
 ]);
 const auditArea = path => {

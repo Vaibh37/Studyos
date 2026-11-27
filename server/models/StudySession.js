@@ -57,6 +57,9 @@ const studySessionSchema =
     }
   );
 
+// Owner-scoped list order; avoids a blocking sort on large study histories.
+studySessionSchema.index({ userId: 1, endedAt: -1 });
+
 module.exports =
   mongoose.model(
     "StudySession",

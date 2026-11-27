@@ -129,3 +129,94 @@ test("errors and malformed data are never cached", async () => {
   await assert.rejects(f.readStudyData(tasks),/incomplete study data/);
   assert.deepEqual(await f.readStudyData(tasks),[{id:3}]);
 });
+
+const bundle = marker => ({
+  tasks: [{ id: marker + "-task" }],
+  sessions: [{ id: marker + "-session" }],
+  events: [{ id: marker + "-event" }],
+});
+
+test("cold Dashboard uses one authenticated request and populates all three existing list caches", async () => {
+  const f = fixture({ fetcher: () => response(bundle("first")) });
+  const [a, b] = await Promise.all([f.readDashboardData(), f.readDashboardData()]);
+  assert.deepEqual(a, bundle("first"));
+  assert.deepEqual(a, b);
+  assert.equal(f.calls.length, 1);
+  assert.equal(f.calls[0].path, "/api/dashboard");
+  assert.equal(f.calls[0].headers.Authorization, "Bearer alice");
+  assert.equal(f.calls[0].headers["X-Firebase-AppCheck"], "app-check");
+  assert.equal(f.calls[0].cache, "no-store");
+  a.tasks[0].id = "changed";
+  assert.deepEqual(await f.readStudyData(tasks), bundle("first").tasks);
+  assert.deepEqual(await f.readStudyData("/api/study-sessions"), bundle("first").sessions);
+  assert.deepEqual(await f.readStudyData("/api/events"), bundle("first").events);
+  assert.equal(f.calls.length, 1);
+  await f.readDashboardData({ fresh: true });
+  assert.equal(f.calls.length, 2);
+});
+
+test("Dashboard reuses warm resources and requests only the remaining cold list when possible", async () => {
+  const f = fixture({ fetcher: url => response([{ id: url.split(".invalid")[1] }]) });
+  await f.readStudyData(tasks);
+  await f.readStudyData("/api/study-sessions");
+  const result = await f.readDashboardData();
+  assert.deepEqual(result.events, [{id: "/api/events"}]);
+  assert.deepEqual(f.calls.map(call => call.path), [tasks, "/api/study-sessions", "/api/events"]);
+});
+
+test("Dashboard rolls back safely to legacy reads only if the new route is not deployed", async () => {
+  const f = fixture({ fetcher: url => {
+    const path = url.split(".invalid")[1];
+    return path === "/api/dashboard" ? response({message: "Missing"}, 404) : response([{id:path}]);
+  } });
+  assert.deepEqual(await f.readDashboardData(), {
+    tasks: [{id: tasks}], sessions: [{id: "/api/study-sessions"}], events: [{id: "/api/events"}],
+  });
+  assert.equal(f.calls.length, 4);
+  for (const status of [401, 403, 429]) {
+    const denied = fixture({ fetcher: () => response({message: "Denied"}, status) });
+    await assert.rejects(denied.readDashboardData(), /Denied/);
+    assert.equal(denied.calls.length, 1, "Never bypass a rejection using legacy endpoints");
+  }
+});
+
+test("malformed bundle never enters the cache and an account switch rejects old bundle results", async () => {
+  const malformed = fixture({ fetcher: () => response({ tasks: [] }) });
+  await assert.rejects(malformed.readDashboardData(), /incomplete dashboard data/);
+  await assert.rejects(malformed.readDashboardData(), /incomplete dashboard data/);
+  assert.equal(malformed.calls.length, 2);
+  const old = deferred(), started = deferred();
+  const f = fixture({fetcher: (_u,_o,n) => {
+    if(n===1) {started.resolve(); return old.promise;}
+    return response(bundle("bob"));
+  }});
+  const first = f.readDashboardData(), rejected = assert.rejects(first, /sign-in changed/);
+  await started.promise;
+  f.changeUser(account("bob"));
+  assert.deepEqual(await f.readDashboardData(), bundle("bob"));
+  old.resolve(response(bundle("alice")));
+  await rejected;
+  assert.deepEqual(await f.readStudyData(tasks), bundle("bob").tasks);
+});
+
+test("an older Dashboard bundle cannot repopulate any list cache after a mutation", async () => {
+  const old = deferred(), started = deferred();
+  const f = fixture({fetcher: (_u,o,n) => {
+    if(n===1) { started.resolve(); return old.promise; }
+    return o.method === "PATCH" ? response({id:"write"}) : response(bundle("new"));
+  }});
+  const before = f.readDashboardData();
+  await started.promise;
+  await f.apiRequest(tasks + "/1", {method:"PATCH",body:"{}"});
+  assert.deepEqual(await f.readDashboardData(), bundle("new"));
+  old.resolve(response(bundle("old")));
+  assert.deepEqual(await before, bundle("old"));
+  assert.deepEqual(await f.readDashboardData(), bundle("new"));
+  assert.equal(f.calls.length,3);
+});
+
+test("Dashboard retries a transient error as one bundle, not three separate requests", async () => {
+  const f = fixture({ fetcher: (_u,_o,n) => n === 1 ? response({},503) : response(bundle("retry")) });
+  assert.deepEqual(await f.readDashboardData(), bundle("retry"));
+  assert.deepEqual(f.calls.map(call => call.path), ["/api/dashboard","/api/dashboard"]);
+});

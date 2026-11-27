@@ -12,6 +12,11 @@ const loaders = {
   chats: () => import("../pages/Chats"),
   settings: () => import("../pages/Settings"),
 };
+export function getStartupPage() {
+  let saved;
+  try { saved = localStorage.getItem("studyos_startup_page"); } catch { /* Storage disabled. */ }
+  return Object.hasOwn(loaders, saved) ? saved : "dashboard";
+}
 const flights = new Map();
 export function loadWorkspacePage(page) {
   if (!Object.hasOwn(loaders, page)) return Promise.reject(new Error("Unknown workspace route"));
@@ -26,7 +31,7 @@ export function loadWorkspacePage(page) {
 export function canSpeculate() {
   if (typeof navigator === "undefined" || navigator.onLine === false) return false;
   const connection = navigator.connection;
-  return !connection?.saveData && !["slow-2g", "2g"].includes(connection?.effectiveType);
+  return !connection?.saveData && !["slow-2g", "2g", "3g"].includes(connection?.effectiveType);
 }
 export function preloadWorkspacePath(path) {
   if (!canSpeculate()) return;

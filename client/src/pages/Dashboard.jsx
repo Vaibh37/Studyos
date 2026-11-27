@@ -16,7 +16,7 @@ import {
 } from "../components/icons";
 
 import { useAuth } from "../context/AuthContext";
-import { readStudyData } from "../services/api";
+import { readDashboardData } from "../services/api";
 import { localDb } from "../services/localDb";
 import { getCalendarEvents } from "../services/calendarData";
 import { getStudySessions } from "../services/studySessionData";
@@ -105,13 +105,14 @@ function Dashboard() {
       setError("");
 
       try {
+        const bundle = isGuest ? null : readDashboardData({ fresh: manual });
         const tasksPromise = isGuest
           ? localDb.getAll("tasks")
-          : readStudyData("/api/tasks", { fresh: manual });
+          : bundle.then(data => data.tasks);
         const [taskData, sessionData, eventData] = await Promise.all([
           tasksPromise,
-          getStudySessions(isGuest, { cache: true, fresh: manual }),
-          getCalendarEvents(isGuest, { cache: true, fresh: manual, tasksPromise }),
+          isGuest ? getStudySessions(true) : bundle.then(data => data.sessions),
+          getCalendarEvents(isGuest, { tasksPromise, eventsPromise: bundle?.then(data => data.events) }),
         ]);
 
         setTasks(

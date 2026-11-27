@@ -21,7 +21,7 @@ import {
 } from "./context/AuthContext";
 import { apiRequest } from "./services/api";
 import { WorkspaceRouteLoading } from "./components/WorkspaceStates";
-import { loadWorkspacePage } from "./services/routePreload";
+import { getStartupPage, loadWorkspacePage } from "./services/routePreload";
 
 // =========================================================
 // PUBLIC PAGES
@@ -109,32 +109,6 @@ const SecurityAdmin = lazyPage(() => import("./pages/SecurityAdmin"));
 // =========================================================
 // APPLICATION ROUTES
 // =========================================================
-
-const VALID_APP_PAGES = [
-  "dashboard",
-  "tasks",
-  "subjects",
-  "notes",
-  "calendar",
-  "focus",
-  "progress",
-  "leaderboard",
-  "groups",
-  "chats",
-  "settings",
-];
-
-const getStartupPage =
-  () => {
-    let saved;
-    try { saved = localStorage.getItem("studyos_startup_page"); } catch { /* Storage may be disabled. */ }
-
-    return VALID_APP_PAGES.includes(
-      saved
-    )
-      ? saved
-      : "dashboard";
-  };
 
 // =========================================================
 // LOADING

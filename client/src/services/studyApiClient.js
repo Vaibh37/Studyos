@@ -163,21 +163,62 @@ export function createStudyApiClient({
     finally { finishWrite?.(); }
   }
 
-  // Only these safe list reads retry; never repeat a mutation or auth failure.
+  // Only safe private list reads retry; never repeat a mutation or auth failure.
+  async function requestRead(path, user) {
+    try { return await request(path, { cache: "no-store" }, user); }
+    catch (error) {
+      if (!error.retryable || !isOnline()) throw error;
+      await sleep(350);
+      assertSameAccount(user);
+      return request(path, { cache: "no-store" }, user);
+    }
+  }
+
   function readStudyData(path, { fresh = false } = {}) {
     if (!studyPaths.has(path)) throw new Error("Unexpected study data path");
     const user = getUser();
     setStudyDataScope(user);
-    return reads.read(user, path, async () => {
-      try { return await request(path, { cache: "no-store" }, user); }
-      catch (error) {
-        if (!error.retryable || !isOnline()) throw error;
-        await sleep(350);
-        assertSameAccount(user);
-        return request(path, { cache: "no-store" }, user);
-      }
-    }, { fresh });
+    return reads.read(user, path, () => requestRead(path, user), { fresh });
   }
 
-  return { apiRequest, readStudyData, setStudyDataScope, invalidateStudyData };
+  // Cache individual resources, not an additional copy of the entire
+  // dashboard. Cache hits and existing in-flight list reads are still reused.
+  // On a cold dashboard, all three loaders join a single authenticated GET.
+  async function readDashboardData({ fresh = false } = {}) {
+    const user = getUser();
+    setStudyDataScope(user);
+    const paths = {
+      tasks: "/api/tasks", sessions: "/api/study-sessions", events: "/api/events",
+    };
+    const missing = new Set();
+    let flight;
+    function load(key) {
+      missing.add(key);
+      if (!flight) {
+        flight = Promise.resolve().then(async () => {
+          if (missing.size === 1) return { [key]: await requestRead(paths[key], user) };
+          try {
+            const result = await requestRead("/api/dashboard", user);
+            if (!Object.keys(paths).every(name => Array.isArray(result?.[name]))) {
+              throw new StudyApiError("StudyOS returned incomplete dashboard data. Please refresh and try again.", { code: "INVALID_RESPONSE" });
+            }
+            return result;
+          } catch (error) {
+            // Git-based deployment may publish the frontend first. Never
+            // fall back on forbidden, revoked, rate-limited or malformed reads.
+            if (error.status !== 404) throw error;
+            return Object.fromEntries(await Promise.all([...missing].map(async name =>
+              [name, await requestRead(paths[name], user)])));
+          }
+        });
+      }
+      return flight.then(result => result[key]);
+    }
+    const entries = await Promise.all(Object.entries(paths).map(async ([key, path]) =>
+      [key, await reads.read(user, path, () => load(key), { fresh })]));
+    assertSameAccount(user);
+    return Object.fromEntries(entries);
+  }
+
+  return { apiRequest, readStudyData, readDashboardData, setStudyDataScope, invalidateStudyData };
 }

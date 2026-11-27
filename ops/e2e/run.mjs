@@ -230,8 +230,23 @@ async function journeys() {
   await a.getByPlaceholder("Enter your name").fill(customGreeting);
   await button(a, "Save profile").click();
   await visible(a.getByText("Profile saved successfully", { exact: true }));
-  await a.goto(WEB + "/app/dashboard", { waitUntil: "domcontentloaded" });
-  await visible(a.locator(".ds-heading h1").filter({ hasText: customGreeting }));
+  const dashboardReads = [];
+  const recordDashboardReads = request => {
+    const url = new URL(request.url());
+    if (url.origin === API && request.method() === "GET" &&
+        ["/api/dashboard", "/api/tasks", "/api/events", "/api/study-sessions"].includes(url.pathname)) {
+      dashboardReads.push(url.pathname);
+    }
+  };
+  a.on("request", recordDashboardReads);
+  try {
+    await responseFor(a, "GET", /^\/api\/dashboard$/, () =>
+      a.goto(WEB + "/app/dashboard", { waitUntil: "domcontentloaded" }));
+    await visible(a.locator(".ds-heading h1").filter({ hasText: customGreeting }));
+    await visible(a.locator(".ds-clean[aria-busy=false]"));
+    assert.deepEqual(dashboardReads, ["/api/dashboard"]);
+  } finally { a.off("request", recordDashboardReads); }
+  console.log("PASS cold Dashboard uses one combined private data request");
 
   const task = label("E2E task"), changedTask = task + " edited";
   await go(a, "/app/tasks", "Tasks");
