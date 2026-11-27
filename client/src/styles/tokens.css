@@ -370,3 +370,36 @@ body.rain-theme {
   --shadow-sm: 0 1px 2px rgb(7 17 25 / 18%);
   --shadow-md: 0 10px 30px rgb(7 17 25 / 28%);
 }
+
+
+/* Stargaze — midnight sky, soft starlight, and warm amber accents. */
+:root.stargaze-theme,
+body.stargaze-theme {
+  color-scheme: dark;
+  --color-bg: #0b2038;
+  --color-surface: #122a45;
+  --color-surface-subtle: #193652;
+  --color-surface-hover: #234461;
+  --color-text: #f0f5fc;
+  --color-text-secondary: #dce8f7;
+  --color-text-muted: #bacde3;
+  --color-text-faint: #a6bdd8;
+  --color-border: #385673;
+  --color-border-strong: #6382a2;
+  --color-solid: #e2ecf9;
+  --color-solid-hover: #f5f8ff;
+  --color-solid-text: #0b2038;
+  --color-solid-pressed: #bfd1e8;
+  --color-focus: #f2d59a;
+  --color-selected: #284967;
+  --color-selected-border: #7593af;
+  --color-control: #193652;
+  --color-control-hover: #234461;
+  --color-control-pressed: #142d47;
+  --color-disabled-bg: #193652;
+  --color-disabled-text: #a6bdd8;
+  --color-control-highlight: rgb(226 238 255 / 9%);
+  --color-control-shadow: rgb(4 15 32 / 28%);
+  --shadow-sm: 0 1px 2px rgb(4 15 32 / 20%);
+  --shadow-md: 0 10px 30px rgb(4 15 32 / 30%);
+}

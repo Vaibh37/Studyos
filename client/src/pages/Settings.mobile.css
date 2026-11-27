@@ -4211,3 +4211,22 @@ body:has(.settings-clean) .study-select-option-copy small {
 .settings-v2-page.settings-clean .settings-v2-theme-card:has(.settings-v2-theme-preview-rain) > svg {
   color: #f0f4f7;
 }
+
+
+/* Stargaze preview uses the actual supplied portrait wallpaper. */
+.settings-v2-page .settings-v2-theme-preview-stargaze {
+  border-color: #6382a2;
+  background: #0b2038 url("/themes/stargaze.webp") center 78% / cover no-repeat !important;
+}
+.settings-v2-page .settings-v2-theme-preview-stargaze span:nth-child(1) {
+  background: #0b2038;
+}
+.settings-v2-page .settings-v2-theme-preview-stargaze span:nth-child(2) {
+  background: #234461;
+}
+.settings-v2-page .settings-v2-theme-preview-stargaze span:nth-child(3) {
+  background: #f2d59a;
+}
+.settings-v2-page.settings-clean .settings-v2-theme-card:has(.settings-v2-theme-preview-stargaze) > svg {
+  color: #f0f5fc;
+}

@@ -192,12 +192,14 @@
           const isCoffee = theme === "coffee";
           const isCloud = theme === "cloud";
           const isRain = theme === "rain";
+          const isStargaze = theme === "stargaze";
           const isLight = theme === "light" || isCoffee || isCloud;
           for (const element of [document.documentElement, document.body]) {
             element.classList.toggle("light-theme", isLight);
             element.classList.toggle("coffee-theme", isCoffee);
             element.classList.toggle("cloud-theme", isCloud);
             element.classList.toggle("rain-theme", isRain);
+            element.classList.toggle("stargaze-theme", isStargaze);
           }
           if (isLight) {
             panel.style.background = isCloud ? "#a8bab9" : isCoffee ? "#faf0df" : "#f7f8fa";
@@ -206,6 +208,13 @@
             retry.style.background = isCloud ? "#294346" : isCoffee ? "#795344" : "#24262b";
             retry.style.color = "#fff";
             document.querySelector('meta[name="theme-color"]').content = panel.style.background;
+          } else if (isStargaze) {
+            panel.style.background = "#0b2038";
+            panel.style.color = "#f0f5fc";
+            document.getElementById("studyos-startup-description").style.color = "#bacde3";
+            retry.style.background = "#dce8f7";
+            retry.style.color = "#0b2038";
+            document.querySelector('meta[name="theme-color"]').content = "#0b2038";
           } else if (isRain) {
             panel.style.background = "#182935";
             panel.style.color = "#f0f4f7";

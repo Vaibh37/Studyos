@@ -3,7 +3,7 @@ import test from "node:test";
 import { normalizeTheme, isLightTheme, readTheme, applyTheme, saveTheme } from "../src/services/theme.js";
 
 test("only supported themes are accepted", () => {
-  for (const theme of ["dark", "light", "coffee", "cloud", "rain"]) assert.equal(normalizeTheme(theme), theme);
+  for (const theme of ["dark", "light", "coffee", "cloud", "rain", "stargaze"]) assert.equal(normalizeTheme(theme), theme);
   for (const theme of [undefined, null, "", "unknown", "COFFEE"]) assert.equal(normalizeTheme(theme), "dark");
 });
 
@@ -36,11 +36,19 @@ test("Theme selection persists, and switching between light and dark themes clea
     assert.equal(isLightTheme("rain"), false);
     assert.equal(isLightTheme("cloud"), true);
     for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["rain-theme"]);
+    saveTheme("stargaze");
+    assert.equal(readTheme(), "stargaze");
+    assert.equal(color, "#0b2038");
+    assert.equal(isLightTheme("stargaze"), false);
+    for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["stargaze-theme"]);
+    // Reloading from the stored preference restores the same class.
+    applyTheme(readTheme());
+    for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["stargaze-theme"]);
     saveTheme("light");
     for (const node of [root, body]) assert.deepEqual([...node.classList.values], ["light-theme"]);
     applyTheme("dark");
     for (const node of [root, body]) assert.equal(node.classList.values.size, 0);
-    assert.deepEqual(events, ["studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated"]);
+    assert.deepEqual(events, ["studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated", "studyos-theme-updated"]);
   } finally {
     delete globalThis.document;
     delete globalThis.localStorage;
