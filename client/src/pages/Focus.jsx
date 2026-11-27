@@ -100,6 +100,23 @@ const getCustomValueForDuration =
   };
 
 
+// The timer and session API continue to use whole minutes.
+const parseCustomDuration = (value, unit) => {
+  if (value.trim() === "") return null;
+  const minutes = Number(value) * (unit === "hr" ? 60 : 1);
+  return Number.isFinite(minutes) && minutes >= 1 && minutes <= 720
+    ? Math.round(minutes)
+    : null;
+};
+
+const formatSessionDuration = (minutes) => {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return `${hours} hr${remainder ? ` ${remainder} min` : ""}`;
+};
+
+
 // =========================================================
 // FOCUS
 // =========================================================
@@ -186,13 +203,15 @@ function Focus() {
   );
 
   const [
-    customMinutes,
-    setCustomMinutes,
+    customDuration,
+    setCustomDuration,
   ] = useState(
     getCustomValueForDuration(
       initialDefaultMinutes
     )
   );
+
+  const [customUnit, setCustomUnit] = useState("min");
 
   const [
     selectedShareGroupId,
@@ -469,7 +488,8 @@ function Focus() {
               60
           );
 
-          setCustomMinutes(
+          setCustomUnit("min");
+          setCustomDuration(
             getCustomValueForDuration(
               defaultMinutes
             )
@@ -918,7 +938,8 @@ function Focus() {
           savedPlanned
         );
 
-        setCustomMinutes(
+        setCustomUnit("min");
+        setCustomDuration(
           getCustomValueForDuration(
             savedPlanned
           )
@@ -1125,7 +1146,8 @@ function Focus() {
                     60
                 );
 
-                setCustomMinutes(
+                setCustomUnit("min");
+                setCustomDuration(
                   getCustomValueForDuration(
                     defaultMinutes
                   )
@@ -1618,55 +1640,35 @@ function Focus() {
           60
       );
 
-      setCustomMinutes("");
+      setCustomDuration("");
     };
 
 
-  const handleCustomMinutes =
-    (
-      event
-    ) => {
-      if (
-        status !==
-        "idle"
-      ) {
-        return;
-      }
+  const handleCustomDuration = (event) => {
+    if (status !== "idle") return;
+    const value = event.target.value;
+    setCustomDuration(value);
 
-      const value =
-        event.target.value;
+    const minutes = parseCustomDuration(value, customUnit);
+    if (minutes !== null) {
+      setPlannedMinutes(minutes);
+      setRemainingSeconds(minutes * 60);
+    }
+  };
 
-      setCustomMinutes(
-        value
-      );
+  const handleCustomUnit = (event) => {
+    if (status !== "idle") return;
+    const unit = event.target.value;
+    const minutes = parseCustomDuration(customDuration, customUnit);
+    setCustomUnit(unit);
 
-      const number =
-        Number(
-          value
-        );
-
-      if (
-        Number.isFinite(
-          number
-        ) &&
-        number >= 1 &&
-        number <= 720
-      ) {
-        const rounded =
-          Math.round(
-            number
-          );
-
-        setPlannedMinutes(
-          rounded
-        );
-
-        setRemainingSeconds(
-          rounded *
-            60
-        );
-      }
-    };
+    // Preserve a valid duration when changing units; an empty field stays empty.
+    if (minutes !== null) {
+      setCustomDuration(String(unit === "hr" ? Number((minutes / 60).toFixed(2)) : minutes));
+    } else {
+      setCustomDuration("");
+    }
+  };
 
 
   // =======================================================
@@ -1682,10 +1684,9 @@ function Focus() {
         return;
       }
 
-      const duration =
-        Number(
-          plannedMinutes
-        );
+      const duration = customDuration === ""
+        ? Number(plannedMinutes)
+        : parseCustomDuration(customDuration, customUnit);
 
       if (
         !Number.isFinite(
@@ -1695,7 +1696,9 @@ function Focus() {
         duration > 720
       ) {
         showError(
-          "Choose a duration between 1 and 720 minutes."
+          customUnit === "hr"
+            ? "Choose a duration between 1 minute and 12 hours."
+            : "Choose a duration between 1 and 720 minutes."
         );
 
         return;
@@ -2111,7 +2114,8 @@ function Focus() {
             60
         );
 
-        setCustomMinutes(
+        setCustomUnit("min");
+        setCustomDuration(
           getCustomValueForDuration(
             defaultMinutes
           )
@@ -2236,7 +2240,8 @@ function Focus() {
           60
       );
 
-      setCustomMinutes(
+      setCustomUnit("min");
+      setCustomDuration(
         getCustomValueForDuration(
           defaultMinutes
         )
@@ -3032,7 +3037,7 @@ function Focus() {
                       }
                     >
                       {status === "idle"
-                        ? `${plannedMinutes} minute session`
+                        ? `${formatSessionDuration(plannedMinutes)} session`
                         : activeSubjectName}
                     </span>
 
@@ -3055,13 +3060,13 @@ function Focus() {
                       disabled={status !== "idle"}
                       className={
                         plannedMinutes === minutes &&
-                        customMinutes === ""
+                        customDuration === ""
                           ? "is-active"
                           : ""
                       }
                       aria-pressed={
                         plannedMinutes === minutes &&
-                        customMinutes === ""
+                        customDuration === ""
                       }
                       onClick={() => chooseDuration(minutes)}
                     >
@@ -3071,19 +3076,30 @@ function Focus() {
 
                 </div>
 
-                <label className="v2f-custom">
+                <div className="v2f-custom">
                   <input
                     type="number"
-                    min="1"
-                    max="720"
+                    inputMode="decimal"
+                    min={customUnit === "hr" ? 1 / 60 : 1}
+                    max={customUnit === "hr" ? 12 : 720}
+                    step="any"
                     placeholder="Custom"
-                    aria-label="Custom duration in minutes"
-                    value={customMinutes}
+                    aria-label={`Custom duration in ${customUnit === "hr" ? "hours" : "minutes"}`}
+                    aria-invalid={customDuration !== "" && parseCustomDuration(customDuration, customUnit) === null}
+                    value={customDuration}
                     disabled={status !== "idle"}
-                    onChange={handleCustomMinutes}
+                    onChange={handleCustomDuration}
                   />
-                  <span>min</span>
-                </label>
+                  <select
+                    aria-label="Custom duration unit"
+                    value={customUnit}
+                    onChange={handleCustomUnit}
+                    disabled={status !== "idle"}
+                  >
+                    <option value="min">min</option>
+                    <option value="hr">hr</option>
+                  </select>
+                </div>
 
               </div>
 
@@ -3184,7 +3200,7 @@ function Focus() {
 
                   <span>
                     {formatStudyTime(elapsedSeconds)} /
-                    {" "}{plannedMinutes} min
+                    {" "}{formatSessionDuration(plannedMinutes)}
                     {" "}&middot;{" "}
                     {Math.round(progressPercent)}%
                   </span>
@@ -3263,7 +3279,7 @@ function Focus() {
 
                       <span>
                         {session.plannedMinutes
-                          ? `Target ${session.plannedMinutes} min`
+                          ? `Target ${formatSessionDuration(session.plannedMinutes)}`
                           : "Focus session"}
                       </span>
                     </div>
