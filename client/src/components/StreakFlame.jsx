@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import DialogSurface from "./DialogSurface";
 
 import {
@@ -472,7 +473,24 @@ export default function StreakFlame() {
 
   const isDashboard = /^\/app\/dashboard\/?$/.test(pathname);
 
-  if (!ready || !isDashboard) return null;
+  const [headerSlot, setHeaderSlot] = useState(null);
+  useEffect(() => {
+    if (!isDashboard) { setHeaderSlot(null); return; }
+    // The dashboard route loads lazily. Attach the existing check-in trigger
+    // once its header exists, without remounting the streak service.
+    const attach = () => {
+      const slot = document.getElementById("studyos-dashboard-streak");
+      if (!slot) return false;
+      setHeaderSlot(slot);
+      return true;
+    };
+    if (attach()) return;
+    const observer = new MutationObserver(() => { if (attach()) observer.disconnect(); });
+    observer.observe(document.getElementById("root"), { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [isDashboard]);
+
+  if (!ready || !isDashboard || !headerSlot?.isConnected) return null;
 
   const days = record?.count || 0;
   const best = record?.best || days;
@@ -499,9 +517,8 @@ export default function StreakFlame() {
 
   return (
     <>
-      {/* Always-moving top-right flame */}
-
-      <button
+      {/* Existing living flame, placed within the dashboard header. */}
+      {createPortal(<button
         ref={triggerRef}
         type="button"
         className={`sf2-trigger${
@@ -515,7 +532,7 @@ export default function StreakFlame() {
         </span>
 
         <strong>{record ? days : "?"}</strong>
-      </button>
+      </button>, headerSlot)}
 
       {/* Center celebration */}
 

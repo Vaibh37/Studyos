@@ -247,6 +247,21 @@ async function journeys() {
     assert.deepEqual(dashboardReads, ["/api/dashboard"]);
   } finally { a.off("request", recordDashboardReads); }
   console.log("PASS cold Dashboard uses one combined private data request");
+  await visible(a.locator(".ds-streak-slot .sf2-trigger"));
+  await assertNoOverflow(a);
+  assert.equal(await a.locator(".ds-chart-day").count(), 7);
+  const dashboardTask = label("Dashboard task");
+  await button(a, "Add task").click();
+  await a.getByRole("textbox", { name: "New task title" }).fill(dashboardTask);
+  await responseFor(a, "POST", /^\/api\/tasks$/, () => button(a, "Add").click());
+  await visible(button(a, "Mark " + dashboardTask + " as complete"));
+  await responseFor(a, "PATCH", /^\/api\/tasks\/[^/]+$/, () => button(a, "Mark " + dashboardTask + " as complete").click());
+  await absent(button(a, "Mark " + dashboardTask + " as complete"));
+  await go(a, "/app/tasks", "Tasks");
+  await visible(button(a, "Mark " + dashboardTask + " as incomplete"));
+  await button(a, "Delete " + dashboardTask).click();
+  await responseFor(a, "DELETE", /^\/api\/tasks\/[^/]+$/, () => button(a.getByRole("dialog"), "Delete task").click());
+  console.log("PASS dashboard inline task creation, completion, persistence, and inline streak");
 
   const task = label("E2E task"), changedTask = task + " edited";
   await go(a, "/app/tasks", "Tasks");
@@ -447,6 +462,18 @@ async function journeys() {
   await button(m.getByLabel("Settings sections"), "Appearance").click();
   await m.getByRole("button", { name: /^Coffee Warm cream and espresso tones/ }).click();
   await m.waitForFunction(() => document.body.classList.contains("coffee-theme"));
+  await assertNoOverflow(m);
+  await exact(nav, "link", "Home").click();
+  await visible(m.locator(".ds-clean[aria-busy=false]"));
+  await visible(m.locator(".ds-streak-slot .sf2-trigger"));
+  await assertNoOverflow(m);
+  assert.equal(await m.locator(".ds-streak-slot .sf2-trigger").evaluate(el => getComputedStyle(el).position), "static");
+  await visible(button(m, "Mark " + mobileTask + " as complete"));
+  await responseFor(m, "PATCH", /^\/api\/tasks\/[^/]+$/, () => button(m, "Mark " + mobileTask + " as complete").click());
+  await absent(button(m, "Mark " + mobileTask + " as complete"));
+  const chartDay = m.locator(".ds-chart-day:not(:disabled)").first();
+  await chartDay.click();
+  assert.equal(await chartDay.getAttribute("aria-pressed"), "true");
   await assertNoOverflow(m);
   await exact(nav, "link", "Focus").click();
   await visible(exact(m, "heading", "Focus"));
