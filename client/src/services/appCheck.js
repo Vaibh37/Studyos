@@ -1,15 +1,33 @@
-import { getToken } from "firebase/app-check";
-import { appCheck } from "../firebase";
+import app from "../firebase";
 
-// Not configured until a Firebase web App Check site key is deployed.
-// App Check caches tokens and refreshes them itself.
+// Keep reCAPTCHA and App Check code off public/guest startup paths. The
+// configured provider is still initialized before any API/socket token is
+// requested, and its normal automatic token refresh stays enabled.
+let initialization;
+function getAppCheck() {
+  if (!initialization) {
+    initialization = import("firebase/app-check").then(sdk => ({
+      sdk,
+      instance: sdk.initializeAppCheck(app, {
+        provider: new sdk.ReCaptchaEnterpriseProvider(import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY),
+        isTokenAutoRefreshEnabled: true,
+      }),
+    })).catch(error => {
+      initialization = undefined;
+      throw error;
+    });
+  }
+  return initialization;
+}
+
 export async function getAppCheckToken() {
-  if (!appCheck) return null;
+  if (!import.meta.env.VITE_FIREBASE_APP_CHECK_SITE_KEY) return null;
   try {
-    const { token } = await getToken(appCheck);
+    const { sdk, instance } = await getAppCheck();
+    const { token } = await sdk.getToken(instance);
     return token || null;
   } catch {
-    // Server enforcement is a separate, explicit rollout step.
+    // Server enforcement still rejects missing or invalid App Check tokens.
     return null;
   }
 }

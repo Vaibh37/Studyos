@@ -1,5 +1,7 @@
 import { useLocation } from "react-router";
-import { Analytics } from "@vercel/analytics/react";
+import { lazy, Suspense } from "react";
+import RecoveryBoundary from "./RecoveryBoundary";
+const Analytics = lazy(() => import("@vercel/analytics/react").then(module => ({ default: module.Analytics })));
 import useAnalyticsPreference from "../hooks/useAnalyticsPreference";
 import {
   allowedAnalyticsPaths,
@@ -18,6 +20,6 @@ export default function OptionalAnalytics() {
   const enabled = useAnalyticsPreference();
   const { pathname } = useLocation();
   return enabled && allowedAnalyticsPaths.has(pathname)
-    ? <Analytics beforeSend={beforeSend} />
+    ? <RecoveryBoundary silent><Suspense fallback={null}><Analytics beforeSend={beforeSend} /></Suspense></RecoveryBoundary>
     : null;
 }

@@ -1,4 +1,5 @@
-import { copyFile, mkdir } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { copyFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -64,3 +65,14 @@ console.log(
     fetchedCount ? `, ${fetchedCount} fetched from the pinned GitHub revision` : ""
   }).`
 );
+
+// The committed WebP variants are pixel-identical to their PNG sources.
+const hashes = JSON.parse(await readFile(path.join(targetDirectory, "source-hashes.json"), "utf8"));
+for (const name of screenshots) {
+  const bytes = await readFile(path.join(targetDirectory, name));
+  const hash = createHash("sha256").update(bytes).digest("hex");
+  if (hash !== hashes[name]) {
+    throw new Error("Regenerate the optimized marketing screenshot: " + name + " (python client/scripts/optimize-marketing-screenshots.py)");
+  }
+  await readFile(path.join(targetDirectory, name.replace(/\.png$/, ".webp")));
+}

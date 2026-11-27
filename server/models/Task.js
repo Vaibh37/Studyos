@@ -124,6 +124,9 @@ taskSchema.pre("save", function () {
   }
 });
 
+// Owner-scoped list order; avoids a blocking sort on large study histories.
+taskSchema.index({ userId: 1, completed: 1, dueDate: 1, createdAt: -1 });
+
 module.exports =
   mongoose.model(
     "Task",

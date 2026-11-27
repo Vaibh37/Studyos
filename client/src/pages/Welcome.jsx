@@ -1,3 +1,5 @@
+import { loadGoogleIdentity } from "../services/googleIdentity";
+import { canSpeculate } from "../services/routePreload";
 import { MAX_SIGNUP_NAME_LENGTH } from "../services/signupValidation";
 import {
   useEffect,
@@ -32,6 +34,19 @@ function Welcome() {
     registerWithEmail,
     continueAsGuest,
   } = useAuth();
+
+  // Login is the only screen that needs the Google Identity SDK. Delay
+  // speculative network work until the sign-in controls have rendered.
+  useEffect(() => {
+    if (!canSpeculate()) return;
+    const warm = () => void loadGoogleIdentity().catch(() => {});
+    if ("requestIdleCallback" in window) {
+      const idle = window.requestIdleCallback(warm, { timeout: 1500 });
+      return () => window.cancelIdleCallback(idle);
+    }
+    const timer = window.setTimeout(warm, 250);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const [
     emailMode,

@@ -170,7 +170,19 @@ const authenticatedApiLimiter = rateLimit({
   message: { message: "Too many account requests. Please slow down." },
 });
 
+// Each dashboard bundle reads up to three private collections. Keep a much
+// tighter limit than a single-resource read, without relaxing other limits.
+const dashboardReadLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 60,
+  keyGenerator: userOrIpKey,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many dashboard requests. Please slow down." },
+});
+
 module.exports = {
+  dashboardReadLimiter,
   authenticatedApiLimiter,
   globalApiLimiter,
   attachmentUploadLimiter,

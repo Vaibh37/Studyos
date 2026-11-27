@@ -2,7 +2,7 @@
 // Do not store request URLs, identifiers, tokens, bodies, query strings,
 // error messages, or user attributes. No third-party telemetry service.
 const { performance } = require("node:perf_hooks");
-const AREAS = new Set(["auth", "account", "security", "tasks", "subjects", "notes",
+const AREAS = new Set(["auth", "account", "security", "dashboard", "tasks", "subjects", "notes",
   "events", "study-sessions", "groups", "leaderboard"]);
 const SYSTEM = new Set(["health", "status", "uptime", "version"]);
 const LATENCY_BOUNDS = [25, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 30000];

@@ -20,6 +20,7 @@ test("App Check: audit safely, enforce on HTTP and real Socket.IO connections", 
   app.use(express.json());
   app.use("/api", guards.http);
   app.get("/api/ping", (req, res) => res.json({ ok: true }));
+  app.get("/api/dashboard", (req, res) => res.json({ ok: true }));
   app.get("/api/health", (req, res) => res.json({ status: "ok" }));
   app.get("/api/health/db", (req, res) => res.json({ status: "ok" }));
   app.get("/api/health/ready", (req, res) => res.json({ status: "ok" }));
@@ -62,6 +63,10 @@ test("App Check: audit safely, enforce on HTTP and real Socket.IO connections", 
     assert.ok(guards.counts.valid > 0);
 
     mode = "enforce";
+    assert.equal((await fetch(url + "/api/dashboard")).status, 403);
+    assert.equal((await fetch(url + "/api/dashboard", {
+      headers: { "X-Firebase-AppCheck": "real-app-check" },
+    })).status, 200);
     const beforePublic = { ...guards.counts };
     assert.equal((await fetch(url + "/api/health")).status, 200);
     assert.equal((await fetch(url + "/api/health/db")).status, 200);

@@ -34,7 +34,7 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
     if (
       request === "../middleware/firebaseAuth" &&
       ["noteRoutes.js", "taskRoutes.js", "subjectRoutes.js",
-       "eventRoutes.js", "studySessionRoutes.js"].some(
+       "eventRoutes.js", "studySessionRoutes.js", "dashboardRoutes.js"].some(
          (name) => parent?.filename?.endsWith(name))
     ) {
       return fakeFirebase;
@@ -45,6 +45,7 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
   let routers;
   try {
     routers = {
+      dashboard: require("../routes/dashboardRoutes"),
       notes: require("../routes/noteRoutes"),
       tasks: require("../routes/taskRoutes"),
       subjects: require("../routes/subjectRoutes"),
@@ -57,6 +58,7 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
 
   const app = express();
   app.use(express.json());
+  app.use("/api/dashboard", routers.dashboard);
   app.use("/api/notes", routers.notes);
   app.use("/api/tasks", routers.tasks);
   app.use("/api/subjects", routers.subjects);
@@ -205,6 +207,22 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
       "/api/study-sessions/" + session.body._id, "DELETE")).status, 404);
     assert.equal((await call(bob, "/api/study-sessions")).body.length, 0);
     assert.equal((await call(alice, "/api/study-sessions")).body.length, 1);
+
+    // A bundled read has exactly the original owner-scoped response shapes.
+    assert.equal((await call("guest", "/api/dashboard")).status, 401);
+    const aliceBundle = await call(alice, "/api/dashboard?userId=" + bob);
+    assert.equal(aliceBundle.status, 200);
+    assert.deepEqual(aliceBundle.body, {
+      tasks: (await call(alice, "/api/tasks")).body,
+      sessions: (await call(alice, "/api/study-sessions")).body,
+      events: (await call(alice, "/api/events")).body,
+    });
+    const bobBundle = await call(bob, "/api/dashboard?userId=" + alice);
+    assert.equal(bobBundle.status, 200);
+    assert.deepEqual(bobBundle.body, { tasks: [], sessions: [], events: [] });
+    assert.equal((await fetch(base + "/api/dashboard", {
+      headers: { Authorization: "Bearer " + alice },
+    })).headers.get("Cache-Control"), "no-store");
 
     // No unauthorized mutation reached another account's records.
     assert.equal((await Note.countDocuments({ userId: alice })), 1);

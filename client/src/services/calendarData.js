@@ -108,10 +108,10 @@ const taskToCalendarEvent =
 // =========================================================
 
 export const getCalendarEvents =
-  async (isGuest, { cache = false, fresh = false, tasksPromise } = {}) => {
+  async (isGuest, { cache = false, fresh = false, tasksPromise, eventsPromise } = {}) => {
     const read = path => cache ? readStudyData(path, { fresh }) : apiRequest(path);
     const [events, tasks] = await Promise.all([
-      isGuest ? localDb.getAll("events") : read("/api/events"),
+      eventsPromise || (isGuest ? localDb.getAll("events") : read("/api/events")),
       tasksPromise || (isGuest ? localDb.getAll("tasks") : read("/api/tasks")),
     ]);
 

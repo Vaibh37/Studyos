@@ -34,7 +34,7 @@ function Hero() {
         <div className="marketing-hero-visual">
           <div className="marketing-product-frame">
             <img
-              src="/studyos-screenshots/dashboard.png"
+              src="/studyos-screenshots/dashboard.webp"
               alt="StudyOS dashboard showing daily study progress, focus activity, tasks, XP and upcoming work"
               fetchPriority="high"
               decoding="async"

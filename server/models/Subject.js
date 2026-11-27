@@ -37,6 +37,9 @@ const subjectSchema =
     }
   );
 
+// Owner-scoped list order; avoids a blocking sort on large study histories.
+subjectSchema.index({ userId: 1, createdAt: -1 });
+
 module.exports =
   mongoose.model(
     "Subject",
