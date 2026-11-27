@@ -1656,9 +1656,8 @@ function Focus() {
     }
   };
 
-  const handleCustomUnit = (event) => {
-    if (status !== "idle") return;
-    const unit = event.target.value;
+  const handleCustomUnit = (unit) => {
+    if (status !== "idle" || unit === customUnit) return;
     const minutes = parseCustomDuration(customDuration, customUnit);
     setCustomUnit(unit);
 
@@ -3090,15 +3089,23 @@ function Focus() {
                     disabled={status !== "idle"}
                     onChange={handleCustomDuration}
                   />
-                  <select
-                    aria-label="Custom duration unit"
-                    value={customUnit}
-                    onChange={handleCustomUnit}
-                    disabled={status !== "idle"}
-                  >
-                    <option value="min">min</option>
-                    <option value="hr">hr</option>
-                  </select>
+                  <div className="v2f-unit-toggle" role="group" aria-label="Custom duration unit">
+                    {[
+                      { value: "min", label: "Minutes" },
+                      { value: "hr", label: "Hours" },
+                    ].map(({ value, label }) => (
+                      <button
+                        key={value}
+                        type="button"
+                        aria-label={label}
+                        aria-pressed={customUnit === value}
+                        disabled={status !== "idle"}
+                        onClick={() => handleCustomUnit(value)}
+                      >
+                        {value}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
               </div>

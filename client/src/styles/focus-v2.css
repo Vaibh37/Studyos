@@ -790,10 +790,10 @@
 .v2f-clean .v2f-custom {
   display: flex;
   align-items: center;
-  gap: 4px;
-  width: 134px;
+  gap: 6px;
+  width: 164px;
   flex-shrink: 0;
-  padding: 0 7px;
+  padding: 3px 4px 3px 10px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   border-radius: 8px;
@@ -805,8 +805,10 @@
 
 .v2f-clean .v2f-custom input {
   display: block;
+  flex: 1;
   width: 100%;
   min-width: 0;
+  padding: 0;
   border: 0;
   background: transparent;
   color: var(--color-text);
@@ -824,30 +826,55 @@
 
 .v2f-clean .v2f-custom input:focus-visible {
   outline: 0;
+  box-shadow: none;
 }
 
-.v2f-clean .v2f-custom select {
-  flex: 0 0 44px;
-  width: 44px;
-  min-height: 30px;
-  padding: 0 0 0 4px;
-  border: 0;
-  border-left: 1px solid var(--color-border);
+.v2f-clean .v2f-custom:has(input:focus-visible) {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-text) 16%, transparent);
+}
+
+.v2f-clean .v2f-unit-toggle {
+  flex: 0 0 76px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  align-self: stretch;
+  padding: 2px;
+  border-radius: 6px;
+  background: var(--color-bg);
+}
+
+.v2f-clean .v2f-unit-toggle button {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 2px;
+  border: 1px solid transparent;
+  border-radius: 5px;
   background: transparent;
   color: var(--color-text-muted);
-  font: inherit;
   font-size: 13px;
-  cursor: pointer;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.v2f-clean .v2f-custom select option {
-  background: var(--color-surface);
+.v2f-clean .v2f-unit-toggle button:hover:not(:disabled) {
   color: var(--color-text);
 }
 
-.v2f-clean .v2f-custom select:focus-visible {
-  outline: 2px solid var(--color-border-strong);
-  outline-offset: 2px;
+.v2f-clean .v2f-unit-toggle button[aria-pressed="true"] {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.v2f-clean .v2f-unit-toggle button:focus-visible {
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: -2px;
+  box-shadow: none;
 }
 
 .v2f-clean .v2f-custom:has(input[aria-invalid="true"]) {
@@ -1183,7 +1210,7 @@
   }
 
   .v2f-clean .v2f-controls {
-    width: min(100%, 330px);
+    width: min(100%, 360px);
   }
 
   .v2f-clean .v2f-primary-action {
@@ -1243,6 +1270,9 @@
     display: none;
   }
 
+}
+
+@media (max-width: 375px) {
   .v2f-clean .v2f-duration-row {
     flex-wrap: wrap;
   }
