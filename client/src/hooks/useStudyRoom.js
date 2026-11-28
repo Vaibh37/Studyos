@@ -5,6 +5,7 @@ const empty = { roomId: null, participants: [], participantId: null, offset: 0, 
 
 export function useStudyRoom(roomId, uid, status, subject) {
   const [state, setState] = useState(empty);
+  const [attempt, setAttempt] = useState(0);
   const latest = useRef({ status, subject });
   const connection = useRef(null);
   useEffect(() => { latest.current = { status, subject: String(subject || "").slice(0, 80) }; }, [status, subject]);
@@ -97,8 +98,8 @@ export function useStudyRoom(roomId, uid, status, subject) {
       socket.off("connect_error", connectionError);
       if (socket.connected) socket.emit("study-room:leave", { roomId });
     };
-  }, [roomId, uid]);
+  }, [roomId, uid, attempt]);
 
   useEffect(() => { connection.current?.sendState(); }, [status, subject]);
-  return state.roomId === roomId ? state : { ...empty, roomId };
+  return { ...(state.roomId === roomId ? state : { ...empty, roomId }), retry: () => setAttempt(n => n + 1) };
 }

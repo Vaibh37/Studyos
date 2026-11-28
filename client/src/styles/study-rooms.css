@@ -145,3 +145,34 @@
   .room-participant-time { font-size:10px; }
 }
 @media (prefers-reduced-motion:reduce) { .room-desk-light,.room-desk-page,.room-timer::before { animation:none; } }
+
+/* Live directory details are deliberately compact; the original room layout
+   stays unchanged for small rooms. */
+.room-public-heading { margin-top:21px; }
+.room-public-heading h2 { margin:0 0 12px; }
+.room-directory-summary { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--room-accent); margin-bottom:12px; }
+.room-occupancy-dot { flex:0 0 7px; width:7px; height:7px; border-radius:50%; background:currentColor; }
+.room-directory-label > .room-directory-occupancy { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:550; }
+.room-directory-occupancy.is-active { color:var(--room-accent); }
+.room-directory-warning { display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--color-text-muted); font-size:13px; margin-bottom:10px; }
+.room-directory-warning .room-button { min-height:34px; }
+.room-participant-toolbar { display:flex; gap:10px; align-items:center; padding:0 20px 13px; }
+.room-participant-toolbar input {
+  width:min(100%,260px); min-width:0; min-height:40px; border:1px solid var(--color-border);
+  border-radius:8px; color:var(--color-text); background:var(--color-surface-subtle);
+  padding:9px 11px; font:inherit; font-size:13px;
+}
+.room-participant-toolbar .study-select { width:168px; flex-shrink:0; }
+.room-no-match { grid-column:1/-1; padding:22px 6px; color:var(--color-text-muted); font-size:13px; text-align:center; }
+.room-preferences .room-audio .study-select { width:142px; }
+@media (max-width:900px) {
+  .room-participant-toolbar { padding:0 14px 12px; gap:8px; }
+  .room-participant-toolbar input { flex:1; width:0; }
+  .room-participant-toolbar .study-select { width:145px; }
+  .room-audio { flex:1 1 100%; }
+  .room-preferences .room-audio .study-select { width:142px; }
+}
+@media (max-width:365px) {
+  .room-participant-toolbar .study-select { width:126px; }
+  .room-directory-summary { font-size:11px; }
+}

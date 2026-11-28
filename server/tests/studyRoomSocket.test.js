@@ -133,3 +133,63 @@ test("real room sockets: live state, server time, private authorization, dedupli
   assert.equal((await deleted).roomId, PRIVATE);
   assert.equal((await request(alice, "study-room:state", data(PRIVATE, "running"))).ok, false);
 });
+
+test("live room directory reveals only aggregate occupancy, checks private membership and revokes subscriptions", async t => {
+  const srv = http.createServer();
+  const io = new Server(srv);
+  const clients = [];
+  const memberIds = new Set(["directory-alice", "directory-bob"]);
+  const manager = createStudyRoomPresence(io, {
+    membership: async (id, uid) => id === GROUP && memberIds.has(uid) ? { displayName: uid } : null,
+    directoryMembership: async (ids, uid) => memberIds.has(uid) ? ids.filter(id => id === GROUP) : [],
+  });
+  io.studyRoomPresence = manager;
+  io.use((socket,next) => { socket.user={uid:socket.handshake.auth.uid,name:socket.handshake.auth.uid};next(); });
+  io.on("connection",socket => {
+    socket.join(getAuthenticatedUserRoom(socket.user.uid));
+    registerSocketInboundProtection(socket);
+    manager.register(socket);
+  });
+  await new Promise(resolve=>srv.listen(0,"127.0.0.1",resolve));
+  t.after(async()=>{for(const socket of clients)socket.disconnect();await new Promise(resolve=>io.close(resolve));});
+  async function open(uid) {
+    const socket=connect(`http://127.0.0.1:${srv.address().port}`,{auth:{uid},transports:["websocket"],forceNew:true});
+    clients.push(socket);await event(socket,"connect");return socket;
+  }
+  const [alice,bob,stranger]=await Promise.all(["directory-alice","directory-bob","directory-stranger"].map(open));
+  const subscribed=await request(alice,"study-room:directory:subscribe",{groupIds:[GROUP]});
+  assert.equal(subscribed.ok,true);
+  assert.equal(subscribed.rooms.length,5);
+  assert.equal(subscribed.rooms.find(x=>x.roomId===PRIVATE).total,0);
+  const denied=await request(stranger,"study-room:directory:subscribe",{groupIds:[GROUP]});
+  assert.equal(denied.rooms.length,4);
+  assert.equal(denied.rooms.some(x=>x.roomId===PRIVATE),false);
+  assert.equal(validateSocketPacket(["study-room:directory:subscribe",{groupIds:[{$ne:null}]}]),false);
+  assert.equal(validateSocketPacket(["study-room:directory:subscribe",{groupIds:Array(101).fill(GROUP)}]),false);
+  let leaked=0;
+  stranger.on("study-room:occupancy",summary=>{if(summary.roomId===PRIVATE)leaked++;});
+  const change=event(alice,"study-room:occupancy");
+  await request(bob,"study-room:join",data(PRIVATE,"running","Private topic"));
+  const summary=await change;
+  assert.deepEqual(summary,{roomId:PRIVATE,total:1,studying:1,capacity:200});
+  const pause=event(alice,"study-room:occupancy");
+  await request(bob,"study-room:state",data(PRIVATE,"paused","Private topic"));
+  assert.equal((await pause).studying,0);
+  const revoked=event(alice,"study-room:occupancy:removed");
+  memberIds.delete("directory-alice");
+  revokeMemberGroupAccess(io,GROUP,"directory-alice");
+  assert.equal((await revoked).roomId,PRIVATE);
+  let afterRevocation=0;
+  alice.on("study-room:occupancy",s=>{if(s.roomId===PRIVATE)afterRevocation++;});
+  await request(bob,"study-room:state",data(PRIVATE,"running","Private topic"));
+  const publicChange=event(stranger,"study-room:occupancy");
+  await request(bob,"study-room:join",data(PUBLIC,"running","Public topic"));
+  assert.deepEqual(await publicChange,{roomId:PUBLIC,total:1,studying:1,capacity:200});
+  assert.equal(leaked,0);
+  assert.equal(afterRevocation,0);
+  await request(stranger,"study-room:directory:unsubscribe",{});
+  let afterUnsubscribe=0;stranger.on("study-room:occupancy",()=>afterUnsubscribe++);
+  await request(bob,"study-room:state",data(PUBLIC,"paused"));
+  await new Promise(resolve=>setTimeout(resolve,50));
+  assert.equal(afterUnsubscribe,0);
+});

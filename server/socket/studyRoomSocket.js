@@ -7,6 +7,8 @@ const MAX_ROOM_MEMBERS = 200;
 const MAX_MEMBERS = 2000;
 const groupIdFor = id => id.startsWith("group:") ? id.slice(6) : null;
 const roomChannel = id => `study-room:${id}`;
+const directoryChannel = id => `study-room-directory:${id}`;
+const userChannel = uid => `user:${String(uid)}`;
 const cleanText = (value, max) => typeof value === "string"
   ? value.replace(/[\p{Cc}\p{Cf}]/gu, "").trim().slice(0, max) : "";
 const validRoom = id => typeof id === "string" &&
@@ -16,6 +18,12 @@ function createStudyRoomPresence(io, {
   clock = Date.now,
   membership = (groupId, userId) => require("../models/social/GroupMember")
     .findOne({ groupId, userId }).select("displayName").lean(),
+  directoryMembership = async (groupIds, userId) => {
+    if (!groupIds.length) return [];
+    const memberships = await require("../models/social/GroupMember")
+      .find({ groupId: { $in: groupIds }, userId }).select("groupId").lean();
+    return memberships.map(record => String(record.groupId));
+  },
 } = {}) {
   const rooms = new Map();
   const users = new Map();
@@ -34,7 +42,19 @@ function createStudyRoomPresence(io, {
       elapsedMs: member.elapsedMs, startedAt: member.startedAt,
     })),
   });
-  const publish = id => io.to(roomChannel(id)).emit("study-room:snapshot", snapshot(id));
+  const occupancy = id => {
+    const members = rooms.get(id);
+    let studying = 0;
+    for (const member of members?.values() || []) if (member.status === "running") studying++;
+    return { roomId: id, total: members?.size || 0, studying, capacity: MAX_ROOM_MEMBERS };
+  };
+  const publish = id => {
+    io.to(roomChannel(id)).emit("study-room:snapshot", snapshot(id));
+    io.to(directoryChannel(id)).emit("study-room:occupancy", occupancy(id));
+  };
+  const unsubscribeDirectory = socket => {
+    for (const channel of socket.rooms) if (channel.startsWith("study-room-directory:")) socket.leave(channel);
+  };
 
   function remove(member, reason, notify = true) {
     if (!member || users.get(member.uid) !== member) return;
@@ -78,6 +98,25 @@ function createStudyRoomPresence(io, {
       const member = users.get(uid);
       return member?.socket === socket && member.roomId === id ? member : null;
     };
+    // Directory viewers only receive aggregate occupancy, never identities or
+    // subjects. Private group counts use independent, membership-protected rooms.
+    on("study-room:directory:subscribe", async data => {
+      unsubscribeDirectory(socket);
+      const groupIds = [...new Set(data.groupIds.map(id => id.toLowerCase()))];
+      const checks = groupIds.map(groupId => ({ groupId, uid, revoked: false }));
+      for (const check of checks) pending.add(check);
+      let authorized;
+      try { authorized = new Set(await directoryMembership(groupIds, uid)); }
+      finally { for (const check of checks) pending.delete(check); }
+      if (!socket.connected) return { ok: false, message: "Connection closed." };
+      const ids = [...PUBLIC_ROOMS, ...checks.filter(check => !check.revoked && authorized.has(check.groupId)).map(check => `group:${check.groupId}`)];
+      for (const id of ids) socket.join(directoryChannel(id));
+      return { ok: true, rooms: ids.map(occupancy) };
+    });
+    on("study-room:directory:unsubscribe", () => {
+      unsubscribeDirectory(socket);
+      return { ok: true };
+    });
     on("study-room:join", async data => {
       const id = data.roomId;
       if (!validRoom(id)) return { ok: false, message: "Unknown study room." };
@@ -155,6 +194,7 @@ function createStudyRoomPresence(io, {
     removeAccount(uid) {
       const userId = String(uid);
       recent.delete(userId);
+      for (const socket of io.sockets.sockets.values()) if (socket.user?.uid === userId) unsubscribeDirectory(socket);
       for (const authorization of pending) if (authorization.uid === userId) authorization.revoked = true;
       remove(users.get(userId), "Your account is no longer available.");
     },
@@ -163,6 +203,8 @@ function createStudyRoomPresence(io, {
       const userId = String(uid);
       for (const authorization of pending) if (authorization.groupId === id && authorization.uid === userId) authorization.revoked = true;
       if (recent.get(userId)?.roomId === `group:${id}`) recent.delete(userId);
+      io.to(userChannel(userId)).emit("study-room:occupancy:removed", { roomId: `group:${id}` });
+      io.in(userChannel(userId)).socketsLeave(directoryChannel(`group:${id}`));
       const member = users.get(userId);
       if (member?.roomId === `group:${id}`) remove(member, "Your group membership ended.");
     },
@@ -171,6 +213,8 @@ function createStudyRoomPresence(io, {
       const id = `group:${group}`;
       for (const authorization of pending) if (authorization.groupId === group) authorization.revoked = true;
       for (const [uid, visit] of recent) if (visit.roomId === id) recent.delete(uid);
+      io.to(directoryChannel(id)).emit("study-room:occupancy:removed", { roomId: id });
+      io.in(directoryChannel(id)).socketsLeave(directoryChannel(id));
       for (const member of Array.from(rooms.get(id)?.values() || [])) remove(member, "This study group was deleted.");
     },
   };
