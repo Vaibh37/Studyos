@@ -262,6 +262,24 @@ async function onboardingJourney() {
     const tour = page.locator(".workspace-tour");
     await visible(tour.getByRole("heading", { name: "Welcome to StudyOS" }));
     await visible(tour.getByText("Practice environment · Nothing is saved to your study records"));
+    const world = tour.locator("canvas.journey-world");
+    await visible(world);
+    assert.equal(await world.getAttribute("aria-hidden"), "true", "Motion scenery must be decorative");
+    const scenery = await world.evaluateHandle(node => node);
+    // Reduced motion must retain a real, stationary illustration, not a blank
+    // stage. Read a small sample rather than an expensive full canvas export.
+    const worldSample = () => world.evaluate(node => {
+      const ctx = node.getContext("2d");
+      return Array.from(ctx.getImageData(Math.floor(node.width / 3), Math.floor(node.height / 3), 16, 16).data);
+    });
+    await page.waitForFunction(() => {
+      const node = document.querySelector("canvas.journey-world");
+      return node && node.getContext("2d")?.getImageData(Math.floor(node.width / 3), Math.floor(node.height / 3), 1, 1).data[0] > 0;
+    });
+    const still = await worldSample();
+    assert(still.some((value, i) => i % 4 !== 3 && value > 0), "Cinematic stage must render");
+    await delay(200);
+    assert.deepEqual(await worldSample(), still, "Reduced-motion scenery must remain stationary");
     assert(await page.locator(".app-shell-v2").evaluate(node => node.inert), "Tour must make the workspace inert");
     assert.equal(await page.locator(".sf2-stage").count(), 0, "Streak celebration must not cover the tour");
     await assertNoOverflow(page);
@@ -274,6 +292,7 @@ async function onboardingJourney() {
     await button(tour, "Continue").click();
     await visible(tour.getByRole("heading", { name: "Find your focus" }));
     await visible(tour.getByText("Sign in to join live rooms.", { exact: false }));
+    assert(await world.evaluate((node, previous) => node === previous, scenery), "Scene cuts must preserve the continuous world canvas");
     await button(tour, "Start practice").click();
     await delay(1250);
     await button(tour, "Pause").click();
@@ -292,6 +311,8 @@ async function onboardingJourney() {
     await visible(tour.getByRole("heading", { name: "See how far you've come" }));
     assert.equal(await tour.getByRole("progressbar", { name: "Tour progress" }).getAttribute("aria-valuenow"), "3");
     assert.equal(await tour.locator(".journey-result-face strong").textContent(), "2/2");
+    assert(await world.evaluate((node, previous) => node === previous, scenery), "Recap must reuse the same visual world");
+    await scenery.dispose();
     await button(tour, "Focus 5s").click();
     assert.equal(await tour.locator(".journey-result-face strong").textContent(), "5s");
     await visible(tour.getByText("Your guest study data stays in this browser.", { exact: false }));
