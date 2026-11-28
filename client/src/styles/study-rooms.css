@@ -176,3 +176,48 @@
   .room-participant-toolbar .study-select { width:126px; }
   .room-directory-summary { font-size:11px; }
 }
+
+/* Room presence on other workspace pages: a compact inline dock, not a
+   floating overlay. It never covers editor controls or bottom navigation. */
+.room-dock {
+  --room-accent:var(--color-success);
+  box-sizing:border-box; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  gap:8px 16px; width:100%; max-width:var(--workspace-max,1200px); margin:0 auto 16px;
+  min-height:64px; padding:7px 12px; border:1px solid var(--color-border); border-radius:10px;
+  background:var(--color-surface); color:var(--color-text); flex-shrink:0;
+}
+.room-dock-room { display:flex; gap:10px; align-items:center; min-width:0; color:inherit; text-decoration:none; flex:1; }
+.room-dock-room > .room-desk { width:45px; flex:0 0 45px; }
+.room-dock-details { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.room-dock-details strong { font-size:13px; font-weight:650; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.room-dock-details > span { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--color-text-muted); white-space:nowrap; }
+.room-dock-details .room-live-dot { width:6px; height:6px; flex:0 0 6px; }
+.room-dock-room > svg:last-child { flex-shrink:0; color:var(--color-text-muted); }
+.room-dock-actions { display:flex; align-items:center; justify-content:flex-end; gap:6px; flex-shrink:0; }
+.room-dock-time { font-variant-numeric:tabular-nums; font-size:16px; font-weight:650; white-space:nowrap; padding-inline:3px; }
+.room-dock-icon,.room-dock-sound { display:grid; place-items:center; background:transparent; border:1px solid var(--color-border); border-radius:7px; min-width:36px; min-height:36px; color:var(--color-text); cursor:pointer; font:inherit; }
+.room-dock-sound { padding-inline:9px; font-size:12px; font-weight:550; white-space:nowrap; }
+.room-dock-icon:hover,.room-dock-sound:hover { background:var(--color-surface-hover); }
+.room-dock-icon:disabled { opacity:.5; cursor:not-allowed; }
+.room-dock-sound[aria-pressed="true"] { color:var(--room-accent); }
+.room-dock-warning { display:flex; gap:8px; width:100%; align-items:center; justify-content:space-between; color:var(--color-text-muted); font-size:12px; padding:4px 0; }
+.room-dock-warning button { border:0; background:none; color:var(--color-text); text-decoration:underline; cursor:pointer; font:inherit; }
+@media (max-width:540px) {
+  .room-dock { gap:6px; padding:8px 10px; margin-bottom:12px; }
+  .room-dock-room { flex-basis:100%; }
+  .room-dock-room > .room-desk { width:40px; flex-basis:40px; }
+  .room-dock-actions { width:100%; justify-content:flex-end; }
+  .room-dock-time { margin-right:auto; }
+  .room-dock-icon,.room-dock-sound { min-height:44px; min-width:44px; }
+}
+/* Chat is viewport-sized. Reserve the dock's height within its flex layout. */
+@media (min-width:901px) {
+  #root .app-shell-v2-main:has(> .room-dock + .chats-page:not(.is-fullscreen)) > .chats-page {
+    height:calc(100dvh - 122px) !important; min-height:0 !important;
+  }
+}
+@media (min-width:761px) and (max-width:900px) {
+  #root .app-shell-v2-main:has(> .room-dock + .chats-page:not(.is-fullscreen)) > .chats-page {
+    height:max(240px, calc(100dvh - 225px)) !important;
+  }
+}

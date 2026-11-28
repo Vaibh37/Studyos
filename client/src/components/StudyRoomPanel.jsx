@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
-import { UsersRound, LockKeyhole as Lock, Play, Pause, CheckCircle2, CloudRain, Cloud, Moon, BookOpen } from "./icons";
+import { UsersRound, LockKeyhole as Lock, Play, Pause, CheckCircle2, CloudRain, Cloud, Moon, BookOpen, ArrowUpRight, LogOut } from "./icons";
 import StudySelect from "./StudySelect";
 import FocusZen from "./FocusZen";
 import FocusCompletion from "./FocusCompletion";
@@ -53,8 +53,8 @@ export function StudyDesk({ status = "idle" }) {
   </svg>;
 }
 
-function AmbientSound({ uid }) {
-  const [preference, setPreference] = useState(() => readRoomSound(localStorage, uid));
+function useRoomAudio(uid) {
+  const [preference, setPreference] = useState(() => uid ? readRoomSound(localStorage, uid) : { kind: "rain", volume: 35 });
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState("");
   const sound = useRef(null);
@@ -77,7 +77,7 @@ function AmbientSound({ uid }) {
     }
   }, []);
 
-  useEffect(() => { writeRoomSound(localStorage, uid, preference); }, [uid, preference]);
+  useEffect(() => { if (uid) writeRoomSound(localStorage, uid, preference); }, [uid, preference]);
 
   async function play(nextKind, nextVolume) {
     stop();
@@ -114,11 +114,14 @@ function AmbientSound({ uid }) {
     }
   }
 
+  function mute() {
+    stop();
+    setPlaying(false);
+  }
+
   function toggle() {
-    if (sound.current) {
-      stop();
-      setPlaying(false);
-    } else void play(kind, volume);
+    if (sound.current) mute();
+    else void play(kind, volume);
   }
 
   function changeKind(value) {
@@ -127,17 +130,44 @@ function AmbientSound({ uid }) {
     if (wasPlaying) void play(value, volume);
   }
 
+  function changeVolume(next) {
+    setPreference(old => ({ ...old, volume: next }));
+    const current = sound.current;
+    if (current) current.gain.gain.setTargetAtTime(next / 100 * .35, current.context.currentTime, .06);
+  }
+
+  return { kind, volume, playing, error, toggle, mute, changeKind, changeVolume };
+}
+
+function AmbientSound({ audio }) {
+  const { kind, volume, playing, error, toggle, changeKind, changeVolume } = audio;
   return <div className="room-audio">
     <StudySelect value={kind} onChange={changeKind} options={AMBIENT_SOUNDS} ariaLabel="Ambient sound" />
     <button className="room-button" type="button" aria-pressed={playing} onClick={toggle}>{playing ? "Mute sound" : kind === "rain" ? "Play rain sound" : "Play sound"}</button>
-    {playing && <input aria-label="Ambient sound volume" type="range" min="0" max="100" value={volume} onChange={e => {
-      const next = Number(e.target.value);
-      setPreference(old => ({ ...old, volume: next }));
-      const current = sound.current;
-      if (current) current.gain.gain.setTargetAtTime(next / 100 * .35, current.context.currentTime, .06);
-    }} />}
+    {playing && <input aria-label="Ambient sound volume" type="range" min="0" max="100" value={volume} onChange={e => changeVolume(Number(e.target.value))} />}
     {error && <span role="status">{error}</span>}
   </div>;
+}
+
+function StudyRoomDock({ room, presence, status, timer, busy, remainingSeconds, toggle, audio, leave, sessionError }) {
+  const playing = audio.playing;
+  const activeCount = presence.participants.filter(p => p.status === "running").length;
+  return <aside className="room-dock" aria-label="Active study room">
+    <Link className="room-dock-room" to="/app/study-rooms" title="Return to study room">
+      <StudyDesk status={status} />
+      <span className="room-dock-details"><strong>{room.name}</strong>
+        <span><span className={`room-live-dot${presence.connected ? " is-online" : ""}`} />{presence.connected ? `${activeCount} studying · ${stateNames[status]}` : "Room disconnected"}</span>
+      </span>
+      <ArrowUpRight size={15} />
+    </Link>
+    <div className="room-dock-actions">
+      <strong className="room-dock-time" aria-label={status === "idle" ? "Next focus duration" : "Elapsed focus time"}>{duration(timer)}</strong>
+      {status !== "idle" && <button type="button" className="room-dock-icon" disabled={busy || (status === "paused" && remainingSeconds <= 0)} aria-label={status === "running" ? "Pause room focus" : "Resume room focus"} title={status === "running" ? "Pause focus" : "Resume focus"} onClick={toggle}>{status === "running" ? <Pause size={17} weight="fill" /> : <Play size={17} weight="fill" />}</button>}
+      <button type="button" className="room-dock-sound" aria-pressed={playing} onClick={audio.toggle}>{playing ? "Mute sound" : "Play sound"}</button>
+      <button type="button" className="room-dock-icon" aria-label="Leave study room" title="Leave study room (your Focus timer continues)" onClick={leave} disabled={busy}><LogOut size={19} /></button>
+    </div>
+    {(presence.error || audio.error || sessionError) && <div className="room-dock-warning" role="status"><span>{presence.error || audio.error || sessionError}</span>{presence.error && <button type="button" onClick={presence.retry}>Reconnect</button>}</div>}
+  </aside>;
 }
 
 function DirectoryCard({ item, occupancy, disabled, onJoin }) {
@@ -170,16 +200,17 @@ export default function StudyRoomPanel({
   isGuest, uid, groups, loading, hydrated, status, remainingSeconds, elapsedSeconds,
   subjectOptions, selectedSubjectId, setSelectedSubjectId, activeSubjectName,
   plannedMinutes, chooseDuration, customDuration, customUnit, handleCustomDuration, handleCustomUnit,
-  savingSession, startSession, pauseSession, resumeSession, finishSession,
+  savingSession, startingSession, startSession, pauseSession, resumeSession, finishSession,
   error, message, setError, zenAnchorRef, zenOpen, setZenOpen, completion, setCompletion,
+  roomView = true, onRoomActive = () => {},
 }) {
   const [roomChoice, setRoom] = useState(null);
   const room = roomChoice?.ownerUid === uid ? roomChoice : null;
   const restoredRoomUid = useRef(null);
   const [shareSubject, setShareSubject] = useState(false);
   const [environment, setEnvironment] = useState("none");
-  const [starting, setStarting] = useState(false);
-  const startingRef = useRef(false);
+  const audio = useRoomAudio(uid);
+  const [roomNotice, setRoomNotice] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
   const [now, setNow] = useState(Date.now);
   const [query, setQuery] = useState("");
@@ -189,40 +220,48 @@ export default function StudyRoomPanel({
   const connected = presence.connected;
 
   useEffect(() => {
-    if (!room) return;
+    if (!room || !roomView) return;
+    setNow(Date.now());
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
-  }, [room]);
+  }, [room, roomView]);
 
   useEffect(() => { restoredRoomUid.current = null; setRoom(null); setShareSubject(false); setQuery(""); setSort("activity"); }, [uid]);
 
   function join(next) {
+    setRoomNotice("");
     setShareSubject(false);
     setQuery("");
     setSort("activity");
     setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ENVIRONMENTS.map(option => option.value)));
     writeRoomSelection(sessionStorage, uid, next.id);
     setRoom({ ...next, ownerUid: uid });
+    onRoomActive(true);
   }
 
   function leaveRoom() {
+    audio.mute();
     writeRoomSelection(sessionStorage, uid, null);
     setRoom(null);
+    setShareSubject(false);
     setZenOpen(false);
+    onRoomActive(false);
   }
+
+  // A server-initiated ejection (membership ended or another tab joined) is
+  // terminal. Do not keep audio playing or silently rejoin on refresh.
+  useEffect(() => {
+    if (!presence.removed || !room) return;
+    setRoomNotice(presence.error);
+    leaveRoom();
+  }, [presence.removed, room]);
 
   function changeEnvironment(value) {
     setEnvironment(value);
     if (room) writeRoomScenery(localStorage, uid, room.id, value);
   }
 
-  const start = async () => {
-    if (startingRef.current) return;
-    startingRef.current = true;
-    setStarting(true);
-    try { await startSession(); } finally { startingRef.current = false; setStarting(false); }
-  };
-  const toggle = status === "running" ? pauseSession : status === "paused" ? resumeSession : start;
+  const toggle = status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession;
   const clockNow = now + presence.offset;
   const participants = [...presence.participants].sort((a, b) => {
     if (a.id === presence.participantId) return -1;
@@ -235,7 +274,7 @@ export default function StudyRoomPanel({
     const search = query.trim().toLowerCase();
     return !search || [p.name, p.subject, p.id === presence.participantId ? "You" : ""].some(value => value?.toLowerCase().includes(search));
   });
-  const timerDisabled = !hydrated || loading || savingSession || starting;
+  const timerDisabled = !hydrated || loading || savingSession || startingSession;
   const timer = status === "idle" ? remainingSeconds : elapsedSeconds;
   const privateRooms = groups.map(group => ({
     id: `group:${String(group._id).toLowerCase()}`, name: group.name || "Study group", atmosphere: "none", icon: Lock,
@@ -246,15 +285,21 @@ export default function StudyRoomPanel({
     if (!uid || isGuest || !hydrated || loading || restoredRoomUid.current === uid) return;
     restoredRoomUid.current = uid;
     const previousId = readRoomSelection(sessionStorage, uid);
-    if (!previousId) return;
+    if (!previousId) { onRoomActive(false); return; }
     const next = [...PUBLIC_ROOMS, ...privateRooms].find(item => item.id === previousId);
     if (next) {
       setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ENVIRONMENTS.map(option => option.value)));
       setRoom({ ...next, ownerUid: uid });
-    } else writeRoomSelection(sessionStorage, uid, null);
+      onRoomActive(true);
+    } else {
+      writeRoomSelection(sessionStorage, uid, null);
+      onRoomActive(false);
+    }
   }, [uid, isGuest, hydrated, loading, privateRoomKey]);
-  const directory = useStudyRoomDirectory(uid, hydrated && !isGuest && !room, privateRooms.map(group => group.id.slice(6)));
+  const directory = useStudyRoomDirectory(uid, roomView && hydrated && !isGuest && !room, privateRooms.map(group => group.id.slice(6)));
   const publicStudying = PUBLIC_ROOMS.reduce((count, item) => count + (directory.rooms[item.id]?.studying || 0), 0);
+
+  if (!roomView) return room ? <StudyRoomDock {...{ room, presence, status, timer, remainingSeconds, toggle, audio, leave: leaveRoom, busy: timerDisabled, sessionError: error }} /> : null;
 
   return <div className="study-rooms-page">
     <header className="room-page-header">
@@ -264,9 +309,10 @@ export default function StudyRoomPanel({
       </div>
     </header>
 
+    {roomNotice && <div className="room-notice" role="status">{roomNotice}<button className="room-button" type="button" onClick={() => setRoomNotice("")}>Dismiss</button></div>}
     {isGuest ? <section className="room-placeholder"><UsersRound size={36} /><h2>Study together with an account</h2><p>Sign in to see live students and join study rooms. Your guest data stays on this device.</p><Link className="room-button room-primary" to="/app/settings">Account settings</Link></section> : !room ? <>
       {error && <div className="room-notice room-error" role="alert">{error}<button type="button" className="room-button" onClick={() => setError("")}>Dismiss</button></div>}
-      <div className="room-privacy-note"><UsersRound size={18} /><span>Rooms are silent. Joining shares your display name, focus status and time in the room. Subjects are optional.</span></div>
+      <div className="room-privacy-note"><UsersRound size={18} /><span>Rooms are silent. Joining shares your display name, focus status and time in the room, even while you use other StudyOS pages. Subjects are optional. Leave the room to stop sharing.</span></div>
       <div className="room-section-heading room-public-heading">
         <h2 className="room-section-title">Public rooms</h2>
         {directory.connected && <span className="room-directory-summary"><span className="room-occupancy-dot" /> {publicStudying} studying now</span>}
@@ -309,7 +355,7 @@ export default function StudyRoomPanel({
       <section className="room-live" aria-label={room.name}>
         <header className="room-live-header">
           <div><h2>{room.name}</h2><p><span className={`room-live-dot${connected ? " is-online" : ""}`} /> {connected ? <><strong>{activeCount} studying</strong> <span>· {participants.length} in room</span></> : "Connecting to the room"}</p></div>
-          <button type="button" className="room-button" onClick={leaveRoom}>Leave</button>
+          <button type="button" className="room-button" onClick={leaveRoom} disabled={savingSession || startingSession}>Leave</button>
         </header>
         {presence.error && <div className="room-notice room-error" role="status">{presence.error}<button type="button" className="room-button" onClick={presence.retry}>Reconnect</button></div>}
         {(participants.length > 8 || query || sort !== "activity") && <div className="room-participant-toolbar">
@@ -323,9 +369,9 @@ export default function StudyRoomPanel({
         <div className="room-preferences">
           <label className="room-share"><input type="checkbox" checked={shareSubject} onChange={e => setShareSubject(e.target.checked)} /> Share my subject</label>
           <StudySelect value={environment} onChange={changeEnvironment} options={ENVIRONMENTS} ariaLabel="Choose room scenery" />
-          <AmbientSound key={uid} uid={uid} />
+          <AmbientSound audio={audio} />
         </div>
-        <footer className="room-live-footer">Times are measured while studying in this room. Leaving does not stop your personal Focus timer.</footer>
+        <footer className="room-live-footer">Your desk stays active across StudyOS pages. Leave to stop sharing your room presence; your personal Focus timer continues.</footer>
       </section>
     </>}
     {zenOpen && room && !completion && <FocusZen anchor={zenAnchorRef.current} time={duration(timer)} status={status} animate={true} error={error} saving={timerDisabled || (status === "paused" && remainingSeconds <= 0)} onToggle={toggle} onClose={() => setZenOpen(false)} />}

@@ -94,13 +94,9 @@ const Notes = lazy(() => loadWorkspacePage("notes"));
 
 const Calendar = lazy(() => loadWorkspacePage("calendar"));
 
-const Focus = lazy(() => loadWorkspacePage("focus"));
-
 const Progress = lazy(() => loadWorkspacePage("progress"));
 
 const Leaderboard = lazy(() => loadWorkspacePage("leaderboard"));
-
-const StudyRooms = lazy(() => loadWorkspacePage("study-rooms"));
 
 const Groups = lazy(() => loadWorkspacePage("groups"));
 
@@ -490,12 +486,8 @@ function App() {
               }
             />
 
-            <Route
-              path="focus"
-              element={
-                <Focus />
-              }
-            />
+            {/* The workspace shell owns the persistent Focus controller. */}
+            <Route path="focus" element={<></>} />
 
             <Route
               path="progress"
@@ -511,7 +503,7 @@ function App() {
               }
             />
 
-            <Route path="study-rooms" element={<StudyRooms />} />
+            <Route path="study-rooms" element={<></>} />
 
             <Route
               path="groups"

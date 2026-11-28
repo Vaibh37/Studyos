@@ -1,4 +1,4 @@
-# Study Rooms V2
+# Study Rooms V3
 
 Study Rooms are silent live study spaces built on the existing authenticated
 Socket.IO server and verified Focus timer. There is no webcam, microphone,
@@ -27,7 +27,13 @@ turn on subject sharing.
   per account on the device, but audio never starts automatically.
 - A tab remembers the last joined room through reloads and navigation. Rejoining
   is authorized by the server; leaving explicitly clears the selection.
-  Live presence still ends when navigating away from Study Rooms.
+  A single Focus controller stays mounted across StudyOS workspace pages
+  while joined, so room presence, room time, sound and the verified Focus run
+  continue without reconnecting. A compact dock offers pause/resume, sound,
+  return and explicit leave. Audio still never autoplays after reload.
+  Leaving or signing out stops presence and audio and clears the tab's selection;
+  server revocation also clears the selection. Leaving does not stop the
+  personal timer. Closing the tab or losing connectivity removes live presence.
 - Private-room access is checked before joining; member removal and group
   deletion revoke active access, including a membership check in flight.
 

@@ -3,6 +3,7 @@ import RecoveryBoundary from "../components/RecoveryBoundary";
 import DialogSurface from "../components/DialogSurface";
 import {
   Suspense,
+  lazy,
   useEffect,
   useRef,
   useState,
@@ -25,9 +26,10 @@ import "../styles/mobile/mobile-shell.css";
 
 import Sidebar from "../components/Sidebar";
 import { WorkspaceRouteLoading } from "../components/WorkspaceStates";
-import { scheduleWorkspaceWarmup } from "../services/routePreload";
+import { loadWorkspacePage, scheduleWorkspaceWarmup } from "../services/routePreload";
 import NetworkNotice from "../components/NetworkNotice";
 import MobileBottomNav from "../components/mobile/MobileBottomNav";
+import { readRoomSelection } from "../services/roomAmbience";
 
 import {
   useAuth,
@@ -37,6 +39,22 @@ import {
   getGuestDataSnapshot,
   migrateGuestDataToAccount,
 } from "../services/guestMigration";
+
+const PersistentFocus = lazy(() => loadWorkspacePage("study-rooms"));
+
+// A separate lifetime from the route error boundary: room presence and audio
+// survive navigation, but inactive users never load or fetch Focus off-route.
+function WorkspaceFocusHost({ uid, page, pathname }) {
+  const [roomActive, setRoomActive] = useState(() => Boolean(uid && readRoomSelection(sessionStorage, uid)));
+  const view = page === "focus" || page === "study-rooms" ? page : "background";
+  if (view === "background" && !roomActive) return null;
+
+  return <RecoveryBoundary scope="route" silent={view === "background"}>
+    <Suspense fallback={view === "background" ? null : <WorkspaceRouteLoading pathname={pathname} />}>
+      <PersistentFocus view={view} onRoomActive={setRoomActive} />
+    </Suspense>
+  </RecoveryBoundary>;
+}
 
 // =========================================================
 // APPLICATION PAGE LABELS
@@ -209,7 +227,7 @@ function StudyApp() {
       );
 
   const routePage =
-    routeParts[1];
+    routeParts[1]?.toLowerCase();
 
   const activePage =
     VALID_PAGES.includes(
@@ -788,6 +806,7 @@ function StudyApp() {
           <main id="workspace-main" ref={mainRef} className="main-content app-shell-v2-main" tabIndex={-1} aria-label={PAGE_LABELS[activePage]}>
 
             {!isGuest && <NetworkNotice />}
+            <WorkspaceFocusHost key={isGuest ? "guest" : firebaseUser?.uid || "unknown"} uid={isGuest ? null : firebaseUser?.uid} page={routePage} pathname={location.pathname} />
             <RecoveryBoundary key={location.pathname} scope="route">
               <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
                 <Outlet />

@@ -518,18 +518,53 @@ async function journeys() {
   await visible(b.locator(".room-participant.is-running").filter({ hasText: alice.name }));
   await a.getByLabel("Share my subject").check();
   await visible(b.locator(".room-participant.is-running").getByText("General Study", { exact: true }));
-  await delay(1200);
-  await button(a, "Pause focus").click();
+  // SPA navigation must not cause a disconnect, lose the room timer or
+  // duplicate the Focus controller/run. Sound stays playing until muted/left.
+  await button(a, "Play sound").click();
+  await visible(button(a, "Mute sound"));
+  const readRun = page => page.evaluate(() => {
+    const key = Object.keys(localStorage).find(k => k.startsWith("studyos_active_focus_timer:account:"));
+    return JSON.parse(localStorage.getItem(key))?.runId;
+  });
+  const runId = await readRun(a);
+  assert(runId, "Missing verified Focus run");
+  const readRoomTime = page => page.locator(".room-participant.is-self .room-participant-time").textContent();
+  const initialRoomTime = await readRoomTime(a);
+  await exact(a, "link", "Notes").click();
+  await visible(exact(a, "heading", "Notes"));
+  const dock = a.getByLabel("Active study room");
+  await visible(dock.getByText(group, { exact: true }));
+  await visible(button(dock, "Mute sound"));
+  await visible(b.getByText("· 2 in room", { exact: true }));
+  await visible(b.locator(".room-participant.is-running").getByText("General Study", { exact: true }));
+  await button(dock, "Pause room focus").click();
   await visible(b.locator(".room-participant.is-paused").filter({ hasText: alice.name }));
-  await button(a, "Resume focus").click();
+  await button(dock, "Resume room focus").click();
   await visible(b.locator(".room-participant.is-running").filter({ hasText: alice.name }));
+  await exact(a, "link", "Focus").click();
+  await visible(exact(a, "heading", "Focus"));
+  await visible(button(a, "Pause"));
+  await visible(button(dock, "Mute sound"));
+  await dock.getByRole("link").click();
+  await visible(exact(a, "heading", "Study Rooms"));
+  await visible(button(a, "Mute sound"));
+  await visible(a.locator(".room-timer.room-environment--rain"));
+  assert.equal(await readRun(a), runId, "Navigating replaced the Focus run");
+  assert((await readRoomTime(a)) >= initialRoomTime, "Navigating reset room time");
+  assert.equal(await a.getByLabel("Share my subject").isChecked(), true);
+  await delay(1200);
   await responseFor(a, "POST", /^\/api\/study-sessions$/, () => button(a, "Finish & save").click());
   await visible(b.locator(".room-participant.is-idle").filter({ hasText: alice.name }));
-  await button(b, "Leave").click();
+  await exact(b, "link", "Tasks").click();
+  await visible(exact(b, "heading", "Tasks"));
+  const bobDock = b.getByLabel("Active study room");
+  await visible(bobDock);
+  await button(bobDock, "Leave study room").click();
+  await absent(bobDock);
   await visible(a.getByText("· 1 in room", { exact: true }));
   await button(a, "Continue").click();
   await button(a, "Leave").click();
-  console.log("PASS Study Rooms with live directory counts, remembered room and atmosphere, real Focus run, optional subject sharing, pause/resume, save and live departure");
+  console.log("PASS Study Rooms with live directory counts, remembered atmosphere, persistent presence/audio across pages, shared verified Focus controller, optional subject sharing and explicit departure");
 
   // Responsive app shell on a touch-sized Chromium device, using a third
   // authenticated account and the actual mobile settings navigation.
@@ -568,7 +603,12 @@ async function journeys() {
   await visible(m.locator(".room-participant.is-self"));
   assert.equal((await m.locator(".room-participant-grid").evaluate(el => getComputedStyle(el).gridTemplateColumns)).split(" ").length, 4);
   await assertNoOverflow(m);
-  await button(m, "Leave").click();
+  await exact(nav, "link", "Tasks").click();
+  const mobileDock = m.getByLabel("Active study room");
+  await visible(mobileDock.getByText("Quiet Room", { exact: true }));
+  await assertNoOverflow(m);
+  await button(mobileDock, "Leave study room").click();
+  await absent(mobileDock);
 
   await exact(nav, "link", "Home").click();
   await visible(m.locator(".ds-clean[aria-busy=false]"));

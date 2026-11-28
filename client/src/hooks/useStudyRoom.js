@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { connectSocket } from "../socket";
 
-const empty = { roomId: null, participants: [], participantId: null, offset: 0, connected: false, error: "" };
+const empty = { roomId: null, participants: [], participantId: null, offset: 0, connected: false, error: "", removed: false };
 
 export function useStudyRoom(roomId, uid, status, subject) {
   const [state, setState] = useState(empty);
@@ -24,9 +24,9 @@ export function useStudyRoom(roomId, uid, status, subject) {
         offset: Number(snapshot.serverNow) - Date.now(),
       }));
     };
-    const fail = message => {
+    const fail = (message, removed = false) => {
       joined = false;
-      setState({ ...empty, roomId, error: message });
+      setState({ ...empty, roomId, error: message, removed });
     };
     const sendState = () => {
       if (cancelled || blocked || !joined || !socket?.connected) return;
@@ -66,7 +66,7 @@ export function useStudyRoom(roomId, uid, status, subject) {
       if (event?.roomId !== roomId || cancelled) return;
       blocked = true;
       ++generation;
-      fail(event.message || "You left this room.");
+      fail(event.message || "You left this room.", true);
     };
     const connectionError = () => {
       if (!cancelled && !blocked) setState(old => ({

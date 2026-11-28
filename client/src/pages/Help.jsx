@@ -42,6 +42,7 @@ export default function Help() {
         <p>Quiet live spaces for studying alongside other people, without a camera or microphone. Sign in, choose a public room, or join a private room associated with one of your study groups.</p>
         <ul>
           <li>Join a room and start your own Focus timer. See who is studying, on a break or at their desk.</li>
+          <li>Keep your room and ambient audio active while using Notes, Tasks or other workspace pages. Use the mini room dock to pause or resume, mute sound, return or leave.</li>
           <li>Choose a personal atmosphere and optional ambient sound. Sound is off until you choose to play it.</li>
           <li>Your display name and room focus status are visible to other room participants. Subject names stay private unless you enable sharing.</li>
           <li>Room time reflects the current visit, not your entire study history. Leaving the room ends your live presence.</li>

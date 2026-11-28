@@ -105,8 +105,11 @@ function Privacy() {
           elapsed room focus time with other people in that room. Public rooms
           can be joined by signed-in StudyOS users; private rooms are restricted
           to their study group members. Subject names are shared only if you
-          enable the room's subject-sharing option. Live presence is temporary
-          and separate from your saved study history and leaderboard score.
+          enable the room's subject-sharing option. While you remain joined,
+          presence and enabled subject sharing continue when you navigate other
+          StudyOS workspace pages. Leave the room or sign out to stop sharing.
+          Live presence is temporary and separate from your saved study history
+          and leaderboard score.
         </p>
       </section>
 

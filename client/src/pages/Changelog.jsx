@@ -3,6 +3,11 @@ import PublicPageShell from "../components/marketing/PublicPageShell";
 
 const updates = [
   {
+    date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V3",
+    description: "Keep studying together without staying on the room page.",
+    changes: ["Your live desk, study time and ambient audio stay active when you navigate the workspace.", "A compact room dock with the timer, live count, pause and resume, sound and leave controls.", "The same verified Focus run works across the room and Focus pages. Explicit leave and sign-out stop room presence."],
+  },
+  {
     date: "2026-11-28", label: "28 November 2026", title: "Help Center & public status",
     description: "Useful product and support information is easier to find.",
     changes: ["A dedicated Help Center, changelog and public System Status page.", "Direct links to privacy preferences, support and the open-source license.", "A more compact, responsive footer."],

@@ -23,6 +23,7 @@ import {
 } from "../firebase";
 
 import { disconnectSocket, disconnectObsoleteSocket } from "../socket";
+import { writeRoomSelection } from "../services/roomAmbience";
 import { getAppCheckToken } from "../services/appCheck";
 import { setStudyDataScope } from "../services/api";
 import { canSpeculate, getStartupPage, loadWorkspacePage } from "../services/routePreload";
@@ -265,6 +266,7 @@ export function AuthProvider({
 
   const continueAsGuest =
     async () => {
+      if (auth.currentUser?.uid) writeRoomSelection(sessionStorage, auth.currentUser.uid, null);
       disconnectSocket();
       preloadStudyApp();
 
@@ -294,6 +296,7 @@ export function AuthProvider({
 
   const logout =
     async () => {
+      if (auth.currentUser?.uid) writeRoomSelection(sessionStorage, auth.currentUser.uid, null);
       disconnectSocket();
       rememberGuestMode(false);
 
