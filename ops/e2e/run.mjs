@@ -469,15 +469,26 @@ async function journeys() {
 
   // Study Rooms use the real verified Focus run and authenticated socket.
   await Promise.all([go(a, "/app/study-rooms", "Study Rooms"), go(b, "/app/study-rooms", "Study Rooms")]);
-  await Promise.all([
-    a.getByRole("button", { name: new RegExp(group) }).click(),
-    b.getByRole("button", { name: new RegExp(group) }).click(),
-  ]);
+  const directoryGroup = page => page.getByRole("button", { name: new RegExp(group) });
+  await visible(directoryGroup(b).getByText("0 studying · 0 in room", { exact: true }));
+  await directoryGroup(a).click();
+  await visible(directoryGroup(b).getByText("0 studying · 1 in room", { exact: true }));
+  await responseFor(a, "POST", /^\/api\/study-sessions\/start$/, () => button(a, "Start focus").click());
+  await visible(directoryGroup(b).getByText("1 studying · 1 in room", { exact: true }));
+  await directoryGroup(b).click();
   await Promise.all([
     visible(a.getByText("· 2 in room", { exact: true })),
     visible(b.getByText("· 2 in room", { exact: true })),
   ]);
-  await responseFor(a, "POST", /^\/api\/study-sessions\/start$/, () => button(a, "Start focus").click());
+  await a.getByRole("combobox", { name: "Choose room scenery" }).click();
+  await a.getByRole("option", { name: "Rain", exact: true }).click();
+  await a.getByRole("combobox", { name: "Ambient sound" }).click();
+  await a.getByRole("option", { name: "Ocean waves", exact: true }).click();
+  await a.reload({ waitUntil: "domcontentloaded" });
+  await visible(button(a, "Pause focus"));
+  await visible(a.locator(".room-timer.room-environment--rain"));
+  await visible(a.getByRole("combobox", { name: "Ambient sound" }).getByText("Ocean waves", { exact: true }));
+  await visible(button(a, "Play sound"));
   await visible(b.locator(".room-participant.is-running").filter({ hasText: alice.name }));
   await a.getByLabel("Share my subject").check();
   await visible(b.locator(".room-participant.is-running").getByText("General Study", { exact: true }));
@@ -492,7 +503,7 @@ async function journeys() {
   await visible(a.getByText("· 1 in room", { exact: true }));
   await button(a, "Continue").click();
   await button(a, "Leave").click();
-  console.log("PASS Study Rooms with real Focus run, optional subject sharing, pause/resume, save and live departure");
+  console.log("PASS Study Rooms with live directory counts, remembered room and atmosphere, real Focus run, optional subject sharing, pause/resume, save and live departure");
 
   // Responsive app shell on a touch-sized Chromium device, using a third
   // authenticated account and the actual mobile settings navigation.

@@ -5,6 +5,8 @@ import StudySelect from "./StudySelect";
 import FocusZen from "./FocusZen";
 import FocusCompletion from "./FocusCompletion";
 import { useStudyRoom } from "../hooks/useStudyRoom";
+import { useStudyRoomDirectory } from "../hooks/useStudyRoomDirectory";
+import { AMBIENT_SOUNDS, createAmbientSamples, readRoomScenery, writeRoomScenery, readRoomSound, writeRoomSound, readRoomSelection, writeRoomSelection } from "../services/roomAmbience";
 import "../styles/study-rooms.css";
 
 const PUBLIC_ROOMS = [
@@ -51,17 +53,18 @@ export function StudyDesk({ status = "idle" }) {
   </svg>;
 }
 
-function AmbientSound() {
+function AmbientSound({ uid }) {
+  const [preference, setPreference] = useState(() => readRoomSound(localStorage, uid));
   const [playing, setPlaying] = useState(false);
-  const [volume, setVolume] = useState(35);
   const [error, setError] = useState("");
   const sound = useRef(null);
+  const { kind, volume } = preference;
 
   function stop() {
     const current = sound.current;
     sound.current = null;
     if (!current) return;
-    current.source.stop();
+    try { current.source.stop(); } catch { /* Already stopped. */ }
     void current.context.close().catch(() => {});
   }
 
@@ -69,63 +72,91 @@ function AmbientSound() {
     const current = sound.current;
     sound.current = null;
     if (current) {
-      current.source.stop();
+      try { current.source.stop(); } catch { /* Already stopped. */ }
       void current.context.close().catch(() => {});
     }
   }, []);
 
-  async function toggle() {
-    if (sound.current) {
-      stop();
-      setPlaying(false);
-      return;
-    }
+  useEffect(() => { writeRoomSound(localStorage, uid, preference); }, [uid, preference]);
+
+  async function play(nextKind, nextVolume) {
+    stop();
+    let context;
     try {
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) throw new Error("Audio isn't supported in this browser.");
-      const context = new Audio();
-      const length = context.sampleRate * 4;
-      const buffer = context.createBuffer(1, length, context.sampleRate);
-      const data = buffer.getChannelData(0);
-      let previous = 0;
-      for (let i = 0; i < length; i++) {
-        previous = previous * 0.84 + (Math.random() * 2 - 1) * 0.16;
-        data[i] = previous;
-      }
+      context = new Audio();
+      const samples = createAmbientSamples(nextKind, context.sampleRate);
+      const buffer = context.createBuffer(1, samples.length, context.sampleRate);
+      buffer.copyToChannel(samples, 0);
       const source = context.createBufferSource();
       const filter = context.createBiquadFilter();
       const gain = context.createGain();
       source.buffer = buffer;
       source.loop = true;
       filter.type = "lowpass";
-      filter.frequency.value = 1800;
-      gain.gain.value = volume / 100 * 0.45;
+      filter.frequency.value = nextKind === "brown" ? 480 : nextKind === "ocean" ? 1300 : nextKind === "fan" ? 850 : 2400;
+      gain.gain.value = 0;
       source.connect(filter).connect(gain).connect(context.destination);
       sound.current = { context, source, gain };
       source.start();
       await context.resume();
-      if (sound.current?.context === context) setPlaying(true);
+      if (sound.current?.context !== context) return;
+      gain.gain.setTargetAtTime(nextVolume / 100 * .35, context.currentTime, .08);
+      setPlaying(true);
       setError("");
     } catch {
-      stop();
+      if (sound.current && sound.current.context !== context) return;
+      if (sound.current?.context === context) stop();
+      else if (context && context.state !== "closed") void context.close().catch(() => {});
       setPlaying(false);
       setError("Ambient sound is unavailable.");
     }
   }
 
+  function toggle() {
+    if (sound.current) {
+      stop();
+      setPlaying(false);
+    } else void play(kind, volume);
+  }
+
+  function changeKind(value) {
+    const wasPlaying = Boolean(sound.current);
+    setPreference(old => ({ ...old, kind: value }));
+    if (wasPlaying) void play(value, volume);
+  }
+
   return <div className="room-audio">
-    <button className="room-button" type="button" aria-pressed={playing} onClick={toggle}>{playing ? "Mute rain" : "Play rain sound"}</button>
+    <StudySelect value={kind} onChange={changeKind} options={AMBIENT_SOUNDS} ariaLabel="Ambient sound" />
+    <button className="room-button" type="button" aria-pressed={playing} onClick={toggle}>{playing ? "Mute sound" : kind === "rain" ? "Play rain sound" : "Play sound"}</button>
     {playing && <input aria-label="Ambient sound volume" type="range" min="0" max="100" value={volume} onChange={e => {
       const next = Number(e.target.value);
-      setVolume(next);
-      if (sound.current) sound.current.gain.gain.value = next / 100 * 0.45;
+      setPreference(old => ({ ...old, volume: next }));
+      const current = sound.current;
+      if (current) current.gain.gain.setTargetAtTime(next / 100 * .35, current.context.currentTime, .06);
     }} />}
     {error && <span role="status">{error}</span>}
   </div>;
 }
 
+function DirectoryCard({ item, occupancy, disabled, onJoin }) {
+  const Icon = item.icon;
+  return <button type="button" className="room-directory-item" disabled={disabled} onClick={() => onJoin(item)}>
+    <div className={`room-directory-art room-environment--${item.atmosphere}`}><Icon size={29} weight="regular" /></div>
+    <span className="room-directory-label"><strong>{item.name}</strong><span>{item.description}</span>
+      {occupancy && <span className={`room-directory-occupancy${occupancy.studying > 0 ? " is-active" : ""}`}>
+        <span className="room-occupancy-dot" aria-hidden="true" />
+        {occupancy.total >= occupancy.capacity ? "Room full" : `${occupancy.studying} studying · ${occupancy.total} in room`}
+      </span>}
+    </span>
+    <span className="room-directory-join">Join <span aria-hidden="true">→</span></span>
+  </button>;
+}
+
+const participantSeconds = (participant, now) => (participant.elapsedMs + (participant.startedAt === null ? 0 : Math.max(0, now - participant.startedAt))) / 1000;
 function DeskParticipant({ participant, now, self }) {
-  const seconds = (participant.elapsedMs + (participant.startedAt === null ? 0 : Math.max(0, now - participant.startedAt))) / 1000;
+  const seconds = participantSeconds(participant, now);
   return <li className={`room-participant is-${participant.status}${self ? " is-self" : ""}`}>
     <StudyDesk status={participant.status} />
     <strong title={participant.name}>{self ? "You" : participant.name}</strong>
@@ -142,13 +173,17 @@ export default function StudyRoomPanel({
   savingSession, startSession, pauseSession, resumeSession, finishSession,
   error, message, setError, zenAnchorRef, zenOpen, setZenOpen, completion, setCompletion,
 }) {
-  const [room, setRoom] = useState(null);
+  const [roomChoice, setRoom] = useState(null);
+  const room = roomChoice?.ownerUid === uid ? roomChoice : null;
+  const restoredRoomUid = useRef(null);
   const [shareSubject, setShareSubject] = useState(false);
   const [environment, setEnvironment] = useState("none");
   const [starting, setStarting] = useState(false);
   const startingRef = useRef(false);
   const [customOpen, setCustomOpen] = useState(false);
   const [now, setNow] = useState(Date.now);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("activity");
   const subject = status === "idle" ? "" : activeSubjectName;
   const presence = useStudyRoom(hydrated && !isGuest ? room?.id : null, uid, status, shareSubject ? subject : "");
   const connected = presence.connected;
@@ -159,12 +194,26 @@ export default function StudyRoomPanel({
     return () => clearInterval(interval);
   }, [room]);
 
-  useEffect(() => { setRoom(null); setShareSubject(false); }, [uid]);
+  useEffect(() => { restoredRoomUid.current = null; setRoom(null); setShareSubject(false); setQuery(""); setSort("activity"); }, [uid]);
 
   function join(next) {
     setShareSubject(false);
-    setEnvironment(next.atmosphere || "none");
-    setRoom(next);
+    setQuery("");
+    setSort("activity");
+    setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ENVIRONMENTS.map(option => option.value)));
+    writeRoomSelection(sessionStorage, uid, next.id);
+    setRoom({ ...next, ownerUid: uid });
+  }
+
+  function leaveRoom() {
+    writeRoomSelection(sessionStorage, uid, null);
+    setRoom(null);
+    setZenOpen(false);
+  }
+
+  function changeEnvironment(value) {
+    setEnvironment(value);
+    if (room) writeRoomScenery(localStorage, uid, room.id, value);
   }
 
   const start = async () => {
@@ -174,18 +223,38 @@ export default function StudyRoomPanel({
     try { await startSession(); } finally { startingRef.current = false; setStarting(false); }
   };
   const toggle = status === "running" ? pauseSession : status === "paused" ? resumeSession : start;
+  const clockNow = now + presence.offset;
   const participants = [...presence.participants].sort((a, b) => {
     if (a.id === presence.participantId) return -1;
     if (b.id === presence.participantId) return 1;
+    if (sort === "duration") return participantSeconds(b, clockNow) - participantSeconds(a, clockNow);
     return Number(b.status === "running") - Number(a.status === "running");
   });
   const activeCount = participants.filter(p => p.status === "running").length;
+  const visibleParticipants = participants.filter(p => {
+    const search = query.trim().toLowerCase();
+    return !search || [p.name, p.subject, p.id === presence.participantId ? "You" : ""].some(value => value?.toLowerCase().includes(search));
+  });
   const timerDisabled = !hydrated || loading || savingSession || starting;
   const timer = status === "idle" ? remainingSeconds : elapsedSeconds;
   const privateRooms = groups.map(group => ({
     id: `group:${String(group._id).toLowerCase()}`, name: group.name || "Study group", atmosphere: "none", icon: Lock,
     description: "Only members of your study group can join.",
   })).filter(group => /^group:[a-f0-9]{24}$/.test(group.id));
+  const privateRoomKey = privateRooms.map(group => group.id).sort().join(",");
+  useEffect(() => {
+    if (!uid || isGuest || !hydrated || loading || restoredRoomUid.current === uid) return;
+    restoredRoomUid.current = uid;
+    const previousId = readRoomSelection(sessionStorage, uid);
+    if (!previousId) return;
+    const next = [...PUBLIC_ROOMS, ...privateRooms].find(item => item.id === previousId);
+    if (next) {
+      setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ENVIRONMENTS.map(option => option.value)));
+      setRoom({ ...next, ownerUid: uid });
+    } else writeRoomSelection(sessionStorage, uid, null);
+  }, [uid, isGuest, hydrated, loading, privateRoomKey]);
+  const directory = useStudyRoomDirectory(uid, hydrated && !isGuest && !room, privateRooms.map(group => group.id.slice(6)));
+  const publicStudying = PUBLIC_ROOMS.reduce((count, item) => count + (directory.rooms[item.id]?.studying || 0), 0);
 
   return <div className="study-rooms-page">
     <header className="room-page-header">
@@ -198,19 +267,17 @@ export default function StudyRoomPanel({
     {isGuest ? <section className="room-placeholder"><UsersRound size={36} /><h2>Study together with an account</h2><p>Sign in to see live students and join study rooms. Your guest data stays on this device.</p><Link className="room-button room-primary" to="/app/settings">Account settings</Link></section> : !room ? <>
       {error && <div className="room-notice room-error" role="alert">{error}<button type="button" className="room-button" onClick={() => setError("")}>Dismiss</button></div>}
       <div className="room-privacy-note"><UsersRound size={18} /><span>Rooms are silent. Joining shares your display name, focus status and time in the room. Subjects are optional.</span></div>
-      <h2 className="room-section-title">Public rooms</h2>
+      <div className="room-section-heading room-public-heading">
+        <h2 className="room-section-title">Public rooms</h2>
+        {directory.connected && <span className="room-directory-summary"><span className="room-occupancy-dot" /> {publicStudying} studying now</span>}
+      </div>
+      {directory.error && <div className="room-directory-warning" role="status">{directory.error} <button type="button" className="room-button" onClick={directory.refresh}>Retry</button></div>}
       <div className="room-directory">
-        {PUBLIC_ROOMS.map(({ icon: Icon, ...item }) => <button type="button" className="room-directory-item" key={item.id} disabled={!hydrated || loading} onClick={() => join(item)}>
-          <div className={`room-directory-art room-environment--${item.atmosphere}`}><Icon size={29} weight="regular" /></div>
-          <span className="room-directory-label"><strong>{item.name}</strong><span>{item.description}</span></span>
-          <span className="room-directory-join">Join <span aria-hidden="true">→</span></span>
-        </button>)}
+        {PUBLIC_ROOMS.map(item => <DirectoryCard key={item.id} item={item} occupancy={directory.rooms[item.id]} disabled={!hydrated || loading} onJoin={join} />)}
       </div>
       <div className="room-section-heading"><h2 className="room-section-title">Private rooms</h2><Link to="/app/groups">Manage study groups</Link></div>
       {loading ? <p className="room-note">Loading your study groups…</p> : privateRooms.length ? <div className="room-directory">
-        {privateRooms.map(({ icon: Icon, ...item }) => <button type="button" className="room-directory-item" key={item.id} disabled={!hydrated} onClick={() => join(item)}>
-          <div className="room-directory-art"><Icon size={27} /></div><span className="room-directory-label"><strong>{item.name}</strong><span>{item.description}</span></span><span className="room-directory-join">Join <span aria-hidden="true">→</span></span>
-        </button>)}
+        {privateRooms.map(item => <DirectoryCard key={item.id} item={item} occupancy={directory.rooms[item.id]} disabled={!hydrated} onJoin={join} />)}
       </div> : <section className="room-placeholder room-placeholder--small"><Lock size={23} /><p>Create or join a Study Group to get a private room.</p><Link to="/app/groups" className="room-button">Study Groups</Link></section>}
       {status !== "idle" && <p className="room-note">Your Focus timer is still active. <Link to="/app/focus">Open Focus</Link></p>}
     </> : <>
@@ -242,16 +309,21 @@ export default function StudyRoomPanel({
       <section className="room-live" aria-label={room.name}>
         <header className="room-live-header">
           <div><h2>{room.name}</h2><p><span className={`room-live-dot${connected ? " is-online" : ""}`} /> {connected ? <><strong>{activeCount} studying</strong> <span>· {participants.length} in room</span></> : "Connecting to the room"}</p></div>
-          <button type="button" className="room-button" onClick={() => setRoom(null)}>Leave</button>
+          <button type="button" className="room-button" onClick={leaveRoom}>Leave</button>
         </header>
-        {presence.error && <div className="room-notice room-error" role="status">{presence.error}<button type="button" className="room-button" onClick={() => setRoom(null)}>Return to rooms</button></div>}
+        {presence.error && <div className="room-notice room-error" role="status">{presence.error}<button type="button" className="room-button" onClick={presence.retry}>Reconnect</button></div>}
+        {(participants.length > 8 || query || sort !== "activity") && <div className="room-participant-toolbar">
+          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Find a student" aria-label="Find a student" />
+          <StudySelect value={sort} onChange={setSort} options={[{ value: "activity", label: "Studying first" }, { value: "duration", label: "Most focused time" }]} ariaLabel="Sort participants" />
+        </div>}
         {participants.length > 0 ? <ul className="room-participant-grid" aria-label="Room participants">
-          {participants.map(participant => <DeskParticipant key={participant.id} participant={participant} self={participant.id === presence.participantId} now={now + presence.offset} />)}
+          {visibleParticipants.map(participant => <DeskParticipant key={participant.id} participant={participant} self={participant.id === presence.participantId} now={clockNow} />)}
+          {!visibleParticipants.length && <li className="room-no-match">No matching students.</li>}
         </ul> : <div className="room-placeholder room-placeholder--small"><StudyDesk /><p>{connected ? "No one at a desk yet." : "Waiting for a live connection…"}</p></div>}
         <div className="room-preferences">
           <label className="room-share"><input type="checkbox" checked={shareSubject} onChange={e => setShareSubject(e.target.checked)} /> Share my subject</label>
-          <StudySelect value={environment} onChange={setEnvironment} options={ENVIRONMENTS} ariaLabel="Choose room scenery" />
-          <AmbientSound />
+          <StudySelect value={environment} onChange={changeEnvironment} options={ENVIRONMENTS} ariaLabel="Choose room scenery" />
+          <AmbientSound key={uid} uid={uid} />
         </div>
         <footer className="room-live-footer">Times are measured while studying in this room. Leaving does not stop your personal Focus timer.</footer>
       </section>

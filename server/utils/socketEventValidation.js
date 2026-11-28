@@ -12,6 +12,8 @@ const roomState = {
   subject: value => typeof value === "string" && value.length <= 80,
 };
 const fields = Object.freeze({
+  "study-room:directory:subscribe": { groupIds: value => Array.isArray(value) && value.length <= 100 && value.every(objectId) },
+  "study-room:directory:unsubscribe": {},
   "study-room:join": roomState,
   "study-room:state": roomState,
   "study-room:leave": { roomId: validRoom },
