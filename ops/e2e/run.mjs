@@ -217,6 +217,27 @@ async function landingJourney() {
     await exact(page, "link", "Explore features").click();
     await page.waitForURL(/#features$/);
     await visible(exact(page, "heading", "Tools for everyday study."));
+    const footer = page.locator("footer.marketing-footer");
+    assert.equal(await footer.getByRole("link", { name: "Study Rooms", exact: true }).getAttribute("href"), "/help#study-rooms");
+    assert.equal(await footer.getByRole("link", { name: "Cookie & Analytics Preferences", exact: true }).getAttribute("href"), "/privacy#analytics-preferences");
+    assert.equal(await footer.getByRole("link", { name: "System Status", exact: true }).getAttribute("href"), "/status");
+    assert(!(await footer.innerText()).includes("All systems operational"));
+    await exact(footer, "link", "Study Rooms").click();
+    await visible(exact(page, "heading", "Help Center"));
+    await visible(page.locator("#study-rooms"));
+    await assertNoOverflow(page);
+    await exact(page.locator("footer"), "link", "Cookie & Analytics Preferences").click();
+    await visible(exact(page, "heading", "Privacy Policy"));
+    await visible(exact(page, "button", "Enable analytics"));
+    await exact(page.locator("footer"), "link", "Changelog").click();
+    await visible(exact(page, "heading", "Changelog"));
+    await visible(exact(page, "heading", "Study Rooms V2"));
+    await assertNoOverflow(page);
+    await exact(page.locator("footer"), "link", "System Status").click();
+    await visible(exact(page, "heading", "System Status"));
+    await visible(exact(page, "heading", "Service checks"));
+    await visible(exact(page, "button", "Load history"));
+    await assertNoOverflow(page);
     await context.close();
   }
   console.log("PASS public landing walkthrough, screenshot loading, theme, links and responsive layout");

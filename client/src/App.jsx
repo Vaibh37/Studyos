@@ -58,6 +58,9 @@ const Terms = lazyPage(
 );
 
 const NotFound = lazyPage(() => import("./pages/NotFound"));
+const Help = lazyPage(() => import("./pages/Help"));
+const Changelog = lazyPage(() => import("./pages/Changelog"));
+const Status = lazyPage(() => import("./pages/Status"));
 
 const Contact = lazyPage(
   () =>
@@ -569,6 +572,10 @@ function App() {
               <Contact />
             }
           />
+
+          <Route path="/help" element={<Help />} />
+          <Route path="/changelog" element={<Changelog />} />
+          <Route path="/status" element={<Status />} />
 
           {/* ===============================================
               FALLBACK

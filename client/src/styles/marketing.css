@@ -1256,23 +1256,23 @@
    ========================================================= */
 
 .marketing-footer {
-  padding: 72px 0 28px;
+  padding: 50px 0 22px;
   border-top: 1px solid var(--marketing-border);
   background: #080808;
 }
 
 .marketing-footer-grid {
   display: grid;
-  grid-template-columns: 2fr repeat(4, 1fr);
-  gap: 56px;
-  padding-bottom: 68px;
+  grid-template-columns: minmax(0, 1.65fr) repeat(4, minmax(0, 1fr));
+  gap: clamp(22px, 3.5vw, 48px);
+  padding-bottom: 40px;
 }
 
 .marketing-footer-brand p {
   max-width: 330px;
-  margin: 20px 0 0;
+  margin: 16px 0 0;
   color: var(--marketing-muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
 }
 
@@ -1280,21 +1280,23 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.marketing-footer-column strong {
-  margin-bottom: 5px;
-  color: var(--marketing-text-soft);
-  font-size: 11px;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.marketing-footer-column h2 {
+  margin: 0 0 4px;
+  color: var(--marketing-text);
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.015em;
 }
 
 .marketing-footer-column a {
   color: var(--marketing-muted) !important;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
   transition: color 160ms ease;
 }
 
@@ -1305,11 +1307,11 @@
 .marketing-footer-bottom {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding-top: 22px;
+  gap: 18px;
+  padding-top: 18px;
   border-top: 1px solid var(--marketing-border);
   color: var(--marketing-faint);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .marketing-footer-bottom a {
@@ -1540,8 +1542,8 @@
   }
 
   .marketing-footer-grid {
-    grid-template-columns: 1.7fr repeat(4, 1fr);
-    gap: 34px;
+    grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr));
+    gap: 24px;
   }
 
   .marketing-contact-grid {
@@ -1802,8 +1804,8 @@
   }
 
   .marketing-footer-grid {
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 42px 28px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 30px 24px;
   }
 
   .marketing-footer-brand {
@@ -1949,12 +1951,12 @@
   }
 
   .marketing-footer {
-    padding-top: 58px;
+    padding-top: 36px;
   }
 
   .marketing-footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 38px 26px;
+    gap: 28px 22px;
   }
 
   .marketing-footer-bottom {
@@ -2190,4 +2192,41 @@
 }
 :is(.coffee-theme, .cloud-theme) .marketing-page .marketing-final-bg::after {
   background: linear-gradient(90deg, var(--color-surface-subtle), transparent 42%, var(--color-surface-subtle));
+}
+
+/* Public support pages use the existing neutral document layout. */
+.marketing-document-content section[id] { scroll-margin-top: 108px; }
+.marketing-document-content ol { margin: 16px 0 0; padding-left: 22px; }
+.public-guide-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding-bottom: 28px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid var(--marketing-border);
+}
+.public-guide-nav a { font-size: 14px; line-height: 1.65; }
+.public-faq { display: grid; gap: 9px; margin: 18px 0 0; }
+.public-faq dt { color: var(--marketing-text); font-weight: var(--font-weight-semibold); font-size: 15px; }
+.public-faq dd { margin: 0 0 14px; color: var(--marketing-text-soft); font-size: 15px; line-height: 1.7; }
+.public-changelog-entry > time { display: block; color: var(--marketing-muted); font-size: 13px; margin-bottom: 10px; }
+.public-changelog-entry figure { margin: 22px 0 0; }
+.public-changelog-entry img { width: 100%; height: auto; display: block; border: 1px solid var(--marketing-border); border-radius: 8px; }
+.public-changelog-entry figcaption { margin-top: 9px; font-size: 12px; color: var(--marketing-muted); }
+.public-status-heading { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.public-status-button.marketing-button { min-height: 36px; padding: 8px 12px; font-size: 13px; }
+.public-status-list { margin: 18px 0 0; border-top: 1px solid var(--marketing-border); }
+.public-status-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 15px 0; border-bottom: 1px solid var(--marketing-border); }
+.public-status-row dt { min-width: 0; color: var(--marketing-text); font-size: 15px; font-weight: var(--font-weight-semibold); }
+.public-status-row small { display: block; color: var(--marketing-muted); font-size: 12px; font-weight: var(--font-weight-normal, 400); margin-top: 5px; line-height: 1.45; }
+.public-status-row dd { margin: 0; text-align: right; color: var(--marketing-text-soft); font-size: 14px; flex-shrink: 0; }
+.marketing-document-content .public-page-note { color: var(--marketing-muted); font-size: 13px; line-height: 1.6; }
+.marketing-document-content .public-monitor-list { list-style: none; padding: 0; margin: 18px 0 0; border-top: 1px solid var(--marketing-border); }
+.public-monitor-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--marketing-border); font-size: 14px; }
+.public-monitor-list li span { text-align: right; flex-shrink: 0; }
+@media (max-width: 720px) {
+  .marketing-footer-bottom a { margin-left: auto; }
+  .public-status-row { gap: 10px; }
+  .public-status-row dd { font-size: 13px; }
+  .public-guide-nav { gap: 8px 16px; }
 }

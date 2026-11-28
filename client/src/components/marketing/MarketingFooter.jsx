@@ -4,16 +4,60 @@ import GithubMark from "./GithubMark";
 
 const copyrightYear = new Date().getFullYear();
 
-const productLinks = [
-  ["Overview", "/#overview"],
-  ["Study Planner", "/study-planner"],
-  ["Focus Timer", "/focus-timer"],
-  ["Study Groups", "/study-groups"],
-  ["Notes & Organization", "/notes"],
-  ["Progress Tracking", "/progress"],
-  ["Get Started", "/start"],
-  ["Leaderboard", "/#leaderboard"],
+const columns = [
+  {
+    title: "Product",
+    links: [
+      ["Overview", "/#overview"],
+      ["Study Planner", "/study-planner"],
+      ["Focus Timer", "/focus-timer"],
+      ["Study Rooms", "/help#study-rooms"],
+      ["Study Groups", "/study-groups"],
+      ["Notes", "/notes"],
+      ["Progress Tracking", "/progress"],
+      ["Leaderboard", "/#leaderboard"],
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      ["Documentation", "https://github.com/Vaibh37/Studyos#local-development"],
+      ["Changelog", "/changelog"],
+      ["Roadmap", "https://github.com/Vaibh37/Studyos#roadmap"],
+      ["GitHub", "https://github.com/Vaibh37/Studyos"],
+      ["Getting Started", "/start"],
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      ["Help Center", "/help"],
+      ["Contact", "/contact"],
+      ["Email Support", "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Support"],
+      ["Report a Bug", "https://github.com/Vaibh37/Studyos/issues/new"],
+      ["Request a Feature", "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Feature%20Request"],
+      ["Report Abuse", "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Abuse%20Report"],
+      ["System Status", "/status"],
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      ["Privacy Policy", "/privacy"],
+      ["Terms & Conditions", "/terms"],
+      ["Cookie & Analytics Preferences", "/privacy#analytics-preferences"],
+      ["Open-source License", "https://github.com/Vaibh37/Studyos/blob/main/LICENSE"],
+    ],
+  },
 ];
+
+const clientRoutes = new Set(["/help", "/changelog", "/contact", "/status", "/privacy", "/terms"]);
+
+function FooterLink({ label, href }) {
+  if (clientRoutes.has(href.split("#")[0])) return <Link to={href}>{label}</Link>;
+  const external = href.startsWith("https://");
+  return <a href={href} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined}>{label}</a>;
+}
 
 function MarketingFooter() {
   return (
@@ -25,32 +69,15 @@ function MarketingFooter() {
               <span className="marketing-brand-mark">S</span>
               <span>StudyOS</span>
             </Link>
-            <p>A connected workspace for planning, Focus, progress and optional study competition.</p>
+            <p>A connected workspace to plan, focus, track progress and study together.</p>
           </div>
 
-          <div className="marketing-footer-column">
-            <strong>Product</strong>
-            {productLinks.map(([label, href]) => <a key={label} href={href}>{label}</a>)}
-          </div>
-
-          <div className="marketing-footer-column">
-            <strong>Resources</strong>
-            <a href="https://github.com/Vaibh37/Studyos" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="https://github.com/Vaibh37/Studyos#roadmap" target="_blank" rel="noreferrer">Roadmap</a>
-          </div>
-
-          <div className="marketing-footer-column">
-            <strong>Support</strong>
-            <Link to="/contact">Contact</Link>
-            <a href="mailto:devvaibhav37@gmail.com?subject=StudyOS%20Feedback">Feedback</a>
-            <a href="mailto:devvaibhav37@gmail.com">devvaibhav37@gmail.com</a>
-          </div>
-
-          <div className="marketing-footer-column">
-            <strong>Legal</strong>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms & Conditions</Link>
-          </div>
+          {columns.map(({ title, links }) => (
+            <nav className="marketing-footer-column" aria-label={title} key={title}>
+              <h2>{title}</h2>
+              {links.map(([label, href]) => <FooterLink key={label} label={label} href={href} />)}
+            </nav>
+          ))}
         </div>
 
         <div className="marketing-footer-bottom">

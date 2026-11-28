@@ -174,7 +174,7 @@ function Privacy() {
         </p>
       </section>
 
-      <section>
+      <section id="analytics-preferences">
         <h2>11. Browser storage and optional analytics</h2>
         <p>
           StudyOS uses browser storage for authentication, preferences, guest

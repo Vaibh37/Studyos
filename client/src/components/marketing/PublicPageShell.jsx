@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation } from "react-router";
 
 import Seo from "../Seo";
@@ -13,6 +14,18 @@ function PublicPageShell({
 }) {
   const location =
     useLocation();
+
+  // Hash targets in lazy public pages are present only after the component mounts.
+  useEffect(() => {
+    if (!location.hash) return;
+    let id;
+    try { id = decodeURIComponent(location.hash.slice(1)); }
+    catch { return; }
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [location.pathname, location.hash]);
 
   const pageTitle =
     `${title} — StudyOS`;

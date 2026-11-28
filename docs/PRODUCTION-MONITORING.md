@@ -1,6 +1,8 @@
 # StudyOS production monitoring
 
-Monitoring is separate from the product interface. No availability badges or user-level telemetry are introduced, no new paid service is required, and production probes do not create or change study data.
+The public [System Status page](https://studyos37.space/status) uses existing read-only API liveness, dependency readiness and process-uptime endpoints. It makes no background polling requests from the footer; only visits to the status page trigger a live check, and visitors can refresh explicitly. No availability badges or user-level telemetry are introduced, no new paid service is required, and production probes do not create or change study data.
+
+Visitors can explicitly load recent completed scheduled production monitor runs from the public GitHub Actions API. The page links to the actual workflow records, distinguishes failed or inconclusive checks from confirmed incidents, and does not claim a continuous uptime percentage. Process uptime is time since the backend process started, not historical availability. The browser does not send StudyOS credentials to GitHub.
 
 ## Scheduled checks
 
