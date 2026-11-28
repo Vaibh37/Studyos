@@ -501,7 +501,16 @@ async function journeys() {
   await visible(directoryGroup(b).getByText("0 studying · 1 in room", { exact: true }));
   await responseFor(a, "POST", /^\/api\/study-sessions\/start$/, () => button(a, "Start focus").click());
   await visible(directoryGroup(b).getByText("1 studying · 1 in room", { exact: true }));
-  await directoryGroup(b).click();
+  await button(a, "Invite").click();
+  const privateInviteURL = await a.getByRole("textbox", { name: "Room invitation link" }).inputValue();
+  assert.equal(new URL(privateInviteURL).origin, WEB);
+  await button(a, "Close invitation").click();
+  await b.goto(privateInviteURL, { waitUntil: "domcontentloaded" });
+  const invite = b.getByLabel("Room invitation", { exact: true });
+  await visible(invite.getByText(`Join ${group}?`, { exact: true }));
+  await visible(a.getByText("· 1 in room", { exact: true }));
+  await absent(b.locator(".room-timer"));
+  await button(invite, "Join room").click();
   await Promise.all([
     visible(a.getByText("· 2 in room", { exact: true })),
     visible(b.getByText("· 2 in room", { exact: true })),
@@ -528,6 +537,26 @@ async function journeys() {
   });
   const runId = await readRun(a);
   assert(runId, "Missing verified Focus run");
+  await button(a, "Zen").click();
+  const sharedZen = a.getByRole("dialog", { name: "Shared Zen mode" });
+  await visible(sharedZen);
+  await visible(button(sharedZen, "Pause"));
+  await visible(sharedZen.locator(".studyos-zen-scene.room-environment--rain[data-ready=true]"));
+  await visible(sharedZen.locator(".zen-room-grid .room-participant").filter({ hasText: bob.name }));
+  await visible(button(sharedZen, "Mute sound"));
+  await button(sharedZen, "Pause").click();
+  await visible(b.locator(".room-participant.is-paused").filter({ hasText: alice.name }));
+  await button(sharedZen, "Resume").click();
+  await visible(b.locator(".room-participant.is-running").filter({ hasText: alice.name }));
+  await button(b, "Leave").click();
+  await visible(sharedZen.getByText("1 left", { exact: true }));
+  await directoryGroup(b).click();
+  await visible(sharedZen.getByText("1 joined", { exact: true }));
+  await visible(sharedZen.locator(".zen-room-grid .room-participant").filter({ hasText: bob.name }));
+  await sharedZen.getByRole("button", { name: /Exit Zen/ }).click();
+  await absent(sharedZen);
+  assert.equal(await readRun(a), runId);
+  await visible(button(a, "Mute sound"));
   const readRoomTime = page => page.locator(".room-participant.is-self .room-participant-time").textContent();
   const initialRoomTime = await readRoomTime(a);
   await exact(a, "link", "Notes").click();
@@ -564,13 +593,24 @@ async function journeys() {
   await visible(a.getByText("· 1 in room", { exact: true }));
   await button(a, "Continue").click();
   await button(a, "Leave").click();
-  console.log("PASS Study Rooms with live directory counts, remembered atmosphere, persistent presence/audio across pages, shared verified Focus controller, optional subject sharing and explicit departure");
+  console.log("PASS Study Rooms with authorized invitations, shared Zen live desks and timer, remembered atmosphere, persistent presence/audio, shared verified Focus controller and explicit departure");
 
   // Responsive app shell on a touch-sized Chromium device, using a third
   // authenticated account and the actual mobile settings navigation.
   const { page: m } = await newPage(true);
   const mobile = credentials("Mobile");
-  await emailForm(m, mobile, true);
+  await m.goto(privateInviteURL, { waitUntil: "domcontentloaded" });
+  await m.waitForURL(/get-started\?room=/);
+  await button(m, "Continue with Email").click();
+  await button(m, "Create account").click();
+  await fillEmailForm(m, mobile, true);
+  await button(m, "Create Account").click();
+  await m.waitForURL(/app\/study-rooms\?room=/, { timeout: 30_000 });
+  const denied = m.getByLabel("Room invitation", { exact: true });
+  await visible(denied.getByText("Room unavailable", { exact: true }));
+  assert(!(await denied.innerText()).includes(group), "Private room name was disclosed");
+  assert.equal(await button(denied, "Join room").count(), 0);
+  await button(denied, "Dismiss").click();
   const nav = m.getByRole("navigation", { name: "Mobile navigation" });
   await visible(nav);
   await exact(nav, "link", "Tasks").click();
@@ -596,13 +636,21 @@ async function journeys() {
   await m.getByRole("button", { name: /^Coffee Warm cream and espresso tones/ }).click();
   await m.waitForFunction(() => document.body.classList.contains("coffee-theme"));
   await assertNoOverflow(m);
-  await button(nav, "More navigation").click();
-  await exact(m.getByRole("dialog"), "link", "Study Rooms").click();
+  await m.goto(WEB + "/app/study-rooms?room=public%3Aquiet", { waitUntil: "domcontentloaded" });
   await visible(exact(m, "heading", "Study Rooms"));
-  await m.getByRole("button", { name: /Quiet Room/ }).click();
+  const publicInvite = m.getByLabel("Room invitation", { exact: true });
+  await visible(publicInvite.getByText("Join Quiet Room?", { exact: true }));
+  await button(publicInvite, "Join room").click();
   await visible(m.locator(".room-participant.is-self"));
   assert.equal((await m.locator(".room-participant-grid").evaluate(el => getComputedStyle(el).gridTemplateColumns)).split(" ").length, 4);
   await assertNoOverflow(m);
+  await button(m, "Zen").click();
+  const mobileZen = m.getByRole("dialog", { name: "Shared Zen mode" });
+  await visible(button(mobileZen, "Start focus"));
+  await visible(mobileZen.locator(".zen-room-grid .room-participant.is-self"));
+  await assertNoOverflow(m);
+  await mobileZen.getByRole("button", { name: /Exit Zen/ }).click();
+  await absent(mobileZen);
   await exact(nav, "link", "Tasks").click();
   const mobileDock = m.getByLabel("Active study room");
   await visible(mobileDock.getByText("Quiet Room", { exact: true }));

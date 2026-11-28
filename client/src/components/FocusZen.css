@@ -124,3 +124,90 @@
   .v2f-clean .v2f-zen-trigger,
   .v2f-clean .v2f-zen-symbol { transition: none; }
 }
+
+/* Shared Zen is the existing cinematic dialog with an optional room stage.
+   The personal Zen layout remains unchanged. */
+.studyos-zen-room {
+  --room-accent:#9bdfbf;
+  --zen-room-y:32vh;
+  --zen-room-size:min(17.5vw,18vh,158px);
+  --zen-muted:#c2cbd0;
+}
+.studyos-zen-scene {
+  position:absolute; inset:0; overflow:hidden; opacity:0; pointer-events:none;
+  background:#10181b; transition:opacity .6s ease;
+}
+.studyos-zen-scene[data-ready=true] { opacity:1; }
+.studyos-zen-scene::before {
+  content:""; position:absolute; inset:-2%;
+  background-image:linear-gradient(180deg,#0a1118a0 0%,#0a121844 38%,#080e13c4 69%,#080d11f0 100%),var(--room-image,linear-gradient(135deg,#2c3e42,#0e141a));
+  background-size:cover; background-position:center;
+  animation:zen-room-scene-drift 48s ease-in-out infinite alternate;
+}
+.studyos-zen-scene::after {
+  content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 32%,#08101512 0,#060b1070 65%,#060b10bd);
+}
+@keyframes zen-room-scene-drift { from {transform:scale(1)} to {transform:scale(1.075) translate3d(-.4%,.5%,0)} }
+.studyos-zen-room .studyos-zen-digits { color:#f7f8f8; text-shadow:0 0 45px #141c24aa; font-weight:350; }
+.zen-room-header { position:absolute; top:max(24px,env(safe-area-inset-top)); left:max(24px,env(safe-area-inset-left)); display:flex; gap:9px; align-items:flex-start; max-width:calc(100% - 164px); }
+.zen-room-indicator { width:8px; height:8px; border-radius:50%; flex:0 0 8px; margin-top:8px; background:#89939a; }
+.zen-room-indicator.is-online { background:var(--room-accent); box-shadow:0 0 16px #9bdfbf66; }
+.zen-room-header div { display:flex; flex-direction:column; min-width:0; gap:5px; }
+.zen-room-header strong { font-size:clamp(16px,2vw,22px); color:#f3f6f7; font-weight:600; letter-spacing:-.025em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.zen-room-header div > span { font-size:12px; color:var(--zen-muted); }
+.studyos-zen-room .studyos-zen-ui button { background:#10181bd9; border:1px solid #b9c9ce33; border-radius:8px; color:#f1f5f6; font-size:13px; font-weight:550; }
+.studyos-zen-room .studyos-zen-ui button:hover { background:#263438; }
+.zen-room-controls {
+  position:absolute; top:calc(var(--zen-room-y) + var(--zen-room-size) * .54 + 10px); left:50%; transform:translateX(-50%);
+  width:min(calc(100% - 24px),560px); display:flex; flex-direction:column; align-items:center; gap:13px;
+}
+.zen-room-detail { color:#e4eaec; font-size:13px; margin:0; max-width:100%; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+.zen-room-buttons { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:7px; }
+.studyos-zen-room .zen-room-buttons button { position:static; transform:none; padding:10px 14px; min-height:40px; white-space:nowrap; }
+.studyos-zen-room .zen-room-buttons .studyos-zen-action { background:#e9eff0; color:#121b1e; border-color:#e9eff0; }
+.studyos-zen-room .zen-room-buttons .studyos-zen-action:hover { background:#fff; }
+.zen-room-error { font-size:12px; color:#f5b7af; text-align:center; max-width:100%; }
+.zen-room-roster {
+  position:absolute; inset: max(57%,calc(var(--zen-room-y) + var(--zen-room-size) * .54 + 105px)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));
+  width:auto; max-width:1000px; margin-inline:auto; display:flex; flex-direction:column; min-height:0;
+  border-top:1px solid #bfd1d533; padding-top:12px;
+}
+.zen-room-roster header { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:0 4px 9px; flex-shrink:0; }
+.zen-room-roster h2 { margin:0; font-size:14px; font-weight:550; color:#e4eaec; }
+.zen-room-activity { font-size:12px; color:var(--room-accent); animation:zen-roster-change .3s ease both; }
+.zen-room-grid {
+  display:flex; flex-wrap:wrap; align-content:flex-start; justify-content:center; gap:6px;
+  min-height:0; width:100%; margin:0; padding:2px 0 4px; overflow:auto; overscroll-behavior:contain;
+  scrollbar-width:thin; scrollbar-color:#80959866 transparent; pointer-events:auto; list-style:none;
+}
+.studyos-zen-room .zen-room-grid .room-participant { flex:0 0 min(116px,calc((100% - 18px) / 4)); min-width:0; padding:5px 3px; color:#eaf0f1; animation:zen-desk-arrive .34s ease both; }
+.studyos-zen-room .zen-room-grid .room-desk { width:min(63px,90%); }
+.studyos-zen-room .room-desk--idle { color:#b2c0c0; }
+.studyos-zen-room .room-desk--paused { color:#e5cd9a; }
+.studyos-zen-room .room-desk--running { color:var(--room-accent); }
+.studyos-zen-room .room-participant-time,.studyos-zen-room .room-participant-status,.studyos-zen-room .room-participant-subject { color:var(--zen-muted); }
+.studyos-zen-room .room-participant.is-running .room-participant-time { color:var(--room-accent); }
+.zen-room-waiting { text-align:center; color:var(--zen-muted); font-size:13px; margin:10px 0; }
+@keyframes zen-desk-arrive { from {opacity:0; transform:translateY(6px) scale(.96)} to {opacity:1; transform:none} }
+@keyframes zen-roster-change { from {opacity:0; transform:translateY(3px)} to {opacity:1; transform:none} }
+@media(max-width:540px) {
+  .zen-room-header { left:max(14px,env(safe-area-inset-left)); top:max(17px,env(safe-area-inset-top)); max-width:calc(100% - 122px); }
+  .studyos-zen-room .studyos-zen-exit { top:max(14px,env(safe-area-inset-top)); right:max(14px,env(safe-area-inset-right)); padding:9px 12px; }
+  .studyos-zen-room .studyos-zen-exit span { display:none; }
+  .zen-room-controls { gap:10px; }
+  .zen-room-detail { font-size:12px; }
+  .studyos-zen-room .zen-room-buttons button { padding:8px 10px; min-height:44px; font-size:12px; }
+  .zen-room-roster { left:12px; right:12px; bottom:max(12px,env(safe-area-inset-bottom)); }
+  .studyos-zen-room .zen-room-grid .room-participant { flex-basis:calc((100% - 18px) / 4); }
+}
+@media(max-height:450px) {
+  .zen-room-header { top:10px; }
+  .studyos-zen-room .studyos-zen-exit { top:8px; }
+  .zen-room-controls { top:calc(var(--zen-room-y) + var(--zen-room-size) * .54 + 3px); gap:5px; }
+  .studyos-zen-room .zen-room-buttons button { min-height:32px; padding:5px 10px; }
+  .zen-room-roster { top:calc(var(--zen-room-y) + var(--zen-room-size) * .54 + 65px); bottom:6px; padding-top:5px; }
+  .zen-room-roster header { padding-bottom:4px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .studyos-zen-scene,.studyos-zen-scene::before,.zen-room-activity,.studyos-zen-room .zen-room-grid .room-participant { animation:none; transition:none; }
+}

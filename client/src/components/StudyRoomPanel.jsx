@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
-import { UsersRound, LockKeyhole as Lock, Play, Pause, CheckCircle2, CloudRain, Cloud, Moon, BookOpen, ArrowUpRight, LogOut } from "./icons";
+import { Link, useSearchParams } from "react-router";
+import { useAuth } from "../context/AuthContext";
+import { UsersRound, LockKeyhole as Lock, Play, Pause, CheckCircle2, CloudRain, Cloud, Moon, BookOpen, ArrowUpRight, LogOut, Link2, Copy, X } from "./icons";
 import StudySelect from "./StudySelect";
 import FocusZen from "./FocusZen";
 import FocusCompletion from "./FocusCompletion";
 import { useStudyRoom } from "../hooks/useStudyRoom";
 import { useStudyRoomDirectory } from "../hooks/useStudyRoomDirectory";
 import { AMBIENT_SOUNDS, createAmbientSamples, readRoomScenery, writeRoomScenery, readRoomSound, writeRoomSound, readRoomSelection, writeRoomSelection } from "../services/roomAmbience";
+import { allowedInvitedRoom, roomInviteURL } from "../services/studyRoomLinks";
 import "../styles/study-rooms.css";
 
 const PUBLIC_ROOMS = [
@@ -196,6 +198,56 @@ function DeskParticipant({ participant, now, self }) {
   </li>;
 }
 
+// In Zen use the live roster, not a stale snapshot or the directory's search.
+function ZenRoomRoster({ presence, now }) {
+  const { participants, participantId, connected } = presence;
+  const previous = useRef(null);
+  const [activity, setActivity] = useState("");
+  const ids = participants.map(p => p.id).sort().join(",");
+  useEffect(() => {
+    if (!connected) { previous.current = null; setActivity(""); return; }
+    const next = new Set(ids ? ids.split(",") : []);
+    const prior = previous.current;
+    previous.current = next;
+    if (!prior) return;
+    const joined = [...next].filter(id => !prior.has(id)).length;
+    const left = [...prior].filter(id => !next.has(id)).length;
+    if (joined || left) setActivity([joined ? `${joined} joined` : "", left ? `${left} left` : ""].filter(Boolean).join(" · "));
+  }, [ids, connected]);
+  useEffect(() => {
+    if (!activity) return;
+    const timeout = setTimeout(() => setActivity(""), 2300);
+    return () => clearTimeout(timeout);
+  }, [activity]);
+  const ordered = [...participants].sort((a, b) => Number(b.id === participantId) - Number(a.id === participantId));
+  return <section className="zen-room-roster" aria-label="Live study desks">
+    <header><h2>Study together</h2><span className="zen-room-activity" role="status" key={activity}>{activity}</span></header>
+    {connected && ordered.length ? <ul className="zen-room-grid" aria-label="Zen room participants" tabIndex={0}>
+      {ordered.map(p => <DeskParticipant key={p.id} participant={p} now={now} self={p.id === participantId} />)}
+    </ul> : <p className="zen-room-waiting">{connected ? "No one at a desk yet." : "Waiting for a live connection…"}</p>}
+  </section>;
+}
+
+function RoomInvitePanel({ room, onClose }) {
+  const url = roomInviteURL(window.location.origin, room.id);
+  const [copied, setCopied] = useState(false);
+  const input = useRef(null);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch { input.current?.focus(); input.current?.select(); }
+  };
+  return <div className="room-invite-share">
+    <div><strong>Invite someone to {room.name}</strong><p>{room.id.startsWith("group:") ? "This link works for existing group members. For new members, use the group invitation in Study Groups." : "Anyone with a StudyOS account can open this link and choose to join."}</p></div>
+    <div className="room-invite-copy">
+      <input ref={input} aria-label="Room invitation link" value={url || ""} readOnly onFocus={event => event.target.select()} />
+      <button type="button" className="room-button" onClick={copy}><Copy size={16} /> {copied ? "Copied" : "Copy link"}</button>
+      <button type="button" className="room-button" aria-label="Close invitation" onClick={onClose}><X size={16} /></button>
+    </div>
+  </div>;
+}
+
 export default function StudyRoomPanel({
   isGuest, uid, groups, loading, hydrated, status, remainingSeconds, elapsedSeconds,
   subjectOptions, selectedSubjectId, setSelectedSubjectId, activeSubjectName,
@@ -204,6 +256,11 @@ export default function StudyRoomPanel({
   error, message, setError, zenAnchorRef, zenOpen, setZenOpen, completion, setCompletion,
   roomView = true, onRoomActive = () => {},
 }) {
+  const { logout } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const inviteRequested = roomView && searchParams.has("room");
+  const inviteId = inviteRequested ? searchParams.get("room") : null;
+  const [shareOpen, setShareOpen] = useState(false);
   const [roomChoice, setRoom] = useState(null);
   const room = roomChoice?.ownerUid === uid ? roomChoice : null;
   const restoredRoomUid = useRef(null);
@@ -228,7 +285,16 @@ export default function StudyRoomPanel({
 
   useEffect(() => { restoredRoomUid.current = null; setRoom(null); setShareSubject(false); setQuery(""); setSort("activity"); }, [uid]);
 
+  function dismissInvite() {
+    if (!inviteRequested) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("room");
+    setSearchParams(next, { replace: true });
+  }
+
   function join(next) {
+    dismissInvite();
+    setShareOpen(false);
     setRoomNotice("");
     setShareSubject(false);
     setQuery("");
@@ -240,6 +306,7 @@ export default function StudyRoomPanel({
   }
 
   function leaveRoom() {
+    setShareOpen(false);
     audio.mute();
     writeRoomSelection(sessionStorage, uid, null);
     setRoom(null);
@@ -281,6 +348,7 @@ export default function StudyRoomPanel({
     description: "Only members of your study group can join.",
   })).filter(group => /^group:[a-f0-9]{24}$/.test(group.id));
   const privateRoomKey = privateRooms.map(group => group.id).sort().join(",");
+  const invitedRoom = allowedInvitedRoom(inviteId, PUBLIC_ROOMS, privateRooms);
   useEffect(() => {
     if (!uid || isGuest || !hydrated || loading || restoredRoomUid.current === uid) return;
     restoredRoomUid.current = uid;
@@ -309,8 +377,17 @@ export default function StudyRoomPanel({
       </div>
     </header>
 
+    {inviteRequested && !isGuest && <section className="room-invite-preview" aria-label="Room invitation">
+      <div><strong>{loading || !hydrated ? "Checking room invitation…" : invitedRoom ? (room?.id === invitedRoom.id ? `You're already in ${invitedRoom.name}` : `Join ${invitedRoom.name}?`) : "Room unavailable"}</strong>
+        <p>{loading || !hydrated ? "Checking your access." : invitedRoom ? (room?.id === invitedRoom.id ? "Your desk is already here." : room ? "Switching rooms keeps your personal Focus timer running." : "You'll share your display name and focus status when you join. Subject sharing is optional.") : "This room is private, invalid or no longer available. Ask the organizer for a Study Group invitation if needed."}</p>
+      </div>
+      <div className="room-header-actions">
+        {hydrated && !loading && invitedRoom && room?.id !== invitedRoom.id && <button type="button" className="room-button room-primary" disabled={savingSession || startingSession} onClick={() => join(invitedRoom)}>{room ? "Switch room" : "Join room"}</button>}
+        <button type="button" className="room-button" onClick={dismissInvite}>Dismiss</button>
+      </div>
+    </section>}
     {roomNotice && <div className="room-notice" role="status">{roomNotice}<button className="room-button" type="button" onClick={() => setRoomNotice("")}>Dismiss</button></div>}
-    {isGuest ? <section className="room-placeholder"><UsersRound size={36} /><h2>Study together with an account</h2><p>Sign in to see live students and join study rooms. Your guest data stays on this device.</p><Link className="room-button room-primary" to="/app/settings">Account settings</Link></section> : !room ? <>
+    {isGuest ? <section className="room-placeholder"><UsersRound size={36} /><h2>Study together with an account</h2><p>Sign in to see live students and join study rooms. Your guest data stays on this device.</p>{inviteRequested ? <button type="button" className="room-button room-primary" onClick={() => void logout()}>Sign in to join</button> : <Link className="room-button room-primary" to="/app/settings">Account settings</Link>}</section> : !room ? <>
       {error && <div className="room-notice room-error" role="alert">{error}<button type="button" className="room-button" onClick={() => setError("")}>Dismiss</button></div>}
       <div className="room-privacy-note"><UsersRound size={18} /><span>Rooms are silent. Joining shares your display name, focus status and time in the room, even while you use other StudyOS pages. Subjects are optional. Leave the room to stop sharing.</span></div>
       <div className="room-section-heading room-public-heading">
@@ -355,8 +432,12 @@ export default function StudyRoomPanel({
       <section className="room-live" aria-label={room.name}>
         <header className="room-live-header">
           <div><h2>{room.name}</h2><p><span className={`room-live-dot${connected ? " is-online" : ""}`} /> {connected ? <><strong>{activeCount} studying</strong> <span>· {participants.length} in room</span></> : "Connecting to the room"}</p></div>
-          <button type="button" className="room-button" onClick={leaveRoom} disabled={savingSession || startingSession}>Leave</button>
+          <div className="room-header-actions">
+            <button type="button" className="room-button" aria-expanded={shareOpen} disabled={!connected} onClick={() => setShareOpen(open => !open)}><Link2 size={16} /> Invite</button>
+            <button type="button" className="room-button" onClick={leaveRoom} disabled={savingSession || startingSession}>Leave</button>
+          </div>
         </header>
+        {shareOpen && connected && <RoomInvitePanel key={room.id} room={room} onClose={() => setShareOpen(false)} />}
         {presence.error && <div className="room-notice room-error" role="status">{presence.error}<button type="button" className="room-button" onClick={presence.retry}>Reconnect</button></div>}
         {(participants.length > 8 || query || sort !== "activity") && <div className="room-participant-toolbar">
           <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Find a student" aria-label="Find a student" />
@@ -374,7 +455,12 @@ export default function StudyRoomPanel({
         <footer className="room-live-footer">Your desk stays active across StudyOS pages. Leave to stop sharing your room presence; your personal Focus timer continues.</footer>
       </section>
     </>}
-    {zenOpen && room && !completion && <FocusZen anchor={zenAnchorRef.current} time={duration(timer)} status={status} animate={true} error={error} saving={timerDisabled || (status === "paused" && remainingSeconds <= 0)} onToggle={toggle} onClose={() => setZenOpen(false)} />}
+    {zenOpen && room && !completion && <FocusZen anchor={zenAnchorRef.current} time={duration(timer)} status={status} animate={true} error={error} saving={timerDisabled || (status === "paused" && remainingSeconds <= 0)} onToggle={toggle} onClose={() => setZenOpen(false)} sharedRoom={{
+      name: room.name, connected, activeCount, total: participants.length, scenery: environment,
+      detail: status === "idle" ? "Ready to focus" : `${activeSubjectName} · ${duration(remainingSeconds)} remaining`,
+      audio, onFinish: () => finishSession(false),
+      roster: <ZenRoomRoster presence={presence} now={clockNow} />,
+    }} />}
     {completion && <FocusCompletion seconds={completion.seconds} onClose={() => setCompletion(null)} />}
   </div>;
 }

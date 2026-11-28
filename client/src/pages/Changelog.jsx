@@ -3,6 +3,11 @@ import PublicPageShell from "../components/marketing/PublicPageShell";
 
 const updates = [
   {
+    date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V4",
+    description: "A cinematic shared Zen experience that keeps you connected while you focus.",
+    changes: ["Full-screen room scenery, live desks and a large independent Focus timer.", "Smooth desk arrivals, live departures and uninterrupted ambient sound.", "Shareable room links with explicit join confirmation and private-room access checks."],
+  },
+  {
     date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V3",
     description: "Keep studying together without staying on the room page.",
     changes: ["Your live desk, study time and ambient audio stay active when you navigate the workspace.", "A compact room dock with the timer, live count, pause and resume, sound and leave controls.", "The same verified Focus run works across the room and Focus pages. Explicit leave and sign-out stop room presence."],

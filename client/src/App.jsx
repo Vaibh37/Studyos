@@ -22,6 +22,7 @@ import {
 import { apiRequest } from "./services/api";
 import { WorkspaceRouteLoading } from "./components/WorkspaceStates";
 import { getStartupPage, loadWorkspacePage } from "./services/routePreload";
+import { parseRoomId, roomDestination } from "./services/studyRoomLinks";
 
 // =========================================================
 // PUBLIC PAGES
@@ -191,9 +192,10 @@ function GetStartedRoute() {
   const invite = new URLSearchParams(location.search).get("invite");
   const validInvite = /^[A-F0-9]{8}$/i.test(invite || "");
 
+  const room = parseRoomId(new URLSearchParams(location.search).get("room"));
   const destination = validInvite
     ? "/app/groups?invite=" + invite.toUpperCase()
-    : "/app";
+    : roomDestination(room) || "/app";
 
   if (loading) {
     return (
@@ -236,9 +238,11 @@ function ProtectedStudyApp() {
     location.pathname === "/app/groups" &&
     /^[A-F0-9]{8}$/i.test(invite || "");
 
+  const room = location.pathname.toLowerCase().replace(/\/$/, "") === "/app/study-rooms"
+    ? parseRoomId(new URLSearchParams(location.search).get("room")) : null;
   const loginDestination = validInvite
     ? "/get-started?invite=" + invite.toUpperCase()
-    : "/get-started";
+    : roomDestination(room, "/get-started") || "/get-started";
 
   if (loading) {
     return (
