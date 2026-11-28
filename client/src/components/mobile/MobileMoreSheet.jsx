@@ -11,6 +11,7 @@ import {
   MessageCircle,
   Settings,
   UsersRound,
+  GraduationCap,
   X,
 } from "../icons";
 
@@ -19,6 +20,7 @@ export const moreItems = [
   { to: "/app/notes", label: "Notes", icon: FileText },
   { to: "/app/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/app/progress", label: "Progress", icon: BarChart3 },
+  { to: "/app/study-rooms", label: "Study Rooms", icon: GraduationCap },
   { to: "/app/groups", label: "Study Groups", icon: UsersRound },
   { to: "/app/chats", label: "Chats", icon: MessageCircle },
   { to: "/app/settings", label: "Settings", icon: Settings },

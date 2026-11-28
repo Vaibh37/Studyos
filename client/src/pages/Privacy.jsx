@@ -74,6 +74,14 @@ function Privacy() {
           in Cloudflare R2 and access is controlled by the application's group
           authorization rules.
         </p>
+        <p>
+          Joining a Study Room shares your display name, current focus status and
+          elapsed room focus time with other people in that room. Public rooms
+          can be joined by signed-in StudyOS users; private rooms are restricted
+          to their study group members. Subject names are shared only if you
+          enable the room's subject-sharing option. Live presence is temporary
+          and separate from your saved study history and leaderboard score.
+        </p>
       </section>
 
       <section>

@@ -467,6 +467,33 @@ async function journeys() {
   assert.equal(await button(b, "Download " + file).count(), 1, "Retry created duplicate attachments");
   console.log("PASS interrupted signed upload, retained file, manual retry, one delivery, byte-for-byte download and persisted chat history");
 
+  // Study Rooms use the real verified Focus run and authenticated socket.
+  await Promise.all([go(a, "/app/study-rooms", "Study Rooms"), go(b, "/app/study-rooms", "Study Rooms")]);
+  await Promise.all([
+    a.getByRole("button", { name: new RegExp(group) }).click(),
+    b.getByRole("button", { name: new RegExp(group) }).click(),
+  ]);
+  await Promise.all([
+    visible(a.getByText("· 2 in room", { exact: true })),
+    visible(b.getByText("· 2 in room", { exact: true })),
+  ]);
+  await responseFor(a, "POST", /^\/api\/study-sessions\/start$/, () => button(a, "Start focus").click());
+  await visible(b.locator(".room-participant.is-running").filter({ hasText: alice.name }));
+  await a.getByLabel("Share my subject").check();
+  await visible(b.locator(".room-participant.is-running").getByText("General Study", { exact: true }));
+  await delay(1200);
+  await button(a, "Pause focus").click();
+  await visible(b.locator(".room-participant.is-paused").filter({ hasText: alice.name }));
+  await button(a, "Resume focus").click();
+  await visible(b.locator(".room-participant.is-running").filter({ hasText: alice.name }));
+  await responseFor(a, "POST", /^\/api\/study-sessions$/, () => button(a, "Finish & save").click());
+  await visible(b.locator(".room-participant.is-idle").filter({ hasText: alice.name }));
+  await button(b, "Leave").click();
+  await visible(a.getByText("· 1 in room", { exact: true }));
+  await button(a, "Continue").click();
+  await button(a, "Leave").click();
+  console.log("PASS Study Rooms with real Focus run, optional subject sharing, pause/resume, save and live departure");
+
   // Responsive app shell on a touch-sized Chromium device, using a third
   // authenticated account and the actual mobile settings navigation.
   const { page: m } = await newPage(true);
@@ -497,6 +524,15 @@ async function journeys() {
   await m.getByRole("button", { name: /^Coffee Warm cream and espresso tones/ }).click();
   await m.waitForFunction(() => document.body.classList.contains("coffee-theme"));
   await assertNoOverflow(m);
+  await button(nav, "More navigation").click();
+  await exact(m.getByRole("dialog"), "link", "Study Rooms").click();
+  await visible(exact(m, "heading", "Study Rooms"));
+  await m.getByRole("button", { name: /Quiet Room/ }).click();
+  await visible(m.locator(".room-participant.is-self"));
+  assert.equal((await m.locator(".room-participant-grid").evaluate(el => getComputedStyle(el).gridTemplateColumns)).split(" ").length, 4);
+  await assertNoOverflow(m);
+  await button(m, "Leave").click();
+
   await exact(nav, "link", "Home").click();
   await visible(m.locator(".ds-clean[aria-busy=false]"));
   await visible(m.locator(".ds-streak-slot .sf2-trigger"));

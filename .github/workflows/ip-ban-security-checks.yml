@@ -109,7 +109,7 @@ jobs:
       - name: Build the StudyOS UI
         run: npm run build --prefix client
       - name: Verify strict realtime events, admission, session expiry and upload signing
-        run: node --test server/tests/realtimeSecurity.test.js
+        run: node --test server/tests/realtimeSecurity.test.js server/tests/studyRoomSocket.test.js
       - name: Verify App Check and Turnstile bot protection
         run: node --test server/tests/botProtection.test.js
       - name: Real HTTP + Socket.IO isolated MongoDB integration

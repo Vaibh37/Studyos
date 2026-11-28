@@ -14,11 +14,13 @@ const getGroupRoom = (groupId) => {
 
 function revokeMemberGroupAccess(io, groupId, uid) {
   if (!io || !groupId || !uid) return;
+  io.studyRoomPresence?.revokeGroupMember(groupId, uid);
   io.in(getAuthenticatedUserRoom(uid)).socketsLeave(getGroupRoom(groupId));
 }
 
 function revokeDeletedGroupAccess(io, groupId) {
   if (!io || !groupId) return;
+  io.studyRoomPresence?.revokeGroup(groupId);
   const room = getGroupRoom(groupId);
   io.in(room).socketsLeave(room);
 }
@@ -27,6 +29,7 @@ function revokeDeletedGroupAccess(io, groupId) {
 // Existing sockets authenticated earlier must not remain usable.
 function disconnectAccountSockets(io, uid) {
   if (!io || !uid) return;
+  io.studyRoomPresence?.removeAccount(uid);
   io.in(getAuthenticatedUserRoom(uid)).disconnectSockets(true);
 }
 

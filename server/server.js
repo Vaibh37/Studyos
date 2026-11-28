@@ -373,6 +373,10 @@ app.use(
 // SOCKET CONNECTION
 // =========================================
 
+const { createStudyRoomPresence } = require("./socket/studyRoomSocket");
+const studyRoomPresence = createStudyRoomPresence(io);
+io.studyRoomPresence = studyRoomPresence;
+
 io.on(
   "connection",
   (
@@ -386,6 +390,7 @@ io.on(
     // Fail early before any event handler can query MongoDB or broadcast.
     // Limit by authenticated account across every open tab and device.
     registerSocketInboundProtection(socket);
+    studyRoomPresence.register(socket);
 
     // Every authenticated connection has a private revocation room.
     socket.join(getAuthenticatedUserRoom(socket.user.uid));

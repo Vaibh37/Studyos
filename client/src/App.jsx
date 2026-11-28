@@ -97,6 +97,8 @@ const Progress = lazy(() => loadWorkspacePage("progress"));
 
 const Leaderboard = lazy(() => loadWorkspacePage("leaderboard"));
 
+const StudyRooms = lazy(() => loadWorkspacePage("study-rooms"));
+
 const Groups = lazy(() => loadWorkspacePage("groups"));
 
 const Chats = lazy(() => loadWorkspacePage("chats"));
@@ -505,6 +507,8 @@ function App() {
                 <Leaderboard />
               }
             />
+
+            <Route path="study-rooms" element={<StudyRooms />} />
 
             <Route
               path="groups"

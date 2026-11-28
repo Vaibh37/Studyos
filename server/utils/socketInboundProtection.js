@@ -7,6 +7,9 @@ const { validateSocketPacket } = require("./socketEventValidation");
 // These budgets are process-local; use a shared store if scaling to multiple
 // independent Socket.IO processes.
 const eventPolicies = {
+  "study-room:join": [[10_000, 5], [60_000, 18]],
+  "study-room:state": [[10_000, 10], [60_000, 40]],
+  "study-room:leave": [[10_000, 8], [60_000, 30]],
   "group:join": [[10_000, 12], [60_000, 60]],
   "group:typing:start": [[10_000, 20], [60_000, 120]],
   "group:typing:stop": [[10_000, 20], [60_000, 120]],
