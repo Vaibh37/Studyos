@@ -113,6 +113,12 @@ async function emailForm(page, account, register) {
   await fillEmailForm(page, account, register);
   await button(page, register ? "Create Account" : "Sign In").click();
   await page.waitForURL(/\/app\//, { timeout: 30_000 });
+  if (register) {
+    const tour = page.getByRole("dialog", { name: "Welcome to StudyOS" });
+    await visible(tour);
+    await button(tour, "Skip tour").click();
+    await absent(tour);
+  }
   await visible(page.getByRole("main"));
 }
 async function signOut(page) {
@@ -246,6 +252,45 @@ async function landingJourney() {
     await context.close();
   }
   console.log("PASS public landing walkthrough, screenshot loading, theme, links and responsive layout");
+}
+
+async function onboardingJourney() {
+  for (const mobile of [false, true]) {
+    const { context, page } = await newPage(mobile);
+    await page.goto(WEB + "/get-started", { waitUntil: "domcontentloaded" });
+    await button(page, "Continue as Guest").click();
+    const tour = page.locator(".workspace-tour");
+    await visible(tour.getByRole("heading", { name: "Welcome to StudyOS" }));
+    assert(await page.locator(".app-shell-v2").evaluate(node => node.inert), "Tour must make the workspace inert");
+    assert.equal(await page.locator(".sf2-stage").count(), 0, "Streak celebration must not cover the tour");
+    await assertNoOverflow(page);
+    await button(tour, "Continue").click();
+    await visible(tour.getByRole("heading", { name: "Find your focus" }));
+    await visible(tour.getByText("Sign in to join live rooms.", { exact: false }));
+    await button(tour, "Back").click();
+    await visible(tour.getByRole("heading", { name: "Welcome to StudyOS" }));
+    await button(tour, "Continue").click();
+    await button(tour, "Continue").click();
+    await visible(tour.getByRole("heading", { name: "See how far you've come" }));
+    await visible(tour.getByText("Your guest study data stays in this browser.", { exact: false }));
+    await assertNoOverflow(page);
+    await button(tour, "Done").click();
+    await absent(tour);
+    assert.equal(await page.evaluate(() => localStorage.getItem("studyos_onboarding_v1:guest")), "completed");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await visible(page.getByRole("main"));
+    await absent(tour);
+    await page.goto(WEB + "/app/settings?section=general", { waitUntil: "domcontentloaded" });
+    await button(page, "Replay tour").click();
+    await visible(tour);
+    if (mobile) await button(tour, "Skip tour").tap();
+    else await page.keyboard.press("Escape");
+    await absent(tour);
+    await visible(button(page, "Replay tour"));
+    assert.equal(await page.evaluate(() => document.activeElement.textContent.trim()), "Replay tour");
+    await context.close();
+  }
+  console.log("PASS guest first-run tour, step navigation, accessible dismissal, replay and persisted completion");
 }
 
 async function privacyJourney() {
@@ -697,6 +742,7 @@ try {
   browser = await chromium.launch({ headless: true,
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}) });
   await landingJourney();
+  await onboardingJourney();
   await journeys();
   // Release the happy-path clients and their sockets before running the
   // adversarial cases (all clients share a loopback IP rate-limit bucket).

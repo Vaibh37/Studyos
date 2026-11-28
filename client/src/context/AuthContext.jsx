@@ -1,3 +1,4 @@
+import { requestOnboarding } from "../services/onboarding";
 import { validateSignup } from "../services/signupValidation";
 import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { RecoveryPanel } from "../components/RecoveryBoundary";
@@ -11,6 +12,7 @@ import {
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  getAdditionalUserInfo,
   onAuthStateChanged,
   signInWithCredential,
   signInWithEmailAndPassword,
@@ -90,6 +92,13 @@ export function AuthProvider({
     setLoading,
   ] = useState(true);
   const [authError, setAuthError] = useState(false);
+  // Firebase's observer can render the workspace before the credential
+  // promise returns. Notify an already-mounted shell when a new account
+  // is confirmed, using the SDK's actual new-user result.
+  const [onboardingRevision, setOnboardingRevision] = useState(0);
+  const requestNewAccountTour = user => {
+    if (requestOnboarding(localStorage, user)) setOnboardingRevision(value => value + 1);
+  };
 
   // =======================================================
   // ACCEPT FIREBASE USER
@@ -189,6 +198,7 @@ export function AuthProvider({
           firebaseCredential
         );
 
+      if (getAdditionalUserInfo(result)?.isNewUser) requestNewAccountTour(result.user);
       acceptFirebaseUser(
         result.user
       );
@@ -215,6 +225,8 @@ export function AuthProvider({
           email.trim(),
           password
         );
+
+      requestNewAccountTour(result.user);
 
       if (
         cleanName
@@ -278,6 +290,7 @@ export function AuthProvider({
         );
       }
 
+      requestOnboarding(localStorage, null, true);
       rememberGuestMode(true);
       noteDrafts.activate(GUEST_DRAFT_SCOPE);
 
@@ -349,6 +362,8 @@ export function AuthProvider({
     <AuthContext.Provider
       value={{
         firebaseUser,
+
+        onboardingRevision,
 
         guestMode,
 

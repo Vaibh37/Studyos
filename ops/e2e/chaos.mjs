@@ -71,6 +71,9 @@ export async function chaosJourneys({
     form.requestSubmit();
   });
   await a.waitForURL(/\/app\//, { timeout: 30_000 });
+  const signupTour = a.getByRole("dialog", { name: "Welcome to StudyOS" });
+  await visible(signupTour);
+  await button(signupTour, "Skip tour").click();
   await go(a, "/app/settings", "Settings");
   await visible(a.getByText(account.email, { exact: true }));
   await visible(a.getByText(account.name, { exact: true }).first());

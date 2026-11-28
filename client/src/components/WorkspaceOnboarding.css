@@ -1,0 +1,170 @@
+.workspace-tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(0 0 0 / 64%);
+}
+.workspace-tour {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 520px);
+  max-height: min(100%, calc(100dvh - 40px));
+  min-width: 0;
+  overflow: hidden;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 25%);
+}
+.workspace-tour-header, .workspace-tour-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 16px 26px;
+}
+.workspace-tour-header { border-bottom: 1px solid var(--color-border); }
+.workspace-tour-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+.workspace-tour-brand > span {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 7px;
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+.workspace-tour-content {
+  padding: 25px 26px 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.workspace-tour-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+.workspace-tour-progress-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+.workspace-tour-progress-bars span {
+  height: 3px;
+  flex: 1;
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+.workspace-tour-progress-bars .is-filled { background: var(--color-solid); }
+.workspace-tour h2 {
+  margin-bottom: 8px;
+  font-size: 27px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+.workspace-tour p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
+}
+.workspace-tour-items {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+}
+.workspace-tour-items li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--color-border);
+}
+.workspace-tour-items li:last-child { padding-bottom: 0; }
+.workspace-tour-item-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-subtle);
+}
+.workspace-tour-items strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 3px;
+}
+.workspace-tour-storage {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 12px;
+  background: var(--color-surface-subtle);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+}
+.workspace-tour-storage svg { flex: 0 0 19px; margin-top: 2px; }
+.workspace-tour-storage p { font-size: 13px; }
+.workspace-tour-footer { border-top: 1px solid var(--color-border); }
+.workspace-tour-duration { color: var(--color-text-muted); font-size: 12px; }
+.workspace-tour :is(button.workspace-tour-skip, button.workspace-tour-secondary, button.workspace-tour-primary) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.workspace-tour button.workspace-tour-skip { font-size: 13px; padding-inline: 10px; }
+.workspace-tour button.workspace-tour-secondary { border-color: var(--color-border); }
+.workspace-tour :is(button.workspace-tour-skip, button.workspace-tour-secondary):hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+.workspace-tour button.workspace-tour-primary {
+  min-width: 120px;
+  background: var(--color-solid);
+  color: var(--color-solid-text);
+}
+.workspace-tour button.workspace-tour-primary:hover { background: var(--color-solid-hover); }
+@media (max-width: 480px) {
+  .workspace-tour-overlay { padding: 12px; }
+  .workspace-tour { max-height: calc(100dvh - 24px); }
+  .workspace-tour-header, .workspace-tour-footer { padding: 12px 18px; }
+  .workspace-tour-content { padding: 20px 18px; }
+  .workspace-tour h2 { font-size: 24px; }
+  .workspace-tour-items li { gap: 10px; padding-block: 12px; }
+  .workspace-tour-item-icon { flex-basis: 34px; height: 34px; }
+}

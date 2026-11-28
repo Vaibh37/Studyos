@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
 import DialogSurface from "./DialogSurface";
+import { onboardingKey, readOnboarding } from "../services/onboarding";
 
 import {
   useCallback,
@@ -266,6 +267,9 @@ export default function StreakFlame() {
     (mode === "guest" ||
       (mode === "authenticated" && Boolean(userId)));
 
+  const tourKey = onboardingKey(firebaseUser, mode === "guest");
+  const onboardingPending = readOnboarding(localStorage, tourKey) === "pending";
+
   const [record, setRecord] = useState(null);
   const [celebration, setCelebration] = useState(null);
   const [returning, setReturning] = useState(false);
@@ -279,6 +283,10 @@ export default function StreakFlame() {
   const closingRef = useRef(false);
 
   const reveal = useCallback((kind) => {
+    // Record the daily check-in as usual, but don't stack an automatic
+    // celebration over a first-run tour or another active modal.
+    if (kind !== "replay" && (readOnboarding(localStorage, tourKey) === "pending" ||
+        document.querySelector('[data-dialog-surface][aria-modal="true"]:not(.sf2-stage)'))) return;
     clearTimeout(returnTimer.current);
 
     closingRef.current = false;
@@ -286,7 +294,17 @@ export default function StreakFlame() {
     setTravel({ x: 0, y: 0 });
     setBurst((value) => value + 1);
     setCelebration(kind);
-  }, []);
+  }, [tourKey]);
+
+  // A new Firebase credential may be confirmed after a check-in begins.
+  // Don't leave an earlier welcome animation queued behind onboarding.
+  useEffect(() => {
+    if (!onboardingPending) return;
+    clearTimeout(returnTimer.current);
+    setCelebration(current => current === "replay" ? current : null);
+    setReturning(false);
+    closingRef.current = false;
+  }, [onboardingPending]);
 
   const dismiss = useCallback(() => {
     if (!celebration || closingRef.current) return;
@@ -492,6 +510,7 @@ export default function StreakFlame() {
 
   if (!ready || !isDashboard || !headerSlot?.isConnected) return null;
 
+  const showingCelebration = celebration && (celebration === "replay" || !onboardingPending);
   const days = record?.count || 0;
   const best = record?.best || days;
 
@@ -522,7 +541,7 @@ export default function StreakFlame() {
         ref={triggerRef}
         type="button"
         className={`sf2-trigger${
-          celebration ? " is-hidden" : ""
+          showingCelebration ? " is-hidden" : ""
         }`}
         onClick={handleTrigger}
         aria-label={`Daily visit streak: ${days} days. Show celebration`}
@@ -536,7 +555,7 @@ export default function StreakFlame() {
 
       {/* Center celebration */}
 
-      {celebration && (
+      {showingCelebration && (
         <div
           className={`sf2-overlay${
             returning ? " is-returning" : ""

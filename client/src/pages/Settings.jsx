@@ -4,7 +4,7 @@ import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
 import { withDeadline } from "../services/deadline";
 import DialogSurface from "../components/DialogSurface";
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useOutletContext, useSearchParams } from "react-router";
 import {
   BadgeCheck,
   Bell,
@@ -138,6 +138,7 @@ const STARTUP_PAGE_OPTIONS = [
 // =========================================================
 
 function Settings() {
+  const { openOnboarding } = useOutletContext();
   const {
     firebaseUser,
     isAuthenticated,
@@ -2857,6 +2858,25 @@ function Settings() {
 
                 </div>
 
+              </div>
+
+              <div className="settings-v2-panel">
+                <div className="settings-v2-panel-header">
+                  <div>
+                    <h3>Get started</h3>
+                    <p>Learn the basics or revisit the workspace tour.</p>
+                  </div>
+                  <BookOpen size={21} />
+                </div>
+                <div className="settings-v2-row">
+                  <div className="settings-v2-row-copy">
+                    <strong>Workspace tour</strong>
+                    <span>A quick introduction to planning, focus and progress.</span>
+                  </div>
+                  <button type="button" className="settings-v2-secondary-button" onClick={openOnboarding}>
+                    Replay tour
+                  </button>
+                </div>
               </div>
 
               {/* OVERVIEW */}

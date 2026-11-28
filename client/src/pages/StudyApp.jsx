@@ -1,6 +1,8 @@
 import { applyTheme, readTheme, THEME_EVENT } from "../services/theme";
 import RecoveryBoundary from "../components/RecoveryBoundary";
 import DialogSurface from "../components/DialogSurface";
+import WorkspaceOnboarding from "../components/WorkspaceOnboarding";
+import { onboardingKey, shouldOfferOnboarding, writeOnboarding } from "../services/onboarding";
 import {
   Suspense,
   lazy,
@@ -190,6 +192,7 @@ const buildGuestSignature =
 function StudyApp() {
   const {
     firebaseUser,
+    onboardingRevision,
     isAuthenticated,
     isGuest,
   } = useAuth();
@@ -285,6 +288,56 @@ function StudyApp() {
   ] = useState(
     ""
   );
+
+  // The automatic tour is restricted to a fresh workspace's first dashboard
+  // entry. Wait for guest migration to settle so the dialogs never compete.
+  const tourKey = onboardingKey(firebaseUser, isGuest);
+  const [migrationChecked, setMigrationChecked] = useState(isGuest);
+  const autoTourAllowed = useRef(true);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (routePage && routePage !== "dashboard") {
+      autoTourAllowed.current = false;
+      if (shouldOfferOnboarding(localStorage, firebaseUser, isGuest)) {
+        writeOnboarding(localStorage, tourKey, "dismissed");
+      }
+      return;
+    }
+    if (!autoTourAllowed.current || routePage !== "dashboard" || !migrationChecked ||
+        showGuestMigration || !shouldOfferOnboarding(localStorage, firebaseUser, isGuest)) return;
+    let cancelled = false;
+    const offer = async () => {
+      let eligible = shouldOfferOnboarding(localStorage, firebaseUser, isGuest);
+      if (eligible && isGuest) {
+        try {
+          const snapshot = await getGuestDataSnapshot();
+          if (cancelled) return;
+          if (getSnapshotCount(snapshot) > 0) {
+            writeOnboarding(localStorage, tourKey, "dismissed");
+            eligible = false;
+          }
+        } catch { eligible = false; }
+      }
+      if (cancelled || !autoTourAllowed.current) return;
+      autoTourAllowed.current = false;
+      if (eligible && !document.querySelector('[data-dialog-surface][aria-modal="true"]')) {
+        setTourOpen(true);
+      }
+    };
+    void offer();
+    return () => { cancelled = true; };
+  }, [onboardingRevision, routePage, migrationChecked, showGuestMigration, isGuest, firebaseUser, tourKey]);
+
+  function openOnboarding() {
+    autoTourAllowed.current = false;
+    setTourOpen(true);
+  }
+
+  function closeOnboarding(status) {
+    writeOnboarding(localStorage, tourKey, status);
+    setTourOpen(false);
+  }
 
   // Display the persisted, account-scoped timer even on other app pages.
   useEffect(() => {
@@ -598,7 +651,9 @@ function StudyApp() {
           }
         };
 
-      checkGuestData();
+      checkGuestData().finally(() => {
+        if (!cancelled) setMigrationChecked(true);
+      });
 
       return () => {
         cancelled =
@@ -809,7 +864,7 @@ function StudyApp() {
             <WorkspaceFocusHost key={isGuest ? "guest" : firebaseUser?.uid || "unknown"} uid={isGuest ? null : firebaseUser?.uid} page={routePage} pathname={location.pathname} />
             <RecoveryBoundary key={location.pathname} scope="route">
               <Suspense fallback={<WorkspaceRouteLoading pathname={location.pathname} />}>
-                <Outlet />
+                <Outlet context={{ openOnboarding }} />
               </Suspense>
             </RecoveryBoundary>
 
@@ -826,6 +881,12 @@ function StudyApp() {
         />
 
       </div>
+
+      {tourOpen && !showGuestMigration && (
+        <WorkspaceOnboarding isGuest={isGuest}
+          onDismiss={() => closeOnboarding("dismissed")}
+          onComplete={() => closeOnboarding("completed")} />
+      )}
 
       {showGuestMigration && (
         <div className="delete-modal-overlay">

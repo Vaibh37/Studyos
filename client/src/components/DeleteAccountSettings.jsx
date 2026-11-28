@@ -1,3 +1,4 @@
+import { clearOnboarding, onboardingKey } from "../services/onboarding";
 import { clearProfileName } from "../services/profileName";
 import DialogSurface from "./DialogSurface";
 import { useState } from "react";
@@ -83,6 +84,7 @@ export default function DeleteAccountSettings() {
 
       try {
         clearProfileName(localStorage, firebaseUser);
+        clearOnboarding(localStorage, onboardingKey(firebaseUser));
       } catch { /* Account deletion already succeeded on the server. */ }
       try {
         await logout();
