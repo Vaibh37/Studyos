@@ -669,9 +669,13 @@ async function journeys() {
   await a.waitForFunction(() => document.querySelector(".room-atmosphere--zen")?.getAttribute("data-active") === "true");
   const drop = weatherStage.locator(".atmosphere-rain i").first();
   const firstTransform = await drop.evaluate(el => getComputedStyle(el).transform);
-  await a.waitForTimeout(300);
   assert.equal(await drop.evaluate(el => getComputedStyle(el).animationPlayState), "running");
-  assert.notEqual(await drop.evaluate(el => getComputedStyle(el).transform), firstTransform, "Rain must move inside fullscreen Zen");
+  assert.equal(await drop.evaluate(el => getComputedStyle(el).animationIterationCount), "infinite");
+  assert(await drop.evaluate(el => parseFloat(getComputedStyle(el).animationDuration) >= 2), "Rain animation must not be shortened by global reduced-motion CSS");
+  await a.waitForFunction(previous => {
+    const el = document.querySelector(".room-atmosphere--zen .atmosphere-rain i");
+    return el && getComputedStyle(el).transform !== "none" && getComputedStyle(el).transform !== previous;
+  }, firstTransform, { timeout: 5000 });
   await button(sharedZen, "Motion on").click();
   await absent(weatherStage.locator(".atmosphere-rain"));
 

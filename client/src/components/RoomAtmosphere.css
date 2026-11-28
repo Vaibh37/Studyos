@@ -58,3 +58,15 @@
 @media (max-width:540px) {
   .atmosphere-rain > i:nth-child(n+33), .atmosphere-snow > i:nth-child(n+33) { display:none; }
 }
+
+/* The app-wide reduced-motion rules use !important. An explicit room Motion
+   opt-in restores only the decorative atmosphere loops, not other UI motion.
+   :is(#root,body) also covers the Shared Zen dialog portaled into body. */
+@media (prefers-reduced-motion:reduce) {
+  :is(#root,body) .room-atmosphere[data-motion=true] :is(.atmosphere-image,.atmosphere-weather > i) { animation-iteration-count:infinite !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] .atmosphere-image { animation-duration:48s !important; }
+  :is(#root,body) .room-atmosphere--header[data-motion=true] .atmosphere-image { animation-duration:34s !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] :is(.atmosphere-rain,.atmosphere-snow,.atmosphere-stargaze) > i { animation-duration:var(--duration) !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] .atmosphere-mist > i { animation-duration:24s !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] .atmosphere-mist > i:nth-child(2) { animation-duration:32s !important; }
+}
