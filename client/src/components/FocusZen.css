@@ -138,16 +138,6 @@
   background:#10181b; transition:opacity .6s ease;
 }
 .studyos-zen-scene[data-ready=true] { opacity:1; }
-.studyos-zen-scene::before {
-  content:""; position:absolute; inset:-2%;
-  background-image:linear-gradient(180deg,#0a1118a0 0%,#0a121844 38%,#080e13c4 69%,#080d11f0 100%),var(--room-image,linear-gradient(135deg,#2c3e42,#0e141a));
-  background-size:cover; background-position:center;
-  animation:zen-room-scene-drift 48s ease-in-out infinite alternate;
-}
-.studyos-zen-scene::after {
-  content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 32%,#08101512 0,#060b1070 65%,#060b10bd);
-}
-@keyframes zen-room-scene-drift { from {transform:scale(1)} to {transform:scale(1.075) translate3d(-.4%,.5%,0)} }
 .studyos-zen-room .studyos-zen-digits { color:#f7f8f8; text-shadow:0 0 45px #141c24aa; font-weight:350; }
 .zen-room-header { position:absolute; top:max(24px,env(safe-area-inset-top)); left:max(24px,env(safe-area-inset-left)); display:flex; gap:9px; align-items:flex-start; max-width:calc(100% - 164px); }
 .zen-room-indicator { width:8px; height:8px; border-radius:50%; flex:0 0 8px; margin-top:8px; background:#89939a; }

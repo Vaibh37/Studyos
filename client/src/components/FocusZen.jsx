@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import "./FocusZen.css";
+import RoomAtmosphere from "./RoomAtmosphere";
 
 const clamp = x => Math.max(0, Math.min(1, x));
 const mix = (a,b,t) => a+(b-a)*t;
@@ -158,7 +159,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
   return createPortal(
     <dialog className={`studyos-zen-dialog${roomMode?" studyos-zen-room":""}`} ref={dialog} aria-label={roomMode?"Shared Zen mode":"Zen focus mode"}>
       <canvas ref={canvas} aria-hidden="true" />
-      {roomMode && <div className={`studyos-zen-scene room-environment--${sharedRoom.scenery}`} data-ready={ready} aria-hidden="true" />}
+      {roomMode && <div className={`studyos-zen-scene room-environment--${sharedRoom.scenery}`} data-ready={ready} aria-hidden="true"><RoomAtmosphere scene={sharedRoom.scenery} phase={sharedRoom.phase || "fixed"} active={ready} variant="zen" /></div>}
       <div className="studyos-zen-digits" ref={digits} role="timer">{time}</div>
       <div className="studyos-zen-ui" data-ready={ready} inert={!ready}>
         <button ref={exit} type="button" className="studyos-zen-exit" onClick={()=>requestExit.current?.()}>Exit Zen <span>Esc</span></button>
@@ -166,7 +167,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
           <header className="zen-room-header">
             <span className={`zen-room-indicator${sharedRoom.connected?" is-online":""}`} />
             <div><strong>{sharedRoom.name}</strong>
-              <span>{sharedRoom.connected?`${sharedRoom.activeCount} studying · ${sharedRoom.total} in room`:"Reconnecting to room…"}</span>
+              <span>{sharedRoom.connected?`${sharedRoom.activeCount} studying · ${sharedRoom.total} in room`:"Reconnecting to room…"}{sharedRoom.phaseLabel && ` · ${sharedRoom.phaseLabel}`}</span>
             </div>
           </header>
           <div className="zen-room-controls">
@@ -174,7 +175,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
             <div className="zen-room-buttons">
               <button type="button" className="studyos-zen-action" disabled={saving || pending} onClick={toggle}>{status==="running"?"Pause":status==="paused"?"Resume":"Start focus"}</button>
               {status!=="idle" && <button type="button" disabled={saving || pending} onClick={sharedRoom.onFinish}>Finish &amp; save</button>}
-              <button type="button" aria-pressed={sharedRoom.audio.playing} onClick={sharedRoom.audio.toggle}>{sharedRoom.audio.playing?"Mute sound":"Play sound"}</button>
+              <button type="button" aria-pressed={sharedRoom.audio.playing} disabled={!sharedRoom.audio.playing && sharedRoom.audio.canPlay === false} onClick={sharedRoom.audio.toggle}>{sharedRoom.audio.playing?"Mute sound":"Play sound"}</button>
             </div>
             {(error || sharedRoom.audio.error) && <span className="zen-room-error" role="alert">{error || sharedRoom.audio.error}</span>}
           </div>

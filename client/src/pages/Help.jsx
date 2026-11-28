@@ -44,6 +44,7 @@ export default function Help() {
           <li>Join a room and start your own Focus timer. See who is studying, on a break or at their desk.</li>
           <li>Keep your room and ambient audio active while using Notes, Tasks or other workspace pages. Use the mini room dock to pause or resume, mute sound, return or leave.</li>
           <li>Choose a personal atmosphere and optional ambient sound. Sound is off until you choose to play it.</li>
+          <li>Choose Auto · local time for a dawn, daylight, evening or night atmosphere, or select animated rain, clouds, snowfall and other scenes. Use Sound mixer to blend the four ambient sounds; sound and scenery are personal and stay on the device.</li>
           <li>Open Zen inside a room to see your full-screen atmosphere, live desks and Focus timer together. Your sound continues while you enter or exit Zen.</li>
           <li>Choose Customize desk to personalize the character, lamp, study activity and accessories. Plants unlock with saved verified sessions of at least 20 minutes. Optional encouragement and shared milestones are silent.</li>
           <li>Use Invite to share a room link. Recipients choose whether to join. Private links work only for current group members.</li>

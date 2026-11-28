@@ -83,3 +83,33 @@ export function writeRoomSelection(storage, uid, roomId) {
     else storage.removeItem(selectionKey(uid));
   } catch { /* Storage unavailable. */ }
 }
+
+// V6 preferences retain the V2-V5 solo selection and master volume when
+// upgrading. Layer and master levels are bounded, device-local and never
+// sent to other room participants.
+const mixerKey = uid => `studyos_room_mixer:${uid}`;
+const level = (value, fallback = 0) => Number.isFinite(value) ? Math.min(100, Math.max(0, Math.round(value))) : fallback;
+export function soloLayers(kind) {
+  return Object.fromEntries(AMBIENT_SOUNDS.map(sound => [sound.value, sound.value === kind ? 100 : 0]));
+}
+export function normalizeRoomMixer(value, fallback = { kind: "rain", volume: 35 }) {
+  const fallbackKind = AMBIENT_SOUNDS.some(sound => sound.value === fallback.kind) ? fallback.kind : "rain";
+  const layers = value?.layers && typeof value.layers === "object" && !Array.isArray(value.layers)
+    ? Object.fromEntries(AMBIENT_SOUNDS.map(sound => [sound.value, level(value.layers[sound.value])]))
+    : soloLayers(fallbackKind);
+  const solo = AMBIENT_SOUNDS.find(sound => layers[sound.value] === 100 && AMBIENT_SOUNDS.every(other => other === sound || layers[other.value] === 0));
+  return { kind: solo?.value || "mix", volume: level(value?.volume, level(fallback.volume, 35)), layers };
+}
+export function readRoomMixer(storage, uid) {
+  const legacy = readRoomSound(storage, uid);
+  try { return normalizeRoomMixer(JSON.parse(storage.getItem(mixerKey(uid))), legacy); }
+  catch { return normalizeRoomMixer(null, legacy); }
+}
+export function writeRoomMixer(storage, uid, mixer) {
+  if (!uid) return;
+  try { storage.setItem(mixerKey(uid), JSON.stringify(normalizeRoomMixer(mixer))); }
+  catch { /* Preferences are optional. */ }
+}
+export function canPlayRoomMixer(mixer) {
+  return AMBIENT_SOUNDS.some(sound => mixer.layers[sound.value] > 0);
+}

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Original winter mountain landscape">
+<defs>
+  <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#142c3d"/><stop offset=".54" stop-color="#44667a"/><stop offset="1" stop-color="#abc0c7"/></linearGradient>
+  <radialGradient id="moonlight"><stop stop-color="#e4eff3" stop-opacity=".46"/><stop offset="1" stop-color="#bacfdd" stop-opacity="0"/></radialGradient>
+  <linearGradient id="far" x2=".15" y2="1"><stop stop-color="#a4bec9"/><stop offset="1" stop-color="#57778a"/></linearGradient>
+  <linearGradient id="snow" x2=".26" y2="1"><stop stop-color="#d3e2e7"/><stop offset=".55" stop-color="#89a7b6"/><stop offset="1" stop-color="#4d6f82"/></linearGradient>
+  <linearGradient id="slope" x2=".12" y2="1"><stop stop-color="#8ba5b1"/><stop offset="1" stop-color="#304e60"/></linearGradient>
+  <linearGradient id="ground" x2=".12" y2="1"><stop stop-color="#8dabb7"/><stop offset="1" stop-color="#263f50"/></linearGradient>
+  <filter id="mist"><feGaussianBlur stdDeviation="22"/></filter>
+  <g id="pine"><path d="M0 0L-25 49L-12 47L-39 92L-23 88L-48 130L-7 122V147H7V122L48 130L23 88L39 92L13 47L25 49Z" fill="currentColor"/><path d="M0 4L-22 49L-7 43L-32 87L-10 80L-39 121L-4 112L8 118L40 124L20 96L12 99L24 113L0 111Z" fill="#b9d1dd" opacity=".43"/></g>
+</defs>
+<rect width="1600" height="900" fill="url(#sky)"/>
+<circle cx="1162" cy="158" r="164" fill="url(#moonlight)"/>
+<circle cx="1162" cy="158" r="33" fill="#dce8ed" opacity=".85"/>
+<path d="M0 488L137 343L208 395L329 250L407 327L464 287L564 408L659 295L779 382L903 272L1007 386L1126 273L1248 390L1377 298L1600 487V735H0Z" fill="url(#far)" opacity=".85"/>
+<path d="M0 524L153 386L267 443L419 285L563 469L689 367L760 429L919 308L1095 464L1210 353L1391 442L1523 332L1600 420V719H0Z" fill="url(#snow)"/>
+<path d="M419 285L346 415L390 393L403 414L433 398L468 450L563 469L481 388Z M919 308L855 402L902 388L928 421L950 420L1095 464L1004 398Z M1523 332L1452 423L1504 401L1544 446L1600 467V420Z" fill="#e1edf0" opacity=".71"/>
+<path d="M0 548Q192 499 353 545T727 542Q952 506 1128 554T1600 533V790H0Z" fill="url(#slope)"/>
+<path d="M-80 555Q358 504 769 579T1680 540" fill="none" stroke="#d1e0e4" opacity=".26" stroke-width="50" filter="url(#mist)"/>
+
+<use href="#pine" transform="translate(-66.0 584.4) scale(0.464)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(2.9 556.6) scale(0.420)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(63.3 589.4) scale(0.392)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(101.3 607.7) scale(0.283)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(177.8 580.5) scale(0.405)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(207.9 587.4) scale(0.334)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(280.7 627.0) scale(0.282)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(322.1 574.8) scale(0.308)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(377.3 566.7) scale(0.357)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(422.5 559.8) scale(0.450)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(480.6 595.6) scale(0.334)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(540.5 545.7) scale(0.519)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(606.7 567.9) scale(0.531)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(653.5 597.5) scale(0.361)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(723.5 565.9) scale(0.416)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(758.7 591.4) scale(0.375)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(814.7 593.8) scale(0.506)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(892.9 602.8) scale(0.411)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(952.2 584.5) scale(0.351)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1010.6 574.2) scale(0.401)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1035.2 614.7) scale(0.360)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1120.0 585.1) scale(0.363)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1162.9 607.4) scale(0.418)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1221.3 601.9) scale(0.329)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1254.8 529.3) scale(0.467)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1341.8 568.1) scale(0.480)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1388.1 558.7) scale(0.409)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1440.1 571.4) scale(0.302)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1481.1 588.8) scale(0.462)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1556.1 554.3) scale(0.338)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1597.6 595.9) scale(0.362)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(1674.8 542.3) scale(0.554)" color="#354f60" opacity="0.6"/>
+<use href="#pine" transform="translate(-52.2 652.8) scale(0.585)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(32.6 608.2) scale(0.786)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(94.6 610.8) scale(0.655)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(184.6 561.2) scale(0.858)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(281.8 602.7) scale(0.945)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(339.8 590.2) scale(0.993)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(417.8 608.6) scale(0.717)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(516.3 625.5) scale(0.635)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(587.2 653.4) scale(0.634)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(666.8 627.7) scale(0.728)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(769.4 648.4) scale(0.683)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(840.5 600.9) scale(0.908)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(922.4 570.7) scale(0.941)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1010.9 631.6) scale(0.535)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1085.1 543.4) scale(0.944)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1181.6 572.2) scale(0.802)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1261.3 634.7) scale(0.779)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1323.3 593.4) scale(0.960)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1427.3 566.0) scale(0.936)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1484.4 621.4) scale(0.540)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1564.3 591.3) scale(0.632)" color="#1d3543" opacity="0.92"/>
+<use href="#pine" transform="translate(1652.6 651.2) scale(0.627)" color="#1d3543" opacity="0.92"/>
+<path d="M0 702Q301 634 544 750T1000 740Q1294 674 1600 714V900H0Z" fill="url(#ground)"/>
+<use href="#pine" transform="translate(-44.6 707.8) scale(0.818)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(69.9 693.2) scale(0.935)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(192.1 730.8) scale(0.893)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(317.3 641.7) scale(1.093)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(420.1 583.8) scale(1.573)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(1165.1 658.1) scale(1.102)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(1281.0 694.6) scale(0.857)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(1400.5 575.6) scale(1.416)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(1520.9 668.2) scale(1.146)" color="#142c39" opacity="0.92"/>
+<use href="#pine" transform="translate(1643.9 655.5) scale(1.079)" color="#142c39" opacity="0.92"/>
+<path d="M0 855Q245 819 407 861Q769 889 1092 850T1600 856V900H0Z" fill="#1b3545" opacity=".75"/></svg>

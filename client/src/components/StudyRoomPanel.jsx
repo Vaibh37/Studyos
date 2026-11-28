@@ -9,7 +9,10 @@ import FocusZen from "./FocusZen";
 import FocusCompletion from "./FocusCompletion";
 import { useStudyRoom } from "../hooks/useStudyRoom";
 import { useStudyRoomDirectory } from "../hooks/useStudyRoomDirectory";
-import { AMBIENT_SOUNDS, createAmbientSamples, readRoomScenery, writeRoomScenery, readRoomSound, writeRoomSound, readRoomSelection, writeRoomSelection } from "../services/roomAmbience";
+import { AMBIENT_SOUNDS, readRoomScenery, writeRoomScenery, readRoomSelection, writeRoomSelection } from "../services/roomAmbience";
+import { ROOM_SCENERY, resolveRoomScene } from "../services/roomScenery";
+import { useRoomAudio } from "../hooks/useRoomAudio";
+import RoomAtmosphere from "./RoomAtmosphere";
 import { allowedInvitedRoom, roomInviteURL } from "../services/studyRoomLinks";
 import "../styles/study-rooms.css";
 
@@ -19,11 +22,6 @@ const PUBLIC_ROOMS = [
   { id: "public:cloud", name: "Cloud Room", description: "A little space above the noise.", icon: Cloud, atmosphere: "cloud" },
   { id: "public:night", name: "Night Study", description: "For evening readers and night owls.", icon: Moon, atmosphere: "stargaze" },
 ];
-const ENVIRONMENTS = [
-  { value: "none", label: "No scenery" }, { value: "rain", label: "Rain" },
-  { value: "cloud", label: "Clouds" }, { value: "stargaze", label: "Night sky" },
-  { value: "ronin", label: "Misty fields" },
-];
 const pad = n => String(n).padStart(2, "0");
 const duration = seconds => {
   const n = Math.max(0, Math.floor(Number(seconds) || 0));
@@ -31,100 +29,32 @@ const duration = seconds => {
 };
 const stateNames = { running: "Studying", paused: "On break", idle: "At desk" };
 
-function useRoomAudio(uid) {
-  const [preference, setPreference] = useState(() => uid ? readRoomSound(localStorage, uid) : { kind: "rain", volume: 35 });
-  const [playing, setPlaying] = useState(false);
-  const [error, setError] = useState("");
-  const sound = useRef(null);
-  const { kind, volume } = preference;
-
-  function stop() {
-    const current = sound.current;
-    sound.current = null;
-    if (!current) return;
-    try { current.source.stop(); } catch { /* Already stopped. */ }
-    void current.context.close().catch(() => {});
-  }
-
-  useEffect(() => () => {
-    const current = sound.current;
-    sound.current = null;
-    if (current) {
-      try { current.source.stop(); } catch { /* Already stopped. */ }
-      void current.context.close().catch(() => {});
-    }
-  }, []);
-
-  useEffect(() => { if (uid) writeRoomSound(localStorage, uid, preference); }, [uid, preference]);
-
-  async function play(nextKind, nextVolume) {
-    stop();
-    let context;
-    try {
-      const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!Audio) throw new Error("Audio isn't supported in this browser.");
-      context = new Audio();
-      const samples = createAmbientSamples(nextKind, context.sampleRate);
-      const buffer = context.createBuffer(1, samples.length, context.sampleRate);
-      buffer.copyToChannel(samples, 0);
-      const source = context.createBufferSource();
-      const filter = context.createBiquadFilter();
-      const gain = context.createGain();
-      source.buffer = buffer;
-      source.loop = true;
-      filter.type = "lowpass";
-      filter.frequency.value = nextKind === "brown" ? 480 : nextKind === "ocean" ? 1300 : nextKind === "fan" ? 850 : 2400;
-      gain.gain.value = 0;
-      source.connect(filter).connect(gain).connect(context.destination);
-      sound.current = { context, source, gain };
-      source.start();
-      await context.resume();
-      if (sound.current?.context !== context) return;
-      gain.gain.setTargetAtTime(nextVolume / 100 * .35, context.currentTime, .08);
-      setPlaying(true);
-      setError("");
-    } catch {
-      if (sound.current && sound.current.context !== context) return;
-      if (sound.current?.context === context) stop();
-      else if (context && context.state !== "closed") void context.close().catch(() => {});
-      setPlaying(false);
-      setError("Ambient sound is unavailable.");
-    }
-  }
-
-  function mute() {
-    stop();
-    setPlaying(false);
-  }
-
-  function toggle() {
-    if (sound.current) mute();
-    else void play(kind, volume);
-  }
-
-  function changeKind(value) {
-    const wasPlaying = Boolean(sound.current);
-    setPreference(old => ({ ...old, kind: value }));
-    if (wasPlaying) void play(value, volume);
-  }
-
-  function changeVolume(next) {
-    setPreference(old => ({ ...old, volume: next }));
-    const current = sound.current;
-    if (current) current.gain.gain.setTargetAtTime(next / 100 * .35, current.context.currentTime, .06);
-  }
-
-  return { kind, volume, playing, error, toggle, mute, changeKind, changeVolume };
-}
-
 function AmbientSound({ audio }) {
-  const { kind, volume, playing, error, toggle, changeKind, changeVolume } = audio;
-  return <div className="room-audio">
-    <StudySelect value={kind} onChange={changeKind} options={AMBIENT_SOUNDS} ariaLabel="Ambient sound" />
-    <button className="room-button" type="button" aria-pressed={playing} onClick={toggle}>{playing ? "Mute sound" : kind === "rain" ? "Play rain sound" : "Play sound"}</button>
-    {playing && <input aria-label="Ambient sound volume" type="range" min="0" max="100" value={volume} onChange={e => changeVolume(Number(e.target.value))} />}
-    {error && <span role="status">{error}</span>}
-  </div>;
+  const [mixerOpen, setMixerOpen] = useState(false);
+  const { kind, volume, layers, playing, canPlay, error, toggle, changeKind, changeVolume, changeLayer } = audio;
+  const layerCount = AMBIENT_SOUNDS.filter(sound => layers[sound.value] > 0).length;
+  return <>
+    <div className="room-audio">
+      <StudySelect value={kind} onChange={changeKind} options={AMBIENT_SOUNDS.concat(kind === "mix" ? [{ value: "mix", label: "Custom mix", disabled: true }] : [])} ariaLabel="Ambient sound" />
+      <button className="room-button" type="button" aria-pressed={playing} disabled={!playing && !canPlay} onClick={toggle}>{playing ? "Mute sound" : kind === "rain" ? "Play rain sound" : "Play sound"}</button>
+      {playing && !mixerOpen && <input aria-label="Ambient sound volume" type="range" min="0" max="100" value={volume} onChange={e => changeVolume(Number(e.target.value))} />}
+      <button className="room-button room-mix-button" type="button" aria-label="Sound mixer" aria-expanded={mixerOpen} onClick={() => setMixerOpen(open => !open)}>Sound mixer{layerCount > 1 && <span className="room-mix-count" aria-hidden="true">{layerCount}</span>}</button>
+      {error && <span role="status">{error}</span>}
+    </div>
+    {mixerOpen && <section className="room-sound-mixer" aria-label="Ambient sound mixer">
+      <header><div><h3>Sound mixer</h3><p>Blend your own background atmosphere. Only you can hear it.</p></div><button className="room-button" type="button" aria-label="Close sound mixer" onClick={() => setMixerOpen(false)}><X size={16} /></button></header>
+      <div className="room-mixer-layers">
+        {AMBIENT_SOUNDS.map(sound => <label key={sound.value} className="room-mixer-layer">
+          <span>{sound.label}</span><output>{layers[sound.value]}%</output>
+          <input type="range" min="0" max="100" step="1" value={layers[sound.value]} aria-label={sound.label + " layer volume"} onChange={e => changeLayer(sound.value, Number(e.target.value))} />
+        </label>)}
+      </div>
+      <div className="room-mixer-master">
+        <label><span>Master volume</span><input aria-label="Master ambient volume" type="range" min="0" max="100" value={volume} onChange={e => changeVolume(Number(e.target.value))}/><output>{volume}%</output></label>
+        <span>{!canPlay ? "Raise a layer to enable sound." : playing ? "Playing · adjust any layer live" : "Sound is off until you press Play."}</span>
+      </div>
+    </section>}
+  </>;
 }
 
 function StudyRoomDock({ room, presence, status, timer, busy, remainingSeconds, toggle, audio, leave, sessionError }) {
@@ -141,7 +71,7 @@ function StudyRoomDock({ room, presence, status, timer, busy, remainingSeconds, 
     <div className="room-dock-actions">
       <strong className="room-dock-time" aria-label={status === "idle" ? "Next focus duration" : "Elapsed focus time"}>{duration(timer)}</strong>
       {status !== "idle" && <button type="button" className="room-dock-icon" disabled={busy || (status === "paused" && remainingSeconds <= 0)} aria-label={status === "running" ? "Pause room focus" : "Resume room focus"} title={status === "running" ? "Pause focus" : "Resume focus"} onClick={toggle}>{status === "running" ? <Pause size={17} weight="fill" /> : <Play size={17} weight="fill" />}</button>}
-      <button type="button" className="room-dock-sound" aria-pressed={playing} onClick={audio.toggle}>{playing ? "Mute sound" : "Play sound"}</button>
+      <button type="button" className="room-dock-sound" aria-pressed={playing} disabled={!playing && !audio.canPlay} onClick={audio.toggle}>{playing ? "Mute sound" : "Play sound"}</button>
       <button type="button" className="room-dock-icon" aria-label="Leave study room" title="Leave study room (your Focus timer continues)" onClick={leave} disabled={busy}><LogOut size={19} /></button>
     </div>
     {(presence.error || audio.error || sessionError) && <div className="room-dock-warning" role="status"><span>{presence.error || audio.error || sessionError}</span>{presence.error && <button type="button" onClick={presence.retry}>Reconnect</button>}</div>}
@@ -313,7 +243,7 @@ export default function StudyRoomPanel({
     setShareSubject(false);
     setQuery("");
     setSort("activity");
-    setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ENVIRONMENTS.map(option => option.value)));
+    setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ROOM_SCENERY.map(option => option.value)));
     writeRoomSelection(sessionStorage, uid, next.id);
     setRoom({ ...next, ownerUid: uid });
     onRoomActive(true);
@@ -344,6 +274,7 @@ export default function StudyRoomPanel({
   }
 
   const toggle = status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession;
+  const scene = resolveRoomScene(environment, new Date(now));
   const clockNow = now + presence.offset;
   const participants = [...presence.participants].sort((a, b) => {
     if (a.id === presence.participantId) return -1;
@@ -371,7 +302,7 @@ export default function StudyRoomPanel({
     if (!previousId) { onRoomActive(false); return; }
     const next = [...PUBLIC_ROOMS, ...privateRooms].find(item => item.id === previousId);
     if (next) {
-      setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ENVIRONMENTS.map(option => option.value)));
+      setEnvironment(readRoomScenery(localStorage, uid, next.id, next.atmosphere || "none", ROOM_SCENERY.map(option => option.value)));
       setRoom({ ...next, ownerUid: uid });
       onRoomActive(true);
     } else {
@@ -421,7 +352,8 @@ export default function StudyRoomPanel({
       </div> : <section className="room-placeholder room-placeholder--small"><Lock size={23} /><p>Create or join a Study Group to get a private room.</p><Link to="/app/groups" className="room-button">Study Groups</Link></section>}
       {status !== "idle" && <p className="room-note">Your Focus timer is still active. <Link to="/app/focus">Open Focus</Link></p>}
     </> : <>
-      <section aria-label="Your focus timer" className={`room-timer room-environment--${environment}`}>
+      <section aria-label="Your focus timer" className={`room-timer room-environment--${scene.scene}`} data-scene={scene.scene}>
+        <RoomAtmosphere scene={scene.scene} phase={scene.phase} active={!zenOpen} />
         <div className="room-timer-top">
           <div className="room-timer-content">
             <span>{status === "idle" ? "Next focus session" : status === "paused" ? "Focus time · Paused" : "Current focus time"}</span>
@@ -467,14 +399,17 @@ export default function StudyRoomPanel({
         </ul> : <div className="room-placeholder room-placeholder--small"><StudyDesk /><p>{connected ? "No one at a desk yet." : "Waiting for a live connection…"}</p></div>}
         <div className="room-preferences">
           <label className="room-share"><input type="checkbox" checked={shareSubject} onChange={e => setShareSubject(e.target.checked)} /> Share my subject</label>
-          <StudySelect value={environment} onChange={changeEnvironment} options={ENVIRONMENTS} ariaLabel="Choose room scenery" />
-          <AmbientSound audio={audio} />
+          <div className="room-scenery-choice">
+            <StudySelect value={environment} onChange={changeEnvironment} options={ROOM_SCENERY} ariaLabel="Choose room scenery" />
+            {environment === "auto" && <span className="room-scene-phase" title="Based on this device’s local time">{scene.label} now</span>}
+          </div>
+          <AmbientSound key={room.id} audio={audio} />
         </div>
         <footer className="room-live-footer">Your desk stays active across StudyOS pages. Leave to stop sharing your room presence; your personal Focus timer continues.</footer>
       </section>
     </>}
     {zenOpen && room && !completion && <FocusZen anchor={zenAnchorRef.current} time={duration(timer)} status={status} animate={true} error={error} saving={timerDisabled || (status === "paused" && remainingSeconds <= 0)} onToggle={toggle} onClose={() => setZenOpen(false)} sharedRoom={{
-      name: room.name, connected, activeCount, total: participants.length, scenery: environment,
+      name: room.name, connected, activeCount, total: participants.length, scenery: scene.scene, phase: scene.phase, phaseLabel: environment === "auto" ? scene.label : null,
       detail: status === "idle" ? "Ready to focus" : `${activeSubjectName} · ${duration(remainingSeconds)} remaining`,
       audio, onFinish: () => finishSession(false),
       roster: <ZenRoomRoster presence={presence} now={clockNow} />,

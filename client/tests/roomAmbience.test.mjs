@@ -45,3 +45,17 @@ test("last room can restore only within the same account and tab; explicit leave
   writeRoomSelection(tab,"alice","unknown-room");
   assert.equal(readRoomSelection(tab,"alice"),null);
 });
+
+test("V6 mixer upgrades legacy solo choices, bounds volumes and isolates local preferences", async () => {
+  const { readRoomMixer, writeRoomMixer, normalizeRoomMixer, canPlayRoomMixer, soloLayers } = await import("../src/services/roomAmbience.js");
+  const storage = memory();
+  writeRoomSound(storage, "alice", { kind: "ocean", volume: 42 });
+  assert.deepEqual(readRoomMixer(storage, "alice"), { kind: "ocean", volume: 42, layers: soloLayers("ocean") });
+  const mixed = normalizeRoomMixer({ layers: { rain: 150, ocean: 40.7, brown: -5, fan: "70", unknown: 5 }, volume: 120 });
+  assert.deepEqual(mixed, { kind: "mix", layers: { rain: 100, ocean: 41, brown: 0, fan: 0 }, volume: 100 });
+  writeRoomMixer(storage, "alice", mixed);
+  assert.deepEqual(readRoomMixer(storage, "alice"), mixed);
+  assert.deepEqual(readRoomMixer(storage, "bob"), { kind: "rain", volume: 35, layers: soloLayers("rain") });
+  assert(!canPlayRoomMixer(normalizeRoomMixer({ volume: 35, layers: {} })));
+  assert(canPlayRoomMixer(mixed));
+});

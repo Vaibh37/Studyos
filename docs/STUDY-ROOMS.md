@@ -1,4 +1,4 @@
-# Study Rooms V5
+# Study Rooms V6
 
 Study Rooms are silent live study spaces built on the existing authenticated
 Socket.IO server and verified Focus timer. There is no webcam, microphone,
@@ -53,6 +53,17 @@ turn on subject sharing.
   Opt-in peers see a small saved-session milestone after a verified save of at
   least 60 seconds, without duration or subject. Desk animations respect
   reduced motion. No reactions or milestones are stored.
+- Dynamic Environments extend the existing scenery with decorative rain,
+  drifting mist/clouds, a twinkling night sky and an original winter landscape.
+  Auto resolves dawn (05:00–07:59), daylight (08:00–16:59), evening
+  (17:00–19:59) and night (20:00–04:59) using only the device's local clock.
+  Personal scenery transitions crossfade; atmospheric motion is paused when
+  offscreen, when the page is hidden or when reduced motion is requested.
+- The Sound mixer blends up to four local audio loops in one AudioContext,
+  with independent levels and master volume. Changing layers fades gain
+  rather than resetting sound playback. Old solo preferences are migrated
+  on read. Mixer preferences remain account-scoped on the device; there is
+  no audio autoplay, recording, external stream, or location permission.
 - Private-room access is checked before joining; member removal and group
   deletion revoke active access, including a membership check in flight.
 

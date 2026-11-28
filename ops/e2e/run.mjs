@@ -620,6 +620,12 @@ async function journeys() {
   await b.reload({ waitUntil: "domcontentloaded" });
   await visible(b.locator(".room-participant.is-self .room-desk[data-activity=typing][data-lamp=round]"));
   await a.getByRole("combobox", { name: "Choose room scenery" }).click();
+  await a.getByRole("option", { name: "Auto · local time", exact: true }).click();
+  await visible(a.locator('.room-atmosphere[data-phase]:not([data-phase=fixed])'));
+  await a.getByRole("combobox", { name: "Choose room scenery" }).click();
+  await a.getByRole("option", { name: "Snowfall", exact: true }).click();
+  await visible(a.locator('.room-atmosphere[data-scene=snow] .atmosphere-layer[data-scene=snow]'));
+  await a.getByRole("combobox", { name: "Choose room scenery" }).click();
   await a.getByRole("option", { name: "Rain", exact: true }).click();
   await a.getByRole("combobox", { name: "Ambient sound" }).click();
   await a.getByRole("option", { name: "Ocean waves", exact: true }).click();
@@ -634,6 +640,16 @@ async function journeys() {
   // SPA navigation must not cause a disconnect, lose the room timer or
   // duplicate the Focus controller/run. Sound stays playing until muted/left.
   await button(a, "Play sound").click();
+  await visible(button(a, "Mute sound"));
+  await button(a, "Sound mixer").click();
+  const mixer = a.getByLabel("Ambient sound mixer", { exact: true });
+  await visible(mixer);
+  assert.equal(await mixer.getByLabel("Ocean waves layer volume").inputValue(), "100");
+  await mixer.getByLabel("Brown noise layer volume").press("End");
+  assert.equal(await mixer.getByLabel("Brown noise layer volume").inputValue(), "100");
+  assert.equal(await mixer.getByLabel("Ocean waves layer volume").inputValue(), "100");
+  await visible(a.getByRole("combobox", { name: "Ambient sound" }).getByText("Custom mix", { exact: true }));
+  await button(mixer, "Close sound mixer").click();
   await visible(button(a, "Mute sound"));
   const readRun = page => page.evaluate(() => {
     const key = Object.keys(localStorage).find(k => k.startsWith("studyos_active_focus_timer:account:"));
@@ -753,6 +769,11 @@ async function journeys() {
   await visible(mobileStudio);
   await assertNoOverflow(m);
   await button(mobileStudio, "Close desk customization").click();
+  await button(m, "Sound mixer").click();
+  const mobileMixer = m.getByLabel("Ambient sound mixer", { exact: true });
+  await visible(mobileMixer);
+  await assertNoOverflow(m);
+  await button(mobileMixer, "Close sound mixer").click();
   await button(m, "Zen").click();
   const mobileZen = m.getByRole("dialog", { name: "Shared Zen mode" });
   await visible(button(mobileZen, "Start focus"));
