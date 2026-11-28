@@ -406,6 +406,7 @@ async function journeys() {
   await visible(a.locator(".fc-card-row").first().getByText("In 4d", { exact: true }));
   await assertNoOverflow(a);
   console.log("PASS Japanese starter deck, keyboard review, server scheduling, and reload persistence");
+  await go(a, "/app/settings", "Settings");
 
   const customGreeting = label("Alice private greeting");
   await button(a.getByLabel("Settings sections"), "General").click();

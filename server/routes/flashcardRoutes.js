@@ -64,7 +64,7 @@ router.patch("/:id", wrap(async (req, res) => {
   const updated = await FlashcardDeck.findOneAndUpdate(
     { ...query, revision: doc.revision },
     { $set: { name: next.name, cards: next.cards, revision: next.revision } },
-    { new: true, runValidators: true }
+    { returnDocument: "after", runValidators: true }
   ).lean();
   if (!updated) return res.status(409).json({ message: "This deck changed on another device. Refresh and try again." });
   res.json(present(updated));
