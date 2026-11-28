@@ -2,7 +2,7 @@ const DB_NAME =
   "studyos_guest_db";
 
 const DB_VERSION =
-  1;
+  2;
 
 const STORE_NAMES = [
   "tasks",
@@ -10,6 +10,7 @@ const STORE_NAMES = [
   "notes",
   "events",
   "studySessions",
+  "flashcardDecks",
 ];
 
 let dbPromise =
@@ -787,6 +788,29 @@ const remove =
 const clear = async storeName =>
   commitRecord(await openDb(), storeName, store => store.clear(), true);
 
+// Guest flashcard revisions are checked and committed in one transaction.
+async function mutateFlashcardDeck(id, transform) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("flashcardDecks", "readwrite");
+    const store = tx.objectStore("flashcardDecks");
+    let result, failure;
+    tx.oncomplete = () => resolve(result);
+    tx.onabort = () => reject(failure || tx.error || new Error("Deck save was cancelled."));
+    tx.onerror = () => reject(failure || tx.error);
+    const get = store.get(id);
+    get.onsuccess = () => {
+      const count = store.count();
+      count.onsuccess = () => {
+        try {
+          result = transform(get.result || null, count.result);
+          store.put(result);
+        } catch (error) { failure = error; tx.abort(); }
+      };
+    };
+  });
+}
+
 // =========================================================
 // EXPORT
 // =========================================================
@@ -797,6 +821,7 @@ export const localDb = {
   put,
   remove,
   clear,
+  mutateFlashcardDeck,
 };
 
 export default localDb;

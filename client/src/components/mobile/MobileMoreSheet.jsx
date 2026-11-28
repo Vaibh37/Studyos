@@ -4,6 +4,7 @@ import { NavLink } from "react-router";
 import {
   BarChart3,
   BookOpen,
+  Cards,
   CalendarDays,
   Check,
   ChevronRight,
@@ -18,6 +19,7 @@ import {
 export const moreItems = [
   { to: "/app/subjects", label: "Subjects", icon: BookOpen },
   { to: "/app/notes", label: "Notes", icon: FileText },
+  { to: "/app/flashcards", label: "Flashcards", icon: Cards },
   { to: "/app/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/app/progress", label: "Progress", icon: BarChart3 },
   { to: "/app/study-rooms", label: "Study Rooms", icon: GraduationCap },

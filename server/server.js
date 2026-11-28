@@ -121,6 +121,7 @@ const authRoutes =
     "./routes/authRoutes"
   );
 
+const flashcardRoutes = require("./routes/flashcardRoutes");
 const accountDeletionRoutes = require("./routes/accountDeletionRoutes");
 
 const leaderboardRoutes =
@@ -325,6 +326,7 @@ app.use("/api/security", securityAdminRoutes);
 // =========================================
 
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/flashcards", flashcardRoutes);
 
 app.use(
   "/api/tasks",

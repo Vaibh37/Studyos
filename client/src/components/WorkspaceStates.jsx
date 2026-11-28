@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const routeNames = {
   dashboard: "Dashboard", tasks: "Tasks", subjects: "Subjects",
-  notes: "Notes", calendar: "Calendar", focus: "Focus",
+  notes: "Notes", flashcards: "Flashcards", calendar: "Calendar", focus: "Focus",
   progress: "Progress", leaderboard: "Leaderboard", groups: "Study Groups",
   chats: "Chats", settings: "Settings", "study-rooms": "Study Rooms",
 };

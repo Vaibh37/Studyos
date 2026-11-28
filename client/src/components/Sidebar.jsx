@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   BarChart3,
   BookOpen,
+  Cards,
   CalendarDays,
   CheckSquare,
   FileText,
@@ -32,6 +33,7 @@ const groups = [
       ["Tasks", "/app/tasks", CheckSquare],
       ["Subjects", "/app/subjects", BookOpen],
       ["Notes", "/app/notes", FileText],
+      ["Flashcards", "/app/flashcards", Cards],
       ["Calendar", "/app/calendar", CalendarDays],
     ],
   },

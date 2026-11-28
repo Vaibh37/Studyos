@@ -9,6 +9,7 @@ const { socialDB } = require("../config/socialDb");
 const Task = require("../models/Task");
 const Subject = require("../models/Subject");
 const Note = require("../models/Note");
+const FlashcardDeck = require("../models/FlashcardDeck");
 const Event = require("../models/Event");
 const StudySession = require("../models/StudySession");
 const VisitStreak = require("../models/VisitStreak");
@@ -221,6 +222,8 @@ test("account and group deletion remove issued uploads, personal records and act
     const subj = await Subject.create({ userId: alice, name: "Alice subject" });
     await Task.create({ userId: alice, title: "Alice task" });
     await Note.create({ userId: alice, title: "Alice private note" });
+    await FlashcardDeck.create({ userId: alice, deckId: "private", name: "Alice deck" });
+    await FlashcardDeck.create({ userId: bob, deckId: "private", name: "Bob deck" });
     await Event.create({ userId: alice, title: "Alice event", date: new Date() });
     await StudySession.create({
       userId: alice, subjectId: subj._id,
@@ -251,7 +254,7 @@ test("account and group deletion remove issued uploads, personal records and act
     assert.deepEqual(removedFirebase, [alice]);
 
     for (const Model of [
-      Task, Subject, Note, Event, StudySession,
+      Task, Subject, Note, FlashcardDeck, Event, StudySession,
       VisitStreak, LeaderboardProfile, FocusRun,
     ]) {
       assert.equal(await Model.countDocuments({ userId: alice }), 0, Model.modelName);
@@ -267,6 +270,7 @@ test("account and group deletion remove issued uploads, personal records and act
     assert.equal(await GroupMember.countDocuments({ groupId, userId: bob }), 1);
     assert.equal(await GroupAttachmentUpload.countDocuments({ groupId, userId: bob }), 1);
     assert.equal(await FocusRun.countDocuments({ userId: bob }), 1);
+    assert.equal(await FlashcardDeck.countDocuments({ userId: bob }), 1);
 
     const remaining = await GroupMessage.findById(bobMessage._id).lean();
     assert.equal(remaining.message, "Bob's original message");
