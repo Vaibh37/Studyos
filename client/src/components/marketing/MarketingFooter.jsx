@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 import GithubMark from "./GithubMark";
+import { FEATURE_REQUEST_URL } from "../../services/supportLinks";
 
 const copyrightYear = new Date().getFullYear();
 
@@ -35,7 +36,7 @@ const columns = [
       ["Contact", "/contact"],
       ["Email Support", "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Support"],
       ["Report a Bug", "https://github.com/Vaibh37/Studyos/issues/new"],
-      ["Request a Feature", "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Feature%20Request"],
+      ["Request a Feature", FEATURE_REQUEST_URL],
       ["Report Abuse", "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Abuse%20Report"],
       ["System Status", "/status"],
     ],

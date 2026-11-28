@@ -221,6 +221,11 @@ async function landingJourney() {
     assert.equal(await footer.getByRole("link", { name: "Study Rooms", exact: true }).getAttribute("href"), "/help#study-rooms");
     assert.equal(await footer.getByRole("link", { name: "Cookie & Analytics Preferences", exact: true }).getAttribute("href"), "/privacy#analytics-preferences");
     assert.equal(await footer.getByRole("link", { name: "System Status", exact: true }).getAttribute("href"), "/status");
+    const featureRequest = footer.getByRole("link", { name: "Request a Feature", exact: true });
+    const featureURL = new URL(await featureRequest.getAttribute("href"));
+    assert.equal(featureURL.origin + featureURL.pathname, "https://github.com/Vaibh37/Studyos/issues/new");
+    assert.equal(featureURL.searchParams.get("title"), "Feature request: ");
+    assert.equal(await featureRequest.getAttribute("target"), "_blank");
     assert(!(await footer.innerText()).includes("All systems operational"));
     await exact(footer, "link", "Study Rooms").click();
     await visible(exact(page, "heading", "Help Center"));

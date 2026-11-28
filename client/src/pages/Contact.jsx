@@ -3,6 +3,7 @@ import { Bug, Lightbulb, Mail } from "../components/icons";
 import "../styles/marketing.css";
 
 import PublicPageShell from "../components/marketing/PublicPageShell";
+import { FEATURE_REQUEST_URL } from "../services/supportLinks";
 
 const contactOptions = [
   {
@@ -16,9 +17,10 @@ const contactOptions = [
   {
     icon: Lightbulb,
     title: "Product feedback",
-    copy: "Have a feature idea or something that feels rough? Send direct feedback about the workflow or experience.",
-    label: "Send feedback",
-    href: "mailto:devvaibhav37@gmail.com?subject=StudyOS%20Feedback",
+    copy: "Have a feature idea? Open a feature request on GitHub (a GitHub account is required), or contact support by email.",
+    label: "Request a feature",
+    href: FEATURE_REQUEST_URL,
+    external: true,
   },
   {
     icon: Mail,
