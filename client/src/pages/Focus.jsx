@@ -121,7 +121,7 @@ const formatSessionDuration = (minutes) => {
 // FOCUS
 // =========================================================
 
-function Focus() {
+function Focus({ RoomPanel = null }) {
   const {
     isGuest,
     firebaseUser,
@@ -2836,6 +2836,14 @@ function Focus() {
   const visibleSessions = showAllSessions
     ? sessions
     : sessions.slice(0, 3);
+
+  if (RoomPanel) return <RoomPanel {...{
+    isGuest, uid: firebaseUser?.uid, groups, loading, hydrated, status, remainingSeconds, elapsedSeconds,
+    subjectOptions, selectedSubjectId, setSelectedSubjectId, activeSubjectName,
+    plannedMinutes, chooseDuration, customDuration, customUnit, handleCustomDuration, handleCustomUnit,
+    savingSession, startSession, pauseSession, resumeSession, finishSession,
+    error, message, setError, zenAnchorRef, zenOpen, setZenOpen, completion, setCompletion,
+  }} />;
 
   return (
     <div className="v2f-page v2f-clean">

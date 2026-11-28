@@ -51,6 +51,7 @@ const VALID_PAGES = [
   "focus",
   "progress",
   "leaderboard",
+  "study-rooms",
   "settings",
 ];
 
@@ -78,6 +79,8 @@ const PAGE_LABELS = {
 
   leaderboard:
     "Leaderboard",
+
+  "study-rooms": "Study Rooms",
 
   settings:
     "Settings",

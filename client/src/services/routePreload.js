@@ -8,6 +8,7 @@ const loaders = {
   focus: () => import("../pages/Focus"),
   progress: () => import("../pages/Progress"),
   leaderboard: () => import("../pages/Leaderboard"),
+  "study-rooms": () => import("../pages/StudyRooms"),
   groups: () => import("../pages/Groups"),
   chats: () => import("../pages/Chats"),
   settings: () => import("../pages/Settings"),

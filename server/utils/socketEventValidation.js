@@ -5,7 +5,16 @@ const objectId = value => typeof value === "string" && /^[a-f\d]{24}$/i.test(val
 const text = (value, max) => typeof value === "string" && value.trim().length > 0 && value.length <= max;
 const optional = validator => value => value === undefined || value === null || validator(value);
 const optionalId = optional(value => value === "" || objectId(value));
+const { validRoom } = require("../socket/studyRoomSocket");
+const roomState = {
+  roomId: validRoom,
+  status: value => ["idle", "running", "paused"].includes(value),
+  subject: value => typeof value === "string" && value.length <= 80,
+};
 const fields = Object.freeze({
+  "study-room:join": roomState,
+  "study-room:state": roomState,
+  "study-room:leave": { roomId: validRoom },
   "group:join": { groupId: objectId },
   "group:typing:start": { groupId: objectId },
   "group:typing:stop": { groupId: objectId },

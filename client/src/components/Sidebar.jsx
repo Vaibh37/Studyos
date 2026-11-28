@@ -13,6 +13,7 @@ import {
   Timer,
   Trophy,
   UsersRound,
+  GraduationCap,
   X,
   PanelLeftClose,
   PanelLeftOpen,
@@ -45,6 +46,7 @@ const groups = [
   {
     label: "Community",
     items: [
+      ["Study Rooms", "/app/study-rooms", GraduationCap],
       ["Study Groups", "/app/groups", UsersRound],
       ["Chats", "/app/chats", MessageCircle],
     ],

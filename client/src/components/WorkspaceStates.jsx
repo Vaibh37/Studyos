@@ -4,7 +4,7 @@ const routeNames = {
   dashboard: "Dashboard", tasks: "Tasks", subjects: "Subjects",
   notes: "Notes", calendar: "Calendar", focus: "Focus",
   progress: "Progress", leaderboard: "Leaderboard", groups: "Study Groups",
-  chats: "Chats", settings: "Settings",
+  chats: "Chats", settings: "Settings", "study-rooms": "Study Rooms",
 };
 
 export function SkeletonBlock({ width, height, className = "" }) {
