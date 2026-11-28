@@ -3,6 +3,11 @@ import PublicPageShell from "../components/marketing/PublicPageShell";
 
 const updates = [
   {
+    date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V6 — Dynamic Environments",
+    description: "Make your study atmosphere feel alive.",
+    changes: ["Animated rain, drifting clouds, twinkling night sky and an original snowfall scene.", "Auto scenery follows your device's local day and night cycle, with gentle transitions.", "Blend four ambient sounds with independent levels and a master volume, without interrupting Focus or Shared Zen."],
+  },
+  {
     date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V5 — Living Desks",
     description: "Make your little study space your own.",
     changes: ["Customize your character, lamp, activity and desk accessories, with animated writing, reading, typing and coffee breaks.", "Unlock plants with verified Focus sessions, and share optional quiet encouragement and saved-session milestones.", "Your desk appears live in the room, shared Zen and the mini dock."],

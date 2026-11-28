@@ -103,19 +103,11 @@
 .room-environment--cloud { --room-image:url("/themes/cloud.webp"); }
 .room-environment--stargaze { --room-image:url("/themes/stargaze.webp"); }
 .room-environment--ronin { --room-image:url("/themes/ronin.webp"); }
-.room-timer:is(.room-environment--rain,.room-environment--cloud,.room-environment--stargaze,.room-environment--ronin) {
-  background:#141b21;
-  color:#f6f7f9; --room-accent:#9bdfbf;
+.room-timer[data-scene]:not([data-scene=none]) {
+  background:#141b21; color:#f6f7f9; --room-accent:#9bdfbf;
 }
-.room-timer:is(.room-environment--rain,.room-environment--cloud,.room-environment--stargaze,.room-environment--ronin)::before {
-  content:""; position:absolute; inset:0; border-radius:inherit; z-index:-1; pointer-events:none;
-  background:linear-gradient(90deg,rgba(12,17,23,.90),rgba(12,17,23,.55)),var(--room-image) center 45% / cover no-repeat;
-  background-size:cover, 108%; background-repeat:no-repeat;
-  animation:room-scenery 20s ease-in-out infinite alternate;
-}
-@keyframes room-scenery { to { background-position:center, 53% 49%; } }
-.room-timer:is(.room-environment--rain,.room-environment--cloud,.room-environment--stargaze,.room-environment--ronin) .room-timer-content > span,
-.room-timer:is(.room-environment--rain,.room-environment--cloud,.room-environment--stargaze,.room-environment--ronin) .room-self-desk { color:#e3e6ea; }
+.room-timer[data-scene]:not([data-scene=none]) .room-timer-content > span,
+.room-timer[data-scene]:not([data-scene=none]) .room-self-desk { color:#e3e6ea; }
 .room-directory-art:is(.room-environment--rain,.room-environment--cloud,.room-environment--stargaze,.room-environment--ronin) {
   background:linear-gradient(#1115,#1115),var(--room-image) center / cover no-repeat; color:white;
 }
@@ -292,4 +284,30 @@
 }
 @media(prefers-reduced-motion:reduce) {
   .room-desk-writing,.room-desk-typing,.room-desk-page-turn,.room-desk-steam,.desk-event { animation:none; }
+}
+
+/* V6 personal atmosphere settings remain in the existing room footer. */
+.room-scenery-choice { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.room-scene-phase { font-size:11px; color:var(--color-text-muted); white-space:nowrap; }
+.room-mix-count { font-variant-numeric:tabular-nums; display:grid; place-items:center; width:18px; height:18px; border-radius:4px; font-size:11px; color:var(--room-accent); background:var(--color-surface-subtle); }
+.room-sound-mixer { flex:1 0 100%; width:100%; min-width:0; padding:14px 15px; border:1px solid var(--color-border); border-radius:9px; background:var(--color-surface-subtle); }
+.room-sound-mixer header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:15px; }
+.room-sound-mixer h3 { font-size:15px; font-weight:650; color:var(--color-text); margin:0 0 4px; }
+.room-sound-mixer p { color:var(--color-text-muted); font-size:12px; line-height:1.45; margin:0; }
+.room-mixer-layers { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.room-mixer-layer { display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px; min-width:0; padding:11px; border:1px solid var(--color-border); border-radius:8px; background:var(--color-surface); color:var(--color-text); font-size:12px; font-weight:550; }
+.room-mixer-layer output,.room-mixer-master output { font-size:11px; color:var(--color-text-muted); font-variant-numeric:tabular-nums; }
+.room-mixer-layer input,.room-mixer-master input { accent-color:var(--room-accent); width:100%; min-width:0; height:24px; margin:0; }
+.room-mixer-layer input { grid-column:1/-1; }
+.room-mixer-master { border-top:1px solid var(--color-border); margin-top:12px; padding-top:12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; }
+.room-mixer-master label { display:flex; align-items:center; gap:10px; font-size:12px; font-weight:550; color:var(--color-text); }
+.room-mixer-master input { width:clamp(68px,14vw,160px); }
+.room-mixer-master > span { font-size:11px; color:var(--color-text-muted); }
+.studyos-zen-room .studyos-zen-ui button:disabled,.room-dock-sound:disabled { opacity:.5; cursor:not-allowed; }
+@media(max-width:700px) { .room-mixer-layers { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } }
+@media(max-width:400px) {
+  .room-sound-mixer { padding:12px 10px; }
+  .room-mixer-master label { width:100%; justify-content:space-between; }
+  .room-mixer-master input { flex:1; }
+  .room-mixer-layer { padding:9px; }
 }
