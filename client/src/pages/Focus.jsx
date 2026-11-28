@@ -121,7 +121,7 @@ const formatSessionDuration = (minutes) => {
 // FOCUS
 // =========================================================
 
-function Focus({ RoomPanel = null }) {
+function Focus({ RoomPanel = null, view = "focus", onRoomActive }) {
   const {
     isGuest,
     firebaseUser,
@@ -306,6 +306,9 @@ function Focus({ RoomPanel = null }) {
   const zenAnchorRef = useRef(null);
   const [zenOpen, setZenOpen] = useState(false);
   const [completion, setCompletion] = useState(null);
+
+  const startInFlightRef = useRef(false);
+  const [startingSession, setStartingSession] = useState(false);
 
   const autoFinishLockRef =
     useRef(false);
@@ -1676,12 +1679,7 @@ function Focus({ RoomPanel = null }) {
 
   const startSession =
     async () => {
-      if (
-        status !==
-        "idle"
-      ) {
-        return;
-      }
+      if (status !== "idle" || startInFlightRef.current || !hydrated || loading) return;
 
       const duration = customDuration === ""
         ? Number(plannedMinutes)
@@ -1703,6 +1701,17 @@ function Focus({ RoomPanel = null }) {
         return;
       }
 
+      startInFlightRef.current = true;
+      setStartingSession(true);
+      try {
+        await beginSession(duration);
+      } finally {
+        startInFlightRef.current = false;
+        setStartingSession(false);
+      }
+    };
+
+  const beginSession = async duration => {
       // A signed-in timer must start on the server before it can
       // earn public leaderboard credit. Guests still use local storage.
       let issuedRunId = isGuest ? createLocalId() : null;
@@ -1758,7 +1767,7 @@ function Focus({ RoomPanel = null }) {
         "General Study";
 
       const shareGroupId =
-        !isGuest &&
+        !isGuest && view === "focus" &&
         selectedShareGroup
           ? String(
               selectedShareGroup._id
@@ -2837,16 +2846,30 @@ function Focus({ RoomPanel = null }) {
     ? sessions
     : sessions.slice(0, 3);
 
-  if (RoomPanel) return <RoomPanel {...{
-    isGuest, uid: firebaseUser?.uid, groups, loading, hydrated, status, remainingSeconds, elapsedSeconds,
-    subjectOptions, selectedSubjectId, setSelectedSubjectId, activeSubjectName,
-    plannedMinutes, chooseDuration, customDuration, customUnit, handleCustomDuration, handleCustomUnit,
-    savingSession, startSession, pauseSession, resumeSession, finishSession,
-    error, message, setError, zenAnchorRef, zenOpen, setZenOpen, completion, setCompletion,
-  }} />;
+  // Keep the controller and its room child mounted while only the visible
+  // page changes. Refresh lists on return, never rehydrate a running timer.
+  const previousView = useRef(view);
+  useEffect(() => {
+    if (previousView.current === view) return;
+    previousView.current = view;
+    setZenOpen(false);
+    setOpenSessionMenu(null);
+    setSessionToDelete(null);
+    if (hydrated && view !== "background") {
+      void Promise.all([fetchSubjects(), fetchSessions(), fetchGroups()]).catch(() => {});
+    }
+  }, [view, hydrated]);
 
-  return (
-    <div className="v2f-page v2f-clean">
+  return <>
+    {RoomPanel && <RoomPanel {...{
+      isGuest, uid: firebaseUser?.uid, groups, loading, hydrated, status, remainingSeconds, elapsedSeconds,
+      subjectOptions, selectedSubjectId, setSelectedSubjectId, activeSubjectName,
+      plannedMinutes, chooseDuration, customDuration, customUnit, handleCustomDuration, handleCustomUnit,
+      savingSession, startingSession, startSession, pauseSession, resumeSession, finishSession,
+      error, message, setError, zenAnchorRef, zenOpen, setZenOpen, completion, setCompletion,
+      roomView: view === "study-rooms", onRoomActive,
+    }} />}
+    {view === "focus" && <div className="v2f-page v2f-clean">
 
       <header className="v2f-header">
         <div>
@@ -2868,7 +2891,7 @@ function Focus({ RoomPanel = null }) {
           <button
             type="button"
             className="v2f-zen-trigger"
-            disabled={loading || !hydrated || savingSession}
+            disabled={loading || !hydrated || savingSession || startingSession}
             onClick={() => setZenOpen(true)}
             aria-label="Enter Zen mode"
             aria-haspopup="dialog"
@@ -3126,6 +3149,7 @@ function Focus({ RoomPanel = null }) {
                       type="button"
                       className="v2f-primary-action"
                       onClick={startSession}
+                      disabled={startingSession}
                     >
                       <Play size={17} />
                       Start focus
@@ -3351,7 +3375,7 @@ function Focus({ RoomPanel = null }) {
           status={status}
           animate={true}
           error={error}
-          saving={savingSession || (status === "paused" && remainingSeconds <= 0)}
+          saving={savingSession || startingSession || (status === "paused" && remainingSeconds <= 0)}
           onToggle={status === "running" ? pauseSession : status === "paused" ? resumeSession : startSession}
           onClose={() => setZenOpen(false)}
         />
@@ -3467,8 +3491,8 @@ function Focus({ RoomPanel = null }) {
         </div>
       )}
 
-    </div>
-  );
+    </div>}
+  </>;
 }
 
 
