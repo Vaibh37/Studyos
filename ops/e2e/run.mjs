@@ -132,6 +132,38 @@ async function saveNote(page, title, body) {
   await saved;
   await visible(page.getByText("Saved", { exact: true }).first());
 }
+async function focusStyle(locator) {
+  return locator.evaluate(node => {
+    const style = getComputedStyle(node);
+    return { outline: style.outlineStyle, width: style.outlineWidth,
+      offset: style.outlineOffset, shadow: style.boxShadow, border: style.borderColor };
+  });
+}
+async function assertCleanTaskFocus(page, mobile = false) {
+  const title = page.getByRole("textbox", { name: "Task title", exact: true });
+  const field = page.locator(".add-task-title-field");
+  const before = await focusStyle(field);
+  if (mobile) await title.tap();
+  else await title.click();
+  for (const control of [title, field]) {
+    const style = await focusStyle(control);
+    assert.equal(style.outline, "none", "Text entry must not have an outline");
+    assert.equal(style.shadow, "none", "Text entry must not have a focus glow");
+  }
+  assert.notEqual((await focusStyle(field)).border, before.border, "Focused field must retain a visible border");
+  if (!mobile) {
+    await page.keyboard.press("Tab");
+    const current = page.locator(":focus");
+    assert.equal(await current.getAttribute("aria-label"), "Toggle task details");
+    const style = await focusStyle(current);
+    assert.equal(style.outline, "solid");
+    assert.equal(style.width, "1px");
+    assert.equal(style.offset, "-1px", "Keyboard indicator stays within the button");
+    await page.emulateMedia({ forcedColors: "active" });
+    assert.equal((await focusStyle(current)).width, "2px", "High contrast mode retains a clear indicator");
+    await page.emulateMedia({ forcedColors: "none" });
+  }
+}
 async function assertNoOverflow(page) {
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2),
     "Page has horizontal viewport overflow");
@@ -265,6 +297,7 @@ async function journeys() {
 
   const task = label("E2E task"), changedTask = task + " edited";
   await go(a, "/app/tasks", "Tasks");
+  await assertCleanTaskFocus(a);
   await responseFor(a, "POST", /^\/api\/tasks$/, async () => {
     await a.getByRole("textbox", { name: "Task title" }).fill(task);
     await button(a, "Add task").click();
@@ -445,6 +478,7 @@ async function journeys() {
   await visible(exact(m, "heading", "Tasks"));
   await assertNoOverflow(m);
   const mobileTask = label("Mobile task");
+  await assertCleanTaskFocus(m, true);
   await responseFor(m, "POST", /^\/api\/tasks$/, async () => {
     await m.getByRole("textbox", { name: "Task title" }).fill(mobileTask);
     await button(m, "Add task").click();

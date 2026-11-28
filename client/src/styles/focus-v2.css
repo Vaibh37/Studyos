@@ -829,13 +829,6 @@
   box-shadow: none;
 }
 
-/* Keep the shared accessibility ring inside this compact control so the
-   workspace edge cannot clip it on phones. */
-#root .v2f-clean .v2f-custom:has(input:focus-visible) {
-  outline-offset: -2px !important;
-  box-shadow: none;
-}
-
 .v2f-clean .v2f-unit-toggle {
   flex: 0 0 76px;
   display: grid;
@@ -872,11 +865,6 @@
   background: var(--color-surface-hover);
   color: var(--color-text);
   font-weight: 600;
-}
-
-#root .v2f-clean .v2f-unit-toggle button:focus-visible {
-  outline-offset: -2px !important;
-  box-shadow: none;
 }
 
 .v2f-clean .v2f-custom:has(input[aria-invalid="true"]) {

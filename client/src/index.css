@@ -41,33 +41,55 @@
 /* =========================================================
    GLOBAL FOCUS SYSTEM
 
-   Prevent oversized browser focus rectangles.
-   Applies to all StudyOS pages.
+   Keep focus inside the existing control, not around it.
+   Text fields use their own border and caret; keyboard navigation
+   retains a thin, theme-aware indicator on non-text controls.
    ========================================================= */
 
-/* Consistent two-pixel indicator with a contrasting outer gap. */
-body :is(input, textarea, select, [contenteditable="true"], button, a, [role="button"], [role="tab"], [role="combobox"]):focus-visible,
-#root :is(input, textarea, select, [contenteditable="true"], button, a, [role="button"], [role="tab"], [role="combobox"]):focus-visible,
-#root [tabindex]:not([tabindex="-1"]):not(input, textarea, select, button, a, [contenteditable="true"]):focus-visible {
-  outline: 2px solid var(--color-focus) !important;
-  outline-offset: 2px !important;
-}
-
-/* Grouped inputs have a single ring on their enclosing control, even
-   when a legacy page removes the individual field's border. */
-#root :is(.n3-search, .v2n-search, .v2t-search, .v2s-search, .v2f-custom,
-  .add-task-title-field, .nr-url-field, .settings-v3-unit-field, .chats-composer-input):has(:is(input, textarea):focus-visible) {
-  outline: 2px solid var(--color-focus) !important;
-  outline-offset: 2px !important;
-}
-#root :is(.n3-search, .v2n-search, .v2t-search, .v2s-search, .v2f-custom,
-  .add-task-title-field, .nr-url-field, .settings-v3-unit-field, .chats-composer-input) :is(input, textarea):focus-visible {
+:is(body, #root) :where(button, a, input, textarea, select, summary,
+  [contenteditable], [tabindex], [role="button"], [role="tab"],
+  [role="combobox"], [role="option"], [role="switch"]):focus {
   outline: none !important;
 }
-#root .n3-clean :is(.nr-document, .nr-markdown-source):focus-visible {
-  outline: 2px solid var(--color-focus) !important;
-  outline-offset: 4px !important;
+
+:is(body, #root) :where(button, a, select, summary, input:is([type="checkbox"],
+  [type="radio"], [type="range"], [type="button"], [type="submit"],
+  [type="reset"], [type="color"], [type="file"], [type="image"]),
+  [role="button"], [role="tab"], [role="combobox"], [role="option"],
+  [role="switch"], [tabindex]:not([tabindex="-1"]):not(input, textarea,
+  [contenteditable])):focus-visible {
+  outline: 1px solid currentColor !important;
+  outline-offset: -1px !important;
 }
+
+/* Text entry uses the existing border, without an outline or glow. */
+:is(body, #root) :where(input:not([type="checkbox"], [type="radio"], [type="range"],
+  [type="button"], [type="submit"], [type="reset"], [type="color"],
+  [type="file"], [type="image"]), textarea):focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+:is(body, #root) :where(input:not([type="checkbox"], [type="radio"], [type="range"],
+  [type="button"], [type="submit"], [type="reset"], [type="color"],
+  [type="file"], [type="image"]), textarea):focus:not([aria-invalid="true"]) {
+  border-color: var(--color-text-muted) !important;
+}
+
+/* Compound controls respond once, on their existing outer border. */
+:is(body, #root) :is(.n3-search, .v2n-search, .v2t-search, .v2s-search,
+  .v2s-input, .v2f-custom, .add-task-title-field, .nr-url-field,
+  .settings-v3-unit-field, .chats-search, .chats-composer-input):has(:is(input, textarea):focus) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+:is(body, #root) :is(.n3-search, .v2n-search, .v2t-search, .v2s-search,
+  .v2s-input, .v2f-custom, .add-task-title-field, .nr-url-field,
+  .settings-v3-unit-field, .chats-search, .chats-composer-input):has(:is(input, textarea):focus):not(:has([aria-invalid="true"]:focus)) {
+  border-color: var(--color-text-muted) !important;
+}
+
 #root :is(.v2t-search, .v2s-search, .n3-search, .v2f-custom) input {
   min-height: 24px !important;
 }
@@ -124,9 +146,22 @@ body:has([data-dialog-surface][aria-modal="true"]) { overflow: hidden !important
 }
 
 @media (forced-colors: active) {
-  body :is(button, a, input, textarea, select, [contenteditable="true"], [tabindex]):focus-visible,
-  #root :is(button, a, input, textarea, select, [contenteditable="true"], [tabindex]):focus-visible {
-    outline-color: Highlight !important;
+  :is(body, #root) :where(button, a, input, textarea, select, summary,
+    [contenteditable], [tabindex], [role="button"], [role="tab"],
+    [role="combobox"], [role="option"], [role="switch"]):focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: -2px !important;
+  }
+  :is(body, #root) :is(.n3-search, .v2n-search, .v2t-search, .v2s-search,
+    .v2s-input, .v2f-custom, .add-task-title-field, .nr-url-field,
+    .settings-v3-unit-field, .chats-search, .chats-composer-input):has(:is(input, textarea):focus-visible) {
+    outline: 2px solid Highlight !important;
+    outline-offset: -2px !important;
+  }
+  :is(body, #root) :is(.n3-search, .v2n-search, .v2t-search, .v2s-search,
+    .v2s-input, .v2f-custom, .add-task-title-field, .nr-url-field,
+    .settings-v3-unit-field, .chats-search, .chats-composer-input) :is(input, textarea):focus-visible {
+    outline: none !important;
   }
   #root .app-shell-v2 .task-complete-button[aria-pressed="true"] {
     color: HighlightText !important;
