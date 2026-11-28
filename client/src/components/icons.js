@@ -112,3 +112,7 @@ export { UsersIcon as UsersRound } from "@phosphor-icons/react/dist/csr/Users";
 export { XIcon as X } from "@phosphor-icons/react/dist/csr/X";
 export { XCircleIcon as XCircle } from "@phosphor-icons/react/dist/csr/XCircle";
 export { LightningIcon as Zap } from "@phosphor-icons/react/dist/csr/Lightning";
+
+export { HandWavingIcon as HandWaving } from "@phosphor-icons/react/dist/csr/HandWaving";
+
+export { ThumbsUpIcon as ThumbsUp } from "@phosphor-icons/react/dist/csr/ThumbsUp";

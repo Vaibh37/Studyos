@@ -11,6 +11,8 @@ const eventPolicies = {
   "study-room:directory:unsubscribe": [[10_000, 8], [60_000, 30]],
   "study-room:join": [[10_000, 5], [60_000, 18]],
   "study-room:state": [[10_000, 10], [60_000, 40]],
+  "study-room:desk": [[10_000, 6], [60_000, 20]],
+  "study-room:encourage": [[10_000, 2], [60_000, 5]],
   "study-room:leave": [[10_000, 8], [60_000, 30]],
   "group:join": [[10_000, 12], [60_000, 60]],
   "group:typing:start": [[10_000, 20], [60_000, 120]],

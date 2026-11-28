@@ -374,7 +374,8 @@ app.use(
 // =========================================
 
 const { createStudyRoomPresence } = require("./socket/studyRoomSocket");
-const studyRoomPresence = createStudyRoomPresence(io);
+const { loadDeskProgress } = require("./utils/studyDesk");
+const studyRoomPresence = createStudyRoomPresence(io, { loadProgress: loadDeskProgress });
 io.studyRoomPresence = studyRoomPresence;
 
 io.on(

@@ -391,6 +391,7 @@ router.post(
       res.status(201).json(
         session
       );
+      if (verifiedRun) req.app.get("io")?.studyRoomPresence?.recordSavedSession(req.user.uid, session.durationSeconds);
     } catch (error) {
       logError("CREATE STUDY SESSION ERROR:", error);
 
@@ -416,6 +417,7 @@ router.delete(
             req.user.uid,
         });
 
+      void req.app.get("io")?.studyRoomPresence?.refreshProgress(req.user.uid);
       res.status(200).json({
         message:
           "Study sessions deleted successfully",
@@ -475,6 +477,7 @@ router.delete(
           });
       }
 
+      void req.app.get("io")?.studyRoomPresence?.refreshProgress(req.user.uid);
       res.status(200).json({
         message:
           "Study session deleted successfully",

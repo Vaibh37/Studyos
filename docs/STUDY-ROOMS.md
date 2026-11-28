@@ -1,4 +1,4 @@
-# Study Rooms V4
+# Study Rooms V5
 
 Study Rooms are silent live study spaces built on the existing authenticated
 Socket.IO server and verified Focus timer. There is no webcam, microphone,
@@ -41,6 +41,18 @@ turn on subject sharing.
 - Invite copies a room link. Opening it presents an explicit join confirmation;
   signed-out users can sign in and return to the invitation. Private room
   links do not grant membership or reveal private room details to non-members.
+- Living Desks use original vector parts: character, lamp, study activity and
+  accessory. The desk is saved per account on the device and shared within the
+  joined room (including Zen). Plant and bonsai unlocks require 3 and 10 saved,
+  verified sessions of at least 20 minutes respectively. Only the owner receives
+  the capped progress count; imported or unverified history does not count.
+  Removing qualifying history can relock an accessory.
+- Optional quiet encouragement sends fixed wave and thumbs-up signals only to
+  a consenting recipient in the same room. Cross-room/self targeting and invalid
+  payloads are rejected; sender budgets and recipient cooldown limit abuse.
+  Opt-in peers see a small saved-session milestone after a verified save of at
+  least 60 seconds, without duration or subject. Desk animations respect
+  reduced motion. No reactions or milestones are stored.
 - Private-room access is checked before joining; member removal and group
   deletion revoke active access, including a membership check in flight.
 

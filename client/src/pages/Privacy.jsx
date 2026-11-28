@@ -109,7 +109,12 @@ function Privacy() {
           presence and enabled subject sharing continue when you navigate other
           StudyOS workspace pages. Leave the room or sign out to stop sharing.
           Live presence is temporary and separate from your saved study history
-          and leaderboard score.
+          and leaderboard score. Your selected desk appearance is visible in the
+          joined room and saved on your device. Accessory unlocks use qualifying
+          verified study history; the count is shown only to you. Silent
+          encouragement and shared session milestones are opt-in; reactions go
+          only to the recipient, and no subject or session duration is sent with
+          a milestone.
         </p>
       </section>
 

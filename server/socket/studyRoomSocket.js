@@ -2,6 +2,7 @@
 // All timing is measured by the server; no client-supplied user IDs or totals.
 const { randomUUID } = require("node:crypto");
 const { logError } = require("../utils/safeLogger");
+const { DESK_DEFAULT, allowedDesk, deskProgress } = require("../utils/studyDesk");
 const PUBLIC_ROOMS = new Set(["public:quiet", "public:library", "public:cloud", "public:night"]);
 const MAX_ROOM_MEMBERS = 200;
 const MAX_MEMBERS = 2000;
@@ -16,6 +17,7 @@ const validRoom = id => typeof id === "string" &&
 
 function createStudyRoomPresence(io, {
   clock = Date.now,
+  loadProgress = async () => 0,
   membership = (groupId, userId) => require("../models/social/GroupMember")
     .findOne({ groupId, userId }).select("displayName").lean(),
   directoryMembership = async (groupIds, userId) => {
@@ -39,7 +41,7 @@ function createStudyRoomPresence(io, {
     serverNow: clock(),
     participants: Array.from(rooms.get(id)?.values() || [], member => ({
       id: member.id, name: member.name, subject: member.subject, status: member.status,
-      elapsedMs: member.elapsedMs, startedAt: member.startedAt,
+      elapsedMs: member.elapsedMs, startedAt: member.startedAt, desk: member.desk,
     })),
   });
   const occupancy = id => {
@@ -78,6 +80,22 @@ function createStudyRoomPresence(io, {
     }
     member.subject = nextSubject;
     return true;
+  }
+
+  async function readProgress(uid) {
+    try { return deskProgress(await loadProgress(uid)); }
+    catch (error) { logError("STUDY DESK PROGRESS ERROR:", error); return 0; }
+  }
+  async function refreshProgress(uid) {
+    const member = users.get(uid);
+    if (!member) return;
+    const generation = ++member.progressGeneration;
+    const progress = await readProgress(uid);
+    if (users.get(uid) !== member || member.progressGeneration !== generation) return;
+    member.progress = progress;
+    member.desk = allowedDesk(member.desk, progress);
+    member.socket.emit("study-room:desk-progress", { roomId: member.roomId, progress });
+    publish(member.roomId);
   }
 
   function register(socket) {
@@ -122,14 +140,14 @@ function createStudyRoomPresence(io, {
       if (!validRoom(id)) return { ok: false, message: "Unknown study room." };
       const groupId = groupIdFor(id);
       const authorization = { groupId, uid, revoked: false };
-      let memberRecord = null;
-      if (groupId) {
-        pending.add(authorization);
-        try { memberRecord = await membership(groupId, uid); }
-        finally { pending.delete(authorization); }
-      }
-      if (!socket.connected) return { ok: false, message: "Connection closed." };
-      if (groupId && (!memberRecord || authorization.revoked)) return { ok: false, message: "You are not a member of this study group." };
+      let memberRecord = null, progress = 0;
+      pending.add(authorization);
+      try {
+        if (groupId) memberRecord = await membership(groupId, uid);
+        if (groupId && (!memberRecord || authorization.revoked)) return { ok: false, message: "You are not a member of this study group." };
+        progress = await readProgress(uid);
+      } finally { pending.delete(authorization); }
+      if (!socket.connected || authorization.revoked) return { ok: false, message: "Room access ended." };
       sweepRecent();
 
       const previous = users.get(uid);
@@ -140,8 +158,10 @@ function createStudyRoomPresence(io, {
         return { ok: false, message: "This room is full. Try another room." };
       }
       if (sameRoom && previous.socket === socket) {
-        if (setState(previous, data)) publish(id);
-        return { ok: true, participantId: previous.id, ...snapshot(id) };
+        previous.progress = progress;
+        previous.desk = allowedDesk(previous.desk, progress);
+        setState(previous, data); publish(id);
+        return { ok: true, participantId: previous.id, deskProgress: progress, ...snapshot(id) };
       }
       recent.delete(uid);
       if (previous) remove(previous, "You joined a study room from another tab or device.");
@@ -149,6 +169,7 @@ function createStudyRoomPresence(io, {
         uid, roomId: id, socket, id: randomUUID(),
         name: cleanText(memberRecord?.displayName || socket.user.name, 60) || "Student",
         status: "idle", subject: "", elapsedMs: 0, startedAt: null,
+        desk: { ...DESK_DEFAULT }, progress, progressGeneration: 0, lastEncouragementAt: -Infinity,
       };
       if (sameRoom) {
         member.id = previous.id;
@@ -164,12 +185,32 @@ function createStudyRoomPresence(io, {
       users.set(uid, member);
       socket.join(roomChannel(id));
       publish(id);
-      return { ok: true, participantId: member.id, ...snapshot(id) };
+      return { ok: true, participantId: member.id, deskProgress: progress, ...snapshot(id) };
     });
     on("study-room:state", data => {
       const member = ownMember(data.roomId);
       if (!member) return { ok: false, message: "Join the room first." };
       if (setState(member, data)) publish(member.roomId);
+      return { ok: true };
+    });
+    on("study-room:desk", data => {
+      const member = ownMember(data.roomId);
+      if (!member) return { ok: false, message: "Join the room first." };
+      const desk = allowedDesk(data, member.progress);
+      const changed = Object.keys(desk).some(key => desk[key] !== member.desk[key]);
+      member.desk = desk;
+      if (changed) publish(member.roomId);
+      return { ok: true, desk };
+    });
+    on("study-room:encourage", data => {
+      const member = ownMember(data.roomId);
+      if (!member) return { ok: false, message: "Join the room first." };
+      const target = Array.from(rooms.get(member.roomId)?.values() || []).find(item => item.id === data.participantId);
+      if (!target || target === member || !target.desk.encouragement || !target.socket.connected)
+        return { ok: false, message: "This desk cannot receive encouragement." };
+      if (clock() - target.lastEncouragementAt < 8000) return { ok: false, message: "Give this desk a little quiet time." };
+      target.lastEncouragementAt = clock();
+      target.socket.emit("study-room:encouragement", { roomId: member.roomId, participantId: member.id, kind: data.kind, id: randomUUID() });
       return { ok: true };
     });
     on("study-room:leave", data => {
@@ -191,6 +232,19 @@ function createStudyRoomPresence(io, {
 
   return {
     register,
+    refreshProgress,
+    // Called by the verified session save route only, never a client event.
+    recordSavedSession(uid, seconds) {
+      const member = users.get(uid);
+      if (!member) return;
+      if (seconds >= 60) {
+        for (const recipient of rooms.get(member.roomId)?.values() || []) {
+          if (recipient === member || (member.desk.encouragement && recipient.desk.encouragement))
+            recipient.socket.emit("study-room:milestone", { roomId: member.roomId, participantId: member.id, id: randomUUID() });
+        }
+      }
+      if (seconds >= 20 * 60) void refreshProgress(uid);
+    },
     removeAccount(uid) {
       const userId = String(uid);
       recent.delete(userId);

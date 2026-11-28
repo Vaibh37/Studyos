@@ -6,6 +6,7 @@ const text = (value, max) => typeof value === "string" && value.trim().length > 
 const optional = validator => value => value === undefined || value === null || validator(value);
 const optionalId = optional(value => value === "" || objectId(value));
 const { validRoom } = require("../socket/studyRoomSocket");
+const { deskOptions } = require("./studyDesk");
 const roomState = {
   roomId: validRoom,
   status: value => ["idle", "running", "paused"].includes(value),
@@ -16,6 +17,15 @@ const fields = Object.freeze({
   "study-room:directory:unsubscribe": {},
   "study-room:join": roomState,
   "study-room:state": roomState,
+  "study-room:desk": {
+    roomId: validRoom, ...Object.fromEntries(Object.entries(deskOptions).map(([key, values]) => [key, value => values.includes(value)])),
+    encouragement: value => typeof value === "boolean",
+  },
+  "study-room:encourage": {
+    roomId: validRoom,
+    participantId: value => typeof value === "string" && /^[a-f0-9-]{36}$/.test(value),
+    kind: value => ["wave", "thumb"].includes(value),
+  },
   "study-room:leave": { roomId: validRoom },
   "group:join": { groupId: objectId },
   "group:typing:start": { groupId: objectId },
