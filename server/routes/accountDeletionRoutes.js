@@ -6,6 +6,7 @@ const adminAuth = require("../config/firebaseAdmin");
 const Task = require("../models/Task");
 const Subject = require("../models/Subject");
 const Note = require("../models/Note");
+const FlashcardDeck = require("../models/FlashcardDeck");
 const Event = require("../models/Event");
 const StudySession = require("../models/StudySession");
 const VisitStreak = require("../models/VisitStreak");
@@ -148,7 +149,7 @@ router.delete("/", firebaseAuth, async (req, res) => {
     }
 
     const models = [
-      Task, Subject, Note, Event,
+      Task, Subject, Note, FlashcardDeck, Event,
       StudySession, VisitStreak, LeaderboardProfile, FocusRun
     ];
 

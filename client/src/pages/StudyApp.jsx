@@ -67,6 +67,7 @@ const VALID_PAGES = [
   "tasks",
   "subjects",
   "notes",
+  "flashcards",
   "calendar",
   "focus",
   "progress",
@@ -87,6 +88,8 @@ const PAGE_LABELS = {
 
   notes:
     "Notes",
+
+  flashcards: "Flashcards",
 
   calendar:
     "Calendar",
@@ -119,7 +122,7 @@ const getSnapshotCount =
       snapshot.subjects.length +
       snapshot.notes.length +
       snapshot.events.length +
-      snapshot.studySessions.length
+      snapshot.studySessions.length + snapshot.flashcardDecks.length
     );
   };
 
@@ -182,6 +185,7 @@ const buildGuestSignature =
         normalize(
           snapshot.studySessions
         ),
+      flashcardDecks: normalize(snapshot.flashcardDecks),
     });
   };
 

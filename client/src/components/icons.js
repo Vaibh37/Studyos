@@ -15,6 +15,8 @@ export { SealCheckIcon as BadgeCheck } from "@phosphor-icons/react/dist/csr/Seal
 export { ChartBarIcon as BarChart3 } from "@phosphor-icons/react/dist/csr/ChartBar";
 export { BellIcon as Bell } from "@phosphor-icons/react/dist/csr/Bell";
 export { TextBIcon as Bold } from "@phosphor-icons/react/dist/csr/TextB";
+export { CardsIcon as Cards } from "@phosphor-icons/react/dist/csr/Cards";
+export { SpeakerHighIcon as Speaker } from "@phosphor-icons/react/dist/csr/SpeakerHigh";
 export { BookOpenIcon as BookOpen } from "@phosphor-icons/react/dist/csr/BookOpen";
 export { BugIcon as Bug } from "@phosphor-icons/react/dist/csr/Bug";
 export { CalendarCheckIcon as CalendarCheck2 } from "@phosphor-icons/react/dist/csr/CalendarCheck";

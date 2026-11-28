@@ -1,3 +1,4 @@
+import { clearDecks, exportDecks, restoreDecks } from "../services/flashcards";
 import { applyTheme, readTheme, saveTheme, ILLUSTRATED_THEMES } from "../services/theme";
 import { readProfileName, writeProfileName, clearProfileName } from "../services/profileName";
 import { noteDrafts, GUEST_DRAFT_SCOPE } from "../services/noteDrafts";
@@ -1076,6 +1077,8 @@ function Settings() {
           }
         );
 
+        const flashcardDecks = await exportDecks(isGuest);
+
         const backup = {
           app:
             "StudyOS",
@@ -1095,6 +1098,7 @@ function Settings() {
             notes,
             events,
             studySessions,
+            flashcardDecks,
           },
         };
 
@@ -1258,6 +1262,7 @@ function Settings() {
           notes = [],
           events = [],
           studySessions = [],
+          flashcardDecks = [],
         } =
           pendingBackup.data;
 
@@ -1642,6 +1647,8 @@ function Settings() {
           );
         }
 
+        if (flashcardDecks.length) await restoreDecks(isGuest, flashcardDecks);
+
         // =================================================
         // PREFERENCES
         // =================================================
@@ -2008,6 +2015,7 @@ function Settings() {
         );
 
         await Promise.all([
+          clearDecks(isGuest),
           deleteCollection(
             "tasks",
             "tasks"
@@ -3533,7 +3541,7 @@ function Settings() {
 
                     <span>
                       Downloads tasks,
-                      subjects, notes,
+                      subjects, notes, flashcards,
                       events, Focus
                       sessions and
                       preferences.
@@ -4093,7 +4101,7 @@ function Settings() {
 
             <p>
               This permanently deletes
-              every task, subject, note,
+              every task, subject, note, flashcard deck,
               calendar event and Focus
               session currently stored
               by StudyOS.

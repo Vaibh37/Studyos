@@ -211,6 +211,16 @@ Save and organize study information.
 - Sort by different properties
 - Responsive mobile editor
 
+### Flashcards
+
+- Spaced repetition with Again, Hard, Good and Easy ratings, due-card scheduling, and review progress.
+- Japanese starter library: 230 cards across Hiragana, Katakana, N5 vocabulary, kanji, and grammar.
+- Create private decks for any subject, edit/search cards, and import tab-separated lists.
+- Keyboard shortcuts (Space to reveal, 1–4 to rate) and Japanese pronunciation using installed device voices.
+- Account-scoped synchronization with revision conflict protection; guest decks stay in IndexedDB and can migrate into an account.
+- Flashcard decks and review state are included in JSON backups and data/account deletion.
+- The starter selections are not a complete JLPT syllabus. The scheduler is a lightweight spaced-repetition implementation, not Anki's FSRS algorithm.
+
 ### Calendar
 
 Manage scheduled work and review previous activity.

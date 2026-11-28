@@ -92,6 +92,7 @@ const Tasks = lazy(() => loadWorkspacePage("tasks"));
 const Subjects = lazy(() => loadWorkspacePage("subjects"));
 
 const Notes = lazy(() => loadWorkspacePage("notes"));
+const Flashcards = lazy(() => loadWorkspacePage("flashcards"));
 
 const Calendar = lazy(() => loadWorkspacePage("calendar"));
 
@@ -482,6 +483,8 @@ function App() {
                 <Notes />
               }
             />
+
+            <Route path="flashcards" element={<Flashcards />} />
 
             <Route
               path="calendar"

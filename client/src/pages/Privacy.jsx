@@ -24,7 +24,7 @@ function Privacy() {
         <p>Depending on the mode and features you use, information may include:</p>
         <ul>
           <li>Account and profile data: user identifier, display name, email address and authentication information.</li>
-          <li>Workspace data: tasks, subjects, notes, calendar events, focus activity, study and visit streaks, XP and preferences you save.</li>
+          <li>Workspace data: tasks, subjects, notes, flashcards and review progress, calendar events, focus activity, study and visit streaks, XP and preferences you save.</li>
           <li>Collaboration data: group memberships, messages, reactions, attachments, room presence and eligible shared study activity.</li>
           <li>Technical data: request and device information, IP addresses, security events and optional public-site analytics as described below.</li>
         </ul>
@@ -63,7 +63,7 @@ function Privacy() {
       <section>
         <h2>4. Guest Mode</h2>
         <p>
-          Guest Mode does not require an account. Tasks, subjects, notes, calendar
+          Guest Mode does not require an account. Tasks, subjects, notes, flashcards, calendar
           events and Focus-session data created as a guest are stored in IndexedDB
           in the browser you are using. Clearing browser/site data can remove this
           local data.
@@ -79,7 +79,7 @@ function Privacy() {
         <h2>5. Leaderboard privacy</h2>
         <p>
           Leaderboard participation is opt-in. StudyOS does not publish your email,
-          tasks, notes, subject content or calendar details on the leaderboard.
+          tasks, notes, flashcards, subject content or calendar details on the leaderboard.
           Public leaderboard information can include your chosen public display
           name, ranking and aggregate StudyOS activity used to calculate ranking.
         </p>

@@ -34,7 +34,7 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
     if (
       request === "../middleware/firebaseAuth" &&
       ["noteRoutes.js", "taskRoutes.js", "subjectRoutes.js",
-       "eventRoutes.js", "studySessionRoutes.js", "dashboardRoutes.js"].some(
+       "eventRoutes.js", "studySessionRoutes.js", "dashboardRoutes.js", "flashcardRoutes.js"].some(
          (name) => parent?.filename?.endsWith(name))
     ) {
       return fakeFirebase;
@@ -47,6 +47,7 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
     routers = {
       dashboard: require("../routes/dashboardRoutes"),
       notes: require("../routes/noteRoutes"),
+      flashcards: require("../routes/flashcardRoutes"),
       tasks: require("../routes/taskRoutes"),
       subjects: require("../routes/subjectRoutes"),
       events: require("../routes/eventRoutes"),
@@ -60,6 +61,7 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
   app.use(express.json());
   app.use("/api/dashboard", routers.dashboard);
   app.use("/api/notes", routers.notes);
+  app.use("/api/flashcards", routers.flashcards);
   app.use("/api/tasks", routers.tasks);
   app.use("/api/subjects", routers.subjects);
   app.use("/api/events", routers.events);
@@ -87,6 +89,31 @@ test("private notes, tasks, subjects, events and sessions enforce owner scope wi
     assert.equal((await call("guest", "/api/notes")).status, 401);
     assert.equal((await call("guest", "/api/tasks")).status, 401);
     assert.equal((await call("guest", "/api/events")).status, 401);
+
+    const deckUrl = "/api/flashcards";
+    const deckPayload = { _id: "private-cards", name: "Japanese", language: "ja",
+      cards: [{ id: "one", front: "あ", back: "a" }], userId: bob };
+    assert.equal((await call("guest", deckUrl)).status, 401);
+    const deck = await call(alice, deckUrl, "POST", deckPayload);
+    assert.equal(deck.status, 201, JSON.stringify(deck.body));
+    assert.equal(deck.body.revision, 0);
+    assert.equal((await call(alice, deckUrl)).body[0].stats.new, 1);
+    assert.deepEqual((await call(bob, deckUrl)).body, []);
+    const url = deckUrl + "/private-cards";
+    assert.equal((await call(bob, url)).status, 404);
+    assert.equal((await call(bob, url, "PATCH", { action: "rename", name: "Stolen", revision: 0 })).status, 404);
+    assert.equal((await call(bob, url, "DELETE")).status, 404);
+    const reviewed = await call(alice, url, "PATCH", { action: "review", cardId: "one", rating: "good", revision: 0 });
+    assert.equal(reviewed.status, 200, JSON.stringify(reviewed.body));
+    assert.equal(reviewed.body.cards[0].reviews, 1);
+    assert.equal(reviewed.body.cards[0].stage, "learning");
+    assert.equal((await call(alice, url, "PATCH", { action: "review", cardId: "one", rating: "easy", revision: 0 })).status, 409);
+    assert.equal((await call(alice, url, "PATCH", { action: "review", cardId: "one", rating: "easy", revision: 1 })).status, 409);
+    assert.equal((await call(alice, deckUrl, "POST", deckPayload)).body.revision, 1);
+    assert.equal((await call(bob, deckUrl, "POST", { ...deckPayload, name: "Bob's deck" })).status, 201);
+    assert.equal((await call(alice, deckUrl, "DELETE")).status, 200);
+    assert.equal((await call(bob, url)).body.name, "Bob's deck");
+    assert.equal((await call(alice, url)).status, 404);
 
     const aliceSubject = await call(alice, "/api/subjects", "POST", {
       name: "Alice private subject", color: "#123456",

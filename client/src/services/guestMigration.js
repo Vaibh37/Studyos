@@ -1,3 +1,4 @@
+import { restoreDecks } from "./flashcards";
 import apiRequest from "./api";
 
 import {
@@ -22,6 +23,7 @@ const GUEST_STORES = [
   "notes",
   "events",
   "studySessions",
+  "flashcardDecks",
 ];
 
 // =========================================================
@@ -36,6 +38,7 @@ export const getGuestDataSnapshot =
       notes,
       events,
       studySessions,
+      flashcardDecks,
     ] = await Promise.all([
       localDb.getAll(
         "tasks"
@@ -56,6 +59,7 @@ export const getGuestDataSnapshot =
       localDb.getAll(
         "studySessions"
       ),
+      localDb.getAll("flashcardDecks"),
     ]);
 
     return {
@@ -85,6 +89,7 @@ export const getGuestDataSnapshot =
         )
           ? studySessions
           : [],
+      flashcardDecks: Array.isArray(flashcardDecks) ? flashcardDecks : [],
     };
   };
 
@@ -102,7 +107,7 @@ export const getGuestDataCount =
       data.subjects.length +
       data.notes.length +
       data.events.length +
-      data.studySessions.length
+      data.studySessions.length + data.flashcardDecks.length
     );
   };
 
@@ -149,7 +154,7 @@ export const migrateGuestDataToAccount =
       guestData.subjects.length +
       guestData.notes.length +
       guestData.events.length +
-      guestData.studySessions.length;
+      guestData.studySessions.length + guestData.flashcardDecks.length;
 
     if (totalItems === 0) {
       return {
@@ -162,6 +167,7 @@ export const migrateGuestDataToAccount =
           notes: 0,
           events: 0,
           studySessions: 0,
+          flashcardDecks: 0,
         },
       };
     }
@@ -175,6 +181,7 @@ export const migrateGuestDataToAccount =
       notes: 0,
       events: 0,
       studySessions: 0,
+      flashcardDecks: 0,
     };
 
     // =====================================================
@@ -458,6 +465,11 @@ export const migrateGuestDataToAccount =
     // =====================================================
     // CLEAR GUEST DATA ONLY AFTER FULL SUCCESS
     // =====================================================
+
+    if (guestData.flashcardDecks.length) {
+      await restoreDecks(false, guestData.flashcardDecks, { migration: true });
+      migratedCounts.flashcardDecks = guestData.flashcardDecks.length;
+    }
 
     if (clearAfterSuccess) {
       await clearGuestData();

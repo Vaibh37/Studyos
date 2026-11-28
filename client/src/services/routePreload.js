@@ -4,6 +4,7 @@ const loaders = {
   tasks: () => import("../pages/Tasks"),
   subjects: () => import("../pages/Subjects"),
   notes: () => import("../pages/Notes"),
+  flashcards: () => import("../pages/Flashcards"),
   calendar: () => import("../pages/Calendar"),
   focus: () => import("../pages/Focus"),
   progress: () => import("../pages/Progress"),

@@ -386,6 +386,28 @@ async function journeys() {
   await a.reload({ waitUntil: "domcontentloaded" });
   await visible(a.getByText(alice.email, { exact: true }));
   console.log("PASS registration and Firebase session restoration");
+  await go(a, "/app/flashcards", "Flashcards");
+  const hiraganaPack = a.locator(".fc-pack").filter({ has: a.getByRole("heading", { name: "Hiragana", exact: true }) });
+  await responseFor(a, "POST", /^\/api\/flashcards$/, () => button(hiraganaPack, "Add deck").click());
+  await visible(a.locator(".fc-card-row").first());
+  assert.equal(await a.locator(".fc-card-row").count(), 46);
+  await button(a, "Start review").click();
+  await visible(a.locator(".fc-review-front"));
+  assert.equal(await a.locator(".fc-review-front").textContent(), "あ");
+  await a.keyboard.press("Space");
+  await visible(a.locator(".fc-answer"));
+  assert.equal(await a.locator(".fc-answer").textContent(), "a");
+  await responseFor(a, "PATCH", /^\/api\/flashcards\/ja-hiragana$/, () => a.keyboard.press("4"));
+  await a.waitForFunction(() => document.querySelector(".fc-review-front")?.textContent === "い");
+  await a.reload({ waitUntil: "domcontentloaded" });
+  const hiraganaDeck = a.locator(".fc-deck-main").filter({ hasText: "Hiragana" });
+  await visible(hiraganaDeck);
+  await hiraganaDeck.click();
+  await visible(a.locator(".fc-card-row").first().getByText("In 4d", { exact: true }));
+  await assertNoOverflow(a);
+  console.log("PASS Japanese starter deck, keyboard review, server scheduling, and reload persistence");
+  await go(a, "/app/settings", "Settings");
+
   const customGreeting = label("Alice private greeting");
   await button(a.getByLabel("Settings sections"), "General").click();
   await a.getByPlaceholder("Enter your name").fill(customGreeting);
