@@ -214,7 +214,7 @@ Save and organize study information.
 ### Flashcards
 
 - Spaced repetition with Again, Hard, Good and Easy ratings, due-card scheduling, and review progress.
-- Japanese starter library: 230 cards across Hiragana, Katakana, N5 vocabulary, kanji, and grammar.
+- Optional Japanese starter library (hidden until users choose Browse starter decks): 230 cards across Hiragana, Katakana, N5 vocabulary, kanji, and grammar.
 - Create private decks for any subject, edit/search cards, and import tab-separated lists.
 - Keyboard shortcuts (Space to reveal, 1–4 to rate) and Japanese pronunciation using installed device voices.
 - Account-scoped synchronization with revision conflict protection; guest decks stay in IndexedDB and can migrate into an account.

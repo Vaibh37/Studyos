@@ -32,6 +32,7 @@ function ProgressLine({ stats }) {
 
 function FlashcardsWorkspace({ guest }) {
   const [decks, setDecks] = useState(null);
+  const [starterOpen, setStarterOpen] = useState(false);
   const [deck, setDeck] = useState(null);
   const [session, setSession] = useState(null);
   const [revealed, setRevealed] = useState(false);
@@ -134,7 +135,7 @@ function FlashcardsWorkspace({ guest }) {
   function addStarter(pack) {
     void run(async () => {
       const value = await createDeck(guest, { _id: pack.id, name: pack.name, language: "ja", cards: pack.cards });
-      remember(value); setSearch(""); setSession(null); setStale(false);
+      remember(value); setSearch(""); setSession(null); setStale(false); setStarterOpen(false);
     });
   }
   function saveDialog(event) {
@@ -255,16 +256,24 @@ function FlashcardsWorkspace({ guest }) {
           </button>
           <div className="fc-deck-stats"><span><strong>{item.stats.due}</strong> due</span><span><strong>{item.stats.new}</strong> new</span><ProgressLine stats={item.stats} /></div>
           <button type="button" className="fc-button" onClick={() => open(item._id, true)} disabled={busy || !readyCount(item.stats)}>Study <ArrowRight size={16} /></button>
-        </div>)}</div> : <div className="fc-empty"><Cards size={30} /><h3>Your first deck awaits</h3><p>Create your own deck or add a Japanese starter deck below.</p><button className="fc-button" type="button" disabled={busy} onClick={() => showDialog("deck")}><Plus size={17} /> Create deck</button></div>}
+        </div>)}</div> : <div className="fc-empty"><Cards size={30} /><h3>Your first deck awaits</h3><p>Create your first deck for any subject, or browse optional starter decks.</p><button className="fc-button" type="button" disabled={busy} onClick={() => showDialog("deck")}><Plus size={17} /> Create deck</button></div>}
       </section>
       {availablePacks.length > 0 && <section className="fc-section">
-        <div className="fc-section-head"><div><h2>Japanese starter library</h2><p>Start with kana, then build your vocabulary for JLPT N5.</p></div><span>{availablePacks.length} available</span></div>
+        <div className="fc-starter-disclosure">
+          <div><h2>Starter decks</h2><p>Explore optional study packs and add only the ones you need.</p></div>
+          <button type="button" className="fc-button" aria-expanded={starterOpen} aria-controls="fc-starter-library" onClick={() => setStarterOpen(open => !open)}>{starterOpen ? "Close library" : "Browse starter decks"} {starterOpen ? <X size={16} /> : <ArrowRight size={16} />}</button>
+        </div>
+        <div id="fc-starter-library" className="fc-starter-library" hidden={!starterOpen}>
+        {starterOpen && <>
+        <div className="fc-section-head"><div><h3>Japanese</h3><p>Start with kana, then build your vocabulary for JLPT N5.</p></div><span>{availablePacks.length} available</span></div>
         <div className="fc-packs">{availablePacks.map(pack => <article className="fc-pack" key={pack.id}>
           <span className="fc-pack-mark" lang="ja">{pack.mark}</span>
           <div className="fc-pack-copy"><h3>{pack.name}</h3><p>{pack.description}</p></div>
           <div className="fc-pack-bottom"><span>{pack.cards.length} cards</span><button className="fc-button" type="button" disabled={busy || stale} onClick={() => addStarter(pack)}><Plus size={16} /> Add deck</button></div>
         </article>)}</div>
         <p className="fc-footnote">Starter selections are not exhaustive JLPT syllabi.</p>
+        </>}
+        </div>
       </section>}
       <p className="fc-footnote">{guest ? "Guest decks are saved on this device. Sign in to sync across devices." : "Your decks and review progress are private and synced to your account."}</p>
     </>}
