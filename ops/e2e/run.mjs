@@ -261,29 +261,59 @@ async function onboardingJourney() {
     await button(page, "Continue as Guest").click();
     const tour = page.locator(".workspace-tour");
     await visible(tour.getByRole("heading", { name: "Welcome to StudyOS" }));
-    const preview = tour.locator(".workspace-tour-preview");
-    await visible(preview.locator(".tour-plan-preview"));
-    assert.equal(await preview.getAttribute("aria-hidden"), "true", "Illustration must not add fake interactive controls to the tour");
-    assert((await preview.innerText()).includes("Example preview"), "Sample study information must be labelled");
+    await visible(tour.getByText("Practice environment · Nothing is saved to your study records"));
     assert(await page.locator(".app-shell-v2").evaluate(node => node.inert), "Tour must make the workspace inert");
     assert.equal(await page.locator(".sf2-stage").count(), 0, "Streak celebration must not cover the tour");
     await assertNoOverflow(page);
+    await button(tour, "Review one topic To do").click();
+    assert.equal(await button(tour, "Review one topic Done").getAttribute("aria-pressed"), "true");
+    await tour.getByRole("textbox", { name: "Practice task title" }).fill("Practice test");
+    await button(tour, "Add practice task").click();
+    await button(tour, "Practice test To do").click();
+    await visible(tour.getByText("2 tasks checked off. That's progress."));
     await button(tour, "Continue").click();
     await visible(tour.getByRole("heading", { name: "Find your focus" }));
-    await visible(preview.locator(".tour-focus-dial"));
     await visible(tour.getByText("Sign in to join live rooms.", { exact: false }));
+    await button(tour, "Start practice").click();
+    await delay(1250);
+    await button(tour, "Pause").click();
+    await visible(tour.getByText("Paused", { exact: true }));
+    const remaining = await tour.getByRole("timer").textContent();
+    await delay(600);
+    assert.equal(await tour.getByRole("timer").textContent(), remaining, "Paused timer must not advance");
+    await button(tour, "Resume").click();
+    await visible(tour.getByText("Session complete", { exact: true }), 7000);
     await button(tour, "Back").click();
     await visible(tour.getByRole("heading", { name: "Welcome to StudyOS" }));
+    await visible(tour.getByText("2 tasks checked off. That's progress."));
     await button(tour, "Continue").click();
+    await visible(tour.getByText("Session complete", { exact: true }));
     await button(tour, "Continue").click();
     await visible(tour.getByRole("heading", { name: "See how far you've come" }));
-    await visible(preview.locator(".tour-review-chart"));
-    assert.equal(await tour.locator(".workspace-tour-progress-bars .is-filled").count(), 3);
+    assert.equal(await tour.getByRole("progressbar", { name: "Tour progress" }).getAttribute("aria-valuenow"), "3");
+    assert.equal(await tour.locator(".journey-result-face strong").textContent(), "2/2");
+    await button(tour, "Focus 5s").click();
+    assert.equal(await tour.locator(".journey-result-face strong").textContent(), "5s");
     await visible(tour.getByText("Your guest study data stays in this browser.", { exact: false }));
     await assertNoOverflow(page);
     await button(tour, "Done").click();
     await absent(tour);
     assert.equal(await page.evaluate(() => localStorage.getItem("studyos_onboarding_v1:guest")), "completed");
+    const practiceCounts = await page.evaluate(async () => {
+      const db = await new Promise((resolve, reject) => {
+        const request = indexedDB.open("studyos_guest_db");
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = reject;
+      });
+      try {
+        return await Promise.all(["tasks", "studySessions"].map(name => new Promise((resolve, reject) => {
+          const request = db.transaction(name).objectStore(name).count();
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = reject;
+        })));
+      } finally { db.close(); }
+    });
+    assert.deepEqual(practiceCounts, [0, 0], "Practice activity must never be saved as real study data");
     await page.reload({ waitUntil: "domcontentloaded" });
     await visible(page.getByRole("main"));
     await absent(tour);
@@ -297,7 +327,7 @@ async function onboardingJourney() {
     assert.equal(await page.evaluate(() => document.activeElement.textContent.trim()), "Replay tour");
     await context.close();
   }
-  console.log("PASS guest first-run tour, step navigation, accessible dismissal, replay and persisted completion");
+  console.log("PASS interactive guest first-run tour, task practice, live timer, recap, isolated practice data, dismissal, replay and completion");
 }
 
 async function privacyJourney() {

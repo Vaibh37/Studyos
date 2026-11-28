@@ -1,208 +1,310 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import DialogSurface from "./DialogSurface";
 import {
-  ArrowLeft, ArrowRight, BarChart3, BookOpen, Check, Cloud, FileText,
-  HardDrive, LayoutDashboard, ListChecks, Plus, Timer, UsersRound, Play,
+  ArrowLeft, ArrowRight, Check, Cloud, HardDrive,
+  ListChecks, Pause, Play, Plus, RotateCcw, Timer,
 } from "./icons";
 import "./WorkspaceOnboarding.css";
 
-const steps = [
-  {
-    name: "Plan",
-    title: "Welcome to StudyOS",
-    description: "Give everything you need to study a place of its own.",
-    items: [
-      [ListChecks, "Plan your tasks", "Set deadlines and work through your list."],
-      [BookOpen, "Organize your subjects", "Keep related work together."],
-      [FileText, "Capture your notes", "Keep ideas and revision material close."],
-    ],
-  },
-  {
-    name: "Focus",
-    title: "Find your focus",
-    description: "Make time for the work that matters. One session at a time.",
-    items: [
-      [Timer, "Start a focus session", "Choose a duration, take breaks and record completed sessions."],
-      [UsersRound, "Study Rooms", "Join a live room and focus alongside other students.", "Sign in to join live rooms. You can still use the focus timer as a guest."],
-    ],
-  },
-  {
-    name: "Review",
-    title: "See how far you've come",
-    description: "Build a clearer picture of how you study, one week at a time.",
-    items: [
-      [LayoutDashboard, "Dashboard", "See upcoming work and recent activity."],
-      [BarChart3, "Progress", "Review focus time and study trends."],
-    ],
-  },
+const chapters = [
+  { name: "Plan", title: "Welcome to StudyOS", description: "Everything starts with one clear task." },
+  { name: "Focus", title: "Find your focus", description: "Give one thing your full attention." },
+  { name: "Review", title: "See how far you've come", description: "Every small action is part of your progress." },
 ];
+const PRACTICE_MS = 5000;
+const INITIAL_TASKS = [{ id: 1, title: "Review one topic", done: false }];
 
-// These illustrations are deliberately independent of the user's records:
-// static, clearly labelled examples, not interactive controls or live stats.
-function PlanPreview() {
+function formatClock(ms) {
+  const seconds = Math.ceil(Math.max(0, ms) / 1000);
+  return "00:" + String(seconds).padStart(2, "0");
+}
+
+// A single continuous stage. The orbit changes its perspective and lighting
+// with each chapter rather than introducing unrelated static illustrations.
+const SceneArchitecture = memo(function SceneArchitecture({ index, energized, accomplished }) {
   return (
-    <div className="tour-plan-preview">
-      <div className="tour-example-window">
-        <div className="tour-example-window-top">
-          <span><ListChecks size={15} /> Tasks</span>
-          <Plus size={15} />
-        </div>
-        <div className="tour-example-window-body">
-          <div className="tour-plan-heading">
-            <strong>Today's tasks</strong>
-            <span>1 of 3</span>
+    <div className={`journey-architecture scene-${index}${energized ? " is-energized" : ""}${accomplished ? " is-accomplished" : ""}`} aria-hidden="true">
+      <div className="journey-light" />
+      <svg className="journey-orbit" viewBox="0 0 900 660" fill="none">
+        <g className="journey-orbit-plane">
+          {[100, 147, 194, 241, 288, 335].map((radius, i) => (
+            <circle key={radius} cx="450" cy="330" r={radius} opacity={1 - i * 0.11} />
+          ))}
+          {Array.from({ length: 48 }, (_, i) => {
+            const angle = i * Math.PI / 24;
+            const r1 = i % 4 === 0 ? 298 : 311, r2 = 325;
+            return <line key={i}
+              x1={450 + r1 * Math.cos(angle)} y1={330 + r1 * Math.sin(angle)}
+              x2={450 + r2 * Math.cos(angle)} y2={330 + r2 * Math.sin(angle)} />;
+          })}
+          <circle className="orbit-sweep" cx="450" cy="330" r="288" pathLength="100" strokeDasharray="14 86" />
+          <circle className="orbit-sweep orbit-sweep-inner" cx="450" cy="330" r="194" pathLength="100" strokeDasharray="9 91" />
+          <path className="orbit-cross" d="M20 330H880M450 0V660" />
+        </g>
+      </svg>
+      <div className="journey-horizon" />
+      <span className="journey-coordinate coordinate-left">S / 0{index + 1}</span>
+      <span className="journey-coordinate coordinate-right">StudyOS</span>
+    </div>
+  );
+});
+
+function CompletionPulse({ active }) {
+  if (!active) return null;
+  return <div className="journey-completion-pulse" aria-hidden="true">
+    {Array.from({ length: 12 }, (_, i) => <i key={i} style={{ "--ray": (i * 30) + "deg" }} />)}
+  </div>;
+}
+
+function PlanScene({ tasks, setTasks, completed }) {
+  const [draft, setDraft] = useState("");
+  const inputRef = useRef(null);
+  const id = useRef(Math.max(0, ...tasks.map(task => task.id)) + 1);
+  function addTask(event) {
+    event.preventDefault();
+    const title = draft.trim();
+    if (!title || tasks.length >= 4) return;
+    const task = { id: id.current++, title, done: false };
+    setTasks(current => current.length < 4 ? [...current, task] : current);
+    setDraft("");
+    inputRef.current?.focus();
+  }
+  return (
+    <div className="journey-plan journey-stage-content">
+      <div className="journey-object">
+        <div className="journey-plan-depth" aria-hidden="true" />
+        <section className="journey-task-board" aria-label="Practice task list">
+          <header className="journey-board-header">
+            <div><ListChecks size={19} aria-hidden="true" /><strong>Your first plan</strong></div>
+            <span>{completed}/{tasks.length}</span>
+          </header>
+          <div className="journey-task-progress" aria-hidden="true">
+            <span style={{ "--fill": (completed / tasks.length * 100) + "%" }} />
           </div>
-          <div className="tour-plan-track"><span /></div>
-          {[
-            ["Review lecture notes", "Physics", true],
-            ["Practice problem sets", "Math", false],
-            ["Read next chapter", "Biology", false],
-          ].map(([title, subject, done]) => (
-            <div className={`tour-plan-row${done ? " is-done" : ""}`} key={title}>
-              <span className="tour-plan-checkbox">{done && <Check size={12} weight="bold" />}</span>
-              <span className="tour-plan-task">{title}</span>
-              <span className="tour-plan-subject">{subject}</span>
-            </div>
-          ))}
+          <div className="journey-task-list">
+            {tasks.map(task => (
+              <button key={task.id} type="button" className={`journey-practice-task${task.done ? " is-done" : ""}`}
+                aria-pressed={task.done} onClick={() => setTasks(items => items.map(item => item.id === task.id ? { ...item, done: !item.done } : item))}>
+                <span className="journey-checkbox">{task.done && <Check size={16} weight="bold" aria-hidden="true" />}</span>
+                <span className="journey-task-title">{task.title}</span>
+                <span className="journey-task-tag">{task.done ? "Done" : "To do"}</span>
+              </button>
+            ))}
+          </div>
+          <form className="journey-add-task" onSubmit={addTask}>
+            <input ref={inputRef} type="text" aria-label="Practice task title" maxLength={60}
+              placeholder={tasks.length >= 4 ? "Practice list is full" : "Add your own practice task…"}
+              value={draft} onChange={event => setDraft(event.target.value)} disabled={tasks.length >= 4} />
+            <button type="submit" aria-label="Add practice task" disabled={!draft.trim() || tasks.length >= 4}><Plus size={19} /></button>
+          </form>
+        </section>
+        <div className={`journey-plan-seal${completed > 0 ? " is-achieved" : ""}`} aria-hidden="true">
+          <CompletionPulse key={completed} active={completed > 0} />
+          <Check size={24} weight="bold" />
         </div>
       </div>
-      <div className="tour-plan-note">
-        <span className="tour-plan-note-icon"><FileText size={16} /></span>
-        <span><strong>Revision notes</strong><small>Keep it all in one place</small></span>
-        <span className="tour-plan-note-lines"><i /><i /><i /></span>
+      <div className="journey-feedback" role="status">
+        {completed > 0 ? `${completed} ${completed === 1 ? "task" : "tasks"} checked off. That's progress.` : "Try checking off the task above."}
       </div>
     </div>
   );
 }
 
-function FocusPreview() {
+function TimerScene({ elapsed, running, onStart, onPause, onReset }) {
+  const complete = elapsed >= PRACTICE_MS;
+  const remaining = PRACTICE_MS - elapsed;
+  const progress = Math.min(100, elapsed / PRACTICE_MS * 100);
+  const status = complete ? "Session complete" : running ? "You're focusing" : elapsed ? "Paused" : "Ready when you are";
   return (
-    <div className="tour-focus-preview">
-      <div className="tour-focus-dial">
-        <svg viewBox="0 0 216 216" fill="none">
-          <circle className="tour-dial-outer" cx="108" cy="108" r="104" />
-          <circle className="tour-dial-track" cx="108" cy="108" r="90" strokeWidth="7" />
-          <circle className="tour-dial-progress" cx="108" cy="108" r="90" strokeWidth="7" strokeLinecap="round"
-            pathLength="100" strokeDasharray="72 100" transform="rotate(-90 108 108)" />
-          <circle className="tour-dial-inner" cx="108" cy="108" r="76" />
+    <div className="journey-focus journey-stage-content">
+      <div className={`journey-timer-sculpture${running ? " is-running" : ""}${complete ? " is-complete" : ""}`}>
+        <CompletionPulse active={complete} />
+        <svg className="journey-timer-ring" viewBox="0 0 320 320" fill="none" aria-hidden="true">
+          <circle className="journey-ring-halo" cx="160" cy="160" r="153" />
+          <circle className="journey-ring-track" cx="160" cy="160" r="137" strokeWidth="9" />
+          <circle className="journey-ring-progress" cx="160" cy="160" r="137" strokeWidth="9" strokeLinecap="round"
+            pathLength="100" strokeDasharray="100" strokeDashoffset={100 - progress} transform="rotate(-90 160 160)" />
+          <circle className="journey-ring-inner" cx="160" cy="160" r="119" />
+          {Array.from({ length: 60 }, (_, i) => {
+            const angle = i * Math.PI / 30;
+            return <line key={i} className={i % 5 === 0 ? "is-major" : ""}
+              x1={160 + 109 * Math.cos(angle)} y1={160 + 109 * Math.sin(angle)}
+              x2={160 + (i % 5 === 0 ? 115 : 112) * Math.cos(angle)}
+              y2={160 + (i % 5 === 0 ? 115 : 112) * Math.sin(angle)} />;
+          })}
         </svg>
-        <div className="tour-focus-time"><strong>25:00</strong><span>Focus session</span></div>
-      </div>
-      <div className="tour-focus-action"><Play size={14} weight="fill" /> Start focus</div>
-      <div className="tour-focus-presets"><span>25 min</span><span>50 min</span><span>Custom</span></div>
-    </div>
-  );
-}
-
-const exampleDays = [
-  ["M", 36], ["T", 60], ["W", 46], ["T", 78],
-  ["F", 57], ["S", 94], ["S", 74],
-];
-
-function ReviewPreview() {
-  return (
-    <div className="tour-review-preview tour-example-window">
-      <div className="tour-example-window-top">
-        <span><BarChart3 size={15} /> Progress</span>
-        <span>Last 7 days</span>
-      </div>
-      <div className="tour-review-body">
-        <div className="tour-review-summary"><span>Total focus time</span><strong>12h <small>40m</small></strong></div>
-        <div className="tour-review-chart">
-          {exampleDays.map(([day, height], i) => (
-            <div key={i} className="tour-review-column">
-              <div className="tour-review-bar-track">
-                <span className={i === 5 ? "is-highlight" : ""} style={{ "--bar-height": height + "%" }} />
-              </div>
-              <span>{day}</span>
-            </div>
-          ))}
+        <div className="journey-timer-face">
+          {complete ? <span className="journey-timer-check"><Check size={43} weight="bold" aria-hidden="true" /></span>
+            : <strong role="timer" aria-label="Practice focus time remaining">{formatClock(remaining)}</strong>}
+          <span role="status">{status}</span>
+          <small>5-second practice</small>
         </div>
-        <div className="tour-review-legend"><span /> Focus sessions</div>
       </div>
+      <div className="journey-timer-controls">
+        {complete ? <button type="button" className="journey-action" onClick={onReset}><RotateCcw size={18} aria-hidden="true" /> Try again</button>
+          : running ? <button type="button" className="journey-action" onClick={onPause}><Pause size={18} weight="fill" aria-hidden="true" /> Pause</button>
+            : <button type="button" className="journey-action" onClick={onStart}><Play size={17} weight="fill" aria-hidden="true" /> {elapsed ? "Resume" : "Start practice"}</button>}
+        {elapsed > 0 && !complete && <button type="button" className="journey-reset" onClick={onReset} aria-label="Reset practice timer"><RotateCcw size={19} /></button>}
+      </div>
+      <p className="journey-feedback">A real countdown, just a practice session.</p>
     </div>
   );
 }
 
-const previews = [PlanPreview, FocusPreview, ReviewPreview];
+function ReviewScene({ tasks, completed, elapsed }) {
+  const [metric, setMetric] = useState("tasks");
+  const seconds = Math.floor(elapsed / 1000);
+  const taskRatio = completed / tasks.length;
+  const focusRatio = elapsed / PRACTICE_MS;
+  const value = metric === "tasks" ? completed : seconds;
+  const ratio = metric === "tasks" ? taskRatio : focusRatio;
+  return (
+    <section className="journey-review journey-stage-content" aria-label="Your practice results">
+      <div className="journey-result-dial">
+        <svg viewBox="0 0 320 320" fill="none" aria-hidden="true">
+          <circle className="journey-result-halo" cx="160" cy="160" r="153" />
+          <circle className="journey-result-track" cx="160" cy="160" r="137" strokeWidth="3" />
+          <circle className="journey-result-arc" cx="160" cy="160" r="137" strokeWidth="9" strokeLinecap="round"
+            pathLength="100" strokeDasharray="100" strokeDashoffset={100 - ratio * 100} transform="rotate(-90 160 160)" />
+          <circle className="journey-result-inner" cx="160" cy="160" r="115" />
+        </svg>
+        <div className="journey-result-face" key={metric}>
+          <strong>{value}<small>{metric === "tasks" ? `/${tasks.length}` : "s"}</small></strong>
+          <span>{metric === "tasks" ? "Tasks completed" : "Practice focus time"}</span>
+          <span className="journey-result-caption">Your practice results</span>
+        </div>
+      </div>
+      <div className="journey-metrics" role="group" aria-label="Choose a practice metric">
+        <button type="button" className="journey-metric" aria-pressed={metric === "tasks"} onClick={() => setMetric("tasks")}>
+          <ListChecks size={18} aria-hidden="true" /><span>Tasks</span><strong>{completed}/{tasks.length}</strong>
+          <i aria-hidden="true" style={{ "--fill": taskRatio * 100 + "%" }} />
+        </button>
+        <button type="button" className="journey-metric" aria-pressed={metric === "focus"} onClick={() => setMetric("focus")}>
+          <Timer size={18} aria-hidden="true" /><span>Focus</span><strong>{seconds}s</strong>
+          <i aria-hidden="true" style={{ "--fill": focusRatio * 100 + "%" }} />
+        </button>
+      </div>
+      <p className="journey-feedback">{completed || elapsed >= 1000 ? "A little progress is still progress." : "No practice activity yet. That's okay."}</p>
+    </section>
+  );
+}
 
 export default function WorkspaceOnboarding({ isGuest, onDismiss, onComplete }) {
   const [index, setIndex] = useState(0);
+  const [tasks, setTasks] = useState(INITIAL_TASKS);
+  const [clock, setClock] = useState({ elapsed: 0, startedAt: null });
+  const [now, setNow] = useState(0);
   const headingRef = useRef(null);
-  const step = steps[index];
-  const last = index === steps.length - 1;
+  const scrollRef = useRef(null);
+  const step = chapters[index];
+  const last = index === chapters.length - 1;
+  const completed = tasks.filter(task => task.done).length;
+  const running = clock.startedAt !== null;
+  const elapsed = Math.min(PRACTICE_MS, clock.elapsed + (running ? Math.max(0, now - clock.startedAt) : 0));
   const StorageIcon = isGuest ? HardDrive : Cloud;
-  const Preview = previews[index];
 
-  // Announce the new heading and reset focus each time the user changes step.
+  useEffect(() => {
+    if (clock.startedAt === null) return;
+    const tick = () => {
+      const time = performance.now();
+      setNow(time);
+      if (clock.elapsed + time - clock.startedAt >= PRACTICE_MS) {
+        setClock(current => current.startedAt === clock.startedAt
+          ? { elapsed: PRACTICE_MS, startedAt: null } : current);
+      }
+    };
+    const interval = window.setInterval(tick, 50);
+    return () => window.clearInterval(interval);
+  }, [clock.startedAt, clock.elapsed]);
+
+  function start() {
+    const time = performance.now();
+    setNow(time);
+    setClock(current => current.startedAt === null && current.elapsed < PRACTICE_MS
+      ? { elapsed: current.elapsed, startedAt: time } : current);
+  }
+  function pause() {
+    const time = performance.now();
+    setClock(current => current.startedAt === null ? current : {
+      elapsed: Math.min(PRACTICE_MS, current.elapsed + Math.max(0, time - current.startedAt)),
+      startedAt: null,
+    });
+  }
+  function reset() { setClock({ elapsed: 0, startedAt: null }); }
+  function changeChapter(next) {
+    if (running) pause();
+    setIndex(next);
+  }
+
+  // Pointer parallax only moves the decorative set, never the actual controls.
+  function moveLight(event) {
+    if (event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--stage-x", ((event.clientX - bounds.left) / bounds.width - .5) * 22 + "px");
+    event.currentTarget.style.setProperty("--stage-y", ((event.clientY - bounds.top) / bounds.height - .5) * 22 + "px");
+  }
+  function settleLight(event) {
+    event.currentTarget.style.removeProperty("--stage-x");
+    event.currentTarget.style.removeProperty("--stage-y");
+  }
+
   useLayoutEffect(() => {
-    const heading = headingRef.current;
-    heading?.closest(".workspace-tour-content")?.scrollTo({ top: 0 });
-    heading?.focus({ preventScroll: true });
+    scrollRef.current?.scrollTo({ top: 0 });
+    headingRef.current?.focus({ preventScroll: true });
   }, [index]);
 
   return (
     <div className="workspace-tour-overlay">
-      <DialogSurface className="workspace-tour" aria-labelledby="workspace-tour-title"
-        aria-describedby="workspace-tour-description" onDismiss={onDismiss}
-        initialFocus="#workspace-tour-title">
-        <header className="workspace-tour-header">
-          <div className="workspace-tour-brand">
-            <span aria-hidden="true">S</span>
-            StudyOS
+      <DialogSurface className={`workspace-tour journey-scene-${index}`} aria-labelledby="workspace-tour-title"
+        aria-describedby="workspace-tour-description" onDismiss={onDismiss} initialFocus="#workspace-tour-title">
+        <header className="journey-header">
+          <div className="journey-brand"><span aria-hidden="true">S</span><strong>StudyOS</strong></div>
+          <div className="journey-chapters" role="progressbar" aria-label="Tour progress"
+            aria-valuemin={0} aria-valuemax={chapters.length} aria-valuenow={index + 1}
+            aria-valuetext={`${step.name}, step ${index + 1} of ${chapters.length}`}>
+            {chapters.map((chapter, i) => <span key={chapter.name} className={i === index ? "is-current" : i < index ? "is-past" : ""} aria-hidden="true">
+              <i>{i < index ? <Check size={12} weight="bold" /> : String(i + 1).padStart(2, "0")}</i><b>{chapter.name}</b>
+            </span>)}
           </div>
-          <button type="button" className="workspace-tour-skip" onClick={onDismiss}>Skip tour</button>
+          <button type="button" className="journey-skip" onClick={onDismiss}>Skip tour</button>
         </header>
-
-        <div className="workspace-tour-content">
-          <div className="workspace-tour-progress" role="progressbar" aria-label="Tour progress"
-            aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={index + 1}
-            aria-valuetext={`Step ${index + 1} of ${steps.length}`}>
-            <div className="workspace-tour-progress-bars" aria-hidden="true">
-              {steps.map(({ name }, i) => <span key={name} className={i <= index ? "is-filled" : ""} />)}
+        <div className="journey-main" ref={scrollRef}>
+          <div className="journey-copy" key={step.name}>
+            <div className="journey-chapter-index" aria-hidden="true">0{index + 1}<span>/</span>03</div>
+            <h2 ref={headingRef} id="workspace-tour-title" tabIndex={-1}>{step.title}</h2>
+            <p id="workspace-tour-description">{step.description}</p>
+            <div className="journey-instruction">
+              <div className="journey-instruction-mark"><span /></div>
+              <p>{index === 0 ? "Check off the practice task or add one of your own. Tasks, subjects and notes help you organize what comes next."
+                : index === 1 ? "Start a five-second focus session. Try pausing and resuming to see how the timer works."
+                : "These results come directly from your actions in this tour. In StudyOS, your completed work and focus sessions will build your progress."}</p>
             </div>
-            <span aria-hidden="true">{index + 1} / {steps.length}</span>
+            {index === 1 && <p className="journey-side-note">{isGuest ? "Sign in to join live rooms. You can still use the focus timer as a guest." : "Join a live room and focus alongside other students."}</p>}
+            {last && <div className="journey-storage"><StorageIcon size={18} aria-hidden="true" /><p>{isGuest
+              ? "Your guest study data stays in this browser. You can sign in later to move it to an account."
+              : "Your study data saves to your account. You can manage your preferences and backups in Settings."}</p></div>}
           </div>
-          <h2 id="workspace-tour-title" ref={headingRef} tabIndex={-1}>{step.title}</h2>
-          <p id="workspace-tour-description">{step.description}</p>
-
-          <ul className="workspace-tour-items">
-            {step.items.map(([Icon, title, description, guestDescription]) => (
-              <li key={title}>
-                <Icon size={19} aria-hidden="true" />
-                <div>
-                  <strong>{title}</strong>
-                  <p>{isGuest && guestDescription ? guestDescription : description}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          {last && (
-            <div className="workspace-tour-storage">
-              <StorageIcon size={17} aria-hidden="true" />
-              <p>{isGuest
-                ? "Your guest study data stays in this browser. You can sign in later to move it to an account."
-                : "Your study data saves to your account. You can manage your preferences and backups in Settings."}</p>
+          <div className="journey-stage" onPointerMove={moveLight} onPointerLeave={settleLight}>
+            <SceneArchitecture index={index} energized={running} accomplished={index === 0 ? completed > 0 : elapsed >= PRACTICE_MS} />
+            <div className="journey-stage-label"><span /> {last ? "Practice recap" : "Try it yourself"}</div>
+            <div className="journey-stage-inner" key={index}>
+              {index === 0 ? <PlanScene tasks={tasks} setTasks={setTasks} completed={completed} />
+                : index === 1 ? <TimerScene elapsed={elapsed} running={running} onStart={start} onPause={pause} onReset={reset} />
+                  : <ReviewScene tasks={tasks} completed={completed} elapsed={elapsed} />}
             </div>
-          )}
+            <div className="journey-stage-footnote">Practice environment · Nothing is saved to your study records</div>
+          </div>
         </div>
-
-        <figure className={`workspace-tour-preview workspace-tour-preview-${step.name.toLowerCase()}`} aria-hidden="true">
-          <div className="workspace-tour-preview-art" key={step.name}>
-            <Preview />
+        <footer className="journey-footer">
+          <div className="journey-footer-left">
+            {index > 0 ? <button type="button" className="journey-back" onClick={() => changeChapter(index - 1)}><ArrowLeft size={18} aria-hidden="true" /> Back</button>
+              : <span className="journey-duration">A quick introduction. At your pace.</span>}
           </div>
-          <figcaption><span>{step.name}</span><span>Example preview</span></figcaption>
-        </figure>
-
-        <footer className="workspace-tour-footer">
-          {index > 0
-            ? <button type="button" className="workspace-tour-secondary" onClick={() => setIndex(i => i - 1)}>
-                <ArrowLeft size={16} aria-hidden="true" /> Back
-              </button>
-            : <span className="workspace-tour-duration">Less than a minute</span>}
-          <button type="button" className="workspace-tour-primary" onClick={() => last ? onComplete() : setIndex(i => i + 1)}>
-            {last ? <>Done <Check size={17} aria-hidden="true" /></> : <>Continue <ArrowRight size={17} aria-hidden="true" /></>}
+          <div className="journey-footer-progress" aria-hidden="true">
+            {chapters.map((chapter, i) => <span key={chapter.name} className={i <= index ? "is-filled" : ""} />)}
+          </div>
+          <button type="button" className="journey-next" onClick={() => last ? onComplete() : changeChapter(index + 1)}>
+            {last ? <>Done <Check size={18} aria-hidden="true" /></> : <>Continue <ArrowRight size={18} aria-hidden="true" /></>}
           </button>
         </footer>
       </DialogSurface>

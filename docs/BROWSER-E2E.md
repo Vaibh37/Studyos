@@ -5,7 +5,7 @@ The [browser journeys workflow](https://github.com/Vaibh37/Studyos/actions/workf
 ## What it exercises
 
 - Email registration, logout, login, reload/session restoration and a protected deep link.
-- First-run onboarding for new accounts and empty guest workspaces; guest step navigation, completion, reload persistence, replay in General settings, keyboard dismissal and focus restoration.
+- First-run onboarding for new accounts and empty guest workspaces; interactive practice tasks, five-second timer with pause/resume, data-driven recap, practice data isolation, step navigation, completion, reload persistence, replay in General settings, keyboard dismissal and focus restoration.
 - Task creation, edit, completion, reload and deletion; rich note creation, editing, save, reload and deletion.
 - Switching accounts in the same browser without exposing the other account's private tasks and notes.
 - A genuine server-timed one-minute Focus session (including pause, reload and resume), public leaderboard opt-in and verified XP.
