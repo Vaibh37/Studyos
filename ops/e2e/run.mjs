@@ -387,6 +387,13 @@ async function journeys() {
   await visible(a.getByText(alice.email, { exact: true }));
   console.log("PASS registration and Firebase session restoration");
   await go(a, "/app/flashcards", "Flashcards");
+  await visible(button(a, "Browse starter decks"));
+  assert.equal(await a.locator(".fc-pack").count(), 0, "Starter decks should not appear without opting in");
+  await button(a, "Browse starter decks").click();
+  await visible(a.getByRole("heading", { name: "Japanese", exact: true }));
+  await button(a, "Close library").click();
+  assert.equal(await a.locator(".fc-pack").count(), 0);
+  await button(a, "Browse starter decks").click();
   const hiraganaPack = a.locator(".fc-pack").filter({ has: a.getByRole("heading", { name: "Hiragana", exact: true }) });
   await responseFor(a, "POST", /^\/api\/flashcards$/, () => button(hiraganaPack, "Add deck").click());
   await visible(a.locator(".fc-card-row").first());
