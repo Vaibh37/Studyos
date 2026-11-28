@@ -8,17 +8,17 @@ function SceneLayer({ scene, phase, className = "" }) {
   return <div className={`atmosphere-layer ${className}`} data-scene={scene} data-phase={phase}>
     <div className="atmosphere-image" />
     <div className="atmosphere-light" />
+    <div className="atmosphere-shade" />
     {(scene === "cloud" || scene === "ronin") && <div className="atmosphere-weather atmosphere-mist"><i/><i/></div>}
     {particlesByScene[scene] && <div className={`atmosphere-weather atmosphere-${scene}`}>
       {particlesByScene[scene].map((p, i) => <i key={i} style={{ "--x": p.x + "%", "--y": p.y + "%", "--size": p.size + "px", "--duration": p.duration + "s", "--delay": p.delay + "s", "--alpha": p.opacity, "--sway": p.sway + "px" }} />)}
     </div>}
-    <div className="atmosphere-shade" />
   </div>;
 }
 
 // Independent from the room clock, roster and timer renders. Animations are
 // CSS-composited, paused when hidden/offscreen and honor reduced motion.
-export default memo(function RoomAtmosphere({ scene, phase, active = true, variant = "header" }) {
+export default memo(function RoomAtmosphere({ scene, phase, active = true, variant = "header", motion = true }) {
   const targetKey = scene + ":" + phase;
   const [transition, setTransition] = useState(() => ({ key: targetKey, current: { scene, phase }, previous: null }));
   const stage = useRef(null);
@@ -28,12 +28,12 @@ export default memo(function RoomAtmosphere({ scene, phase, active = true, varia
     const changed = () => setForeground(!document.hidden);
     document.addEventListener("visibilitychange", changed);
     let observer;
-    if ("IntersectionObserver" in window && stage.current) {
+    if (variant !== "zen" && "IntersectionObserver" in window && stage.current) {
       observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting));
       observer.observe(stage.current);
     }
     return () => { document.removeEventListener("visibilitychange", changed); observer?.disconnect(); };
-  }, []);
+  }, [variant]);
   useEffect(() => {
     setTransition(old => old.key === targetKey ? old : {
       key: targetKey, current: { scene, phase },
@@ -46,7 +46,7 @@ export default memo(function RoomAtmosphere({ scene, phase, active = true, varia
     return () => clearTimeout(timer);
   }, [transition.key, transition.previous]);
 
-  return <div ref={stage} className={`room-atmosphere room-atmosphere--${variant}`} aria-hidden="true" data-active={active && visible && foreground} data-scene={scene} data-phase={phase}>
+  return <div ref={stage} className={`room-atmosphere room-atmosphere--${variant}`} aria-hidden="true" data-active={active && visible && foreground} data-motion={motion} data-scene={scene} data-phase={phase}>
     {transition.previous && <SceneLayer key={transition.previous.scene + ":" + transition.previous.phase} {...transition.previous} className="is-leaving" />}
     <SceneLayer key={transition.key} {...transition.current} className={transition.previous ? "is-entering" : ""} />
   </div>;

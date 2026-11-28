@@ -11,6 +11,7 @@ import { useStudyRoom } from "../hooks/useStudyRoom";
 import { useStudyRoomDirectory } from "../hooks/useStudyRoomDirectory";
 import { AMBIENT_SOUNDS, readRoomScenery, writeRoomScenery, readRoomSelection, writeRoomSelection } from "../services/roomAmbience";
 import { ROOM_SCENERY, resolveRoomScene } from "../services/roomScenery";
+import { useRoomMotion } from "../hooks/useRoomMotion";
 import { useRoomAudio } from "../hooks/useRoomAudio";
 import RoomAtmosphere from "./RoomAtmosphere";
 import { allowedInvitedRoom, roomInviteURL } from "../services/studyRoomLinks";
@@ -203,6 +204,7 @@ export default function StudyRoomPanel({
   const [shareSubject, setShareSubject] = useState(false);
   const [environment, setEnvironment] = useState("none");
   const audio = useRoomAudio(uid);
+  const motion = useRoomMotion(uid);
   const [roomNotice, setRoomNotice] = useState("");
   const [customOpen, setCustomOpen] = useState(false);
   const [now, setNow] = useState(Date.now);
@@ -353,7 +355,7 @@ export default function StudyRoomPanel({
       {status !== "idle" && <p className="room-note">Your Focus timer is still active. <Link to="/app/focus">Open Focus</Link></p>}
     </> : <>
       <section aria-label="Your focus timer" className={`room-timer room-environment--${scene.scene}`} data-scene={scene.scene}>
-        <RoomAtmosphere scene={scene.scene} phase={scene.phase} active={!zenOpen} />
+        <RoomAtmosphere scene={scene.scene} phase={scene.phase} active={!zenOpen} motion={motion.enabled} />
         <div className="room-timer-top">
           <div className="room-timer-content">
             <span>{status === "idle" ? "Next focus session" : status === "paused" ? "Focus time · Paused" : "Current focus time"}</span>
@@ -401,6 +403,7 @@ export default function StudyRoomPanel({
           <label className="room-share"><input type="checkbox" checked={shareSubject} onChange={e => setShareSubject(e.target.checked)} /> Share my subject</label>
           <div className="room-scenery-choice">
             <StudySelect value={environment} onChange={changeEnvironment} options={ROOM_SCENERY} ariaLabel="Choose room scenery" />
+            <button type="button" className="room-button" aria-pressed={motion.enabled} onClick={motion.toggle} title="Toggle animated scenery">{motion.enabled ? "Motion on" : "Motion off"}</button>
             {environment === "auto" && <span className="room-scene-phase" title="Based on this device’s local time">{scene.label} now</span>}
           </div>
           <AmbientSound key={room.id} audio={audio} />
@@ -411,7 +414,7 @@ export default function StudyRoomPanel({
     {zenOpen && room && !completion && <FocusZen anchor={zenAnchorRef.current} time={duration(timer)} status={status} animate={true} error={error} saving={timerDisabled || (status === "paused" && remainingSeconds <= 0)} onToggle={toggle} onClose={() => setZenOpen(false)} sharedRoom={{
       name: room.name, connected, activeCount, total: participants.length, scenery: scene.scene, phase: scene.phase, phaseLabel: environment === "auto" ? scene.label : null,
       detail: status === "idle" ? "Ready to focus" : `${activeSubjectName} · ${duration(remainingSeconds)} remaining`,
-      audio, onFinish: () => finishSession(false),
+      audio, motion, onFinish: () => finishSession(false),
       roster: <ZenRoomRoster presence={presence} now={clockNow} />,
     }} />}
     {completion && <FocusCompletion seconds={completion.seconds} onClose={() => setCompletion(null)} />}

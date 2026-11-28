@@ -24,19 +24,49 @@
 .room-atmosphere--zen .atmosphere-shade { background:linear-gradient(180deg,#0a1118a0 0%,#0a121844 38%,#080e13ce 69%,#080d11f5 100%),radial-gradient(ellipse at 50% 32%,#08101512 0,#060b1040 65%,#060b1070); }
 .atmosphere-weather { overflow:hidden; }
 .atmosphere-weather > i { position:absolute; display:block; pointer-events:none; }
-.atmosphere-rain > i { top:0; left:var(--x); width:var(--size); height:calc(var(--size) * 12); border-radius:50% 50% 42% 42%; background:linear-gradient(180deg,transparent,#b2ddf04d 52%,#daedf1c7 92%); opacity:var(--alpha); animation:atmosphere-rain var(--duration) var(--delay) linear infinite; }
-@keyframes atmosphere-rain { 0% { transform:translate3d(-8px,-60px,0); opacity:0; } 12%,80% { opacity:var(--alpha); } 100% { transform:translate3d(var(--sway),var(--fall),0); opacity:0; } }
-.atmosphere-snow > i { top:0; left:var(--x); width:var(--size); height:var(--size); background:#e3f1f5; border-radius:50%; box-shadow:0 0 3px #e6f0f43b; opacity:var(--alpha); animation:atmosphere-snow var(--duration) var(--delay) linear infinite; }
+/* These moving glass beads sit in front of the scene's darkening layer,
+   but underneath the timer and controls. A bright tip makes motion legible. */
+.atmosphere-rain > i {
+  top:0; left:var(--x); width:var(--size); height:calc(var(--size) * 13);
+  border-radius:50% 50% 45% 45%;
+  background:linear-gradient(180deg,transparent 0%,#b4d7e338 32%,#bde1f19e 78%,#e7f7fbd9 100%);
+  opacity:var(--alpha); animation:atmosphere-rain var(--duration) var(--delay) linear infinite;
+}
+.atmosphere-rain > i::after {
+  content:""; position:absolute; bottom:0; left:0; width:100%; height:calc(var(--size) * 1.8);
+  border-radius:45% 45% 55% 55%; background:linear-gradient(130deg,#edf7facc,#6a9db680 60%,#142b3a99);
+  box-shadow:0 1px 2px #030a11aa;
+}
+@keyframes atmosphere-rain {
+  0% { transform:translate3d(-8px,-70px,0); opacity:0; }
+  8%,90% { opacity:var(--alpha); }
+  100% { transform:translate3d(var(--sway),var(--fall),0); opacity:0; }
+}
+.atmosphere-snow > i { top:0; left:var(--x); width:var(--size); height:var(--size); background:#e3f1f5; border-radius:50%; box-shadow:0 0 4px #e6f0f466; opacity:var(--alpha); animation:atmosphere-snow var(--duration) var(--delay) linear infinite; }
 @keyframes atmosphere-snow { 0% { transform:translate3d(-16px,-20px,0); opacity:0; } 10%,88% { opacity:var(--alpha); } 55% { transform:translate3d(var(--sway),calc(var(--fall)*.54),0); } 100% { transform:translate3d(-18px,var(--fall),0); opacity:0; } }
 .atmosphere-stargaze > i { top:var(--y); left:var(--x); width:var(--size); height:var(--size); background:#cce8ff; border-radius:50%; opacity:var(--alpha); animation:atmosphere-star var(--duration) var(--delay) ease-in-out infinite alternate; }
-@keyframes atmosphere-star { to { opacity:calc(var(--alpha)*.38); } }
-.atmosphere-mist > i { width:80%; height:75%; left:-15%; top:-3%; opacity:.24; background:radial-gradient(ellipse at 28% 54%,#d4e8e841,transparent 57%),radial-gradient(ellipse at 58% 46%,#dbe9ef55,transparent 49%),radial-gradient(ellipse at 78% 62%,#e1ebed3b,transparent 55%); filter:blur(14px); animation:atmosphere-mist 55s ease-in-out infinite alternate; }
-.atmosphere-mist > i:nth-child(2) { left:30%; top:15%; opacity:.29; animation-duration:66s; animation-direction:alternate-reverse; }
+@keyframes atmosphere-star { to { opacity:calc(var(--alpha)*.16); } }
+.atmosphere-mist > i { width:80%; height:75%; left:-15%; top:-3%; opacity:.46; background:radial-gradient(ellipse at 28% 54%,#d4e8e898,transparent 57%),radial-gradient(ellipse at 58% 46%,#dbe9ef75,transparent 49%),radial-gradient(ellipse at 78% 62%,#e1ebed91,transparent 55%); filter:blur(14px); animation:atmosphere-mist 24s ease-in-out infinite alternate; }
+.atmosphere-mist > i:nth-child(2) { left:30%; top:15%; opacity:.36; animation-duration:32s; animation-direction:alternate-reverse; }
 .atmosphere-layer[data-scene=ronin] .atmosphere-mist { opacity:.65; }
 @keyframes atmosphere-mist { from { transform:translate3d(-9%,0,0); } to { transform:translate3d(18%,4%,0); } }
 .room-atmosphere[data-active=false] :is(.atmosphere-image,.atmosphere-weather > i) { animation-play-state:paused; }
+.room-atmosphere[data-motion=false] *, .room-atmosphere[data-motion=false] *::before, .room-atmosphere[data-motion=false] *::after { animation:none !important; }
+.room-atmosphere[data-motion=false] :is(.is-leaving,.atmosphere-rain,.atmosphere-snow,.atmosphere-mist) { display:none; }
+.room-atmosphere--header .atmosphere-rain > i:nth-child(n+28),
+.room-atmosphere--header .atmosphere-snow > i:nth-child(n+28) { display:none; }
+@media (max-width:540px) {
+  .atmosphere-rain > i:nth-child(n+33), .atmosphere-snow > i:nth-child(n+33) { display:none; }
+}
+
+/* The app-wide reduced-motion rules use !important. An explicit room Motion
+   opt-in restores only the decorative atmosphere loops, not other UI motion.
+   :is(#root,body) also covers the Shared Zen dialog portaled into body. */
 @media (prefers-reduced-motion:reduce) {
-  .room-atmosphere *, .room-atmosphere *::before, .room-atmosphere *::after { animation:none !important; }
-  .room-atmosphere .is-leaving { display:none; }
-  .atmosphere-rain,.atmosphere-snow { display:none; }
+  :is(#root,body) .room-atmosphere[data-motion=true] :is(.atmosphere-image,.atmosphere-weather > i) { animation-iteration-count:infinite !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] .atmosphere-image { animation-duration:48s !important; }
+  :is(#root,body) .room-atmosphere--header[data-motion=true] .atmosphere-image { animation-duration:34s !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] :is(.atmosphere-rain,.atmosphere-snow,.atmosphere-stargaze) > i { animation-duration:var(--duration) !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] .atmosphere-mist > i { animation-duration:24s !important; }
+  :is(#root,body) .room-atmosphere[data-motion=true] .atmosphere-mist > i:nth-child(2) { animation-duration:32s !important; }
 }

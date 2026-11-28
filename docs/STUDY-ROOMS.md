@@ -58,7 +58,11 @@ turn on subject sharing.
   Auto resolves dawn (05:00–07:59), daylight (08:00–16:59), evening
   (17:00–19:59) and night (20:00–04:59) using only the device's local clock.
   Personal scenery transitions crossfade; atmospheric motion is paused when
-  offscreen, when the page is hidden or when reduced motion is requested.
+  offscreen or when the page is hidden. Motion initially follows the device’s
+  reduced-motion setting. The Motion on/off button in the room and Shared
+  Zen explicitly overrides that setting for the signed-in account on this
+  device. Visible rain beads, snow and twinkling stars run above the scenery
+  shading and below the focus controls.
 - The Sound mixer blends up to four local audio loops in one AudioContext,
   with independent levels and master volume. Changing layers fades gain
   rather than resetting sound playback. Old solo preferences are migrated
