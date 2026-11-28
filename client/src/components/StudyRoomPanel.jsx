@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { UsersRound, LockKeyhole as Lock, Play, Pause, CheckCircle2, CloudRain, Cloud, Moon, BookOpen, ArrowUpRight, LogOut, Link2, Copy, X } from "./icons";
+import { UsersRound, LockKeyhole as Lock, Play, Pause, CheckCircle2, CloudRain, Cloud, Moon, BookOpen, ArrowUpRight, LogOut, Link2, Copy, X, HandWaving, ThumbsUp } from "./icons";
 import StudySelect from "./StudySelect";
+import { StudyDesk, DeskStudio } from "./StudyDesk";
+import { normalizeDesk, readDesk, writeDesk } from "../services/studyDesk";
 import FocusZen from "./FocusZen";
 import FocusCompletion from "./FocusCompletion";
 import { useStudyRoom } from "../hooks/useStudyRoom";
@@ -28,32 +30,6 @@ const duration = seconds => {
   return `${pad(Math.floor(n / 3600))}:${pad(Math.floor(n / 60) % 60)}:${pad(n % 60)}`;
 };
 const stateNames = { running: "Studying", paused: "On break", idle: "At desk" };
-
-// Original StudyOS desk character, drawn as a compact editorial illustration.
-// The same silhouette reads at mobile sizes; state is also conveyed via text.
-export function StudyDesk({ status = "idle" }) {
-  const active = status === "running";
-  const paused = status === "paused";
-  return <svg className={`room-desk room-desk--${status}`} viewBox="0 0 100 84" fill="none" aria-hidden="true">
-    <path d="M12 74H89" stroke="currentColor" strokeOpacity=".25" strokeWidth="1.6" strokeLinecap="round" />
-    <rect x="28" y="44" width="57" height="5" rx="1.6" fill="currentColor" />
-    <path d="M32 49V73M81 49V73" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    <path d="M16 36V62H35M20 62V73M33 62V73" stroke="currentColor" strokeOpacity=".6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M67 43V29L76 21" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M72 14L82 15L84 25L70 25Z" fill="currentColor" opacity=".8" />
-    {active && <path className="room-desk-light" d="M70 26L59 43H91L84 26Z" fill="currentColor" opacity=".10" />}
-    <path d="M52 43L46 37L57 36L61 42L65 37L69 38L66 43Z" fill="currentColor" opacity=".65" />
-    {active ? <>
-      <circle cx="28" cy="24" r="9" fill="currentColor" />
-      <path d="M20 36Q29 30 37 39L42 47L51 43" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M28 41L26 57L43 58L48 72" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-      <path className="room-desk-page" d="M47 39L54 41" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </> : paused ? <>
-      <rect x="40" y="31" width="12" height="11" rx="2" fill="currentColor" opacity=".85" />
-      <path d="M52 34H55Q58 37 55 39H52M43 28L44 24M49 28L50 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </> : <path d="M41 41H53" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
-  </svg>;
-}
 
 function useRoomAudio(uid) {
   const [preference, setPreference] = useState(() => uid ? readRoomSound(localStorage, uid) : { kind: "rain", volume: 35 });
@@ -156,7 +132,7 @@ function StudyRoomDock({ room, presence, status, timer, busy, remainingSeconds, 
   const activeCount = presence.participants.filter(p => p.status === "running").length;
   return <aside className="room-dock" aria-label="Active study room">
     <Link className="room-dock-room" to="/app/study-rooms" title="Return to study room">
-      <StudyDesk status={status} />
+      <StudyDesk status={status} appearance={presence.participants.find(p => p.id === presence.participantId)?.desk} />
       <span className="room-dock-details"><strong>{room.name}</strong>
         <span><span className={`room-live-dot${presence.connected ? " is-online" : ""}`} />{presence.connected ? `${activeCount} studying · ${stateNames[status]}` : "Room disconnected"}</span>
       </span>
@@ -187,14 +163,40 @@ function DirectoryCard({ item, occupancy, disabled, onJoin }) {
 }
 
 const participantSeconds = (participant, now) => (participant.elapsedMs + (participant.startedAt === null ? 0 : Math.max(0, now - participant.startedAt))) / 1000;
-function DeskParticipant({ participant, now, self }) {
+function DeskParticipant({ participant, now, self, event, onEncourage }) {
+  const [sent, setSent] = useState("");
+  const [sending, setSending] = useState(false);
+  useEffect(() => {
+    if (!sent) return;
+    const timer = setTimeout(() => setSent(""), 3500);
+    return () => clearTimeout(timer);
+  }, [sent]);
+  const send = async kind => {
+    if (sending || sent) return;
+    setSending(true);
+    try {
+      const result = await onEncourage(participant.id, kind);
+      setSent(result?.ok ? "Sent" : "Try later");
+    } finally { setSending(false); }
+  };
+  const activeEvent = event?.participantId === participant.id ? event : null;
+  const EventIcon = activeEvent?.kind === "wave" ? HandWaving : activeEvent?.kind === "thumb" ? ThumbsUp : CheckCircle2;
   const seconds = participantSeconds(participant, now);
   return <li className={`room-participant is-${participant.status}${self ? " is-self" : ""}`}>
-    <StudyDesk status={participant.status} />
+    <div className="room-desk-frame">
+      <StudyDesk status={participant.status} appearance={participant.desk} />
+      {activeEvent && <span key={activeEvent.id} className="desk-event" role="status" title={activeEvent.kind === "saved" ? "Session saved" : "Encouragement received"}><EventIcon size={18} weight="fill" /><span className="desk-sr-only">{activeEvent.kind === "saved" ? "Session saved" : "Encouragement received"}</span></span>}
+    </div>
     <strong title={participant.name}>{self ? "You" : participant.name}</strong>
     <span className="room-participant-time">{duration(seconds)}</span>
     <span className="room-participant-status">{stateNames[participant.status]}</span>
     {participant.subject && <span className="room-participant-subject" title={participant.subject}>{participant.subject}</span>}
+    {!self && onEncourage && participant.desk?.encouragement && <div className="desk-encourage">
+      {sent ? <span role="status">{sent}</span> : <>
+        <button type="button" aria-label={`Wave to ${participant.name}`} title="Send a wave" disabled={sending} onClick={() => send("wave")}><HandWaving size={15} /></button>
+        <button type="button" aria-label={`Give ${participant.name} a thumbs-up`} title="Send a thumbs-up" disabled={sending} onClick={() => send("thumb")}><ThumbsUp size={15} /></button>
+      </>}
+    </div>}
   </li>;
 }
 
@@ -223,7 +225,7 @@ function ZenRoomRoster({ presence, now }) {
   return <section className="zen-room-roster" aria-label="Live study desks">
     <header><h2>Study together</h2><span className="zen-room-activity" role="status" key={activity}>{activity}</span></header>
     {connected && ordered.length ? <ul className="zen-room-grid" aria-label="Zen room participants" tabIndex={0}>
-      {ordered.map(p => <DeskParticipant key={p.id} participant={p} now={now} self={p.id === participantId} />)}
+      {ordered.map(p => <DeskParticipant key={p.id} participant={p} now={now} self={p.id === participantId} event={presence.deskEvent} />)}
     </ul> : <p className="zen-room-waiting">{connected ? "No one at a desk yet." : "Waiting for a live connection…"}</p>}
   </section>;
 }
@@ -261,6 +263,10 @@ export default function StudyRoomPanel({
   const inviteRequested = roomView && searchParams.has("room");
   const inviteId = inviteRequested ? searchParams.get("room") : null;
   const [shareOpen, setShareOpen] = useState(false);
+  const [deskOpen, setDeskOpen] = useState(false);
+  const [deskChoice, setDeskChoice] = useState(() => ({ uid, value: readDesk(localStorage, uid) }));
+  const desk = deskChoice.uid === uid ? deskChoice.value : undefined;
+  useEffect(() => { setDeskChoice({ uid, value: readDesk(localStorage, uid) }); setDeskOpen(false); }, [uid]);
   const [roomChoice, setRoom] = useState(null);
   const room = roomChoice?.ownerUid === uid ? roomChoice : null;
   const restoredRoomUid = useRef(null);
@@ -273,8 +279,15 @@ export default function StudyRoomPanel({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("activity");
   const subject = status === "idle" ? "" : activeSubjectName;
-  const presence = useStudyRoom(hydrated && !isGuest ? room?.id : null, uid, status, shareSubject ? subject : "");
+  const presence = useStudyRoom(hydrated && !isGuest ? room?.id : null, uid, status, shareSubject ? subject : "", desk);
   const connected = presence.connected;
+  const ownDesk = presence.participants.find(p => p.id === presence.participantId)?.desk;
+  function saveDesk(value) {
+    const next = normalizeDesk(value, presence.deskProgress ?? 0);
+    writeDesk(localStorage, uid, next);
+    setDeskChoice({ uid, value: next });
+    setDeskOpen(false);
+  }
 
   useEffect(() => {
     if (!room || !roomView) return;
@@ -295,6 +308,7 @@ export default function StudyRoomPanel({
   function join(next) {
     dismissInvite();
     setShareOpen(false);
+    setDeskOpen(false);
     setRoomNotice("");
     setShareSubject(false);
     setQuery("");
@@ -307,6 +321,7 @@ export default function StudyRoomPanel({
 
   function leaveRoom() {
     setShareOpen(false);
+    setDeskOpen(false);
     audio.mute();
     writeRoomSelection(sessionStorage, uid, null);
     setRoom(null);
@@ -375,8 +390,10 @@ export default function StudyRoomPanel({
         <h1>Study Rooms</h1>
         <p>Find a desk. Focus together.</p>
       </div>
+      {room && presence.deskProgress !== null && <button type="button" className="room-button" aria-expanded={deskOpen} onClick={() => setDeskOpen(open => !open)}>Customize desk</button>}
     </header>
 
+    {deskOpen && room && presence.deskProgress !== null && <DeskStudio appearance={desk} progress={presence.deskProgress} onSave={saveDesk} onClose={() => setDeskOpen(false)} />}
     {inviteRequested && !isGuest && <section className="room-invite-preview" aria-label="Room invitation">
       <div><strong>{loading || !hydrated ? "Checking room invitation…" : invitedRoom ? (room?.id === invitedRoom.id ? `You're already in ${invitedRoom.name}` : `Join ${invitedRoom.name}?`) : "Room unavailable"}</strong>
         <p>{loading || !hydrated ? "Checking your access." : invitedRoom ? (room?.id === invitedRoom.id ? "Your desk is already here." : room ? "Switching rooms keeps your personal Focus timer running." : "You'll share your display name and focus status when you join. Subject sharing is optional.") : "This room is private, invalid or no longer available. Ask the organizer for a Study Group invitation if needed."}</p>
@@ -416,7 +433,7 @@ export default function StudyRoomPanel({
             </div>
             <span className="room-timer-detail">{status === "idle" ? "Choose a subject and duration" : `${activeSubjectName} · ${duration(remainingSeconds)} remaining`}</span>
           </div>
-          <div className="room-self-desk"><StudyDesk status={status} /><span>{stateNames[status]}</span></div>
+          <div className="room-self-desk"><StudyDesk status={status} appearance={ownDesk} /><span>{stateNames[status]}</span></div>
         </div>
         <div className="room-timer-controls">
           {status === "idle" ? <>
@@ -438,13 +455,14 @@ export default function StudyRoomPanel({
           </div>
         </header>
         {shareOpen && connected && <RoomInvitePanel key={room.id} room={room} onClose={() => setShareOpen(false)} />}
+        {presence.deskError && <div className="room-notice room-error" role="status">{presence.deskError}<button type="button" className="room-button" onClick={presence.retryDesk}>Retry desk sync</button></div>}
         {presence.error && <div className="room-notice room-error" role="status">{presence.error}<button type="button" className="room-button" onClick={presence.retry}>Reconnect</button></div>}
         {(participants.length > 8 || query || sort !== "activity") && <div className="room-participant-toolbar">
           <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Find a student" aria-label="Find a student" />
           <StudySelect value={sort} onChange={setSort} options={[{ value: "activity", label: "Studying first" }, { value: "duration", label: "Most focused time" }]} ariaLabel="Sort participants" />
         </div>}
         {participants.length > 0 ? <ul className="room-participant-grid" aria-label="Room participants">
-          {visibleParticipants.map(participant => <DeskParticipant key={participant.id} participant={participant} self={participant.id === presence.participantId} now={clockNow} />)}
+          {visibleParticipants.map(participant => <DeskParticipant key={participant.id} participant={participant} self={participant.id === presence.participantId} now={clockNow} event={presence.deskEvent} onEncourage={presence.encourage} />)}
           {!visibleParticipants.length && <li className="room-no-match">No matching students.</li>}
         </ul> : <div className="room-placeholder room-placeholder--small"><StudyDesk /><p>{connected ? "No one at a desk yet." : "Waiting for a live connection…"}</p></div>}
         <div className="room-preferences">

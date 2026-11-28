@@ -560,6 +560,28 @@ async function journeys() {
     visible(a.getByText("· 2 in room", { exact: true })),
     visible(b.getByText("· 2 in room", { exact: true })),
   ]);
+  // Each account can customize its live desk; only opted-in desks can be
+  // encouraged, and a reaction appears only on its intended recipient.
+  await button(b, "Customize desk").click();
+  const studio = b.getByLabel("Customize your desk", { exact: true });
+  await visible(studio);
+  await studio.getByRole("combobox", { name: "Study activity" }).click();
+  await b.getByRole("option", { name: "Typing", exact: true }).click();
+  await studio.getByRole("combobox", { name: "Desk lamp" }).click();
+  await b.getByRole("option", { name: "Round", exact: true }).click();
+  await studio.getByRole("combobox", { name: "Desk accessory" }).click();
+  assert.equal(await b.getByRole("option", { name: "Plant · Locked", exact: true }).getAttribute("aria-disabled"), "true");
+  await b.keyboard.press("Escape");
+  await studio.getByLabel("Share session milestones and receive silent encouragement").check();
+  await button(studio, "Save desk").click();
+  await absent(studio);
+  const bobDesk = a.locator(".room-participant").filter({ hasText: bob.name });
+  await visible(bobDesk.locator('.room-desk[data-activity=typing][data-lamp=round]'));
+  await button(bobDesk, "Wave to " + bob.name).click();
+  await visible(b.locator(".room-participant").filter({ hasText: alice.name }).getByText("Encouragement received", { exact: true }));
+  assert.equal(await a.locator(".desk-event").count(), 0);
+  await b.reload({ waitUntil: "domcontentloaded" });
+  await visible(b.locator(".room-participant.is-self .room-desk[data-activity=typing][data-lamp=round]"));
   await a.getByRole("combobox", { name: "Choose room scenery" }).click();
   await a.getByRole("option", { name: "Rain", exact: true }).click();
   await a.getByRole("combobox", { name: "Ambient sound" }).click();
@@ -689,6 +711,11 @@ async function journeys() {
   await visible(m.locator(".room-participant.is-self"));
   assert.equal((await m.locator(".room-participant-grid").evaluate(el => getComputedStyle(el).gridTemplateColumns)).split(" ").length, 4);
   await assertNoOverflow(m);
+  await button(m, "Customize desk").click();
+  const mobileStudio = m.getByLabel("Customize your desk", { exact: true });
+  await visible(mobileStudio);
+  await assertNoOverflow(m);
+  await button(mobileStudio, "Close desk customization").click();
   await button(m, "Zen").click();
   const mobileZen = m.getByRole("dialog", { name: "Shared Zen mode" });
   await visible(button(mobileZen, "Start focus"));

@@ -3,6 +3,11 @@ import PublicPageShell from "../components/marketing/PublicPageShell";
 
 const updates = [
   {
+    date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V5 — Living Desks",
+    description: "Make your little study space your own.",
+    changes: ["Customize your character, lamp, activity and desk accessories, with animated writing, reading, typing and coffee breaks.", "Unlock plants with verified Focus sessions, and share optional quiet encouragement and saved-session milestones.", "Your desk appears live in the room, shared Zen and the mini dock."],
+  },
+  {
     date: "2026-11-28", label: "28 November 2026", title: "Study Rooms V4",
     description: "A cinematic shared Zen experience that keeps you connected while you focus.",
     changes: ["Full-screen room scenery, live desks and a large independent Focus timer.", "Smooth desk arrivals, live departures and uninterrupted ambient sound.", "Shareable room links with explicit join confirmation and private-room access checks."],

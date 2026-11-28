@@ -53,6 +53,11 @@ test("Focus ranking requires per-user server-timed, one-use sessions and rejects
   }
 
   const app = express();
+  const milestones = [];
+  app.set("io", { studyRoomPresence: {
+    recordSavedSession: (uid, seconds) => milestones.push({ uid, seconds }),
+    refreshProgress: () => {},
+  } });
   app.use(express.json());
   app.use("/api/study-sessions", studyRoutes);
   app.use("/api/leaderboard", leaderboardRoutes);
@@ -100,6 +105,7 @@ test("Focus ranking requires per-user server-timed, one-use sessions and rejects
     const personal = await call(owner, path, "POST", { ...payload, verified: true });
     assert.equal(personal.status, 201);
     assert.equal(personal.body.verified, false);
+    assert.equal(milestones.length, 0);
     assert.equal((await call(owner, "/api/leaderboard")).body.leaderboard[0].focusMinutes, 0);
 
     const initial = await call(owner, path + "/start", "POST");
@@ -137,6 +143,7 @@ test("Focus ranking requires per-user server-timed, one-use sessions and rejects
     assert.equal(success.body.verified, true);
     assert.equal(success.body.userId, owner); // body cannot impersonate another UID
     assert.equal(success.body.durationSeconds, 60);
+    assert.deepEqual(milestones, [{ uid: owner, seconds: 60 }]);
 
     const rank = await call(owner, "/api/leaderboard");
     assert.equal(rank.status, 200, JSON.stringify(rank.body));
@@ -166,6 +173,19 @@ test("Focus ranking requires per-user server-timed, one-use sessions and rejects
       endedAt: new Date().toISOString(),
     });
     assert.equal(impossible.status, 400);
+    const { loadDeskProgress } = require("../utils/studyDesk");
+    assert.equal(await loadDeskProgress(owner), 0);
+    // Only persisted verified sessions >=20 minutes, scoped to the account.
+    const row = { subjectName: "Desk test", plannedMinutes: 20, durationSeconds: 1200, startedAt: new Date(Date.now() - 1200000), endedAt: new Date() };
+    await StudySession.insertMany([
+      { ...row, userId: owner, verified: false },
+      { ...row, userId: other, verified: true },
+      ...Array.from({ length: 11 }, () => ({ ...row, userId: "desk-fixture", verified: true })),
+      { ...row, userId: owner, verified: true },
+    ]);
+    assert.equal(await loadDeskProgress(owner), 1);
+    assert.equal(await loadDeskProgress("desk-fixture"), 10);
+    assert.equal(await loadDeskProgress(other), 1);
   } finally {
     server.closeAllConnections();
     if (server.listening) await new Promise(resolve => server.close(resolve));
