@@ -608,9 +608,14 @@ small {
 
 /* Active descendant is keyboard highlight, independent of the saved value. */
 .study-select-option.is-highlighted:not(:disabled) {
-  outline: 2px solid var(--color-focus);
-  outline-offset: -2px;
+  box-shadow: inset 2px 0 var(--color-text-muted);
   background: var(--color-surface-hover);
+}
+@media (forced-colors: active) {
+  .study-select-option.is-highlighted:not(:disabled) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 @media (pointer: coarse) {
   .study-select-option { min-height: 44px; }

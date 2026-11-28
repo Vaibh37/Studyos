@@ -201,13 +201,6 @@
   color: var(--color-text) !important;
 }
 
-/* KEYBOARD ACCESSIBILITY */
-
-.app-shell-v2 .study-sidebar :is(a, button):focus-visible {
-  outline: 2px solid var(--color-focus) !important;
-  outline-offset: -2px !important;
-}
-
 /* =========================================================
    SETTINGS FOOTER
    ========================================================= */
