@@ -1,4 +1,4 @@
-# Study Rooms V3
+# Study Rooms V4
 
 Study Rooms are silent live study spaces built on the existing authenticated
 Socket.IO server and verified Focus timer. There is no webcam, microphone,
@@ -34,6 +34,13 @@ turn on subject sharing.
   Leaving or signing out stops presence and audio and clears the tab's selection;
   server revocation also clears the selection. Leaving does not stop the
   personal timer. Closing the tab or losing connectivity removes live presence.
+- Shared Zen expands the chosen scenery to fill the screen with a gentle
+  pan, a large independent Focus timer, and the room's live desks. Audio
+  continues across Zen entry and exit. New desks animate in, departures
+  update the roster immediately, and reduced-motion settings are respected.
+- Invite copies a room link. Opening it presents an explicit join confirmation;
+  signed-out users can sign in and return to the invitation. Private room
+  links do not grant membership or reveal private room details to non-members.
 - Private-room access is checked before joining; member removal and group
   deletion revoke active access, including a membership check in flight.
 
@@ -46,4 +53,5 @@ Run the socket integration regression tests:
 `node --test server/tests/studyRoomSocket.test.js server/tests/realtimeSecurity.test.js`.
 The existing Firebase/MongoDB browser workflow also exercises two authenticated
 users, live directory counts, room and atmosphere restoration, a verified Focus
-save, optional subject sharing, and mobile navigation.
+save, optional subject sharing, shared Zen, permission-safe invitations,
+and mobile navigation.

@@ -1,3 +1,5 @@
+import { parseRoomId } from "./studyRoomLinks.js";
+
 export const AMBIENT_SOUNDS = [
   { value: "rain", label: "Rain" },
   { value: "ocean", label: "Ocean waves" },
@@ -71,7 +73,7 @@ const selectionKey = uid => `studyos_room_selected:${uid}`;
 export function readRoomSelection(storage, uid) {
   try {
     const value = storage.getItem(selectionKey(uid));
-    if (/^(public:(quiet|library|cloud|night)|group:[a-f0-9]{24})$/.test(value || "")) return value;
+    return parseRoomId(value);
   } catch { /* Storage unavailable. */ }
   return null;
 }

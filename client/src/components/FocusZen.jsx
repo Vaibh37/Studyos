@@ -9,7 +9,8 @@ const smooth = x => { x=clamp(x); return x*x*x*(x*(6*x-15)+10); };
 const envelope = x => Math.pow(Math.max(0,Math.sin(Math.PI*clamp(x))),1.5);
 
 // Visual layer only: the parent owns all session state and API calls.
-export default function FocusZen({anchor, time, status, onToggle, onClose, animate, saving, error}) {
+export default function FocusZen({anchor, time, status, onToggle, onClose, animate, saving, error, sharedRoom = null}) {
+  const roomMode = Boolean(sharedRoom);
   const dialog = useRef(null), canvas = useRef(null), digits = useRef(null);
   const exit = useRef(null), closeRef = useRef(onClose);
   const leaving = useRef(false), requestExit = useRef(null);
@@ -37,6 +38,10 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       c.width=Math.round(w*dpr); c.height=Math.round(h*dpr);
       if(g) g.setTransform(dpr,0,0,dpr,0,0);
       rect=original?.getBoundingClientRect();
+      if(roomMode){
+        modal.style.setProperty("--zen-room-y", (h*(h<450?.28:.32))+"px");
+        modal.style.setProperty("--zen-room-size", Math.min(w*.175,h*.18,158)+"px");
+      }
     };
     const curve=(x,b)=>{
       g.moveTo(x-b*.65,-30);
@@ -49,9 +54,11 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       const zoom=1+.045*punch;
       const ax=rect ? rect.left+rect.width/2 : x;
       const ay=rect ? rect.top+rect.height/2 : y;
-      const tx=mix(x+(ax-x)*zoom,x,m), ty=mix(y+(ay-y)*zoom,y,m);
+      const destinationY=roomMode?h*(h<450?.28:.32):y;
+      const tx=mix(x+(ax-x)*zoom,x,m), ty=mix(y+(ay-y)*zoom,destinationY,m);
       const normalSize=original ? parseFloat(getComputedStyle(original).fontSize)||64 : 64;
-      const size=mix(normalSize,Math.min(w*.19,h*.24,180),m)*(1+.025*punch);
+      const targetSize=roomMode?Math.min(w*.175,h*.18,158):Math.min(w*.19,h*.24,180);
+      const size=mix(normalSize,targetSize,m)*(1+.025*punch);
       if(g){
         g.clearRect(0,0,w,h);
         if(t>0){
@@ -107,7 +114,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       // The shell camera zoom is paused at the same instant as the Canvas timeline.
       if(animation) animation.currentTime=t*2500;
     }
-    const doAnimate=animateOnOpen && !!g;
+    const doAnimate=animateOnOpen && !!g && !(roomMode && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     const tick=now=>{
       if(disposed)return;
       const dt=Math.max(0,now-last);last=now;
@@ -147,15 +154,35 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
       if(modal.open)modal.close();
       if(previousFocus?.isConnected)previousFocus.focus({preventScroll:true});
     };
-  },[anchor,animateOnOpen]);
+  },[anchor,animateOnOpen,roomMode]);
   return createPortal(
-    <dialog className="studyos-zen-dialog" ref={dialog} aria-label="Zen focus mode">
+    <dialog className={`studyos-zen-dialog${roomMode?" studyos-zen-room":""}`} ref={dialog} aria-label={roomMode?"Shared Zen mode":"Zen focus mode"}>
       <canvas ref={canvas} aria-hidden="true" />
+      {roomMode && <div className={`studyos-zen-scene room-environment--${sharedRoom.scenery}`} data-ready={ready} aria-hidden="true" />}
       <div className="studyos-zen-digits" ref={digits} role="timer">{time}</div>
       <div className="studyos-zen-ui" data-ready={ready} inert={!ready}>
         <button ref={exit} type="button" className="studyos-zen-exit" onClick={()=>requestExit.current?.()}>Exit Zen <span>Esc</span></button>
-        <button type="button" className="studyos-zen-action" disabled={saving || pending} onClick={toggle}>{status==="running"?"Pause":status==="paused"?"Resume":"Start focus"}</button>
-        {error && <p className="studyos-zen-error" role="alert">{error}</p>}
+        {roomMode ? <>
+          <header className="zen-room-header">
+            <span className={`zen-room-indicator${sharedRoom.connected?" is-online":""}`} />
+            <div><strong>{sharedRoom.name}</strong>
+              <span>{sharedRoom.connected?`${sharedRoom.activeCount} studying · ${sharedRoom.total} in room`:"Reconnecting to room…"}</span>
+            </div>
+          </header>
+          <div className="zen-room-controls">
+            <p className="zen-room-detail">{sharedRoom.detail}</p>
+            <div className="zen-room-buttons">
+              <button type="button" className="studyos-zen-action" disabled={saving || pending} onClick={toggle}>{status==="running"?"Pause":status==="paused"?"Resume":"Start focus"}</button>
+              {status!=="idle" && <button type="button" disabled={saving || pending} onClick={sharedRoom.onFinish}>Finish &amp; save</button>}
+              <button type="button" aria-pressed={sharedRoom.audio.playing} onClick={sharedRoom.audio.toggle}>{sharedRoom.audio.playing?"Mute sound":"Play sound"}</button>
+            </div>
+            {(error || sharedRoom.audio.error) && <span className="zen-room-error" role="alert">{error || sharedRoom.audio.error}</span>}
+          </div>
+          {sharedRoom.roster}
+        </> : <>
+          <button type="button" className="studyos-zen-action" disabled={saving || pending} onClick={toggle}>{status==="running"?"Pause":status==="paused"?"Resume":"Start focus"}</button>
+          {error && <p className="studyos-zen-error" role="alert">{error}</p>}
+        </>}
       </div>
     </dialog>,document.body
   );
