@@ -662,6 +662,19 @@ async function journeys() {
   await visible(sharedZen);
   await visible(button(sharedZen, "Pause"));
   await visible(sharedZen.locator(".studyos-zen-scene.room-environment--rain[data-ready=true]"));
+  const weatherStage = sharedZen.locator(".room-atmosphere--zen");
+  assert.equal(await weatherStage.getAttribute("data-motion"), "false", "Respect reduced motion by default");
+  await button(sharedZen, "Motion off").click();
+  await visible(weatherStage.locator(".atmosphere-rain i").first());
+  await a.waitForFunction(() => document.querySelector(".room-atmosphere--zen")?.getAttribute("data-active") === "true");
+  const drop = weatherStage.locator(".atmosphere-rain i").first();
+  const firstTransform = await drop.evaluate(el => getComputedStyle(el).transform);
+  await a.waitForTimeout(300);
+  assert.equal(await drop.evaluate(el => getComputedStyle(el).animationPlayState), "running");
+  assert.notEqual(await drop.evaluate(el => getComputedStyle(el).transform), firstTransform, "Rain must move inside fullscreen Zen");
+  await button(sharedZen, "Motion on").click();
+  await absent(weatherStage.locator(".atmosphere-rain"));
+
   await visible(sharedZen.locator(".zen-room-grid .room-participant").filter({ hasText: bob.name }));
   await visible(button(sharedZen, "Mute sound"));
   await button(sharedZen, "Pause").click();

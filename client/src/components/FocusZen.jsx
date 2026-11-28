@@ -159,7 +159,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
   return createPortal(
     <dialog className={`studyos-zen-dialog${roomMode?" studyos-zen-room":""}`} ref={dialog} aria-label={roomMode?"Shared Zen mode":"Zen focus mode"}>
       <canvas ref={canvas} aria-hidden="true" />
-      {roomMode && <div className={`studyos-zen-scene room-environment--${sharedRoom.scenery}`} data-ready={ready} aria-hidden="true"><RoomAtmosphere scene={sharedRoom.scenery} phase={sharedRoom.phase || "fixed"} active={ready} variant="zen" /></div>}
+      {roomMode && <div className={`studyos-zen-scene room-environment--${sharedRoom.scenery}`} data-ready={ready} aria-hidden="true"><RoomAtmosphere scene={sharedRoom.scenery} phase={sharedRoom.phase || "fixed"} active={ready} variant="zen" motion={sharedRoom.motion.enabled} /></div>}
       <div className="studyos-zen-digits" ref={digits} role="timer">{time}</div>
       <div className="studyos-zen-ui" data-ready={ready} inert={!ready}>
         <button ref={exit} type="button" className="studyos-zen-exit" onClick={()=>requestExit.current?.()}>Exit Zen <span>Esc</span></button>
@@ -168,6 +168,7 @@ export default function FocusZen({anchor, time, status, onToggle, onClose, anima
             <span className={`zen-room-indicator${sharedRoom.connected?" is-online":""}`} />
             <div><strong>{sharedRoom.name}</strong>
               <span>{sharedRoom.connected?`${sharedRoom.activeCount} studying · ${sharedRoom.total} in room`:"Reconnecting to room…"}{sharedRoom.phaseLabel && ` · ${sharedRoom.phaseLabel}`}</span>
+              <button type="button" className="zen-room-motion" aria-pressed={sharedRoom.motion.enabled} title="Toggle animated scenery" onClick={sharedRoom.motion.toggle}>{sharedRoom.motion.enabled ? "Motion on" : "Motion off"}</button>
             </div>
           </header>
           <div className="zen-room-controls">

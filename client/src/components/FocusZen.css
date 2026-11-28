@@ -146,6 +146,7 @@
 .zen-room-header strong { font-size:clamp(16px,2vw,22px); color:#f3f6f7; font-weight:600; letter-spacing:-.025em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .zen-room-header div > span { font-size:12px; color:var(--zen-muted); }
 .studyos-zen-room .studyos-zen-ui button { background:#10181bd9; border:1px solid #b9c9ce33; border-radius:8px; color:#f1f5f6; font-size:13px; font-weight:550; }
+.studyos-zen-room .studyos-zen-ui .zen-room-motion { position:static; align-self:flex-start; min-height:32px; padding:5px 10px; font-size:12px; }
 .studyos-zen-room .studyos-zen-ui button:hover { background:#263438; }
 .zen-room-controls {
   position:absolute; top:calc(var(--zen-room-y) + var(--zen-room-size) * .54 + 10px); left:50%; transform:translateX(-50%);
