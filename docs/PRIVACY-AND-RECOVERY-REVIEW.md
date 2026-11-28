@@ -28,3 +28,21 @@ The application JSON export in Settings is not a substitute for infrastructure-l
 ## Large-list performance
 
 The existing task and note reads return complete arrays and downstream views, search, exports and data deletion depend on that contract. A safe pagination migration should introduce a separate bounded, user-scoped listing contract with deterministic ordering, preserve exports and bulk actions, and test filtering, mutations, concurrent changes, account isolation and guest/cloud parity before switching these views. A hard limit on the existing response would silently hide study data and can produce incomplete backups, so this change deliberately leaves the current data contract intact.
+
+## November 28, 2026: Legal pages follow-up
+
+The public Terms and Privacy pages now clarify hosted service rules, Apache-2.0 rights, user content ownership, complaints and copyright reporting, applicable law, limited indemnification, data purposes, privacy requests, active-service deletion and retention categories.
+
+This is a documentation change, not a new consent gate, age-verification system, moderation service, or legal compliance certification. Before general release:
+
+- Confirm the operator's legal identity, governing-law wording (India was selected for the India-based operator), and whether group messaging triggers intermediary-specific obligations, including a designated grievance contact, response deadlines, notice and escalation procedures.
+- Set and implement an age policy for account and collaboration features. Assess child-data requirements and obtain legally required authorization before processing where applicable. Do not treat Guest Mode or agreement to these terms as consent. The DPDP commencement notification provides a phased implementation timeline; confirm the applicable obligations and dates with counsel.
+- Inventory retention periods and deletion/backup behavior across Firebase, MongoDB Atlas, R2, Render, Vercel, security records and historical analytics. Document the verified schedule rather than inventing time limits.
+- Establish a private workflow for copyright, safety, privacy and security complaints, identity/authority verification for data requests, and compliant notice and consent for future material changes. Review the pages with an appropriate legal professional.
+
+Official reference material reviewed:
+- Digital Personal Data Protection Act, 2023: https://www.meity.gov.in/static/uploads/2024/02/Digital-Personal-Data-Protection-Act-2023-1.pdf
+- Commencement notification G.S.R. 843(E), November 2025: https://www.meity.gov.in/static/uploads/2025/11/c56ceae6c383460ca69577428d36828b.pdf
+- DPDP Rules, 2025: https://www.meity.gov.in/documents/act-and-policies/digital-personal-data-protection-rules-2025-gDOxUjMtQWa
+- Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, as amended: https://www.meity.gov.in/static/uploads/2025/10/44e62510fb815a5cc72d094c7a5493b6.pdf
+- Indian Contract Act, 1872: https://www.indiacode.nic.in/bitstream/123456789/2187/2/A187209.pdf

@@ -10,7 +10,7 @@ function Privacy() {
       title="Privacy Policy"
       intro="How StudyOS handles your account, study content, groups, and privacy choices."
     >
-      <p className="marketing-document-updated">Last updated: November 27, 2026</p>
+      <p className="marketing-document-updated">Last updated: November 28, 2026</p>
 
       <section>
         <h2>1. What StudyOS stores</h2>
@@ -21,6 +21,13 @@ function Privacy() {
           sign-in and sends application data through the StudyOS Express API for
           storage in MongoDB.
         </p>
+        <p>Depending on the mode and features you use, information may include:</p>
+        <ul>
+          <li>Account and profile data: user identifier, display name, email address and authentication information.</li>
+          <li>Workspace data: tasks, subjects, notes, calendar events, focus activity, study and visit streaks, XP and preferences you save.</li>
+          <li>Collaboration data: group memberships, messages, reactions, attachments, room presence and eligible shared study activity.</li>
+          <li>Technical data: request and device information, IP addresses, security events and optional public-site analytics as described below.</li>
+        </ul>
       </section>
 
       <section>
@@ -30,12 +37,31 @@ function Privacy() {
           the authenticated Firebase user and Firebase ID token to verify account
           requests with the backend. The app can use basic profile information
           supplied by your authentication method, such as your display name and
-          email address, for account functionality.
+          email address, for account functionality. Firebase handles sign-in
+          credentials; StudyOS does not store your raw sign-in password in its
+          application database.
         </p>
       </section>
 
       <section>
-        <h2>3. Guest Mode</h2>
+        <h2>3. Why we process this information</h2>
+        <ul>
+          <li>Authenticate your account and provide, synchronize and restore your study workspace.</li>
+          <li>Calculate study progress, focus totals, streaks and eligible leaderboard results.</li>
+          <li>Deliver group messaging, file sharing and live study room features.</li>
+          <li>Diagnose technical problems, respond to support requests, prevent abuse and protect accounts.</li>
+          <li>Measure selected public-site visits only if you enable optional analytics.</li>
+          <li>Handle complaints and meet applicable legal obligations.</li>
+        </ul>
+        <p>
+          StudyOS does not sell or rent your personal information or offer
+          targeted advertising. Private study content is not published by
+          StudyOS as public leaderboard information.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Guest Mode</h2>
         <p>
           Guest Mode does not require an account. Tasks, subjects, notes, calendar
           events and Focus-session data created as a guest are stored in IndexedDB
@@ -50,7 +76,7 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>4. Leaderboard privacy</h2>
+        <h2>5. Leaderboard privacy</h2>
         <p>
           Leaderboard participation is opt-in. StudyOS does not publish your email,
           tasks, notes, subject content or calendar details on the leaderboard.
@@ -60,7 +86,7 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>5. Study groups and messages</h2>
+        <h2>6. Study groups and messages</h2>
         <p>
           Account users can participate in study groups. StudyOS processes group
           membership, display names, messages, reactions, study activity and
@@ -85,7 +111,7 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>6. Browser notifications</h2>
+        <h2>7. Browser notifications</h2>
         <p>
           StudyOS includes optional browser-notification settings. Notification
           permission is controlled by your browser. You can deny or revoke that
@@ -94,7 +120,7 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>7. Backup and restore</h2>
+        <h2>8. Backup and restore</h2>
         <p>
           StudyOS can create portable JSON backups containing StudyOS data and
           preferences. A backup file is handled wherever you choose to save it.
@@ -104,23 +130,29 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>8. Data reset and deletion</h2>
+        <h2>9. Data reset and deletion</h2>
         <p>
           StudyOS includes data-reset and account-deletion controls in Settings.
           Review the confirmation shown in the application before using destructive
-          actions. Guest data can also be removed by clearing the relevant site data
+          actions. Account deletion requires recent identity verification, and
+          you must delete any study groups you own before the account deletion
+          can proceed. If deletion fails or is unavailable, contact us privately.
+          Guest data can also be removed by clearing the relevant site data
           from your browser.
         </p>
         <p>
-          Other members may retain information they copied or received outside
-          StudyOS. Backup and security records may have separate retention
-          periods. For questions about deletion, access or correction, use the
-          privacy contact below.
+          The account deletion process is designed to remove account-linked
+          workspace records, authentication records, group memberships, messages
+          authored by the account and associated uploaded files from the active
+          service. Other members may retain copies or information they shared
+          independently. Deletion from the active service does not necessarily
+          remove historical backups, provider logs or security records at the
+          same time.
         </p>
       </section>
 
       <section>
-        <h2>9. Infrastructure providers and service security</h2>
+        <h2>10. Infrastructure providers and service security</h2>
         <p>
           StudyOS currently relies on third-party infrastructure to operate:
           Firebase for authentication, Vercel for the frontend, Render for the
@@ -132,10 +164,18 @@ function Privacy() {
           information, to deliver and secure the service. Hosting and security
           logs are separate from optional audience analytics.
         </p>
+        <p>
+          This information may be processed by service providers in countries
+          other than your own, depending on their infrastructure and configuration.
+          Access to your content may also be provided to other users through
+          your sharing choices, or disclosed where required by law. Providers
+          handle information according to their own service arrangements and
+          privacy notices.
+        </p>
       </section>
 
       <section>
-        <h2>10. Browser storage and optional analytics</h2>
+        <h2>11. Browser storage and optional analytics</h2>
         <p>
           StudyOS uses browser storage for authentication, preferences, guest
           data and application functionality. These features do not depend on
@@ -160,17 +200,68 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>11. Children and guardians</h2>
+        <h2>12. Retention and security monitoring</h2>
         <p>
-          StudyOS is used for study-related activities, which may include younger
-          people. Parents and guardians can contact the project operator with
-          questions about a child's information, access or deletion. Do not
-          submit another person's private information without authorization.
+          Account-linked study records are generally kept while needed to
+          provide the account and its features, until you delete them, reset
+          your data or complete account deletion. Guest data remains on your
+          device until removed. Room presence is temporary.
+        </p>
+        <p>
+          Infrastructure logs, backups, historical analytics and security records
+          may have separate retention periods. StudyOS processes network
+          addresses and request information for abuse prevention, including
+          temporary or permanent IP restrictions where necessary. Expired
+          temporary restrictions are no longer applied and their records are
+          removed through background database cleanup. Records may be kept
+          longer where reasonably necessary to address abuse, legal obligations
+          or disputes. Exact provider retention periods depend on their service
+          configuration; contact us for information about a specific category.
         </p>
       </section>
 
       <section>
-        <h2>12. Security</h2>
+        <h2>13. Your privacy choices and requests</h2>
+        <p>
+          You may use the app's available controls to change study records,
+          disable public leaderboard participation, export study data, withdraw
+          optional analytics permission or request deletion. Depending on the
+          law that applies to you, you may also request access to personal data,
+          correction, erasure, restriction, portability, or withdrawal of consent
+          for processing that relies on consent, and raise a complaint with an
+          applicable data protection authority.
+        </p>
+        <p>
+          For requests or grievances relating to personal data, email{" "}
+          <a href="mailto:devvaibhav37@gmail.com?subject=StudyOS%20Privacy%20Request">
+            the StudyOS operator
+          </a>{" "}
+          with a description of your request. We may need to confirm your
+          identity or authority before disclosing or changing account information.
+          Do not include passwords or unnecessary sensitive information in email.
+        </p>
+      </section>
+
+      <section>
+        <h2>14. Children and guardians</h2>
+        <p>
+          StudyOS provides study tools that may be of interest to younger
+          people. If a parent or guardian's authorization is required by
+          applicable law, do not create an account or use features that process
+          a child's personal data without the required authorization. The
+          service does not currently provide a dedicated age-verification or
+          guardian-consent workflow.
+        </p>
+        <p>
+          If you are a parent or guardian and believe a child has provided
+          personal data without required authorization, contact us privately so
+          we can investigate and address access or deletion as appropriate.
+          Do not submit another person's private information without authorization.
+        </p>
+      </section>
+
+      <section>
+        <h2>15. Security</h2>
         <p>
           StudyOS uses the authentication and access controls implemented in the
           current application and backend, but no online service can promise
@@ -180,12 +271,14 @@ function Privacy() {
       </section>
 
       <section>
-        <h2>13. Changes and contact</h2>
+        <h2>16. Changes and contact</h2>
         <p>
-          This policy may change as StudyOS changes. Material product changes should
-          be reflected in an updated version of this page. For privacy questions or
-          direct project contact, email the StudyOS operator. Bug reports can also be
-          filed through the public GitHub issue tracker.
+          We will update this policy as our data practices change and provide
+          additional notice or request consent where required by applicable law.
+          This policy explains our data practices; it is not a substitute for
+          consent where consent is legally required. For privacy questions or
+          grievances, contact the independent StudyOS operator, Vaibhav.
+          Do not include personal data in public bug reports.
         </p>
         <p>
           <a href="mailto:devvaibhav37@gmail.com?subject=StudyOS%20Privacy">
